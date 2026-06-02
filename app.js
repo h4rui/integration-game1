@@ -195,3 +195,12 @@ function flash(color){
     document.body.style.boxShadow = "none";
   },200);
 }
+function start(){
+  document.getElementById("bgm").play();
+
+  i=0;
+  score=0;
+
+  nextQ();
+  startTimer();
+}
