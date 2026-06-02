@@ -1,5 +1,5 @@
-let i = 0;
-let score = 0;
+let enemyHP = 10;
+let playerHP = 5;
 let time = 300;
 let timer;
 let current;
@@ -8,7 +8,6 @@ function rand(min,max){
   return Math.floor(Math.random()*(max-min+1))+min;
 }
 
-// 数式評価
 function evalExpr(str){
   try {
     return math.evaluate(str);
@@ -17,7 +16,6 @@ function evalExpr(str){
   }
 }
 
-// +C除去
 function normalize(str){
   return str.replace(/\s/g,"").replace(/\+C/g,"").replace(/C/g,"");
 }
@@ -26,7 +24,6 @@ function normalize(str){
 function generateQuestion(){
 
   let diff = document.getElementById("difficulty").value;
-
   let type;
 
   if(diff==="easy") type = rand(1,2);
@@ -37,29 +34,19 @@ function generateQuestion(){
   if(type===1){
     let a = rand(-5,5);
     let n = rand(1,3);
-
-    return {
-      q:`∫ ${a}x^${n} dx`,
-      a:`${a/(n+1)}x^${n+1}`
-    };
+    return { q:`∫ ${a}x^${n} dx`, a:`${a/(n+1)}x^${n+1}` };
   }
 
   // sin
   if(type===2){
     let a = rand(1,5);
-    return {
-      q:`∫ ${a}sin(x) dx`,
-      a:`-${a}cos(x)`
-    };
+    return { q:`∫ ${a}sin(x) dx`, a:`-${a}cos(x)` };
   }
 
   // e^x
   if(type===3){
     let a = rand(1,5);
-    return {
-      q:`∫ ${a}e^x dx`,
-      a:`${a}e^x`
-    };
+    return { q:`∫ ${a}e^x dx`, a:`${a}e^x` };
   }
 
   // 定積分
@@ -71,10 +58,7 @@ function generateQuestion(){
 
     let ans = (A/(n+1))*(Math.pow(b,n+1)-Math.pow(a,n+1));
 
-    return {
-      q:`∫[${a}→${b}] ${A}x^${n} dx`,
-      a:`${ans}`
-    };
+    return { q:`∫[${a}→${b}] ${A}x^${n} dx`, a:`${ans}` };
   }
 
   // 四則演算
@@ -86,13 +70,13 @@ function generateQuestion(){
     if(op===1) return {q:`${a}+${b}`, a:`${a+b}`};
     if(op===2) return {q:`${a}-${b}`, a:`${a-b}`};
     if(op===3) return {q:`${a}×${b}`, a:`${a*b}`};
-    if(op===4) return {q:`${a}÷${b||1}`, a:`${a/(b||1)}`};
+    return {q:`${a}÷${b||1}`, a:`${a/(b||1)}`};
   }
 
-  // 積分×四則
-  let a = rand(1,3);
-  let n = rand(1,2);
-  let v = a/(n+1);
+  // 積分バトル
+  let a1 = rand(1,3);
+  let n1 = rand(1,2);
+  let v1 = a1/(n1+1);
 
   let a2 = rand(1,3);
   let n2 = rand(1,2);
@@ -100,17 +84,21 @@ function generateQuestion(){
 
   let op = rand(1,4);
 
-  if(op===1) return {q:"(∫x dx)+(∫x^2 dx)", a:`${v+v2}`};
-  if(op===2) return {q:"(∫x dx)-(∫x^2 dx)", a:`${v-v2}`};
-  if(op===3) return {q:"(∫x dx)×(∫x^2 dx)", a:`${v*v2}`};
-  return {q:"(∫x dx)÷(∫x^2 dx)", a:`${v/v2}`};
+  if(op===1) return {q:"(∫x dx)+(∫x^2 dx)", a:`${v1+v2}`};
+  if(op===2) return {q:"(∫x dx)-(∫x^2 dx)", a:`${v1-v2}`};
+  if(op===3) return {q:"(∫x dx)×(∫x^2 dx)", a:`${v1*v2}`};
+  return {q:"(∫x dx)÷(∫x^2 dx)", a:`${v1/v2}`};
 }
 
 // ===== スタート =====
 function start(){
+  document.getElementById("bgm").volume = 0.2;
   document.getElementById("bgm").play();
-  i=0;
-  score=0;
+
+  enemyHP = 10;
+  playerHP = 5;
+
+  updateHP();
   nextQ();
   startTimer();
 }
@@ -118,11 +106,11 @@ function start(){
 // ===== タイマー =====
 function startTimer(){
   clearInterval(timer);
-  time=300;
+  time = 300;
 
-  timer=setInterval(()=>{
+  timer = setInterval(()=>{
     time--;
-    document.getElementById("timer").innerText=
+    document.getElementById("timer").innerText =
     "⏰ "+Math.floor(time/60)+":"+String(time%60).padStart(2,"0");
 
     if(time<=0) next();
@@ -132,9 +120,8 @@ function startTimer(){
 // ===== 出題 =====
 function nextQ(){
   current = generateQuestion();
-  document.getElementById("q").innerText=
-  current.q;
-  document.getElementById("ans").value="";
+  document.getElementById("q").innerText = current.q;
+  document.getElementById("ans").value = "";
 }
 
 // ===== 回答 =====
@@ -156,24 +143,38 @@ function submit(){
   }
 
   if(ok){
-    score++;
+    enemyHP--;
     document.getElementById("se_correct").play();
-    document.getElementById("result").innerText="○ 正解";
+    document.getElementById("result").innerText="○ 攻撃成功！";
   } else {
+    playerHP--;
     document.getElementById("se_wrong").play();
-    document.getElementById("result").innerText="× 不正解";
+    document.getElementById("result").innerText="× ダメージ！";
   }
 
+  updateHP();
   next();
+}
+
+// ===== HP更新 =====
+function updateHP(){
+  document.getElementById("ehp").innerText = enemyHP;
+  document.getElementById("php").innerText = playerHP;
 }
 
 // ===== 次 =====
 function next(){
-  i++;
-  if(i>=5){
-    document.body.innerHTML=`<h1>結果 ${score}/5</h1>`;
-  } else {
-    nextQ();
-    startTimer();
+
+  if(enemyHP<=0){
+    document.body.innerHTML="<h1>勝利！</h1>";
+    return;
   }
+
+  if(playerHP<=0){
+    document.body.innerHTML="<h1>敗北...</h1>";
+    return;
+  }
+
+  nextQ();
+  startTimer();
 }

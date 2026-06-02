@@ -2,83 +2,58 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>積分でGO</title>
+<title>積分バトルGO</title>
 
 <style>
 body{
   margin:0;
   background: radial-gradient(circle, #111, #000);
   color:white;
-  font-family: sans-serif;
   text-align:center;
+  font-family:sans-serif;
 }
 
-/* タイトル */
 h1{
-  font-size:40px;
-  margin-top:20px;
   color:#00ffcc;
   text-shadow:0 0 10px #00ffcc;
 }
 
-/* 問題 */
 #q{
-  font-size:70px;
-  margin:40px 0;
+  font-size:60px;
+  margin:30px;
   text-shadow:0 0 20px #00ffcc;
 }
 
-/* 入力 */
 input{
   font-size:40px;
-  padding:10px;
   width:80%;
-  border-radius:10px;
-  border:none;
-  outline:none;
   text-align:center;
 }
 
-/* ボタン */
 button{
-  font-size:35px;
-  margin-top:20px;
-  padding:10px 30px;
-  border:none;
-  border-radius:15px;
-  background:#00ffcc;
-  color:black;
-  cursor:pointer;
-  box-shadow:0 0 20px #00ffcc;
-  transition:0.2s;
-}
-
-button:hover{
-  transform:scale(1.1);
-}
-
-/* タイマー */
-#timer{
   font-size:30px;
-  margin-top:10px;
-  color:#ffcc00;
+  margin:10px;
+  padding:10px 20px;
+  background:#00ffcc;
+  border:none;
+  border-radius:10px;
 }
 
-/* 結果 */
-#result{
-  font-size:40px;
-  margin-top:20px;
+#timer{
+  font-size:25px;
+  color:yellow;
+}
+
+#enemy, #player{
+  font-size:30px;
+  margin:10px;
 }
 </style>
 </head>
 
 <body>
 
-<h1>積分でGO</h1>
-
-<div id="timer"></div>
-
-<div id="q">START</div>
+<h1>積分バトルGO</h1>
 
 <select id="difficulty">
   <option value="easy">かんたん</option>
@@ -86,7 +61,12 @@ button:hover{
   <option value="hard">むずかしい</option>
 </select>
 
-<br>
+<div id="timer"></div>
+
+<div id="enemy">👾 敵HP: <span id="ehp">10</span></div>
+<div id="player">❤️ あなたHP: <span id="php">5</span></div>
+
+<div id="q">START</div>
 
 <input id="ans" placeholder="答え">
 
@@ -109,10 +89,8 @@ button:hover{
   <source src="wrong.mp3">
 </audio>
 
+<script src="https://cdn.jsdelivr.net/npm/mathjs@11.11.0/lib/browser/math.js"></script>
 <script src="app.js"></script>
 
 </body>
 </html>
-<audio id="bgm" loop>
-  <source src="bgm.mp3" type="audio/mpeg">
-</audio>
