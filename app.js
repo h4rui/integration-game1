@@ -4,11 +4,11 @@ let time = 300;
 let timer;
 let current;
 
-function rand(min, max){
+function rand(min,max){
   return Math.floor(Math.random()*(max-min+1))+min;
 }
 
-// 数式評価（分数・小数・√対応用）
+// 数式評価
 function evalExpr(str){
   try {
     return math.evaluate(str);
@@ -17,21 +17,24 @@ function evalExpr(str){
   }
 }
 
-// +C削除など
+// +C除去
 function normalize(str){
-  return str
-    .replace(/\s/g,"")
-    .replace(/\+C/g,"")
-    .replace(/C/g,"");
+  return str.replace(/\s/g,"").replace(/\+C/g,"").replace(/C/g,"");
 }
 
-// ===== 問題生成（完全ランダム）=====
+// ===== 問題生成 =====
 function generateQuestion(){
 
-  let type = rand(1,5);
+  let diff = document.getElementById("difficulty").value;
 
-  // ① 不定積分
-  if(type === 1){
+  let type;
+
+  if(diff==="easy") type = rand(1,2);
+  if(diff==="normal") type = rand(1,4);
+  if(diff==="hard") type = rand(1,6);
+
+  // 不定積分
+  if(type===1){
     let a = rand(-5,5);
     let n = rand(1,3);
 
@@ -41,35 +44,32 @@ function generateQuestion(){
     };
   }
 
-  // ② sin
-  if(type === 2){
+  // sin
+  if(type===2){
     let a = rand(1,5);
-
     return {
       q:`∫ ${a}sin(x) dx`,
       a:`-${a}cos(x)`
     };
   }
 
-  // ③ e^x
-  if(type === 3){
+  // e^x
+  if(type===3){
     let a = rand(1,5);
-
     return {
       q:`∫ ${a}e^x dx`,
       a:`${a}e^x`
     };
   }
 
-  // ④ 定積分
-  if(type === 4){
+  // 定積分
+  if(type===4){
     let a = rand(1,3);
     let b = rand(4,8);
     let A = rand(1,3);
     let n = rand(1,2);
 
-    let ans =
-      (A/(n+1))*(Math.pow(b,n+1)-Math.pow(a,n+1));
+    let ans = (A/(n+1))*(Math.pow(b,n+1)-Math.pow(a,n+1));
 
     return {
       q:`∫[${a}→${b}] ${A}x^${n} dx`,
@@ -77,38 +77,33 @@ function generateQuestion(){
     };
   }
 
-  // ⑤ 四則演算
-  let a = rand(-10,10);
-  let b = rand(-10,10);
+  // 四則演算
+  if(type===5){
+    let a = rand(-10,10);
+    let b = rand(-10,10);
+    let op = rand(1,4);
+
+    if(op===1) return {q:`${a}+${b}`, a:`${a+b}`};
+    if(op===2) return {q:`${a}-${b}`, a:`${a-b}`};
+    if(op===3) return {q:`${a}×${b}`, a:`${a*b}`};
+    if(op===4) return {q:`${a}÷${b||1}`, a:`${a/(b||1)}`};
+  }
+
+  // 積分×四則
+  let a = rand(1,3);
+  let n = rand(1,2);
+  let v = a/(n+1);
+
+  let a2 = rand(1,3);
+  let n2 = rand(1,2);
+  let v2 = a2/(n2+1);
+
   let op = rand(1,4);
 
-  let q, ans;
-
-  if(op === 1){
-    q = `${a} + ${b}`;
-    ans = a + b;
-  }
-
-  if(op === 2){
-    q = `${a} - ${b}`;
-    ans = a - b;
-  }
-
-  if(op === 3){
-    q = `${a} × ${b}`;
-    ans = a * b;
-  }
-
-  if(op === 4){
-    if(b === 0) b = 1;
-    q = `${a} ÷ ${b}`;
-    ans = a / b;
-  }
-
-  return {
-    q: q,
-    a: String(ans)
-  };
+  if(op===1) return {q:"(∫x dx)+(∫x^2 dx)", a:`${v+v2}`};
+  if(op===2) return {q:"(∫x dx)-(∫x^2 dx)", a:`${v-v2}`};
+  if(op===3) return {q:"(∫x dx)×(∫x^2 dx)", a:`${v*v2}`};
+  return {q:"(∫x dx)÷(∫x^2 dx)", a:`${v/v2}`};
 }
 
 // ===== スタート =====
@@ -127,21 +122,18 @@ function startTimer(){
 
   timer=setInterval(()=>{
     time--;
-
-    document.getElementById("timer").innerText =
+    document.getElementById("timer").innerText=
     "⏰ "+Math.floor(time/60)+":"+String(time%60).padStart(2,"0");
 
     if(time<=0) next();
   },1000);
 }
 
-// ===== 問題出題 =====
+// ===== 出題 =====
 function nextQ(){
   current = generateQuestion();
-
-  document.getElementById("q").innerText =
-  "問題 "+(i+1)+"/5\n\n"+current.q;
-
+  document.getElementById("q").innerText=
+  current.q;
   document.getElementById("ans").value="";
 }
 
@@ -155,12 +147,12 @@ function submit(){
 
   let ok = false;
 
-  if(userVal !== null && correctVal !== null){
-    ok = Math.abs(userVal - correctVal) < 1e-8;
+  if(userVal!==null && correctVal!==null){
+    ok = Math.abs(userVal-correctVal)<1e-8;
   }
 
   if(!ok){
-    ok = normalize(u) === normalize(current.a);
+    ok = normalize(u)===normalize(current.a);
   }
 
   if(ok){
@@ -169,8 +161,7 @@ function submit(){
     document.getElementById("result").innerText="○ 正解";
   } else {
     document.getElementById("se_wrong").play();
-    document.getElementById("result").innerText=
-    "× 不正解\n答え:"+current.a;
+    document.getElementById("result").innerText="× 不正解";
   }
 
   next();
@@ -179,28 +170,10 @@ function submit(){
 // ===== 次 =====
 function next(){
   i++;
-
   if(i>=5){
-    document.body.innerHTML =
-    `<h2>結果</h2><p>${score}/5</p>`;
+    document.body.innerHTML=`<h1>結果 ${score}/5</h1>`;
   } else {
     nextQ();
     startTimer();
   }
-}
-function flash(color){
-  document.body.style.boxShadow = `0 0 80px ${color}`;
-
-  setTimeout(()=>{
-    document.body.style.boxShadow = "none";
-  },200);
-}
-function start(){
-  document.getElementById("bgm").play();
-
-  i=0;
-  score=0;
-
-  nextQ();
-  startTimer();
 }
