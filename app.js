@@ -188,3 +188,10 @@ function next(){
     startTimer();
   }
 }
+function flash(color){
+  document.body.style.boxShadow = `0 0 80px ${color}`;
+
+  setTimeout(()=>{
+    document.body.style.boxShadow = "none";
+  },200);
+}

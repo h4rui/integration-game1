@@ -3,38 +3,113 @@
 <head>
 <meta charset="UTF-8">
 <title>積分でGO</title>
+
 <style>
-body { font-size: 22px; text-align:center; }
-button, input { font-size:20px; }
+body{
+  margin:0;
+  background: radial-gradient(circle, #111, #000);
+  color:white;
+  font-family: sans-serif;
+  text-align:center;
+}
+
+/* タイトル */
+h1{
+  font-size:40px;
+  margin-top:20px;
+  color:#00ffcc;
+  text-shadow:0 0 10px #00ffcc;
+}
+
+/* 問題 */
+#q{
+  font-size:70px;
+  margin:40px 0;
+  text-shadow:0 0 20px #00ffcc;
+}
+
+/* 入力 */
+input{
+  font-size:40px;
+  padding:10px;
+  width:80%;
+  border-radius:10px;
+  border:none;
+  outline:none;
+  text-align:center;
+}
+
+/* ボタン */
+button{
+  font-size:35px;
+  margin-top:20px;
+  padding:10px 30px;
+  border:none;
+  border-radius:15px;
+  background:#00ffcc;
+  color:black;
+  cursor:pointer;
+  box-shadow:0 0 20px #00ffcc;
+  transition:0.2s;
+}
+
+button:hover{
+  transform:scale(1.1);
+}
+
+/* タイマー */
+#timer{
+  font-size:30px;
+  margin-top:10px;
+  color:#ffcc00;
+}
+
+/* 結果 */
+#result{
+  font-size:40px;
+  margin-top:20px;
+}
 </style>
 </head>
+
 <body>
 
-<h2>積分でGO</h2>
-
-<button onclick="start()">スタート</button>
+<h1>積分でGO</h1>
 
 <div id="timer"></div>
-<div id="q"></div>
+
+<div id="q">START</div>
+
+<select id="difficulty">
+  <option value="easy">かんたん</option>
+  <option value="normal" selected>ふつう</option>
+  <option value="hard">むずかしい</option>
+</select>
+
+<br>
 
 <input id="ans" placeholder="答え">
 
-<button onclick="submit()">回答</button>
+<br>
+
+<button onclick="start()">スタート</button>
+<button onclick="submit()">決定</button>
 
 <div id="result"></div>
 
-<!-- BGM -->
 <audio id="bgm" loop>
-  <source src="bgm.mp3" type="audio/mpeg">
+  <source src="bgm.mp3">
+</audio>
+
+<audio id="se_correct">
+  <source src="correct.mp3">
+</audio>
+
+<audio id="se_wrong">
+  <source src="wrong.mp3">
 </audio>
 
 <script src="app.js"></script>
 
 </body>
 </html>
-<audio id="se_correct">
-  <source src="correct.mp3" type="audio/mpeg">
-</audio>
-<audio id="se_wrong">
-  <source src="wrong.mp3" type="audio/mpeg">
-</audio>
