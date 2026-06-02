@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>積分でGO</title>
+<style>
+body { font-size: 22px; text-align:center; }
+button, input { font-size:20px; }
+</style>
+</head>
+<body>
+
+<h2>積分でGO</h2>
+
+<button onclick="start()">スタート</button>
+
+<div id="timer"></div>
+<div id="q"></div>
+
+<input id="ans" placeholder="答え">
+
+<button onclick="submit()">回答</button>
+
+<div id="result"></div>
+
+<!-- BGM -->
+<audio id="bgm" loop>
+  <source src="bgm.mp3" type="audio/mpeg">
+</audio>
+
+<script src="app.js"></script>
+
+</body>
+</html>
+<audio id="se_correct">
+  <source src="correct.mp3" type="audio/mpeg">
+</audio>
+<audio id="se_wrong">
+  <source src="wrong.mp3" type="audio/mpeg">
+</audio>
