@@ -20,6 +20,22 @@ h1{
   text-shadow:0 0 10px #00ffcc;
 }
 
+.screen{
+  display:none;
+}
+
+.active{
+  display:block;
+}
+
+.modeBtn{
+  display:block;
+  width:80%;
+  margin:18px auto;
+  font-size:30px;
+  padding:18px;
+}
+
 #timer{
   font-size:30px;
   color:yellow;
@@ -79,7 +95,7 @@ h1{
 }
 
 #q{
-  font-size:46px;
+  font-size:42px;
   margin:30px;
   text-shadow:0 0 20px #00ffcc;
 }
@@ -104,7 +120,7 @@ input{
 }
 
 button{
-  font-size:28px;
+  font-size:26px;
   margin:10px;
   padding:10px 20px;
   background:#00ffcc;
@@ -217,30 +233,43 @@ button:hover{
 
 <body>
 
-<h1>⚔️ 積分バトル ⚔️</h1>
-
-<div id="timer">⏰ 5:00</div>
-
-<div id="enemy">👾 敵HP: <span id="ehp">10</span></div>
-<div class="hpFrame">
-  <div id="enemyBar" class="hpBar"></div>
+<div id="titleScreen" class="screen active">
+  <h1>⚔️ 数学バトル ⚔️</h1>
+  <button class="modeBtn" onclick="selectMode('integral')">積分</button>
+  <button class="modeBtn" onclick="selectMode('derivative')">微分</button>
+  <button class="modeBtn" onclick="selectMode('factor')">因数分解</button>
+  <button class="modeBtn" onclick="selectMode('expand')">展開</button>
 </div>
 
-<div id="player">❤️ あなたHP: <span id="php">5</span></div>
-<div class="hpFrame">
-  <div id="playerBar" class="hpBar"></div>
+<div id="gameScreen" class="screen">
+
+  <h1 id="modeTitle">⚔️ 積分バトル ⚔️</h1>
+
+  <div id="timer">⏰ 5:00</div>
+
+  <div id="enemy">👾 敵HP: <span id="ehp">10</span></div>
+  <div class="hpFrame">
+    <div id="enemyBar" class="hpBar"></div>
+  </div>
+
+  <div id="player">❤️ あなたHP: <span id="php">5</span></div>
+  <div class="hpFrame">
+    <div id="playerBar" class="hpBar"></div>
+  </div>
+
+  <div id="goText">GO!</div>
+  <div id="q">START</div>
+
+  <input id="ans" placeholder="答え">
+  <br>
+
+  <button onclick="start()">スタート</button>
+  <button onclick="submit()">決定</button>
+  <button onclick="backTitle()">タイトルへ</button>
+
+  <div id="result"></div>
+
 </div>
-
-<div id="goText">GO!</div>
-<div id="q">START</div>
-
-<input id="ans" placeholder="答え">
-<br>
-
-<button onclick="start()">スタート</button>
-<button onclick="submit()">決定</button>
-
-<div id="result"></div>
 
 <div id="slash"></div>
 <img id="samurai" src="samurai.png">

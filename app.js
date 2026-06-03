@@ -5,6 +5,7 @@ let timer;
 let current;
 let history = [];
 let usedQuestions = [];
+let mode = "integral";
 
 function rand(min,max){
   return Math.floor(Math.random()*(max-min+1))+min;
@@ -45,23 +46,34 @@ function coeff(num){
   return s;
 }
 
-function xPower(p){
-  if(p === 1) return "x";
-  return "x^" + p;
-}
-
 function qPower(p){
   if(p === 1) return "x";
   if(p === 2) return "x²";
   if(p === 3) return "x³";
   if(p === 4) return "x⁴";
   if(p === 5) return "x⁵";
+  if(p === 6) return "x⁶";
+  return "x^" + p;
+}
+
+function xPower(p){
+  if(p === 1) return "x";
   return "x^" + p;
 }
 
 function term(c,p){
+  if(c === 0) return "";
   if(p === 0) return frac(c);
   return coeff(c) + xPower(p);
+}
+
+function cleanDisplay(s){
+  return s
+    .replace(/\+\-/g,"-")
+    .replace(/\+\+/g,"+")
+    .replace(/^＋/,"")
+    .replace(/^\+/,"")
+    .replace(/\+C/g,"+C");
 }
 
 function normalize(str){
@@ -73,17 +85,51 @@ function normalize(str){
     .replace(/π/g,"pi");
 }
 
-function generateQuestion(){
+function selectMode(m){
+  mode = m;
 
-  let type = rand(1,21);
+  document.getElementById("titleScreen").classList.remove("active");
+  document.getElementById("gameScreen").classList.add("active");
+
+  let title = "⚔️ 積分バトル ⚔️";
+
+  if(mode === "derivative") title = "⚔️ 微分バトル ⚔️";
+  if(mode === "factor") title = "⚔️ 因数分解バトル ⚔️";
+  if(mode === "expand") title = "⚔️ 展開バトル ⚔️";
+
+  document.getElementById("modeTitle").innerText = title;
+
+  start();
+}
+
+function backTitle(){
+  clearInterval(timer);
+
+  document.getElementById("gameScreen").classList.remove("active");
+  document.getElementById("titleScreen").classList.add("active");
+
+  document.getElementById("bgm").pause();
+}
+
+function generateQuestion(){
+  if(mode === "integral") return generateIntegral();
+  if(mode === "derivative") return generateDerivative();
+  if(mode === "factor") return generateFactor();
+  if(mode === "expand") return generateExpand();
+}
+
+function generateIntegral(){
+
+  let type = rand(1,8);
 
   if(type===1){
-    let a = rand(-5,5);
-    if(a === 0) a = 1;
-    let n = rand(1,3);
+    let a = rand(-6,6);
+    if(a===0) a = 1;
+
+    let n = rand(1,5);
     let ans = a/(n+1);
 
-    return {
+    return{
       q:`∫ ${coeff(a)}${qPower(n)} dx`,
       a:`${ans}*x^${n+1}`,
       display:`${term(ans,n+1)}+C`
@@ -91,188 +137,267 @@ function generateQuestion(){
   }
 
   if(type===2){
-    let a = rand(1,5);
-    return {
-      q:`∫ ${a}sin(x) dx`,
-      a:`-${a}*cos(x)`,
-      display:`-${a}cos(x)+C`
+    let a = rand(-5,5);
+    let b = rand(-5,5);
+    let c = rand(-5,5);
+
+    if(a===0 && b===0 && c===0) a = 1;
+
+    let display = cleanDisplay(
+      `${term(a/3,3)}+${term(b/2,2)}+${term(c,1)}+C`
+    );
+
+    return{
+      q:`∫ (${coeff(a)}x²${b>=0?"+":""}${coeff(b)}x${c>=0?"+":""}${c}) dx`,
+      a:`${a/3}*x^3+${b/2}*x^2+${c}*x`,
+      display:display
     };
   }
 
   if(type===3){
+    let l = rand(0,3);
+    let r = rand(l+1,l+5);
     let a = rand(1,5);
-    return {
-      q:`∫ ${a}e^x dx`,
-      a:`${a}*exp(x)`,
-      display:`${a}e^x+C`
+    let n = rand(1,4);
+
+    let ans = (a/(n+1))*(Math.pow(r,n+1)-Math.pow(l,n+1));
+
+    return{
+      q:`∫[${l}→${r}] ${coeff(a)}${qPower(n)} dx`,
+      a:`${ans}`,
+      display:frac(ans)
     };
   }
 
   if(type===4){
-    let a = rand(1,3);
-    let b = rand(4,8);
-    let A = rand(1,3);
-    let n = rand(1,2);
-    let ans = (A/(n+1))*(Math.pow(b,n+1)-Math.pow(a,n+1));
+    let l = rand(0,2);
+    let r = rand(l+1,l+4);
 
-    return {
-      q:`∫[${a}→${b}] ${coeff(A)}${qPower(n)} dx`,
+    let a = rand(-4,4);
+    let b = rand(-4,4);
+    let c = rand(-4,4);
+
+    if(a===0 && b===0 && c===0) a = 1;
+
+    let ans =
+      (a/3)*(Math.pow(r,3)-Math.pow(l,3))+
+      (b/2)*(Math.pow(r,2)-Math.pow(l,2))+
+      c*(r-l);
+
+    return{
+      q:`∫[${l}→${r}] (${coeff(a)}x²${b>=0?"+":""}${coeff(b)}x${c>=0?"+":""}${c}) dx`,
       a:`${ans}`,
       display:frac(ans)
     };
   }
 
   if(type===5){
-    let a = rand(0,2);
-    let b = rand(3,5);
-    let ans =
-      ((Math.pow(b,2)-Math.pow(a,2))/2) +
-      ((Math.pow(b,3)-Math.pow(a,3))/3);
+    let a = rand(1,6);
+    let k = rand(1,4);
 
-    return {
-      q:`∫[${a}→${b}] (x+x²) dx`,
-      a:`${ans}`,
-      display:frac(ans)
+    return{
+      q:`∫ ${coeff(a)}sin(${k===1?"x":k+"x"}) dx`,
+      a:`-${a}*cos(${k}*x)/${k}`,
+      display:`-${frac(a/k)}cos(${k===1?"x":k+"x"})+C`
     };
   }
 
   if(type===6){
-    let a = rand(0,2);
-    let b = rand(3,5);
-    let ans =
-      ((Math.pow(b,3)-Math.pow(a,3))/3) -
-      ((Math.pow(b,2)-Math.pow(a,2))/2);
+    let a = rand(1,6);
+    let k = rand(1,4);
 
-    return {
-      q:`∫[${a}→${b}] (x²-x) dx`,
-      a:`${ans}`,
-      display:frac(ans)
+    return{
+      q:`∫ ${coeff(a)}cos(${k===1?"x":k+"x"}) dx`,
+      a:`${a}*sin(${k}*x)/${k}`,
+      display:`${frac(a/k)}sin(${k===1?"x":k+"x"})+C`
     };
   }
 
   if(type===7){
-    let a = rand(0,2);
-    let b = rand(3,5);
-    let ans =
-      2*((Math.pow(b,2)-Math.pow(a,2))/2) +
-      3*(b-a);
+    let a = rand(1,6);
+    let k = rand(1,4);
 
-    return {
-      q:`∫[${a}→${b}] (2x+3) dx`,
-      a:`${ans}`,
-      display:frac(ans)
+    return{
+      q:`∫ ${coeff(a)}e^(${k===1?"x":k+"x"}) dx`,
+      a:`${a}*exp(${k}*x)/${k}`,
+      display:`${frac(a/k)}e^(${k===1?"x":k+"x"})+C`
     };
   }
 
   if(type===8){
-    return {
-      q:`∫[0→π] sin(x) dx`,
-      a:`2`,
-      display:`2`
+    let a = rand(1,5);
+    let b = rand(-5,5);
+    let n = rand(2,4);
+    let bottom = a*(n+1);
+
+    return{
+      q:`∫ (${a}x${b>=0?"+":""}${b})${n===2?"²":n===3?"³":"⁴"} dx`,
+      a:`(${a}*x+${b})^${n+1}/${bottom}`,
+      display:`(${a}x${b>=0?"+":""}${b})^${n+1}/${bottom}+C`
+    };
+  }
+}
+
+function generateDerivative(){
+
+  let type = rand(1,5);
+
+  if(type===1){
+    let a = rand(-6,6);
+    if(a===0) a = 1;
+    let n = rand(2,6);
+
+    let ansC = a*n;
+
+    return{
+      q:`d/dx ${coeff(a)}${qPower(n)}`,
+      a:`${ansC}*x^${n-1}`,
+      display:`${term(ansC,n-1)}`
     };
   }
 
-  if(type===9){
-    return {
-      q:"∫ (2x+1)² dx",
-      a:"(4/3)*x^3+2*x^2+x",
-      display:"4x^3/3+2x^2+x+C"
+  if(type===2){
+    let a = rand(-5,5);
+    let b = rand(-5,5);
+    let c = rand(-5,5);
+    if(a===0 && b===0) a = 1;
+
+    let display = cleanDisplay(
+      `${term(3*a,2)}+${term(2*b,1)}+${c}`
+    );
+
+    return{
+      q:`d/dx (${coeff(a)}x³${b>=0?"+":""}${coeff(b)}x²${c>=0?"+":""}${c}x)`,
+      a:`${3*a}*x^2+${2*b}*x+${c}`,
+      display:display
     };
   }
 
-  if(type===10){
-    return {
-      q:"∫ (x+1)(x-1) dx",
-      a:"(1/3)*x^3-x",
-      display:"x^3/3-x+C"
+  if(type===3){
+    let a = rand(1,6);
+    let k = rand(1,4);
+
+    return{
+      q:`d/dx ${coeff(a)}sin(${k===1?"x":k+"x"})`,
+      a:`${a*k}*cos(${k}*x)`,
+      display:`${coeff(a*k)}cos(${k===1?"x":k+"x"})`
     };
   }
 
-  if(type===11){
-    return {
-      q:"∫ (x²+1) dx",
-      a:"(1/3)*x^3+x",
-      display:"x^3/3+x+C"
+  if(type===4){
+    let a = rand(1,6);
+    let k = rand(1,4);
+
+    return{
+      q:`d/dx ${coeff(a)}cos(${k===1?"x":k+"x"})`,
+      a:`-${a*k}*sin(${k}*x)`,
+      display:`-${coeff(a*k)}sin(${k===1?"x":k+"x"})`
     };
   }
 
-  if(type===12){
-    return {
-      q:"∫ (x²+2x+1) dx",
-      a:"(1/3)*x^3+x^2+x",
-      display:"x^3/3+x^2+x+C"
+  if(type===5){
+    let a = rand(1,6);
+    let k = rand(1,4);
+
+    return{
+      q:`d/dx ${coeff(a)}e^(${k===1?"x":k+"x"})`,
+      a:`${a*k}*exp(${k}*x)`,
+      display:`${coeff(a*k)}e^(${k===1?"x":k+"x"})`
+    };
+  }
+}
+
+function generateFactor(){
+
+  let type = rand(1,4);
+
+  if(type===1){
+    let a = rand(1,8);
+    let b = rand(1,8);
+
+    return{
+      q:`x²+${a+b}x+${a*b} を因数分解`,
+      a:`(x+${a})*(x+${b})`,
+      display:`(x+${a})(x+${b})`
     };
   }
 
-  if(type===13){
-    return {
-      q:"∫[0→1] (3x²+2x+1) dx",
-      a:"3",
-      display:"3"
+  if(type===2){
+    let a = rand(1,8);
+    let b = rand(1,8);
+
+    return{
+      q:`x²-${a+b}x+${a*b} を因数分解`,
+      a:`(x-${a})*(x-${b})`,
+      display:`(x-${a})(x-${b})`
     };
   }
 
-  if(type===14){
-    return {
-      q:"∫ sin(2x) dx",
-      a:"-cos(2*x)/2",
-      display:"-cos(2x)/2+C"
+  if(type===3){
+    let a = rand(1,8);
+    let b = rand(1,8);
+
+    return{
+      q:`x²+${b-a}x-${a*b} を因数分解`,
+      a:`(x-${a})*(x+${b})`,
+      display:`(x-${a})(x+${b})`
     };
   }
 
-  if(type===15){
-    return {
-      q:"∫ cos(2x) dx",
-      a:"sin(2*x)/2",
-      display:"sin(2x)/2+C"
+  if(type===4){
+    let a = rand(2,9);
+
+    return{
+      q:`x²-${a*a} を因数分解`,
+      a:`(x-${a})*(x+${a})`,
+      display:`(x-${a})(x+${a})`
+    };
+  }
+}
+
+function generateExpand(){
+
+  let type = rand(1,4);
+
+  if(type===1){
+    let a = rand(1,8);
+    let b = rand(1,8);
+
+    return{
+      q:`(x+${a})(x+${b}) を展開`,
+      a:`x^2+${a+b}*x+${a*b}`,
+      display:`x^2+${a+b}x+${a*b}`
     };
   }
 
-  if(type===16){
-    return {
-      q:"∫ (3x²-2x) dx",
-      a:"x^3-x^2",
-      display:"x^3-x^2+C"
+  if(type===2){
+    let a = rand(1,8);
+    let b = rand(1,8);
+
+    return{
+      q:`(x-${a})(x-${b}) を展開`,
+      a:`x^2-${a+b}*x+${a*b}`,
+      display:`x^2-${a+b}x+${a*b}`
     };
   }
 
-  if(type===17){
-    return {
-      q:"∫ (x³-x²+x) dx",
-      a:"x^4/4-x^3/3+x^2/2",
-      display:"x^4/4-x^3/3+x^2/2+C"
+  if(type===3){
+    let a = rand(1,8);
+
+    return{
+      q:`(x+${a})² を展開`,
+      a:`x^2+${2*a}*x+${a*a}`,
+      display:`x^2+${2*a}x+${a*a}`
     };
   }
 
-  if(type===18){
-    return {
-      q:"∫ (x²+1)/2 dx",
-      a:"x^3/6+x/2",
-      display:"x^3/6+x/2+C"
-    };
-  }
+  if(type===4){
+    let a = rand(1,8);
 
-  if(type===19){
-    return {
-      q:"∫ (3x²-2x+1)/3 dx",
-      a:"x^3-(1/3)*x^2+x/3",
-      display:"x^3-x^2/3+x/3+C"
-    };
-  }
-
-  if(type===20){
-    return {
-      q:"∫ (x+1)³ dx",
-      a:"x^4/4+x^3+(3/2)*x^2+x",
-      display:"x^4/4+x^3+3x^2/2+x+C"
-    };
-  }
-
-  if(type===21){
-    return {
-      q:"∫ (2x-1)² dx",
-      a:"(4/3)*x^3-2*x^2+x",
-      display:"4x^3/3-2x^2+x+C"
+    return{
+      q:`(x-${a})² を展開`,
+      a:`x^2-${2*a}*x+${a*a}`,
+      display:`x^2-${2*a}x+${a*a}`
     };
   }
 }
@@ -384,20 +509,16 @@ function submit(){
 
   if(!ok){
     try{
-      let userVal = math.evaluate(normalize(u));
-      let correctVal = math.evaluate(current.a);
+      let userVal = math.simplify(normalize(u)).toString();
+      let correctVal = math.simplify(current.a).toString();
 
-      if(
-        typeof userVal === "number" &&
-        typeof correctVal === "number" &&
-        Math.abs(userVal-correctVal) < 1e-8
-      ){
+      if(userVal === correctVal){
         ok = true;
       }
     }catch(e){}
 
     if(!ok){
-      ok = normalize(u) === normalize(current.a);
+      ok = normalize(u) === normalize(current.display);
     }
   }
 
@@ -502,6 +623,7 @@ function showEnd(text){
   document.getElementById("ans").value = "";
 
   let html = `<button onclick="start()">もう一回</button>`;
+  html += `<button onclick="backTitle()">タイトルへ</button>`;
   html += `<h2>解いた問題一覧</h2>`;
 
   for(let i=0; i<history.length; i++){
