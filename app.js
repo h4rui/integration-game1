@@ -45,10 +45,14 @@ function coeff(num){
   return s;
 }
 
+function xPower(p){
+  if(p === 1) return "x";
+  return "x^" + p;
+}
+
 function term(c,p){
   if(p === 0) return frac(c);
-  if(p === 1) return coeff(c) + "x";
-  return coeff(c) + "x^" + p;
+  return coeff(c) + xPower(p);
 }
 
 function normalize(str){
@@ -72,7 +76,7 @@ function generateQuestion(){
     let ans = a/(n+1);
 
     return {
-      q:`∫ ${a}x^${n} dx`,
+      q:`∫ ${coeff(a)}${xPower(n)} dx`,
       a:`${ans}*x^${n+1}`,
       display:`${term(ans,n+1)}+C`
     };
@@ -107,7 +111,7 @@ function generateQuestion(){
     let ans = (A/(n+1))*(Math.pow(b,n+1)-Math.pow(a,n+1));
 
     return {
-      q:`∫[${a}→${b}] ${A}x^${n} dx`,
+      q:`∫[${a}→${b}] ${coeff(A)}${xPower(n)} dx`,
       a:`${ans}`,
       display:frac(ans)
     };
@@ -159,12 +163,10 @@ function generateQuestion(){
   }
 
   if(type===8){
-    let ans = 2;
-
     return {
       q:`∫[0→π] sin(x) dx`,
-      a:`${ans}`,
-      display:frac(ans)
+      a:`2`,
+      display:`2`
     };
   }
 }
