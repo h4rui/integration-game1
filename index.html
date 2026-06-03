@@ -31,6 +31,29 @@ h1{
   padding:18px;
 }
 
+button{
+  font-size:24px;
+  margin:10px;
+  padding:10px 20px;
+  background:#00ffcc;
+  border:none;
+  border-radius:10px;
+}
+
+button:hover{
+  transform:scale(1.08);
+  box-shadow:0 0 20px #00ffcc;
+}
+
+input{
+  font-size:35px;
+  width:80%;
+  text-align:center;
+  border-radius:15px;
+  padding:10px;
+  border:none;
+}
+
 #profileIcon{
   width:90px;
   height:90px;
@@ -40,16 +63,7 @@ h1{
   border:2px solid #00ffcc;
 }
 
-#playerName{
-  font-size:24px;
-  width:70%;
-  margin:10px;
-  text-align:center;
-  border-radius:12px;
-  padding:8px;
-}
-
-#currentTitle{
+#currentTitle,#levelInfo{
   font-size:20px;
   margin:10px;
 }
@@ -96,6 +110,20 @@ h1{
 #enemyBar{background:linear-gradient(90deg,red,orange);}
 #playerBar{background:linear-gradient(90deg,lime,#00ffcc);}
 
+#q{
+  font-size:42px;
+  margin:30px;
+  text-shadow:0 0 20px #00ffcc;
+}
+
+.questionAnim{animation:questionPop .5s;}
+
+@keyframes questionPop{
+  0%{opacity:0;transform:scale(.5) rotate(-3deg);}
+  70%{opacity:1;transform:scale(1.08) rotate(2deg);}
+  100%{opacity:1;transform:scale(1) rotate(0);}
+}
+
 #goText{
   position:fixed;
   top:35%;
@@ -117,50 +145,41 @@ h1{
   100%{opacity:0;transform:translate(-50%,-50%) scale(2);}
 }
 
-#q{
-  font-size:42px;
-  margin:30px;
-  text-shadow:0 0 20px #00ffcc;
+#slash{
+  position:fixed;
+  left:50%;
+  top:40%;
+  font-size:120px;
+  opacity:0;
+  pointer-events:none;
+  z-index:20;
 }
 
-.questionAnim{animation:questionPop .5s;}
+.showSlash{animation:slashAnim .5s;}
 
-@keyframes questionPop{
-  0%{opacity:0;transform:scale(.5) rotate(-3deg);}
-  70%{opacity:1;transform:scale(1.08) rotate(2deg);}
-  100%{opacity:1;transform:scale(1) rotate(0);}
+@keyframes slashAnim{
+  0%{opacity:1;transform:translate(-50%,-50%) scale(0);}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(2);}
 }
 
-input{
-  font-size:35px;
-  width:80%;
-  text-align:center;
-  border-radius:15px;
-  padding:10px;
-  border:none;
+.enemyHit{animation:shake .4s;}
+
+@keyframes shake{
+  0%{transform:translateX(0);}
+  25%{transform:translateX(-20px);}
+  50%{transform:translateX(20px);}
+  75%{transform:translateX(-20px);}
+  100%{transform:translateX(0);}
 }
 
-button{
-  font-size:24px;
-  margin:10px;
-  padding:10px 20px;
-  background:#00ffcc;
-  border:none;
-  border-radius:10px;
+.playerHit{animation:flash .4s;}
+
+@keyframes flash{
+  0%{background:red;}
+  100%{background:radial-gradient(circle,#111,#000);}
 }
 
-button:hover{
-  transform:scale(1.08);
-  box-shadow:0 0 20px #00ffcc;
-}
-
-#result,#panelArea{
-  font-size:22px;
-  margin-top:20px;
-  font-weight:bold;
-}
-
-.rankItem,.titleItem,.profileItem,.settingsItem{
+.rankItem,.titleItem,.profileItem,.settingsItem,.missionItem,.reviewItem,.explainBox{
   background:rgba(255,255,255,0.12);
   margin:10px auto;
   padding:10px;
@@ -177,47 +196,6 @@ button:hover{
   object-fit:cover;
   vertical-align:middle;
   margin-right:8px;
-}
-
-@keyframes shake{
-  0%{transform:translateX(0);}
-  25%{transform:translateX(-20px);}
-  50%{transform:translateX(20px);}
-  75%{transform:translateX(-20px);}
-  100%{transform:translateX(0);}
-}
-
-.enemyHit{animation:shake .4s;}
-.enemySpawn{animation:enemySpawnAnim .8s;}
-
-@keyframes enemySpawnAnim{
-  0%{opacity:0;transform:translateY(-200px) scale(.3);}
-  60%{opacity:1;transform:translateY(20px) scale(1.2);}
-  100%{opacity:1;transform:translateY(0) scale(1);}
-}
-
-@keyframes flash{
-  0%{background:red;}
-  100%{background:radial-gradient(circle,#111,#000);}
-}
-
-.playerHit{animation:flash .4s;}
-
-#slash{
-  position:fixed;
-  left:50%;
-  top:40%;
-  font-size:120px;
-  opacity:0;
-  pointer-events:none;
-  z-index:20;
-}
-
-.showSlash{animation:slashAnim .5s;}
-
-@keyframes slashAnim{
-  0%{opacity:1;transform:translate(-50%,-50%) scale(0);}
-  100%{opacity:0;transform:translate(-50%,-50%) scale(2);}
 }
 
 #adArea{
@@ -241,18 +219,18 @@ button:hover{
 <div id="homeScreen" class="screen active">
   <h1>🏆 数学マスター 🏆</h1>
 
-  <div>
-    <img id="profileIcon" src="">
-    <br>
-    <div id="currentTitle">称号：初心者</div>
-  </div>
+  <img id="profileIcon" src="">
+  <div id="currentTitle">称号：初心者</div>
+  <div id="levelInfo">Lv1</div>
 
   <button class="modeBtn" onclick="showStudyMenu()">📚 学習モード</button>
   <button class="modeBtn" onclick="selectMode('random')">⚔️ ランキングモード</button>
   <button class="modeBtn" onclick="showTitles()">🏅 称号一覧</button>
   <button class="modeBtn" onclick="showWorldRanking()">🌍 週間ランキング</button>
-  <button class="modeBtn" onclick="showSettings()">⚙️ 設定</button>
+  <button class="modeBtn" onclick="showDailyMission()">🎯 デイリーミッション</button>
+  <button class="modeBtn" onclick="showReviewList()">📚 復習リスト</button>
   <button class="modeBtn" onclick="showProfile()">👤 プロフィール</button>
+  <button class="modeBtn" onclick="showSettings()">⚙️ 設定</button>
 
   <div id="panelArea"></div>
 </div>
@@ -260,7 +238,7 @@ button:hover{
 <div id="gameScreen" class="screen">
   <h1 id="modeTitle">🏆 数学マスター 🏆</h1>
 
-  <div id="timer">⏰ 5:00</div>
+  <div id="timer"></div>
 
   <div id="enemy">👾 敵HP: <span id="ehp">10</span></div>
   <div class="hpFrame" id="enemyFrame">
@@ -278,7 +256,6 @@ button:hover{
   <input id="ans" placeholder="答え">
   <br>
 
-  <button onclick="start()">スタート</button>
   <button onclick="submit()">決定</button>
   <button onclick="backHome()">ホームへ</button>
 
@@ -296,6 +273,7 @@ button:hover{
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+
 import {
   getFirestore,
   collection,
@@ -329,27 +307,27 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
+provider.setCustomParameters({ prompt:"select_account" });
 
 window.currentUser = null;
 
-onAuthStateChanged(auth, user=>{
+onAuthStateChanged(auth,user=>{
   window.currentUser = user;
-  if(window.refreshLoginStatus){
-    window.refreshLoginStatus();
-  }
+  if(window.refreshLoginStatus) window.refreshLoginStatus();
 });
 
 window.loginGoogle = async function(){
   try{
-    const result = await signInWithPopup(auth, provider);
+    const result = await signInWithPopup(auth,provider);
     window.currentUser = result.user;
-    alert("Googleログイン成功");
+    alert("Googleログイン成功：" + result.user.displayName);
     if(window.refreshLoginStatus) window.refreshLoginStatus();
   }catch(e){
-    console.log(e);
-    alert("Googleログインに失敗しました");
+    console.error(e);
+    alert("Googleログイン失敗：" + e.code);
   }
 };
 
@@ -362,22 +340,16 @@ window.logoutGoogle = async function(){
 
 function getWeekKey(){
   const now = new Date();
-
-  const japan = new Date(
-    now.toLocaleString("en-US", { timeZone:"Asia/Tokyo" })
-  );
-
+  const japan = new Date(now.toLocaleString("en-US",{timeZone:"Asia/Tokyo"}));
   const day = japan.getDay();
   const diffToMonday = day === 0 ? -6 : 1 - day;
-
   const monday = new Date(japan);
-  monday.setDate(japan.getDate() + diffToMonday);
+  monday.setDate(japan.getDate()+diffToMonday);
   monday.setHours(0,0,0,0);
 
   const y = monday.getFullYear();
   const m = String(monday.getMonth()+1).padStart(2,"0");
   const d = String(monday.getDate()).padStart(2,"0");
-
   return `${y}-${m}-${d}`;
 }
 
@@ -387,10 +359,9 @@ function getPlayerId(){
   }
 
   let playerId = localStorage.getItem("playerId");
-
   if(!playerId){
     playerId = crypto.randomUUID();
-    localStorage.setItem("playerId", playerId);
+    localStorage.setItem("playerId",playerId);
   }
 
   return "local_" + playerId;
@@ -401,19 +372,16 @@ window.saveWorldScore = async function(data){
   const playerId = getPlayerId();
 
   const docId = week + "_" + data.mode + "_" + playerId;
-  const ref = doc(db, "rankings", docId);
+  const ref = doc(db,"rankings",docId);
 
   const old = await getDoc(ref);
 
   if(old.exists()){
     const oldData = old.data();
-
-    if(oldData.score >= data.score){
-      return;
-    }
+    if(oldData.score >= data.score) return;
   }
 
-  await setDoc(ref, {
+  await setDoc(ref,{
     name:data.name,
     icon:data.icon,
     score:data.score,
@@ -421,6 +389,8 @@ window.saveWorldScore = async function(data){
     mode:data.mode,
     week:week,
     playerId:playerId,
+    googleName:window.currentUser ? window.currentUser.displayName : "",
+    googleEmail:window.currentUser ? window.currentUser.email : "",
     updatedAt:serverTimestamp()
   });
 };
@@ -441,7 +411,6 @@ window.loadWorldRanking = async function(){
   });
 
   list.sort((a,b)=>b.score-a.score);
-
   return list;
 };
 </script>

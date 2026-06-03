@@ -1,7 +1,5 @@
 let enemyHP = 10;
 let playerHP = 5;
-let time = 300;
-let timer;
 let current;
 let history = [];
 let usedQuestions = [];
@@ -22,13 +20,17 @@ let settings = {
 
 let playerData = {
   totalCorrect:0,
+  totalQuestions:0,
+  exp:0,
   playTime:0,
   maxCombo:0,
   consecutiveDays:0,
   lastPlayDate:"",
   unlockedTitles:["初心者"],
   equippedTitle:"初心者",
-  bestRandomScore:0
+  bestRandomScore:0,
+  reviewList:[],
+  dailyMission:{}
 };
 
 function rand(min,max){
@@ -45,12 +47,9 @@ function gcd(a,b){
 }
 
 function frac(num){
-  let eps = 1e-10;
-
   for(let d=1; d<=1000; d++){
     let n = Math.round(num*d);
-
-    if(Math.abs(num-n/d)<eps){
+    if(Math.abs(num - n/d) < 1e-10){
       let g = gcd(Math.abs(n),d);
       n/=g;
       d/=g;
@@ -58,7 +57,6 @@ function frac(num){
       return `${n}/${d}`;
     }
   }
-
   return String(num);
 }
 
@@ -104,6 +102,18 @@ function normalize(str){
     .replace(/⁶/g,"^6");
 }
 
+function getLevel(){
+  return Math.floor((playerData.exp || 0) / 100) + 1;
+}
+
+function getExpPercent(){
+  return (playerData.exp || 0) % 100;
+}
+
+function addExp(n){
+  playerData.exp = (playerData.exp || 0) + n;
+}
+
 function titleHTML(t){
   if(t === "⚡️創設者"){
     return `<span class="founderTitle">⚡️創設者</span>`;
@@ -121,16 +131,15 @@ function loadAllData(){
   let s = localStorage.getItem("settings");
   if(s) settings = JSON.parse(s);
 
-  if(!playerData.unlockedTitles){
-    playerData.unlockedTitles = ["初心者"];
-  }
-
-  if(!playerData.equippedTitle){
-    playerData.equippedTitle = "初心者";
-  }
+  if(!playerData.unlockedTitles) playerData.unlockedTitles = ["初心者"];
+  if(!playerData.equippedTitle) playerData.equippedTitle = "初心者";
+  if(!playerData.reviewList) playerData.reviewList = [];
+  if(!playerData.dailyMission) playerData.dailyMission = {};
+  if(!playerData.exp) playerData.exp = 0;
 
   applySettings();
-  updateCurrentTitle();
+  updateHomeStatus();
+  prepareDailyMission();
 }
 
 function saveAllData(){
@@ -141,9 +150,30 @@ function saveAllData(){
 
 window.addEventListener("load", loadAllData);
 
+function updateHomeStatus(){
+  let title = document.getElementById("currentTitle");
+  let level = document.getElementById("levelInfo");
+  let icon = document.getElementById("profileIcon");
+
+  if(title){
+    title.innerHTML = "称号：" + titleHTML(playerData.equippedTitle || "初心者");
+  }
+
+  if(level){
+    level.innerHTML =
+      `Lv${getLevel()}　EXP ${getExpPercent()}/100`;
+  }
+
+  if(icon && playerProfile.icon){
+    icon.src = playerProfile.icon;
+  }
+}
+
 function applySettings(){
-  const bgm = document.getElementById("bgm");
-  bgm.muted = !settings.bgm;
+  let bgm = document.getElementById("bgm");
+  if(bgm){
+    bgm.muted = !settings.bgm;
+  }
 }
 
 function toggleBGM(){
@@ -160,20 +190,13 @@ function toggleSE(){
 }
 
 function refreshLoginStatus(){
-  const el = document.getElementById("loginStatus");
+  let el = document.getElementById("loginStatus");
   if(!el) return;
 
   if(window.currentUser){
     el.innerText = "ログイン中：" + window.currentUser.displayName;
   }else{
     el.innerText = "未ログイン";
-  }
-}
-
-function updateCurrentTitle(){
-  const el = document.getElementById("currentTitle");
-  if(el){
-    el.innerHTML = "称号：" + titleHTML(playerData.equippedTitle || "初心者");
   }
 }
 
@@ -187,7 +210,7 @@ function equipTitle(t){
   if(playerData.unlockedTitles.includes(t)){
     playerData.equippedTitle = t;
     saveAllData();
-    updateCurrentTitle();
+    updateHomeStatus();
     showTitles();
   }
 }
@@ -198,6 +221,7 @@ function checkTitles(){
   let maxCombo = playerData.maxCombo || 0;
   let best = playerData.bestRandomScore || 0;
   let days = playerData.consecutiveDays || 0;
+  let level = getLevel();
 
   if(correct >= 5) unlockTitle("理系");
   if(correct >= 10) unlockTitle("数学初心者");
@@ -230,6 +254,17 @@ function checkTitles(){
   if(days >= 30) unlockTitle("継続は力なり");
   if(days >= 100) unlockTitle("数学狂");
 
+  if(level >= 5) unlockTitle("数学見習い");
+  if(level >= 10) unlockTitle("努力の証");
+  if(level >= 20) unlockTitle("数学修行者");
+  if(level >= 30) unlockTitle("数学戦士");
+  if(level >= 50) unlockTitle("数学エリート");
+  if(level >= 75) unlockTitle("数学の達人");
+  if(level >= 100) unlockTitle("数学マスター");
+  if(level >= 150) unlockTitle("超数学者");
+  if(level >= 200) unlockTitle("数式の支配者");
+  if(level >= 300) unlockTitle("数学神話");
+
   saveAllData();
 }
 
@@ -243,7 +278,10 @@ function allTitles(){
     "10連勝","50連勝","不敗神話",
     "電光石火","疾風迅雷","数学の怪物",
     "TOP10","TOP3","週間王👑",
-    "毎日勉強","継続は力なり","数学狂"
+    "毎日勉強","継続は力なり","数学狂",
+    "数学見習い","努力の証","数学修行者","数学戦士",
+    "数学エリート","数学の達人","数学マスター",
+    "超数学者","数式の支配者","数学神話"
   ];
 }
 
@@ -260,6 +298,115 @@ function showTitles(){
       <div class="titleItem">
         ${unlocked ? titleHTML(t) : "❓？？？"}
         ${unlocked ? `<button onclick="equipTitle('${t}')">装備</button>` : ""}
+      </div>
+    `;
+  }
+
+  box.innerHTML = html;
+}
+
+function getTodayKey(){
+  return new Date().toLocaleDateString("ja-JP", {
+    timeZone:"Asia/Tokyo"
+  });
+}
+
+function prepareDailyMission(){
+  let today = getTodayKey();
+
+  if(playerData.dailyMission.date === today) return;
+
+  let missions = [
+    { id:"correct10", text:"今日10問正解", need:10, count:0, done:false },
+    { id:"integral5", text:"積分を5問正解", need:5, count:0, done:false },
+    { id:"combo5", text:"5連勝する", need:5, count:0, done:false }
+  ];
+
+  playerData.dailyMission = {
+    date:today,
+    missions:missions
+  };
+
+  saveAllData();
+}
+
+function updateMission(type){
+  prepareDailyMission();
+
+  let ms = playerData.dailyMission.missions || [];
+
+  for(let m of ms){
+    if(m.done) continue;
+
+    if(m.id === "correct10" && type === "correct"){
+      m.count++;
+    }
+
+    if(m.id === "integral5" && type === "integral"){
+      m.count++;
+    }
+
+    if(m.id === "combo5" && combo >= 5){
+      m.count = 5;
+    }
+
+    if(m.count >= m.need){
+      m.done = true;
+      addExp(50);
+    }
+  }
+
+  saveAllData();
+}
+
+function showDailyMission(){
+  prepareDailyMission();
+
+  let box = document.getElementById("panelArea");
+  let html = "<h2>🎯 デイリーミッション</h2>";
+
+  for(let m of playerData.dailyMission.missions){
+    html += `
+      <div class="missionItem">
+        ${m.done ? "✅" : "⬜"} ${m.text}<br>
+        ${m.count}/${m.need}<br>
+        報酬：EXP 50
+      </div>
+    `;
+  }
+
+  box.innerHTML = html;
+}
+
+function addReviewItem(q){
+  if(!q) return;
+
+  playerData.reviewList.unshift({
+    q:q.q,
+    a:q.display,
+    explanation:q.explanation || "解説はありません"
+  });
+
+  playerData.reviewList = playerData.reviewList.slice(0,10);
+  saveAllData();
+}
+
+function showReviewList(){
+  let box = document.getElementById("panelArea");
+  let html = "<h2>📚 復習リスト</h2>";
+
+  if(playerData.reviewList.length === 0){
+    html += "<p>まだ復習問題はありません</p>";
+  }
+
+  for(let i=0;i<playerData.reviewList.length;i++){
+    let r = playerData.reviewList[i];
+
+    html += `
+      <div class="reviewItem">
+        <p>${i+1}. ${r.q}</p>
+        <p>正解：${r.a}</p>
+        <button onclick="alert('${String(r.explanation).replace(/'/g,"\\'")}')">解説を見る</button>
       </div>
     `;
   }
@@ -304,7 +451,7 @@ function showProfile(){
     <h2>👤 プロフィール</h2>
 
     <div class="profileItem">
-      <img id="profileIconEdit" src="${playerProfile.icon || ""}" class="rankIcon">
+      <img src="${playerProfile.icon || ""}" class="rankIcon">
       <br>
       <input id="playerNameEdit" placeholder="名前" value="${playerProfile.name || "名無し"}">
       <br>
@@ -314,12 +461,14 @@ function showProfile(){
     </div>
 
     <div class="profileItem">
-      <p>現在の称号：${titleHTML(playerData.equippedTitle || "初心者")}</p>
+      <p>称号：${titleHTML(playerData.equippedTitle || "初心者")}</p>
+      <p>Lv：${getLevel()}</p>
+      <p>EXP：${getExpPercent()}/100</p>
       <p>累計正解数：${playerData.totalCorrect || 0}問</p>
+      <p>累計問題数：${playerData.totalQuestions || 0}問</p>
       <p>プレイ時間：約${playMin}分</p>
       <p>最大連勝：${playerData.maxCombo || 0}</p>
       <p>ベストスコア：${playerData.bestRandomScore || 0}問</p>
-      <p>連続プレイ：${playerData.consecutiveDays || 0}日</p>
     </div>
   `;
 }
@@ -335,21 +484,20 @@ function saveProfileFromPanel(){
     reader.onload = function(e){
       playerProfile.icon = e.target.result;
       saveAllData();
+      updateHomeStatus();
       showProfile();
-      alert("プロフィールを保存したよ");
+      alert("保存したよ");
     };
     reader.readAsDataURL(file);
   }else{
     saveAllData();
+    updateHomeStatus();
     showProfile();
-    alert("プロフィールを保存したよ");
+    alert("保存したよ");
   }
 }
-
 function recordPlayDay(){
-  let today = new Date().toLocaleDateString("ja-JP", {
-    timeZone:"Asia/Tokyo"
-  });
+  let today = getTodayKey();
 
   if(!playerData.lastPlayDate){
     playerData.lastPlayDate = today;
@@ -393,7 +541,6 @@ function selectMode(m){
 }
 
 function backHome(){
-  clearInterval(timer);
   updatePlayTime();
 
   document.getElementById("gameScreen").classList.remove("active");
@@ -402,11 +549,11 @@ function backHome(){
   document.getElementById("bgm").pause();
 
   checkTitles();
-  updateCurrentTitle();
+  saveAllData();
+  updateHomeStatus();
 }
-function start(){
-  clearInterval(timer);
 
+function start(){
   history = [];
   usedQuestions = [];
   score = 0;
@@ -415,17 +562,16 @@ function start(){
 
   document.getElementById("result").innerHTML = "";
   document.getElementById("q").innerText = "START";
+  document.getElementById("timer").innerText = "";
 
   recordPlayDay();
 
   if(mode==="random"){
     enemyHP = 9999;
     playerHP = 1;
-    document.getElementById("timer").innerText = "";
   }else{
     enemyHP = 10;
     playerHP = 5;
-    document.getElementById("timer").innerText = "";
   }
 
   updateHP();
@@ -478,7 +624,8 @@ function generateIntegral(){
     return{
       q:`∫ ${coeff(a)}${qPower(n)} dx`,
       a:`${ans}*x^${n+1}`,
-      display:`${term(ans,n+1)}+C`
+      display:`${term(ans,n+1)}+C`,
+      explanation:`べき乗の積分公式を使います。∫x^n dx = x^(n+1)/(n+1)+C なので、係数${a}をつけて ${term(ans,n+1)}+C です。`
     };
   }
 
@@ -498,7 +645,8 @@ function generateIntegral(){
     return{
       q:`∫ (${coeff(a)}x²${b>=0?"+":""}${coeff(b)}x${c>=0?"+":""}${c}) dx`,
       a:`${a/3}*x^3+${b/2}*x^2+${c}*x`,
-      display:display
+      display:display,
+      explanation:`項ごとに積分します。x²はx³/3、xはx²/2、定数はxをつけます。最後に+Cをつけます。`
     };
   }
 
@@ -515,7 +663,8 @@ function generateIntegral(){
     return{
       q:`∫[${l}→${r}] ${coeff(a)}${qPower(n)} dx`,
       a:`${ans}`,
-      display:frac(ans)
+      display:frac(ans),
+      explanation:`まず不定積分してから上端${r}と下端${l}を代入します。F(${r})-F(${l}) を計算すると ${frac(ans)} です。`
     };
   }
 
@@ -537,7 +686,8 @@ function generateIntegral(){
     return{
       q:`∫[${l}→${r}] (${coeff(a)}x²${b>=0?"+":""}${coeff(b)}x${c>=0?"+":""}${c}) dx`,
       a:`${ans}`,
-      display:frac(ans)
+      display:frac(ans),
+      explanation:`多項式を項ごとに積分し、上端${r}と下端${l}を代入して引きます。答えは ${frac(ans)} です。`
     };
   }
 
@@ -548,7 +698,8 @@ function generateIntegral(){
     return{
       q:`∫ ${coeff(a)}sin(${k===1?"x":k+"x"}) dx`,
       a:`-${a}*cos(${k}*x)/${k}`,
-      display:`-${frac(a/k)}cos(${k===1?"x":k+"x"})+C`
+      display:`-${frac(a/k)}cos(${k===1?"x":k+"x"})+C`,
+      explanation:`sin(kx)の積分は -cos(kx)/k です。係数${a}をかけて答えになります。`
     };
   }
 
@@ -559,7 +710,8 @@ function generateIntegral(){
     return{
       q:`∫ ${coeff(a)}cos(${k===1?"x":k+"x"}) dx`,
       a:`${a}*sin(${k}*x)/${k}`,
-      display:`${frac(a/k)}sin(${k===1?"x":k+"x"})+C`
+      display:`${frac(a/k)}sin(${k===1?"x":k+"x"})+C`,
+      explanation:`cos(kx)の積分は sin(kx)/k です。係数${a}をかけて答えになります。`
     };
   }
 
@@ -570,7 +722,8 @@ function generateIntegral(){
     return{
       q:`∫ ${coeff(a)}e^(${k===1?"x":k+"x"}) dx`,
       a:`${a}*exp(${k}*x)/${k}`,
-      display:`${frac(a/k)}e^(${k===1?"x":k+"x"})+C`
+      display:`${frac(a/k)}e^(${k===1?"x":k+"x"})+C`,
+      explanation:`e^(kx)の積分は e^(kx)/k です。係数${a}をかけて答えになります。`
     };
   }
 
@@ -583,7 +736,8 @@ function generateIntegral(){
     return{
       q:`∫ (${a}x${b>=0?"+":""}${b})${n===2?"²":n===3?"³":"⁴"} dx`,
       a:`(${a}*x+${b})^${n+1}/${bottom}`,
-      display:`(${a}x${b>=0?"+":""}${b})^${n+1}/${bottom}+C`
+      display:`(${a}x${b>=0?"+":""}${b})^${n+1}/${bottom}+C`,
+      explanation:`中身をt=${a}x${b>=0?"+":""}${b}と置くと、dt=${a}dxです。だから1/${a}をかけて、次数を1つ上げます。`
     };
   }
 }
@@ -601,7 +755,8 @@ function generateDerivative(){
     return{
       q:`d/dx ${coeff(a)}${qPower(n)}`,
       a:`${ansC}*x^${n-1}`,
-      display:`${term(ansC,n-1)}`
+      display:`${term(ansC,n-1)}`,
+      explanation:`x^nの微分はnx^(n-1)です。係数${a}をかけるので答えは ${term(ansC,n-1)} です。`
     };
   }
 
@@ -621,7 +776,8 @@ function generateDerivative(){
     return{
       q:`d/dx (${coeff(a)}x³${b>=0?"+":""}${coeff(b)}x²${c>=0?"+":""}${c}x)`,
       a:`${3*a}*x^2+${2*b}*x+${c}`,
-      display:display
+      display:display,
+      explanation:`多項式は項ごとに微分します。x³は3x²、x²は2x、xは1になります。`
     };
   }
 
@@ -632,7 +788,8 @@ function generateDerivative(){
     return{
       q:`d/dx ${coeff(a)}sin(${k===1?"x":k+"x"})`,
       a:`${a*k}*cos(${k}*x)`,
-      display:`${coeff(a*k)}cos(${k===1?"x":k+"x"})`
+      display:`${coeff(a*k)}cos(${k===1?"x":k+"x"})`,
+      explanation:`sin(kx)の微分は kcos(kx) です。係数${a}もかけます。`
     };
   }
 
@@ -643,7 +800,8 @@ function generateDerivative(){
     return{
       q:`d/dx ${coeff(a)}cos(${k===1?"x":k+"x"})`,
       a:`-${a*k}*sin(${k}*x)`,
-      display:`-${coeff(a*k)}sin(${k===1?"x":k+"x"})`
+      display:`-${coeff(a*k)}sin(${k===1?"x":k+"x"})`,
+      explanation:`cos(kx)の微分は -ksin(kx) です。係数${a}もかけます。`
     };
   }
 
@@ -654,7 +812,8 @@ function generateDerivative(){
     return{
       q:`d/dx ${coeff(a)}e^(${k===1?"x":k+"x"})`,
       a:`${a*k}*exp(${k}*x)`,
-      display:`${coeff(a*k)}e^(${k===1?"x":k+"x"})`
+      display:`${coeff(a*k)}e^(${k===1?"x":k+"x"})`,
+      explanation:`e^(kx)の微分は ke^(kx) です。係数${a}もかけます。`
     };
   }
 
@@ -666,7 +825,8 @@ function generateDerivative(){
     return{
       q:`d/dx (${a}x${b>=0?"+":""}${b})${n===2?"²":n===3?"³":"⁴"}`,
       a:`${n*a}*(${a}*x+${b})^${n-1}`,
-      display:`${n*a}(${a}x${b>=0?"+":""}${b})^${n-1}`
+      display:`${n*a}(${a}x${b>=0?"+":""}${b})^${n-1}`,
+      explanation:`合成関数の微分です。外側を微分して、さらに中身${a}x${b>=0?"+":""}${b}の微分${a}をかけます。`
     };
   }
 
@@ -674,7 +834,8 @@ function generateDerivative(){
     return{
       q:`d/dx (x+1)(x-1)`,
       a:`2*x`,
-      display:`2x`
+      display:`2x`,
+      explanation:`(x+1)(x-1)=x²-1です。これを微分すると2xです。`
     };
   }
 
@@ -685,7 +846,8 @@ function generateDerivative(){
     return{
       q:`d/dx (x+${a})(x+${b})`,
       a:`2*x+${a+b}`,
-      display:`2x+${a+b}`
+      display:`2x+${a+b}`,
+      explanation:`先に展開すると x²+${a+b}x+${a*b} です。微分すると 2x+${a+b} です。`
     };
   }
 
@@ -693,7 +855,8 @@ function generateDerivative(){
     return{
       q:`d/dx √x`,
       a:`1/(2*sqrt(x))`,
-      display:`1/(2√x)`
+      display:`1/(2√x)`,
+      explanation:`√xはx^(1/2)です。微分すると(1/2)x^(-1/2)=1/(2√x)です。`
     };
   }
 
@@ -701,7 +864,8 @@ function generateDerivative(){
     return{
       q:`d/dx 1/x`,
       a:`-1/x^2`,
-      display:`-1/x^2`
+      display:`-1/x^2`,
+      explanation:`1/xはx^(-1)です。微分すると -x^(-2)、つまり -1/x^2 です。`
     };
   }
 
@@ -711,7 +875,8 @@ function generateDerivative(){
     return{
       q:`d/dx (${a}x²+1)/2`,
       a:`${a}*x`,
-      display:`${coeff(a)}x`
+      display:`${coeff(a)}x`,
+      explanation:`(${a}x²+1)/2 を微分します。${a}x²の微分は${2*a}x、それを2で割るので${a}xです。`
     };
   }
 
@@ -721,7 +886,8 @@ function generateDerivative(){
     return{
       q:`d/dx ${a}x^(3/2)`,
       a:`${a*3/2}*sqrt(x)`,
-      display:`${frac(a*3/2)}√x`
+      display:`${frac(a*3/2)}√x`,
+      explanation:`x^(3/2)の微分は(3/2)x^(1/2)です。係数${a}をかけます。`
     };
   }
 }
@@ -736,7 +902,8 @@ function generateFactor(){
     return{
       q:`x²+${a+b}x+${a*b} を因数分解`,
       a:`(x+${a})*(x+${b})`,
-      display:`(x+${a})(x+${b})`
+      display:`(x+${a})(x+${b})`,
+      explanation:`足して${a+b}、かけて${a*b}になる数を探します。${a}と${b}なので、(x+${a})(x+${b})です。`
     };
   }
 
@@ -747,7 +914,8 @@ function generateFactor(){
     return{
       q:`x²-${a+b}x+${a*b} を因数分解`,
       a:`(x-${a})*(x-${b})`,
-      display:`(x-${a})(x-${b})`
+      display:`(x-${a})(x-${b})`,
+      explanation:`足して-${a+b}、かけて${a*b}になる数を探します。-${a}と-${b}です。`
     };
   }
 
@@ -758,7 +926,8 @@ function generateFactor(){
     return{
       q:`x²+${b-a}x-${a*b} を因数分解`,
       a:`(x-${a})*(x+${b})`,
-      display:`(x-${a})(x+${b})`
+      display:`(x-${a})(x+${b})`,
+      explanation:`かけて-${a*b}、足して${b-a}になる組を探します。-${a}と${b}です。`
     };
   }
 
@@ -768,18 +937,17 @@ function generateFactor(){
     return{
       q:`x²-${a*a} を因数分解`,
       a:`(x-${a})*(x+${a})`,
-      display:`(x-${a})(x+${a})`
+      display:`(x-${a})(x+${a})`,
+      explanation:`x²-${a*a}は平方差です。a²-b²=(a-b)(a+b)を使います。`
     };
   }
 }
 
 function isPrime(n){
   if(n<2) return false;
-
   for(let i=2;i*i<=n;i++){
     if(n%i===0) return false;
   }
-
   return true;
 }
 
@@ -813,7 +981,8 @@ function generatePrime(){
     q:`${num} を素因数分解`,
     a:factors.join("*"),
     display:factors.join("×"),
-    number:num
+    number:num,
+    explanation:`${num}を素数だけの積に分けます。順に割っていくと ${factors.join("×")} になります。`
   };
 }
 
@@ -845,16 +1014,13 @@ function checkPrimeAnswer(input,number){
         }
       }else{
         let n = Number(part);
-
         if(!Number.isInteger(n)) return false;
         if(!isPrime(n)) return false;
-
         nums.push(n);
       }
     }
 
     let product = nums.reduce((a,b)=>a*b,1);
-
     return product===number;
   }catch(e){
     return false;
@@ -871,7 +1037,8 @@ function generateExpand(){
     return{
       q:`(x+${a})(x+${b}) を展開`,
       a:`x^2+${a+b}*x+${a*b}`,
-      display:`x^2+${a+b}x+${a*b}`
+      display:`x^2+${a+b}x+${a*b}`,
+      explanation:`(x+${a})(x+${b})を展開します。x²+(${a}+${b})x+${a}×${b}です。`
     };
   }
 
@@ -882,7 +1049,8 @@ function generateExpand(){
     return{
       q:`(x-${a})(x-${b}) を展開`,
       a:`x^2-${a+b}*x+${a*b}`,
-      display:`x^2-${a+b}x+${a*b}`
+      display:`x^2-${a+b}x+${a*b}`,
+      explanation:`(x-${a})(x-${b})を展開します。x²-${a+b}x+${a*b}です。`
     };
   }
 
@@ -892,7 +1060,8 @@ function generateExpand(){
     return{
       q:`(x+${a})² を展開`,
       a:`x^2+${2*a}*x+${a*a}`,
-      display:`x^2+${2*a}x+${a*a}`
+      display:`x^2+${2*a}x+${a*a}`,
+      explanation:`(x+a)²=x²+2ax+a²を使います。`
     };
   }
 
@@ -902,7 +1071,8 @@ function generateExpand(){
     return{
       q:`(x-${a})² を展開`,
       a:`x^2-${2*a}*x+${a*a}`,
-      display:`x^2-${2*a}x+${a*a}`
+      display:`x^2-${2*a}x+${a*a}`,
+      explanation:`(x-a)²=x²-2ax+a²を使います。`
     };
   }
 }
@@ -929,35 +1099,92 @@ function expressionsEqual(user,correct){
   }
 }
 
+function selectMode(m){
+  mode = m;
+
+  document.getElementById("homeScreen").classList.remove("active");
+  document.getElementById("gameScreen").classList.add("active");
+
+  let title = "⚔️ 積分バトル ⚔️";
+  if(mode==="derivative") title="⚔️ 微分バトル ⚔️";
+  if(mode==="factor") title="⚔️ 因数分解バトル ⚔️";
+  if(mode==="prime") title="⚔️ 素因数分解バトル ⚔️";
+  if(mode==="expand") title="⚔️ 展開バトル ⚔️";
+  if(mode==="random") title="⚔️ ランキングモード ⚔️";
+
+  document.getElementById("modeTitle").innerText = title;
+  start();
+}
+
+function backHome(){
+  updatePlayTime();
+
+  document.getElementById("gameScreen").classList.remove("active");
+  document.getElementById("homeScreen").classList.add("active");
+
+  document.getElementById("bgm").pause();
+
+  checkTitles();
+  saveAllData();
+  updateHomeStatus();
+}
+
+function start(){
+  history = [];
+  usedQuestions = [];
+  score = 0;
+  combo = 0;
+  playStartTime = Date.now();
+
+  document.getElementById("result").innerHTML = "";
+  document.getElementById("q").innerText = "START";
+  document.getElementById("timer").innerText = "";
+
+  recordPlayDay();
+
+  if(mode==="random"){
+    enemyHP = 9999;
+    playerHP = 1;
+  }else{
+    enemyHP = 10;
+    playerHP = 5;
+  }
+
+  updateHP();
+  nextQ();
+
+  let bgm = document.getElementById("bgm");
+  bgm.volume = 0.2;
+
+  if(settings.bgm){
+    bgm.play();
+  }
+}
+
+function updatePlayTime(){
+  if(playStartTime){
+    let sec = Math.floor((Date.now() - playStartTime)/1000);
+    playerData.playTime += sec;
+    playStartTime = 0;
+    saveAllData();
+  }
+}
+
 function nextQ(){
-  let count = 0;
-
-  do{
-    current = generateQuestion();
-    count++;
-  }while(
-    usedQuestions.includes(current.q) &&
-    count<100
-  );
-
+  current = generateQuestion();
   usedQuestions.push(current.q);
 
   let q = document.getElementById("q");
   let go = document.getElementById("goText");
-  let enemy = document.getElementById("enemy");
 
   q.innerText = "";
   document.getElementById("ans").value = "";
 
-  enemy.classList.remove("enemySpawn");
   go.classList.remove("goAnim");
   q.classList.remove("questionAnim");
 
-  void enemy.offsetWidth;
   void go.offsetWidth;
   void q.offsetWidth;
-
-  enemy.classList.add("enemySpawn");
 
   setTimeout(()=>{
     go.classList.add("goAnim");
@@ -967,7 +1194,18 @@ function nextQ(){
       q.classList.add("questionAnim");
     },300);
 
-  },400);
+  },200);
+}
+
+function showExplanation(){
+  if(!current) return;
+
+  document.getElementById("result").innerHTML += `
+    <div class="explainBox">
+      <h3>📖 解説</h3>
+      <p>${current.explanation || "解説はありません"}</p>
+    </div>
+  `;
 }
 
 function submit(){
@@ -984,14 +1222,14 @@ function submit(){
     unlockTitle("⚡️創設者");
     playerData.equippedTitle = "⚡️創設者";
     saveAllData();
-    updateCurrentTitle();
+    updateHomeStatus();
     alert("⚡️創設者を解放しました！");
     return;
   }
 
   let ok = false;
 
-  if(mode==="prime" && !ok){
+  if(mode==="prime"){
     ok = checkPrimeAnswer(u,current.number);
   }
 
@@ -1002,6 +1240,8 @@ function submit(){
   if(!ok){
     ok = normalize(u) === normalize(current.display);
   }
+
+  playerData.totalQuestions++;
 
   history.push({
     question:current.q,
@@ -1015,24 +1255,27 @@ function submit(){
     combo++;
 
     playerData.totalCorrect++;
+    addExp(10);
 
     if(combo > playerData.maxCombo){
       playerData.maxCombo = combo;
+    }
+
+    updateMission("correct");
+
+    if(mode==="integral"){
+      updateMission("integral");
     }
 
     if(mode!=="random"){
       enemyHP--;
     }
 
-    let enemy = document.getElementById("enemy");
     let slash = document.getElementById("slash");
-
-    enemy.classList.add("enemyHit");
     slash.innerText = "⚔️";
     slash.classList.add("showSlash");
 
     setTimeout(()=>{
-      enemy.classList.remove("enemyHit");
       slash.classList.remove("showSlash");
     },500);
 
@@ -1040,11 +1283,13 @@ function submit(){
       document.getElementById("se_correct").play();
     }
 
-    document.getElementById("result").innerText =
-      "○ 正解！ 正解: " + current.display;
+    document.getElementById("result").innerHTML =
+      `○ 正解！ 正解: ${current.display}`;
 
   }else{
     combo = 0;
+
+    addReviewItem(current);
 
     if(mode==="random"){
       finishRandom();
@@ -1063,8 +1308,10 @@ function submit(){
       document.getElementById("se_wrong").play();
     }
 
-    document.getElementById("result").innerText =
-      "× 不正解！ 正解: " + current.display;
+    document.getElementById("result").innerHTML =
+      `× 不正解！ 正解: ${current.display}
+       <br>
+       <button onclick="showExplanation()">解説を見る</button>`;
   }
 
   checkTitles();
@@ -1074,7 +1321,6 @@ function submit(){
 }
 
 async function finishRandom(){
-  clearInterval(timer);
   updatePlayTime();
 
   if(score > playerData.bestRandomScore){
@@ -1122,8 +1368,6 @@ function updateHP(){
 }
 
 function nextTurn(){
-  clearInterval(timer);
-
   if(mode!=="random"){
     if(enemyHP<=0){
       showEnd("勝利！");
@@ -1142,7 +1386,6 @@ function nextTurn(){
 }
 
 async function showEnd(text){
-  clearInterval(timer);
   updatePlayTime();
 
   document.getElementById("q").innerText = text;
@@ -1194,6 +1437,7 @@ async function showEnd(text){
         <p>${i+1}. ${mark} 問題: ${history[i].question}</p>
         <p>あなたの答え: ${history[i].your}</p>
         <p>正解: ${history[i].answer}</p>
+        <p>${history[i].ok ? "" : current?.explanation || ""}</p>
       </div>
     `;
   }
