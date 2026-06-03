@@ -13,9 +13,12 @@ button:hover{transform:scale(1.08);box-shadow:0 0 20px #00ffcc}
 input{font-size:28px;width:80%;text-align:center;border-radius:15px;padding:10px;border:none;margin:8px}
 a{color:#00ffcc}
 #profileIcon{width:90px;height:90px;border-radius:50%;object-fit:cover;background:#333;border:2px solid #00ffcc}
-#currentTitle,#levelInfo,#rateInfo{font-size:20px;margin:8px}
+#currentTitle,#levelInfo,#rateInfo,#coinInfo{font-size:20px;margin:8px}
 .founderTitle{color:#FFD700;font-weight:bold;animation:founderGlow 2s infinite}
 .meneruTitle{color:#ff0000;font-weight:bold;text-shadow:0 0 10px #ff0000,0 0 20px #ff0000,0 0 40px #ff0000}
+.nakanakaTitle{color:#00aaff;font-weight:bold;text-shadow:0 0 5px #00aaff,0 0 10px #00aaff,0 0 20px #00aaff}
+.urTitle{font-weight:bold;text-shadow:0 0 12px currentColor,0 0 24px currentColor}
+.rainbowTitle{font-weight:bold;background:linear-gradient(90deg,red,orange,yellow,green,blue,purple);-webkit-background-clip:text;color:transparent}
 @keyframes founderGlow{0%{text-shadow:0 0 5px gold,0 0 10px gold}50%{text-shadow:0 0 20px gold,0 0 40px gold}100%{text-shadow:0 0 5px gold,0 0 10px gold}}
 .levelUp{position:fixed;top:35%;left:50%;transform:translate(-50%,-50%);font-size:60px;color:#FFD700;text-shadow:0 0 30px gold;z-index:100;animation:levelPop 1.4s forwards}
 @keyframes levelPop{0%{opacity:0;transform:translate(-50%,-50%) scale(.3)}30%{opacity:1;transform:translate(-50%,-50%) scale(1.3)}100%{opacity:0;transform:translate(-50%,-50%) scale(2)}}
@@ -27,7 +30,10 @@ a{color:#00ffcc}
 .questionAnim{animation:questionPop .5s}@keyframes questionPop{0%{opacity:0;transform:scale(.5) rotate(-3deg)}70%{opacity:1;transform:scale(1.08) rotate(2deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
 #goText{position:fixed;top:35%;left:50%;transform:translate(-50%,-50%);font-size:90px;color:#00ffcc;text-shadow:0 0 30px #00ffcc;opacity:0;pointer-events:none;z-index:50}
 .goAnim{animation:goPop .7s}@keyframes goPop{0%{opacity:0;transform:translate(-50%,-50%) scale(.2)}35%{opacity:1;transform:translate(-50%,-50%) scale(1.4)}100%{opacity:0;transform:translate(-50%,-50%) scale(2)}}
-.rankItem,.titleItem,.profileItem,.settingsItem,.missionItem,.reviewItem,.explainBox,.achievementItem,.friendItem{background:rgba(255,255,255,.12);margin:10px auto;padding:10px;border-radius:10px;width:90%;text-align:left;font-size:18px}
+.gachaAnim{font-size:42px;text-align:center;animation:gachaShake .15s infinite}
+@keyframes gachaShake{0%{transform:translateX(-5px)}50%{transform:translateX(5px)}100%{transform:translateX(0)}}
+.urFlash{animation:urFlashAnim 1s}@keyframes urFlashAnim{0%{background:white}100%{background:radial-gradient(circle,#111,#000)}}
+.rankItem,.titleItem,.profileItem,.settingsItem,.missionItem,.reviewItem,.achievementItem,.friendItem{background:rgba(255,255,255,.12);margin:10px auto;padding:10px;border-radius:10px;width:90%;text-align:left;font-size:18px}
 .rankIcon{width:34px;height:34px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:8px}
 #adArea{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);width:320px;height:50px;background:white;color:black;border-radius:10px;line-height:50px;z-index:10}
 </style>
@@ -39,9 +45,11 @@ a{color:#00ffcc}
   <div id="currentTitle">称号：初心者</div>
   <div id="levelInfo">Lv1</div>
   <div id="rateInfo">正答率：0%</div>
+  <div id="coinInfo">コイン：0</div>
 
   <button class="modeBtn" onclick="showStudyMenu()">📚 学習モード</button>
   <button class="modeBtn" onclick="selectRankingMode()">⚔️ ランキングモード</button>
+  <button class="modeBtn" onclick="showGacha()">🎰 ガチャ</button>
   <button class="modeBtn" onclick="showTitles()">🏅 称号一覧</button>
   <button class="modeBtn" onclick="showAchievements()">🏆 実績一覧</button>
   <button class="modeBtn" onclick="showWorldRanking()">🌍 週間ランキング</button>

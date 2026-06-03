@@ -16,7 +16,8 @@ let playerData = {
   totalCorrect:0,totalQuestions:0,exp:0,playTime:0,maxCombo:0,
   consecutiveDays:0,lastPlayDate:"",
   unlockedTitles:["初心者"],equippedTitle:"初心者",
-  bestRandomScore:0,reviewList:[],dailyMission:{},achievements:[],friends:[]
+  bestRandomScore:0,reviewList:[],dailyMission:{},achievements:[],friends:[],
+  coins:0,gachaTitles:[],loginBonusDay:1,lastCoinBonusDate:""
 };
 
 function rand(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
@@ -32,7 +33,17 @@ function getExpPercent(){return (playerData.exp||0)%100;}
 function getCorrectRate(){if(!playerData.totalQuestions)return 0;return Math.round(playerData.totalCorrect/playerData.totalQuestions*100);}
 function showLevelUp(level){let area=document.getElementById("levelUpArea");area.innerHTML=`<div class="levelUp">LEVEL UP!!<br>Lv${level}</div>`;setTimeout(()=>area.innerHTML="",1500);}
 function addExp(n){let before=getLevel();playerData.exp=(playerData.exp||0)+n;let after=getLevel();if(after>before)showLevelUp(after);}
-function titleHTML(t){if(t==="⚡️創設者")return `<span class="founderTitle">⚡️創設者</span>`;if(t==="MENERU")return `<span class="meneruTitle">👾MENERU👾</span>`;return `🏅 ${t}`;}
+function titleHTML(t){
+  if(t==="⚡️創設者")return `<span class="founderTitle">⚡️創設者</span>`;
+  if(t==="MENERU")return `<span class="meneruTitle">👾MENERU👾</span>`;
+  if(t==="なかなか")return `<span class="nakanakaTitle">🧊なかなか🧊</span>`;
+  if(t==="🌈虹の数学神🌈")return `<span class="rainbowTitle">🌈虹の数学神🌈</span>`;
+  if(t==="❄️絶対零度❄️")return `<span class="urTitle" style="color:#00ccff;">❄️絶対零度❄️</span>`;
+  if(t==="🌌宇宙の支配者🌌")return `<span class="rainbowTitle">🌌宇宙の支配者🌌</span>`;
+  if(t==="🔥原初の数式🔥")return `<span class="urTitle" style="color:#ff3300;">🔥原初の数式🔥</span>`;
+  if(t==="👑究極数学王👑")return `<span class="urTitle" style="color:#ffd700;">👑究極数学王👑</span>`;
+  return `🏅 ${t}`;
+}
 
 function loadAllData(){
   let p=localStorage.getItem("playerProfile"); if(p) playerProfile=JSON.parse(p);
@@ -44,17 +55,22 @@ function loadAllData(){
   if(!playerData.dailyMission) playerData.dailyMission={};
   if(!playerData.achievements) playerData.achievements=[];
   if(!playerData.friends) playerData.friends=[];
+  if(!playerData.coins) playerData.coins=0;
+  if(!playerData.gachaTitles) playerData.gachaTitles=[];
+  if(!playerData.loginBonusDay) playerData.loginBonusDay=1;
+  if(!playerData.lastCoinBonusDate) playerData.lastCoinBonusDate="";
   if(!playerData.exp) playerData.exp=0;
-  applySettings(); updateHomeStatus(); prepareDailyMission();
+  applySettings(); updateHomeStatus(); prepareDailyMission(); giveDailyCoinBonus();
 }
 function saveAllData(){localStorage.setItem("playerProfile",JSON.stringify(playerProfile));localStorage.setItem("playerData",JSON.stringify(playerData));localStorage.setItem("settings",JSON.stringify(settings));}
 window.addEventListener("load",loadAllData);
 
 function updateHomeStatus(){
-  let title=document.getElementById("currentTitle"), level=document.getElementById("levelInfo"), rate=document.getElementById("rateInfo"), icon=document.getElementById("profileIcon");
+  let title=document.getElementById("currentTitle"), level=document.getElementById("levelInfo"), rate=document.getElementById("rateInfo"), coin=document.getElementById("coinInfo"), icon=document.getElementById("profileIcon");
   if(title) title.innerHTML="称号："+titleHTML(playerData.equippedTitle||"初心者");
   if(level) level.innerHTML=`Lv${getLevel()}　EXP ${getExpPercent()}/100`;
   if(rate) rate.innerHTML=`正答率：${getCorrectRate()}%`;
+  if(coin) coin.innerHTML=`コイン：${playerData.coins||0}`;
   if(icon && playerProfile.icon) icon.src=playerProfile.icon;
 }
 function applySettings(){let bgm=document.getElementById("bgm");if(bgm)bgm.muted=!settings.bgm;}
@@ -66,7 +82,7 @@ function equipTitle(t){if(playerData.unlockedTitles.includes(t)){playerData.equi
 function unlockAchievement(a){if(!playerData.achievements.includes(a))playerData.achievements.push(a);}
 
 function achievementList(){
-  return ["初正解","10問正解","100問正解","1000問正解","初ランキング登録","週間ランキング参加","初ログイン","プロフィール設定完了","3連勝","5連勝","10連勝","25連勝","50連勝","100連勝","無双","積分マスター","微分マスター","因数分解マスター","素因数分解マスター","展開マスター","TOP100","TOP50","TOP10","TOP3","週間王👑","15分プレイ","1時間プレイ","10時間プレイ","50時間プレイ","100時間プレイ","数学廃人","3日連続","7日連続","30日連続","100日連続","毎日数学生活","初復習","復習10問","復習50問","復習100問","反省王","創設者","MENERU発見者","古参勢","神速","完璧主義者","数学神","伝説の数学神","1問目で即死","惜しい！","深夜の数学者","朝活勢","寝るな！"];
+  return ["初正解","10問正解","100問正解","1000問正解","初ランキング登録","週間ランキング参加","初ログイン","プロフィール設定完了","3連勝","5連勝","10連勝","25連勝","50連勝","100連勝","無双","積分マスター","微分マスター","因数分解マスター","素因数分解マスター","展開マスター","TOP100","TOP50","TOP10","TOP3","週間王👑","15分プレイ","1時間プレイ","10時間プレイ","50時間プレイ","100時間プレイ","数学廃人","3日連続","7日連続","30日連続","100日連続","毎日数学生活","初復習","復習10問","復習50問","復習100問","反省王","創設者","MENERU発見者","なかなか発見者","初ガチャ","UR獲得","古参勢","神速","完璧主義者","数学神","伝説の数学神","1問目で即死","惜しい！","深夜の数学者","朝活勢","寝るな！"];
 }
 function checkAchievements(){
   if(playerData.totalCorrect>=1)unlockAchievement("初正解");
@@ -98,6 +114,7 @@ function checkAchievements(){
   if((playerData.reviewList||[]).length>=10)unlockAchievement("復習10問");
   if(playerData.equippedTitle==="⚡️創設者")unlockAchievement("創設者");
   if(playerData.equippedTitle==="MENERU")unlockAchievement("MENERU発見者");
+  if(playerData.equippedTitle==="なかなか")unlockAchievement("なかなか発見者");
   if(getLevel()>=300)unlockAchievement("数学神");
   if(getLevel()>=1000)unlockAchievement("伝説の数学神");
   saveAllData();
@@ -108,14 +125,16 @@ function showAchievements(){
   for(let a of achievementList()){
     let got=playerData.achievements.includes(a);
     if(a==="MENERU発見者"&&got){html+=`<div class="achievementItem">✅ <span class="meneruTitle">👾MENERU発見者👾</span></div>`;continue;}
+    if(a==="なかなか発見者"&&got){html+=`<div class="achievementItem">✅ <span class="nakanakaTitle">🧊なかなか発見者🧊</span></div>`;continue;}
     html+=`<div class="achievementItem">${got?"✅":"⬜"} ${a}</div>`;
   }
   document.getElementById("panelArea").innerHTML=html;
 }
 
 function allTitles(){
-  return ["⚡️創設者","MENERU","理系","数学初心者","数学中級者","数学上級者","数学の鬼👹","数学の申し子🪽","数学王👑","伝説","神話","創世神🌌","数学好き","数学大好き","数学者🎓","努力家","秀才","鬼才","天才","10連勝","50連勝","100連勝","不敗神話","電光石火","疾風迅雷","数学の怪物","TOP100","TOP50","TOP10","TOP3","週間王👑","毎日勉強","継続は力なり","数学狂","数学見習い","努力の証","数学修行者","数学戦士","数学エリート","数学の達人","数学マスター","超数学者","数式の支配者","数学神話","数学神","伝説の数学神"];
+  return ["⚡️創設者","MENERU","なかなか","理系","数学初心者","数学中級者","数学上級者","数学の鬼👹","数学の申し子🪽","数学王👑","伝説","神話","創世神🌌","数学好き","数学大好き","数学者🎓","努力家","秀才","鬼才","天才","10連勝","50連勝","100連勝","不敗神話","電光石火","疾風迅雷","数学の怪物","TOP100","TOP50","TOP10","TOP3","週間王👑","毎日勉強","継続は力なり","数学狂","数学見習い","努力の証","数学修行者","数学戦士","数学エリート","数学の達人","数学マスター","超数学者","数式の支配者","数学神話","数学神","伝説の数学神"];
 }
+function getAllDisplayTitles(){return [...new Set([...allTitles(),...gachaPool().map(x=>x.title)])];}
 function checkTitles(){
   let correct=playerData.totalCorrect||0, play=playerData.playTime||0, comboMax=playerData.maxCombo||0, best=playerData.bestRandomScore||0, days=playerData.consecutiveDays||0, level=getLevel();
   if(correct>=5)unlockTitle("理系"); if(correct>=10)unlockTitle("数学初心者"); if(correct>=50)unlockTitle("数学中級者"); if(correct>=100)unlockTitle("数学上級者"); if(correct>=500)unlockTitle("数学の鬼👹"); if(correct>=1000)unlockTitle("数学の申し子🪽"); if(correct>=5000)unlockTitle("数学王👑"); if(correct>=10000)unlockTitle("伝説"); if(correct>=50000)unlockTitle("神話"); if(correct>=100000)unlockTitle("創世神🌌");
@@ -129,7 +148,7 @@ function checkTitles(){
 function showTitles(){
   checkTitles();
   let html="<h2>🏅 称号一覧</h2>";
-  for(let t of allTitles()){
+  for(let t of getAllDisplayTitles()){
     let unlocked=playerData.unlockedTitles.includes(t);
     html+=`<div class="titleItem">${unlocked?titleHTML(t):"❓？？？"} ${unlocked?`<button onclick="equipTitle('${t}')">装備</button>`:""}</div>`;
   }
@@ -137,6 +156,155 @@ function showTitles(){
 }
 
 function getTodayKey(){return new Date().toLocaleDateString("ja-JP",{timeZone:"Asia/Tokyo"});}
+function giveDailyCoinBonus(){
+  let today=getTodayKey();
+  if(playerData.lastCoinBonusDate===today)return;
+  if(!playerData.loginBonusDay)playerData.loginBonusDay=1;
+  let day=playerData.loginBonusDay;
+  playerData.coins=(playerData.coins||0)+day;
+  playerData.lastCoinBonusDate=today;
+  playerData.loginBonusDay++;
+  if(playerData.loginBonusDay>30)playerData.loginBonusDay=1;
+  saveAllData();
+  alert(`🎁 ログインコイン ${day}日目！\n+${day}コイン`);
+}
+function gachaPool(){
+  return [
+    {title:"R称号01", rarity:"R"},
+    {title:"R称号02", rarity:"R"},
+    {title:"R称号03", rarity:"R"},
+    {title:"R称号04", rarity:"R"},
+    {title:"R称号05", rarity:"R"},
+    {title:"R称号06", rarity:"R"},
+    {title:"R称号07", rarity:"R"},
+    {title:"R称号08", rarity:"R"},
+    {title:"R称号09", rarity:"R"},
+    {title:"R称号10", rarity:"R"},
+    {title:"R称号11", rarity:"R"},
+    {title:"R称号12", rarity:"R"},
+    {title:"R称号13", rarity:"R"},
+    {title:"R称号14", rarity:"R"},
+    {title:"R称号15", rarity:"R"},
+    {title:"R称号16", rarity:"R"},
+    {title:"R称号17", rarity:"R"},
+    {title:"R称号18", rarity:"R"},
+    {title:"R称号19", rarity:"R"},
+    {title:"R称号20", rarity:"R"},
+    {title:"R称号21", rarity:"R"},
+    {title:"R称号22", rarity:"R"},
+    {title:"R称号23", rarity:"R"},
+    {title:"R称号24", rarity:"R"},
+    {title:"R称号25", rarity:"R"},
+    {title:"R称号26", rarity:"R"},
+    {title:"R称号27", rarity:"R"},
+    {title:"R称号28", rarity:"R"},
+    {title:"R称号29", rarity:"R"},
+    {title:"R称号30", rarity:"R"},
+    {title:"R称号31", rarity:"R"},
+    {title:"R称号32", rarity:"R"},
+    {title:"R称号33", rarity:"R"},
+    {title:"R称号34", rarity:"R"},
+    {title:"R称号35", rarity:"R"},
+    {title:"R称号36", rarity:"R"},
+    {title:"R称号37", rarity:"R"},
+    {title:"R称号38", rarity:"R"},
+    {title:"R称号39", rarity:"R"},
+    {title:"R称号40", rarity:"R"},
+    {title:"R称号41", rarity:"R"},
+    {title:"R称号42", rarity:"R"},
+    {title:"R称号43", rarity:"R"},
+    {title:"R称号44", rarity:"R"},
+    {title:"R称号45", rarity:"R"},
+    {title:"R称号46", rarity:"R"},
+    {title:"R称号47", rarity:"R"},
+    {title:"R称号48", rarity:"R"},
+    {title:"R称号49", rarity:"R"},
+    {title:"R称号50", rarity:"R"},
+    {title:"R称号51", rarity:"R"},
+    {title:"R称号52", rarity:"R"},
+    {title:"R称号53", rarity:"R"},
+    {title:"R称号54", rarity:"R"},
+    {title:"R称号55", rarity:"R"},
+    {title:"R称号56", rarity:"R"},
+    {title:"R称号57", rarity:"R"},
+    {title:"R称号58", rarity:"R"},
+    {title:"R称号59", rarity:"R"},
+    {title:"R称号60", rarity:"R"},
+    {title:"SR称号01", rarity:"SR"},
+    {title:"SR称号02", rarity:"SR"},
+    {title:"SR称号03", rarity:"SR"},
+    {title:"SR称号04", rarity:"SR"},
+    {title:"SR称号05", rarity:"SR"},
+    {title:"SR称号06", rarity:"SR"},
+    {title:"SR称号07", rarity:"SR"},
+    {title:"SR称号08", rarity:"SR"},
+    {title:"SR称号09", rarity:"SR"},
+    {title:"SR称号10", rarity:"SR"},
+    {title:"SR称号11", rarity:"SR"},
+    {title:"SR称号12", rarity:"SR"},
+    {title:"SR称号13", rarity:"SR"},
+    {title:"SR称号14", rarity:"SR"},
+    {title:"SR称号15", rarity:"SR"},
+    {title:"SR称号16", rarity:"SR"},
+    {title:"SR称号17", rarity:"SR"},
+    {title:"SR称号18", rarity:"SR"},
+    {title:"SR称号19", rarity:"SR"},
+    {title:"SR称号20", rarity:"SR"},
+    {title:"SR称号21", rarity:"SR"},
+    {title:"SR称号22", rarity:"SR"},
+    {title:"SR称号23", rarity:"SR"},
+    {title:"SR称号24", rarity:"SR"},
+    {title:"SR称号25", rarity:"SR"},
+    {title:"👑ガチャ王👑", rarity:"SSR"},
+    {title:"🏆伝説の解答者🏆", rarity:"SSR"},
+    {title:"⚔️数学戦神⚔️", rarity:"SSR"},
+    {title:"🧠超天才🧠", rarity:"SSR"},
+    {title:"🔥極限突破🔥", rarity:"SSR"},
+    {title:"💎王家の数学者💎", rarity:"SSR"},
+    {title:"🌙夜王🌙", rarity:"SSR"},
+    {title:"☀️昼王☀️", rarity:"SSR"},
+    {title:"🎯百発百中🎯", rarity:"SSR"},
+    {title:"📖知識の王📖", rarity:"SSR"},
+    {title:"🌈虹の数学神🌈", rarity:"UR"},
+    {title:"❄️絶対零度❄️", rarity:"UR"},
+    {title:"🌌宇宙の支配者🌌", rarity:"UR"},
+    {title:"🔥原初の数式🔥", rarity:"UR"},
+    {title:"👑究極数学王👑", rarity:"UR"}
+  ];
+}
+function getGachaResult(){
+  let r=Math.random()*100, rarity="R";
+  if(r<2)rarity="UR"; else if(r<10)rarity="SSR"; else if(r<30)rarity="SR";
+  let pool=gachaPool().filter(x=>x.rarity===rarity);
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+function showGacha(){
+  document.getElementById("panelArea").innerHTML=`<h2>🎰 ガチャ</h2><div class="profileItem"><p>所持コイン：${playerData.coins||0}</p><p>1回：10コイン</p><button onclick="drawGacha()">10コインで引く</button></div><div class="profileItem"><h3>排出率</h3><p>R 70% / SR 20% / SSR 8% / UR 2%</p><p>称号100個。URのみ色付き。</p></div>`;
+}
+function drawGacha(){
+  if((playerData.coins||0)<10){alert("コインが足りません");return;}
+  playerData.coins-=10;
+  let poolAll=gachaPool(), box=document.getElementById("panelArea");
+  box.innerHTML=`<h2>🎰 ガチャ演出中...</h2><div id="gachaAnim" class="gachaAnim">???</div>`;
+  let count=0;
+  let anim=setInterval(()=>{
+    let temp=poolAll[Math.floor(Math.random()*poolAll.length)];
+    document.getElementById("gachaAnim").innerHTML=titleHTML(temp.title);
+    count++;
+    if(count>=25){
+      clearInterval(anim);
+      let item=getGachaResult();
+      unlockTitle(item.title);
+      if(!playerData.gachaTitles)playerData.gachaTitles=[];
+      if(!playerData.gachaTitles.includes(item.title))playerData.gachaTitles.push(item.title);
+      unlockAchievement("初ガチャ");
+      if(item.rarity==="UR"){unlockAchievement("UR獲得");document.body.classList.add("urFlash");setTimeout(()=>document.body.classList.remove("urFlash"),1000);}
+      saveAllData();updateHomeStatus();
+      box.innerHTML=`<h2>🎰 ガチャ結果</h2><div class="profileItem"><h2>${item.rarity}</h2><h1>${titleHTML(item.title)}</h1><p>所持コイン：${playerData.coins||0}</p><button onclick="drawGacha()">もう一回引く</button><button onclick="showGacha()">ガチャ画面へ</button></div>`;
+    }
+  },100);
+}
+
 function prepareDailyMission(){
   let today=getTodayKey();
   if(playerData.dailyMission.date===today)return;
@@ -157,14 +325,14 @@ function updateMission(type){
 function showDailyMission(){
   prepareDailyMission();
   let html="<h2>🎯 デイリーミッション</h2>";
-  for(let m of playerData.dailyMission.missions) html+=`<div class="missionItem">${m.done?"✅":"⬜"} ${m.text}<br>${m.count}/${m.need}<br>報酬：EXP50</div>`;
+  for(let m of playerData.dailyMission.missions)html+=`<div class="missionItem">${m.done?"✅":"⬜"} ${m.text}<br>${m.count}/${m.need}<br>報酬：EXP50</div>`;
   document.getElementById("panelArea").innerHTML=html;
 }
 
 function showSettings(){document.getElementById("panelArea").innerHTML=`<h2>⚙️ 設定</h2><div class="settingsItem"><button onclick="toggleBGM()">🎵 BGM ${settings.bgm?"ON":"OFF"}</button><button onclick="toggleSE()">🔊 効果音 ${settings.se?"ON":"OFF"}</button></div><div class="settingsItem"><button onclick="loginGoogle()">Googleログイン</button><button onclick="logoutGoogle()">ログアウト</button><p id="loginStatus">確認中...</p></div>`;refreshLoginStatus();}
 function showProfile(){
   let playMin=Math.floor((playerData.playTime||0)/60);
-  document.getElementById("panelArea").innerHTML=`<h2>👤 プロフィール</h2><div class="profileItem"><img src="${playerProfile.icon||""}" class="rankIcon"><br><input id="playerNameEdit" placeholder="名前" value="${playerProfile.name||"名無し"}"><br><input type="file" id="iconInputEdit" accept="image/*"><br><button onclick="saveProfileFromPanel()">保存</button></div><div class="profileItem"><p>称号：${titleHTML(playerData.equippedTitle||"初心者")}</p><p>Lv：${getLevel()}</p><p>EXP：${getExpPercent()}/100</p><p>正答率：${getCorrectRate()}%</p><p>累計正解数：${playerData.totalCorrect||0}問</p><p>累計問題数：${playerData.totalQuestions||0}問</p><p>プレイ時間：約${playMin}分</p><p>最大連勝：${playerData.maxCombo||0}</p><p>ベストスコア：${playerData.bestRandomScore||0}問</p><p>フレンドID：${window.getMyPlayerId?window.getMyPlayerId():"未取得"}</p></div>`;
+  document.getElementById("panelArea").innerHTML=`<h2>👤 プロフィール</h2><div class="profileItem"><img src="${playerProfile.icon||""}" class="rankIcon"><br><input id="playerNameEdit" placeholder="名前" value="${playerProfile.name||"名無し"}"><br><input type="file" id="iconInputEdit" accept="image/*"><br><button onclick="saveProfileFromPanel()">保存</button></div><div class="profileItem"><p>称号：${titleHTML(playerData.equippedTitle||"初心者")}</p><p>Lv：${getLevel()}</p><p>EXP：${getExpPercent()}/100</p><p>正答率：${getCorrectRate()}%</p><p>所持コイン：${playerData.coins||0}</p><p>累計正解数：${playerData.totalCorrect||0}問</p><p>累計問題数：${playerData.totalQuestions||0}問</p><p>プレイ時間：約${playMin}分</p><p>最大連勝：${playerData.maxCombo||0}</p><p>ベストスコア：${playerData.bestRandomScore||0}問</p><p>フレンドID：${window.getMyPlayerId?window.getMyPlayerId():"未取得"}</p></div>`;
 }
 function saveProfileFromPanel(){
   let name=document.getElementById("playerNameEdit").value.trim();
@@ -178,69 +346,46 @@ async function savePublicProfile(){try{if(window.savePlayerPublicData){await sav
 
 function showFriendMenu(){
   let html=`<h2>🤝 フレンド</h2><div class="friendItem"><p>あなたのID</p><input value="${window.getMyPlayerId?window.getMyPlayerId():"未取得"}" readonly></div><div class="friendItem"><input id="friendIdInput" placeholder="フレンドID"><button onclick="addFriend()">追加</button></div><div id="friendListArea"></div><button onclick="showFriendRanking()">🏆 フレンドランキング</button>`;
-  document.getElementById("panelArea").innerHTML=html; renderFriendList();
+  document.getElementById("panelArea").innerHTML=html;renderFriendList();
 }
 async function addFriend(){
   let id=document.getElementById("friendIdInput").value.trim();
   if(!id){alert("IDを入力して");return;}
   if(playerData.friends.some(f=>(typeof f==="string"?f:f.id)===id)){alert("追加済み");return;}
-  let data=null; try{data=await loadFriendData(id);}catch(e){}
+  let data=null;try{data=await loadFriendData(id);}catch(e){}
   playerData.friends.push({id:id,name:data?data.name:id});
-  saveAllData(); renderFriendList();
+  saveAllData();renderFriendList();
 }
 function removeFriend(id){playerData.friends=playerData.friends.filter(f=>(typeof f==="string"?f:f.id)!==id);saveAllData();renderFriendList();}
 async function renderFriendList(){
-  let area=document.getElementById("friendListArea"); if(!area)return;
+  let area=document.getElementById("friendListArea");if(!area)return;
   let html=playerData.friends.length===0?"<p>フレンドなし</p>":"";
   for(let f of playerData.friends){
     let id=typeof f==="string"?f:f.id;
-    let data=null; try{data=await loadFriendData(id);}catch(e){}
-    if(data) html+=`<div class="friendItem">${data.icon?`<img class="rankIcon" src="${data.icon}">`:""}${data.name}<br>${titleHTML(data.title||"初心者")}<br>Lv${data.level||1}<br><button onclick="removeFriend('${id}')">削除</button></div>`;
+    let data=null;try{data=await loadFriendData(id);}catch(e){}
+    if(data)html+=`<div class="friendItem">${data.icon?`<img class="rankIcon" src="${data.icon}">`:""}${data.name}<br>${titleHTML(data.title||"初心者")}<br>Lv${data.level||1}<br><button onclick="removeFriend('${id}')">削除</button></div>`;
     else html+=`<div class="friendItem">${(typeof f==="string"?id:f.name)||id}<br>データなし<br><button onclick="removeFriend('${id}')">削除</button></div>`;
   }
   area.innerHTML=html;
 }
 async function showFriendRanking(){
-  let html="<h2>🏆 フレンドランキング</h2>", list=[];
+  let html="<h2>🏆 フレンドランキング</h2>",list=[];
   try{for(let f of playerData.friends){let id=typeof f==="string"?f:f.id;let data=await loadFriendData(id);if(data)list.push(data);}}catch(e){console.log(e);}
   list.push({name:playerProfile.name,icon:playerProfile.icon,title:playerData.equippedTitle,level:getLevel(),bestRandomScore:playerData.bestRandomScore});
   list.sort((a,b)=>(b.bestRandomScore||0)-(a.bestRandomScore||0));
-  for(let i=0;i<list.length;i++) html+=`<div class="rankItem">${i+1}位 ${list[i].icon?`<img class="rankIcon" src="${list[i].icon}">`:""}${list[i].name}<br>${titleHTML(list[i].title||"初心者")}<br>Lv${list[i].level||1}<br>スコア：${list[i].bestRandomScore||0}</div>`;
+  for(let i=0;i<list.length;i++)html+=`<div class="rankItem">${i+1}位 ${list[i].icon?`<img class="rankIcon" src="${list[i].icon}">`:""}${list[i].name}<br>${titleHTML(list[i].title||"初心者")}<br>Lv${list[i].level||1}<br>スコア：${list[i].bestRandomScore||0}</div>`;
   document.getElementById("panelArea").innerHTML=html;
 }
 
-function aiExplain(q){
-  q=String(q);
-  if(q.includes("∫"))return "積分は、基本的に次数を1つ上げて、その新しい次数で割ります。";
-  if(q.includes("d/dx"))return "微分は、次数を前に出して、次数を1つ下げます。中身の微分も確認します。";
-  if(q.includes("因数分解"))return "因数分解は、足して真ん中、かけて最後になる数を探します。";
-  if(q.includes("素因数分解"))return "2、3、5、7のような小さい素数から順に割るとミスしにくいです。";
-  return "まず式の形を見て、使える公式を確認しましょう。";
-}
-function addReviewItem(q){
-  if(!q)return;
-  if(playerData.reviewList.some(x=>x.q===q.q))return;
-  playerData.reviewList.unshift({q:q.q,a:q.display,explanation:q.explanation||"解説はありません",ai:aiExplain(q.q),original:q});
-  playerData.reviewList=playerData.reviewList.slice(0,10); saveAllData();
-}
+function aiExplain(q){q=String(q);if(q.includes("∫"))return"積分は次数を1つ上げて、その新しい次数で割ります。";if(q.includes("d/dx"))return"微分は次数を前に出して、次数を1つ下げます。";if(q.includes("因数分解"))return"足して真ん中、かけて最後になる数を探します。";if(q.includes("素因数分解"))return"2、3、5、7のような小さい素数から割ります。";return"式の形を見て、使える公式を確認しましょう。";}
+function addReviewItem(q){if(!q)return;if(playerData.reviewList.some(x=>x.q===q.q))return;playerData.reviewList.unshift({q:q.q,a:q.display,explanation:q.explanation||"解説はありません",ai:aiExplain(q.q),original:q});playerData.reviewList=playerData.reviewList.slice(0,10);saveAllData();}
 function showReviewList(){
   let html="<h2>📚 復習リスト</h2>";
   if(playerData.reviewList.length===0)html+="<p>まだありません</p>";
   for(let i=0;i<playerData.reviewList.length;i++){let r=playerData.reviewList[i];html+=`<div class="reviewItem"><p>${i+1}. ${r.q}</p><p>正解：${r.a}</p><button onclick="alert('${String(r.explanation).replace(/'/g,"\\'")}')">解説</button><button onclick="alert('${String(r.ai).replace(/'/g,"\\'")}')">🤖AI解説</button><button onclick="retryReview(${i})">再挑戦</button></div>`;}
   document.getElementById("panelArea").innerHTML=html;
 }
-function retryReview(i){
-  let r=playerData.reviewList[i]; if(!r)return;
-  current={q:r.q,a:r.original?r.original.a:r.a,display:r.a,explanation:r.explanation};
-  mode="review";
-  document.getElementById("homeScreen").classList.remove("active");
-  document.getElementById("gameScreen").classList.add("active");
-  document.getElementById("modeTitle").innerText="📚 復習モード";
-  document.getElementById("result").innerHTML="";
-  document.getElementById("q").innerText=current.q;
-  document.getElementById("ans").value="";
-  updateHP();
-}
+function retryReview(i){let r=playerData.reviewList[i];if(!r)return;current={q:r.q,a:r.original?r.original.a:r.a,display:r.a,explanation:r.explanation};mode="review";document.getElementById("homeScreen").classList.remove("active");document.getElementById("gameScreen").classList.add("active");document.getElementById("modeTitle").innerText="📚 復習モード";document.getElementById("result").innerHTML="";document.getElementById("q").innerText=current.q;document.getElementById("ans").value="";updateHP();}
 
 function recordPlayDay(){
   let today=getTodayKey();
@@ -263,10 +408,7 @@ function showStudyMenu(){
 }
 function selectDifficulty(m){
   mode=m;
-  document.getElementById("panelArea").innerHTML=`<h2>難易度選択</h2>
-  <button class="modeBtn" onclick="startMode('easy')">🟢 初級</button>
-  <button class="modeBtn" onclick="startMode('normal')">🟡 中級</button>
-  <button class="modeBtn" onclick="startMode('hard')">🔴 上級</button>`;
+  document.getElementById("panelArea").innerHTML=`<h2>難易度選択</h2><button class="modeBtn" onclick="startMode('easy')">🟢 初級</button><button class="modeBtn" onclick="startMode('normal')">🟡 中級</button><button class="modeBtn" onclick="startMode('hard')">🔴 上級</button>`;
 }
 function startMode(diff){difficulty=diff;openGame();start();}
 function selectRankingMode(){mode="random";difficulty="hard";openGame();start();}
@@ -274,82 +416,18 @@ function openGame(){
   document.getElementById("homeScreen").classList.remove("active");
   document.getElementById("gameScreen").classList.add("active");
   let title="⚔️ 積分バトル ⚔️";
-  if(mode==="derivative")title="⚔️ 微分バトル ⚔️";
-  if(mode==="factor")title="⚔️ 因数分解バトル ⚔️";
-  if(mode==="prime")title="⚔️ 素因数分解バトル ⚔️";
-  if(mode==="expand")title="⚔️ 展開バトル ⚔️";
-  if(mode==="arithmetic")title="⚔️ 四則演算バトル ⚔️";
-  if(mode==="random")title="⚔️ ランキングモード ⚔️";
+  if(mode==="derivative")title="⚔️ 微分バトル ⚔️";if(mode==="factor")title="⚔️ 因数分解バトル ⚔️";if(mode==="prime")title="⚔️ 素因数分解バトル ⚔️";if(mode==="expand")title="⚔️ 展開バトル ⚔️";if(mode==="arithmetic")title="⚔️ 四則演算バトル ⚔️";if(mode==="random")title="⚔️ ランキングモード ⚔️";
   document.getElementById("modeTitle").innerText=title;
 }
-function backHome(){
-  updatePlayTime();
-  document.getElementById("gameScreen").classList.remove("active");
-  document.getElementById("homeScreen").classList.add("active");
-  document.getElementById("bgm").pause();
-  checkTitles();checkAchievements();saveAllData();savePublicProfile();updateHomeStatus();
-}
-function start(){
-  history=[];usedQuestions=[];score=0;combo=0;playStartTime=Date.now();
-  document.getElementById("result").innerHTML="";
-  document.getElementById("q").innerText="START";
-  recordPlayDay();
-  if(mode==="random"){enemyHP=9999;playerHP=1;}else{enemyHP=10;playerHP=5;}
-  updateHP();nextQ();
-  let bgm=document.getElementById("bgm");bgm.volume=.2;if(settings.bgm)bgm.play();
-}
+function backHome(){updatePlayTime();document.getElementById("gameScreen").classList.remove("active");document.getElementById("homeScreen").classList.add("active");document.getElementById("bgm").pause();checkTitles();checkAchievements();saveAllData();savePublicProfile();updateHomeStatus();}
+function start(){history=[];usedQuestions=[];score=0;combo=0;playStartTime=Date.now();document.getElementById("result").innerHTML="";document.getElementById("q").innerText="START";recordPlayDay();if(mode==="random"){enemyHP=9999;playerHP=1;}else{enemyHP=10;playerHP=5;}updateHP();nextQ();let bgm=document.getElementById("bgm");bgm.volume=.2;if(settings.bgm)bgm.play();}
 function updatePlayTime(){if(playStartTime){let sec=Math.floor((Date.now()-playStartTime)/1000);playerData.playTime+=sec;playStartTime=0;saveAllData();}}
 
-function generateQuestion(){
-  if(mode==="integral")return generateIntegral();
-  if(mode==="derivative")return generateDerivative();
-  if(mode==="factor")return generateFactor();
-  if(mode==="prime")return generatePrime();
-  if(mode==="expand")return generateExpand();
-  if(mode==="arithmetic")return generateArithmetic();
-  if(mode==="random"){let r=rand(1,5);if(r===1)return generateIntegral();if(r===2)return generateDerivative();if(r===3)return generateFactor();if(r===4)return generatePrime();if(r===5)return generateExpand();}
-}
-
-function generateArithmetic(){
-  let max=difficulty==="easy"?30:difficulty==="normal"?100:300;
-  let a=rand(1,max), b=rand(1,max), type=rand(1,4);
-  if(type===1)return{q:`${a}+${b}`,a:`${a+b}`,display:`${a+b}`,explanation:"足し算です。"};
-  if(type===2){if(a<b)[a,b]=[b,a];return{q:`${a}-${b}`,a:`${a-b}`,display:`${a-b}`,explanation:"引き算です。"};}
-  if(type===3){a=rand(2,difficulty==="easy"?9:20);b=rand(2,difficulty==="easy"?9:20);return{q:`${a}×${b}`,a:`${a*b}`,display:`${a*b}`,explanation:"かけ算です。"};}
-  b=rand(2,difficulty==="easy"?9:20);let ans=rand(2,difficulty==="easy"?9:20);a=b*ans;return{q:`${a}÷${b}`,a:`${ans}`,display:`${ans}`,explanation:"割り算です。"};
-}
-
-function generateIntegral(){
-  let type=difficulty==="easy"?rand(1,2):difficulty==="normal"?rand(1,7):rand(1,8);
-  if(type===1){let a=rand(1,6), n=rand(1,5), ans=a/(n+1);return{q:`∫ ${coeff(a)}${qPower(n)} dx`,a:`${ans}*x^${n+1}`,display:`${term(ans,n+1)}+C`,explanation:"べき乗の積分公式を使います。"};}
-  if(type===2){let a=rand(-5,5),b=rand(-5,5),c=rand(-5,5);if(a===0&&b===0&&c===0)a=1;let display=`${term(a/3,3)}+${term(b/2,2)}+${term(c,1)}+C`.replace(/\+\-/g,"-").replace(/\+\+/g,"+").replace(/^\+/,"");return{q:`∫ (${coeff(a)}x²${b>=0?"+":""}${coeff(b)}x${c>=0?"+":""}${c}) dx`,a:`${a/3}*x^3+${b/2}*x^2+${c}*x`,display,explanation:"多項式は項ごとに積分します。"};}
-  if(type===3){let l=rand(0,3),r=rand(l+1,l+5),a=rand(1,5),n=rand(1,4);let ans=(a/(n+1))*(Math.pow(r,n+1)-Math.pow(l,n+1));return{q:`∫[${l}→${r}] ${coeff(a)}${qPower(n)} dx`,a:`${ans}`,display:frac(ans),explanation:"不定積分して上端と下端を代入します。"};}
-  if(type===4){let a=rand(1,6),k=rand(1,4);return{q:`∫ ${coeff(a)}sin(${k===1?"x":k+"x"}) dx`,a:`-${a}*cos(${k}*x)/${k}`,display:`-${frac(a/k)}cos(${k===1?"x":k+"x"})+C`,explanation:"sin(kx)の積分は -cos(kx)/k です。"};}
-  if(type===5){let a=rand(1,6),k=rand(1,4);return{q:`∫ ${coeff(a)}cos(${k===1?"x":k+"x"}) dx`,a:`${a}*sin(${k}*x)/${k}`,display:`${frac(a/k)}sin(${k===1?"x":k+"x"})+C`,explanation:"cos(kx)の積分は sin(kx)/k です。"};}
-  if(type===6){let a=rand(1,6),k=rand(1,4);return{q:`∫ ${coeff(a)}e^(${k===1?"x":k+"x"}) dx`,a:`${a}*exp(${k}*x)/${k}`,display:`${frac(a/k)}e^(${k===1?"x":k+"x"})+C`,explanation:"e^(kx)の積分は e^(kx)/k です。"};}
-  let a=rand(1,5),b=rand(-5,5),n=rand(2,4),bottom=a*(n+1);return{q:`∫ (${a}x${b>=0?"+":""}${b})${n===2?"²":n===3?"³":"⁴"} dx`,a:`(${a}*x+${b})^${n+1}/${bottom}`,display:`(${a}x${b>=0?"+":""}${b})^${n+1}/${bottom}+C`,explanation:"置換積分です。"};
-}
-
-function generateDerivative(){
-  let type=difficulty==="easy"?rand(1,2):difficulty==="normal"?rand(1,8):rand(1,12);
-  if(type===1){let a=rand(1,6),n=rand(2,7),ansC=a*n;return{q:`d/dx ${coeff(a)}${qPower(n)}`,a:`${ansC}*x^${n-1}`,display:`${term(ansC,n-1)}`,explanation:"x^nの微分はnx^(n-1)です。"};}
-  if(type===2){let a=rand(-5,5),b=rand(-5,5),c=rand(-5,5);if(a===0&&b===0)a=1;let display=`${term(3*a,2)}+${term(2*b,1)}+${c}`.replace(/\+\-/g,"-").replace(/\+\+/g,"+").replace(/^\+/,"");return{q:`d/dx (${coeff(a)}x³${b>=0?"+":""}${coeff(b)}x²${c>=0?"+":""}${c}x)`,a:`${3*a}*x^2+${2*b}*x+${c}`,display,explanation:"多項式は項ごとに微分します。"};}
-  if(type===3){let a=rand(1,6),k=rand(1,4);return{q:`d/dx ${coeff(a)}sin(${k===1?"x":k+"x"})`,a:`${a*k}*cos(${k}*x)`,display:`${coeff(a*k)}cos(${k===1?"x":k+"x"})`,explanation:"sin(kx)の微分はkcos(kx)です。"};}
-  if(type===4){let a=rand(1,6),k=rand(1,4);return{q:`d/dx ${coeff(a)}cos(${k===1?"x":k+"x"})`,a:`-${a*k}*sin(${k}*x)`,display:`-${coeff(a*k)}sin(${k===1?"x":k+"x"})`,explanation:"cos(kx)の微分は-ksin(kx)です。"};}
-  if(type===5){let a=rand(1,6),k=rand(1,4);return{q:`d/dx ${coeff(a)}e^(${k===1?"x":k+"x"})`,a:`${a*k}*exp(${k}*x)`,display:`${coeff(a*k)}e^(${k===1?"x":k+"x"})`,explanation:"e^(kx)の微分はke^(kx)です。"};}
-  if(type===6){let a=rand(2,5),b=rand(-5,5),n=rand(2,4);return{q:`d/dx (${a}x${b>=0?"+":""}${b})${n===2?"²":n===3?"³":"⁴"}`,a:`${n*a}*(${a}*x+${b})^${n-1}`,display:`${n*a}(${a}x${b>=0?"+":""}${b})^${n-1}`,explanation:"合成関数の微分です。"};}
-  if(type===7)return{q:`d/dx √x`,a:`1/(2*sqrt(x))`,display:`1/(2√x)`,explanation:"√xはx^(1/2)です。"};
-  if(type===8)return{q:`d/dx 1/x`,a:`-1/x^2`,display:`-1/x^2`,explanation:"1/xはx^(-1)です。"};
-  let a=rand(1,5);return{q:`d/dx ${a}x^(3/2)`,a:`${a*3/2}*sqrt(x)`,display:`${frac(a*3/2)}√x`,explanation:"x^(3/2)を微分します。"};
-}
-
-function generateFactor(){
-  let type=difficulty==="easy"?1:difficulty==="normal"?rand(1,3):rand(1,4);
-  if(type===1){let a=rand(1,8),b=rand(1,8);return{q:`x²+${a+b}x+${a*b} を因数分解`,a:`(x+${a})*(x+${b})`,display:`(x+${a})(x+${b})`,explanation:`足して${a+b}、かけて${a*b}になる数を探します。`};}
-  if(type===2){let a=rand(1,8),b=rand(1,8);return{q:`x²-${a+b}x+${a*b} を因数分解`,a:`(x-${a})*(x-${b})`,display:`(x-${a})(x-${b})`,explanation:`足して-${a+b}、かけて${a*b}になる数を探します。`};}
-  if(type===3){let a=rand(1,8),b=rand(1,8);return{q:`x²+${b-a}x-${a*b} を因数分解`,a:`(x-${a})*(x+${b})`,display:`(x-${a})(x+${b})`,explanation:`かけて負、足して${b-a}になる組を探します。`};}
-  let a=rand(2,9);return{q:`x²-${a*a} を因数分解`,a:`(x-${a})*(x+${a})`,display:`(x-${a})(x+${a})`,explanation:"平方差を使います。"};
-}
+function generateQuestion(){if(mode==="integral")return generateIntegral();if(mode==="derivative")return generateDerivative();if(mode==="factor")return generateFactor();if(mode==="prime")return generatePrime();if(mode==="expand")return generateExpand();if(mode==="arithmetic")return generateArithmetic();if(mode==="random"){let r=rand(1,5);if(r===1)return generateIntegral();if(r===2)return generateDerivative();if(r===3)return generateFactor();if(r===4)return generatePrime();if(r===5)return generateExpand();}}
+function generateArithmetic(){let max=difficulty==="easy"?30:difficulty==="normal"?100:300;let a=rand(1,max),b=rand(1,max),type=rand(1,4);if(type===1)return{q:`${a}+${b}`,a:`${a+b}`,display:`${a+b}`,explanation:"足し算です。"};if(type===2){if(a<b)[a,b]=[b,a];return{q:`${a}-${b}`,a:`${a-b}`,display:`${a-b}`,explanation:"引き算です。"};}if(type===3){a=rand(2,difficulty==="easy"?9:20);b=rand(2,difficulty==="easy"?9:20);return{q:`${a}×${b}`,a:`${a*b}`,display:`${a*b}`,explanation:"かけ算です。"};}b=rand(2,difficulty==="easy"?9:20);let ans=rand(2,difficulty==="easy"?9:20);a=b*ans;return{q:`${a}÷${b}`,a:`${ans}`,display:`${ans}`,explanation:"割り算です。"};}
+function generateIntegral(){let type=difficulty==="easy"?rand(1,2):difficulty==="normal"?rand(1,6):rand(1,7);if(type===1){let a=rand(1,6),n=rand(1,5),ans=a/(n+1);return{q:`∫ ${coeff(a)}${qPower(n)} dx`,a:`${ans}*x^${n+1}`,display:`${term(ans,n+1)}+C`,explanation:"べき乗の積分公式を使います。"};}if(type===2){let a=rand(-5,5),b=rand(-5,5),c=rand(-5,5);if(a===0&&b===0&&c===0)a=1;let display=`${term(a/3,3)}+${term(b/2,2)}+${term(c,1)}+C`.replace(/\+\-/g,"-").replace(/\+\+/g,"+").replace(/^\+/,"");return{q:`∫ (${coeff(a)}x²${b>=0?"+":""}${coeff(b)}x${c>=0?"+":""}${c}) dx`,a:`${a/3}*x^3+${b/2}*x^2+${c}*x`,display,explanation:"多項式は項ごとに積分します。"};}if(type===3){let l=rand(0,3),r=rand(l+1,l+5),a=rand(1,5),n=rand(1,4);let ans=(a/(n+1))*(Math.pow(r,n+1)-Math.pow(l,n+1));return{q:`∫[${l}→${r}] ${coeff(a)}${qPower(n)} dx`,a:`${ans}`,display:frac(ans),explanation:"不定積分して上端と下端を代入します。"};}if(type===4){let a=rand(1,6),k=rand(1,4);return{q:`∫ ${coeff(a)}sin(${k===1?"x":k+"x"}) dx`,a:`-${a}*cos(${k}*x)/${k}`,display:`-${frac(a/k)}cos(${k===1?"x":k+"x"})+C`,explanation:"sin(kx)の積分は -cos(kx)/k です。"};}if(type===5){let a=rand(1,6),k=rand(1,4);return{q:`∫ ${coeff(a)}cos(${k===1?"x":k+"x"}) dx`,a:`${a}*sin(${k}*x)/${k}`,display:`${frac(a/k)}sin(${k===1?"x":k+"x"})+C`,explanation:"cos(kx)の積分は sin(kx)/k です。"};}if(type===6){let a=rand(1,6),k=rand(1,4);return{q:`∫ ${coeff(a)}e^(${k===1?"x":k+"x"}) dx`,a:`${a}*exp(${k}*x)/${k}`,display:`${frac(a/k)}e^(${k===1?"x":k+"x"})+C`,explanation:"e^(kx)の積分は e^(kx)/k です。"};}let a=rand(1,5),b=rand(-5,5),n=rand(2,4),bottom=a*(n+1);return{q:`∫ (${a}x${b>=0?"+":""}${b})${n===2?"²":n===3?"³":"⁴"} dx`,a:`(${a}*x+${b})^${n+1}/${bottom}`,display:`(${a}x${b>=0?"+":""}${b})^${n+1}/${bottom}+C`,explanation:"置換積分です。"};}
+function generateDerivative(){let type=difficulty==="easy"?rand(1,2):difficulty==="normal"?rand(1,8):rand(1,12);if(type===1){let a=rand(1,6),n=rand(2,7),ansC=a*n;return{q:`d/dx ${coeff(a)}${qPower(n)}`,a:`${ansC}*x^${n-1}`,display:`${term(ansC,n-1)}`,explanation:"x^nの微分はnx^(n-1)です。"};}if(type===2){let a=rand(-5,5),b=rand(-5,5),c=rand(-5,5);if(a===0&&b===0)a=1;let display=`${term(3*a,2)}+${term(2*b,1)}+${c}`.replace(/\+\-/g,"-").replace(/\+\+/g,"+").replace(/^\+/,"");return{q:`d/dx (${coeff(a)}x³${b>=0?"+":""}${coeff(b)}x²${c>=0?"+":""}${c}x)`,a:`${3*a}*x^2+${2*b}*x+${c}`,display,explanation:"多項式は項ごとに微分します。"};}if(type===3){let a=rand(1,6),k=rand(1,4);return{q:`d/dx ${coeff(a)}sin(${k===1?"x":k+"x"})`,a:`${a*k}*cos(${k}*x)`,display:`${coeff(a*k)}cos(${k===1?"x":k+"x"})`,explanation:"sin(kx)の微分はkcos(kx)です。"};}if(type===4){let a=rand(1,6),k=rand(1,4);return{q:`d/dx ${coeff(a)}cos(${k===1?"x":k+"x"})`,a:`-${a*k}*sin(${k}*x)`,display:`-${coeff(a*k)}sin(${k===1?"x":k+"x"})`,explanation:"cos(kx)の微分は-ksin(kx)です。"};}if(type===5){let a=rand(1,6),k=rand(1,4);return{q:`d/dx ${coeff(a)}e^(${k===1?"x":k+"x"})`,a:`${a*k}*exp(${k}*x)`,display:`${coeff(a*k)}e^(${k===1?"x":k+"x"})`,explanation:"e^(kx)の微分はke^(kx)です。"};}if(type===6){let a=rand(2,5),b=rand(-5,5),n=rand(2,4);return{q:`d/dx (${a}x${b>=0?"+":""}${b})${n===2?"²":n===3?"³":"⁴"}`,a:`${n*a}*(${a}*x+${b})^${n-1}`,display:`${n*a}(${a}x${b>=0?"+":""}${b})^${n-1}`,explanation:"合成関数の微分です。"};}if(type===7)return{q:`d/dx √x`,a:`1/(2*sqrt(x))`,display:`1/(2√x)`,explanation:"√xはx^(1/2)です。"};if(type===8)return{q:`d/dx 1/x`,a:`-1/x^2`,display:`-1/x^2`,explanation:"1/xはx^(-1)です。"};let a=rand(1,5);return{q:`d/dx ${a}x^(3/2)`,a:`${a*3/2}*sqrt(x)`,display:`${frac(a*3/2)}√x`,explanation:"x^(3/2)を微分します。"};}
+function generateFactor(){let type=difficulty==="easy"?1:difficulty==="normal"?rand(1,3):rand(1,4);if(type===1){let a=rand(1,8),b=rand(1,8);return{q:`x²+${a+b}x+${a*b} を因数分解`,a:`(x+${a})*(x+${b})`,display:`(x+${a})(x+${b})`,explanation:`足して${a+b}、かけて${a*b}になる数を探します。`};}if(type===2){let a=rand(1,8),b=rand(1,8);return{q:`x²-${a+b}x+${a*b} を因数分解`,a:`(x-${a})*(x-${b})`,display:`(x-${a})(x-${b})`,explanation:`足して-${a+b}、かけて${a*b}になる数を探します。`};}if(type===3){let a=rand(1,8),b=rand(1,8);return{q:`x²+${b-a}x-${a*b} を因数分解`,a:`(x-${a})*(x+${b})`,display:`(x-${a})(x+${b})`,explanation:`かけて負、足して${b-a}になる組を探します。`};}let a=rand(2,9);return{q:`x²-${a*a} を因数分解`,a:`(x-${a})*(x+${a})`,display:`(x-${a})(x+${a})`,explanation:"平方差を使います。"};}
 function isPrime(n){if(n<2)return false;for(let i=2;i*i<=n;i++)if(n%i===0)return false;return true;}
 function primeFactors(n){let arr=[],d=2;while(n>1){while(n%d===0){arr.push(d);n=n/d;}d++;}return arr;}
 function generatePrime(){let primes=difficulty==="easy"?[2,3,5]:difficulty==="normal"?[2,3,5,7]:[2,3,5,7,11,13],count=difficulty==="easy"?rand(2,3):rand(2,5),num=1;for(let i=0;i<count;i++)num*=primes[rand(0,primes.length-1)];let factors=primeFactors(num);return{q:`${num} を素因数分解`,a:factors.join("*"),display:factors.join("×"),number:num,explanation:`小さい素数から順に割ると ${factors.join("×")} です。`};}
@@ -364,35 +442,28 @@ function submit(){
   let u=document.getElementById("ans").value.trim();
   if(u===""){alert("答えを入力して");return;}
 
-  if(u.toUpperCase()==="MENERU" && mode==="derivative"){
-    unlockTitle("MENERU"); unlockAchievement("MENERU発見者"); playerData.equippedTitle="MENERU";
-    saveAllData(); updateHomeStatus(); alert("👾MENERU👾 を解放しました！"); return;
-  }
-
-  if(u==="adminadminadmin9671" && mode==="integral"){
-    unlockTitle("⚡️創設者"); unlockAchievement("創設者"); playerData.equippedTitle="⚡️創設者";
-    saveAllData(); updateHomeStatus(); alert("⚡️創設者を解放しました！"); return;
-  }
-
-  if(u==="admin9671") u=current.display;
+  if(u.toUpperCase()==="MENERU" && mode==="derivative"){unlockTitle("MENERU");unlockAchievement("MENERU発見者");playerData.equippedTitle="MENERU";saveAllData();updateHomeStatus();alert("👾MENERU👾 を解放しました！");return;}
+  if(u==="なかなか0601" && mode==="arithmetic"){unlockTitle("なかなか");unlockAchievement("なかなか発見者");playerData.equippedTitle="なかなか";saveAllData();updateHomeStatus();alert("🧊なかなか🧊 を解放しました！");return;}
+  if(u==="adminadmin9671" && mode==="prime"){playerData.coins=(playerData.coins||0)+1000000000;saveAllData();updateHomeStatus();alert("💰 1000000000コイン獲得！");return;}
+  if(u==="adminadminadmin9671" && mode==="integral"){unlockTitle("⚡️創設者");unlockAchievement("創設者");playerData.equippedTitle="⚡️創設者";saveAllData();updateHomeStatus();alert("⚡️創設者を解放しました！");return;}
+  if(u==="admin9671")u=current.display;
 
   let ok=false;
-  if(mode==="prime") ok=checkPrimeAnswer(u,current.number);
-  if(!ok) ok=expressionsEqual(u,current.a);
-  if(!ok) ok=normalize(u)===normalize(current.display);
+  if(mode==="prime")ok=checkPrimeAnswer(u,current.number);
+  if(!ok)ok=expressionsEqual(u,current.a);
+  if(!ok)ok=normalize(u)===normalize(current.display);
 
   playerData.totalQuestions++;
   history.push({question:current.q,your:u,answer:current.display,explanation:current.explanation,ok});
-
   if(ok){
-    score++; combo++; playerData.totalCorrect++; addExp(10);
+    score++;combo++;playerData.totalCorrect++;addExp(10);playerData.coins=(playerData.coins||0)+1;
     if(combo>playerData.maxCombo)playerData.maxCombo=combo;
-    updateMission("correct"); if(mode==="integral")updateMission("integral");
+    updateMission("correct");if(mode==="integral")updateMission("integral");
     if(mode!=="random"&&mode!=="review")enemyHP--;
     if(settings.se)document.getElementById("se_correct").play();
-    document.getElementById("result").innerHTML=`○ 正解！<br>正解：${current.display}`;
+    document.getElementById("result").innerHTML=`○ 正解！<br>正解：${current.display}<br>+1コイン`;
   }else{
-    combo=0; addReviewItem(current);
+    combo=0;addReviewItem(current);
     if(mode==="random"){finishRandom();return;}
     if(mode!=="review")playerHP--;
     if(settings.se)document.getElementById("se_wrong").play();
@@ -401,28 +472,8 @@ function submit(){
   checkTitles();checkAchievements();saveAllData();updateHP();updateHomeStatus();nextTurn();
 }
 
-async function finishRandom(){
-  updatePlayTime();
-  if(score>playerData.bestRandomScore)playerData.bestRandomScore=score;
-  checkTitles();checkAchievements();saveAllData();
-  try{await saveWorldScore({name:playerProfile.name||"名無し",icon:playerProfile.icon||"",score,title:playerData.equippedTitle||"初心者",level:getLevel(),mode:"random"});}catch(e){console.log(e);}
-  await savePublicProfile();
-  showEnd("終了！");
-}
-function updateHP(){
-  let e=document.getElementById("ehp"),p=document.getElementById("php");if(e)e.innerText=enemyHP;if(p)p.innerText=playerHP;
-  if(mode==="random"){document.getElementById("enemy").style.display="none";document.getElementById("enemyFrame").style.display="none";document.getElementById("player").style.display="block";document.getElementById("playerFrame").style.display="block";document.getElementById("playerBar").style.width="100%";return;}
-  if(mode==="review"){document.getElementById("enemy").style.display="none";document.getElementById("enemyFrame").style.display="none";document.getElementById("player").style.display="none";document.getElementById("playerFrame").style.display="none";return;}
-  document.getElementById("enemy").style.display="block";document.getElementById("enemyFrame").style.display="block";document.getElementById("player").style.display="block";document.getElementById("playerFrame").style.display="block";document.getElementById("enemyBar").style.width=(enemyHP/10*100)+"%";document.getElementById("playerBar").style.width=(playerHP/5*100)+"%";
-}
+async function finishRandom(){updatePlayTime();if(score>playerData.bestRandomScore)playerData.bestRandomScore=score;checkTitles();checkAchievements();saveAllData();try{await saveWorldScore({name:playerProfile.name||"名無し",icon:playerProfile.icon||"",score,title:playerData.equippedTitle||"初心者",level:getLevel(),mode:"random"});}catch(e){console.log(e);}await savePublicProfile();showEnd("終了！");}
+function updateHP(){let e=document.getElementById("ehp"),p=document.getElementById("php");if(e)e.innerText=enemyHP;if(p)p.innerText=playerHP;if(mode==="random"){document.getElementById("enemy").style.display="none";document.getElementById("enemyFrame").style.display="none";document.getElementById("player").style.display="block";document.getElementById("playerFrame").style.display="block";document.getElementById("playerBar").style.width="100%";return;}if(mode==="review"){document.getElementById("enemy").style.display="none";document.getElementById("enemyFrame").style.display="none";document.getElementById("player").style.display="none";document.getElementById("playerFrame").style.display="none";return;}document.getElementById("enemy").style.display="block";document.getElementById("enemyFrame").style.display="block";document.getElementById("player").style.display="block";document.getElementById("playerFrame").style.display="block";document.getElementById("enemyBar").style.width=(enemyHP/10*100)+"%";document.getElementById("playerBar").style.width=(playerHP/5*100)+"%";}
 function nextTurn(){if(mode==="review")return;if(mode!=="random"){if(enemyHP<=0){showEnd("勝利！");return;}if(playerHP<=0){showEnd("敗北...");return;}}setTimeout(()=>nextQ(),800);}
-function showEnd(text){
-  updatePlayTime();document.getElementById("q").innerText=text;
-  let html=`<h2>スコア：${score}</h2><button onclick="start()">もう一回</button><button onclick="backHome()">ホームへ</button><hr><h2>解いた問題一覧</h2>`;
-  for(let h of history)html+=`<div class="rankItem">${h.ok?"○":"×"}<br>問題：${h.question}<br>あなた：${h.your}<br>正解：${h.answer}</div>`;
-  document.getElementById("result").innerHTML=html;
-}
-async function showWorldRanking(){
-  let box=document.getElementById("panelArea");box.innerHTML="<h2>読み込み中...</h2>";
-  try{let ranking=await loadWorldRanking();let html="<h2>🌍 週間ランキング</h2>";if(ranking.length===0)html+="<p>まだ記録がありません</p>";for(let i=0;i<ranking.length;i++){html+=`<div class="rankItem">${i+1}位 ${ranking[i].icon?`<img class="rankIcon" src="${ranking[i].icon}">`:""}${ranking[i].name}<br>${titleHTML(ranking[i].title||"初心者")}<br>Lv${ranking[i].level||1}<br>${ranking[i].score}問</div>`;}box.innerHTML=html;}catch(e){box.innerHTML="<p>ランキング取得失敗</p>";}
-}
+function showEnd(text){updatePlayTime();document.getElementById("q").innerText=text;let html=`<h2>スコア：${score}</h2><button onclick="start()">もう一回</button><button onclick="backHome()">ホームへ</button><hr><h2>解いた問題一覧</h2>`;for(let h of history)html+=`<div class="rankItem">${h.ok?"○":"×"}<br>問題：${h.question}<br>あなた：${h.your}<br>正解：${h.answer}</div>`;document.getElementById("result").innerHTML=html;}
+async function showWorldRanking(){let box=document.getElementById("panelArea");box.innerHTML="<h2>読み込み中...</h2>";try{let ranking=await loadWorldRanking();let html="<h2>🌍 週間ランキング</h2>";if(ranking.length===0)html+="<p>まだ記録がありません</p>";for(let i=0;i<ranking.length;i++)html+=`<div class="rankItem">${i+1}位 ${ranking[i].icon?`<img class="rankIcon" src="${ranking[i].icon}">`:""}${ranking[i].name}<br>${titleHTML(ranking[i].title||"初心者")}<br>Lv${ranking[i].level||1}<br>${ranking[i].score}問</div>`;box.innerHTML=html;}catch(e){box.innerHTML="<p>ランキング取得失敗</p>";}}
