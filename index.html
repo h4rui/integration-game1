@@ -77,6 +77,15 @@ a{color:#00ffcc;}
   animation:founderGlow 2s infinite;
 }
 
+.meneruTitle{
+  color:#ff0000;
+  font-weight:bold;
+  text-shadow:
+    0 0 10px #ff0000,
+    0 0 20px #ff0000,
+    0 0 40px #ff0000;
+}
+
 @keyframes founderGlow{
   0%{text-shadow:0 0 5px gold,0 0 10px gold;}
   50%{text-shadow:0 0 20px gold,0 0 40px gold;}
@@ -101,12 +110,6 @@ a{color:#00ffcc;}
   100%{opacity:0;transform:translate(-50%,-50%) scale(2);}
 }
 
-#timer{
-  font-size:30px;
-  color:yellow;
-  margin:15px;
-}
-
 #enemy,#player{
   font-size:30px;
   margin:10px;
@@ -128,8 +131,13 @@ a{color:#00ffcc;}
   transition:width .4s;
 }
 
-#enemyBar{background:linear-gradient(90deg,red,orange);}
-#playerBar{background:linear-gradient(90deg,lime,#00ffcc);}
+#enemyBar{
+  background:linear-gradient(90deg,red,orange);
+}
+
+#playerBar{
+  background:linear-gradient(90deg,lime,#00ffcc);
+}
 
 #q{
   font-size:42px;
@@ -137,7 +145,9 @@ a{color:#00ffcc;}
   text-shadow:0 0 20px #00ffcc;
 }
 
-.questionAnim{animation:questionPop .5s;}
+.questionAnim{
+  animation:questionPop .5s;
+}
 
 @keyframes questionPop{
   0%{opacity:0;transform:scale(.5) rotate(-3deg);}
@@ -158,7 +168,9 @@ a{color:#00ffcc;}
   z-index:50;
 }
 
-.goAnim{animation:goPop .7s;}
+.goAnim{
+  animation:goPop .7s;
+}
 
 @keyframes goPop{
   0%{opacity:0;transform:translate(-50%,-50%) scale(.2);}
@@ -176,14 +188,18 @@ a{color:#00ffcc;}
   z-index:20;
 }
 
-.showSlash{animation:slashAnim .5s;}
+.showSlash{
+  animation:slashAnim .5s;
+}
 
 @keyframes slashAnim{
   0%{opacity:1;transform:translate(-50%,-50%) scale(0);}
   100%{opacity:0;transform:translate(-50%,-50%) scale(2);}
 }
 
-.playerHit{animation:flash .4s;}
+.playerHit{
+  animation:flash .4s;
+}
 
 @keyframes flash{
   0%{background:red;}
@@ -260,8 +276,6 @@ a{color:#00ffcc;}
 
 <div id="gameScreen" class="screen">
   <h1 id="modeTitle">🏆 数学マスター 🏆</h1>
-
-  <div id="timer"></div>
 
   <div id="enemy">👾 敵HP: <span id="ehp">10</span></div>
   <div class="hpFrame" id="enemyFrame">
@@ -418,8 +432,6 @@ window.saveWorldScore = async function(data){
     mode:data.mode,
     week:week,
     playerId:playerId,
-    googleName:window.currentUser ? window.currentUser.displayName : "",
-    googleEmail:window.currentUser ? window.currentUser.email : "",
     updatedAt:serverTimestamp()
   });
 };
