@@ -30,7 +30,8 @@ let playerData = {
   equippedTitle:"初心者",
   bestRandomScore:0,
   reviewList:[],
-  dailyMission:{}
+  dailyMission:{},
+  achievements:[]
 };
 
 function rand(min,max){
@@ -135,6 +136,7 @@ function loadAllData(){
   if(!playerData.equippedTitle) playerData.equippedTitle = "初心者";
   if(!playerData.reviewList) playerData.reviewList = [];
   if(!playerData.dailyMission) playerData.dailyMission = {};
+  if(!playerData.achievements) playerData.achievements = [];
   if(!playerData.exp) playerData.exp = 0;
 
   applySettings();
@@ -160,8 +162,7 @@ function updateHomeStatus(){
   }
 
   if(level){
-    level.innerHTML =
-      `Lv${getLevel()}　EXP ${getExpPercent()}/100`;
+    level.innerHTML = `Lv${getLevel()}　EXP ${getExpPercent()}/100`;
   }
 
   if(icon && playerProfile.icon){
@@ -213,6 +214,49 @@ function equipTitle(t){
     updateHomeStatus();
     showTitles();
   }
+}
+
+function unlockAchievement(a){
+  if(!playerData.achievements.includes(a)){
+    playerData.achievements.push(a);
+  }
+}
+
+function checkAchievements(){
+  if(playerData.totalCorrect >= 1) unlockAchievement("初正解");
+  if(playerData.totalCorrect >= 10) unlockAchievement("10問正解");
+  if(playerData.totalCorrect >= 100) unlockAchievement("100問正解");
+  if(playerData.bestRandomScore >= 1) unlockAchievement("初ランキング登録");
+  if(playerData.maxCombo >= 10) unlockAchievement("10連勝達成");
+  if((playerData.reviewList || []).length >= 10) unlockAchievement("復習リスト満タン");
+  saveAllData();
+}
+
+function showAchievements(){
+  checkAchievements();
+
+  let all = [
+    "初正解",
+    "10問正解",
+    "100問正解",
+    "初ランキング登録",
+    "10連勝達成",
+    "復習リスト満タン"
+  ];
+
+  let html = "<h2>🏆 実績一覧</h2>";
+
+  for(let a of all){
+    let got = playerData.achievements.includes(a);
+
+    html += `
+      <div class="achievementItem">
+        ${got ? "✅" : "⬜"} ${a}
+      </div>
+    `;
+  }
+
+  document.getElementById("panelArea").innerHTML = html;
 }
 
 function checkTitles(){
@@ -288,7 +332,6 @@ function allTitles(){
 function showTitles(){
   checkTitles();
 
-  let box = document.getElementById("panelArea");
   let html = "<h2>🏅 称号一覧</h2>";
 
   for(let t of allTitles()){
@@ -302,7 +345,7 @@ function showTitles(){
     `;
   }
 
-  box.innerHTML = html;
+  document.getElementById("panelArea").innerHTML = html;
 }
 
 function getTodayKey(){
@@ -316,15 +359,13 @@ function prepareDailyMission(){
 
   if(playerData.dailyMission.date === today) return;
 
-  let missions = [
-    { id:"correct10", text:"今日10問正解", need:10, count:0, done:false },
-    { id:"integral5", text:"積分を5問正解", need:5, count:0, done:false },
-    { id:"combo5", text:"5連勝する", need:5, count:0, done:false }
-  ];
-
   playerData.dailyMission = {
     date:today,
-    missions:missions
+    missions:[
+      { id:"correct10", text:"今日10問正解", need:10, count:0, done:false },
+      { id:"integral5", text:"積分を5問正解", need:5, count:0, done:false },
+      { id:"combo5", text:"5連勝する", need:5, count:0, done:false }
+    ]
   };
 
   saveAllData();
@@ -338,17 +379,9 @@ function updateMission(type){
   for(let m of ms){
     if(m.done) continue;
 
-    if(m.id === "correct10" && type === "correct"){
-      m.count++;
-    }
-
-    if(m.id === "integral5" && type === "integral"){
-      m.count++;
-    }
-
-    if(m.id === "combo5" && combo >= 5){
-      m.count = 5;
-    }
+    if(m.id === "correct10" && type === "correct") m.count++;
+    if(m.id === "integral5" && type === "integral") m.count++;
+    if(m.id === "combo5" && combo >= 5) m.count = 5;
 
     if(m.count >= m.need){
       m.done = true;
@@ -362,7 +395,6 @@ function updateMission(type){
 function showDailyMission(){
   prepareDailyMission();
 
-  let box = document.getElementById("panelArea");
   let html = "<h2>🎯 デイリーミッション</h2>";
 
   for(let m of playerData.dailyMission.missions){
@@ -375,16 +407,21 @@ function showDailyMission(){
     `;
   }
 
-  box.innerHTML = html;
+  document.getElementById("panelArea").innerHTML = html;
 }
 
 function addReviewItem(q){
   if(!q) return;
 
+  if(playerData.reviewList.some(x=>x.q===q.q)){
+    return;
+  }
+
   playerData.reviewList.unshift({
     q:q.q,
     a:q.display,
-    explanation:q.explanation || "解説はありません"
+    explanation:q.explanation || "解説はありません",
+    original:q
   });
 
   playerData.reviewList = playerData.reviewList.slice(0,10);
@@ -392,7 +429,6 @@ function addReviewItem(q){
 }
 
 function showReviewList(){
-  let box = document.getElementById("panelArea");
   let html = "<h2>📚 復習リスト</h2>";
 
   if(playerData.reviewList.length === 0){
@@ -407,13 +443,36 @@ function showReviewList(){
         <p>${i+1}. ${r.q}</p>
         <p>正解：${r.a}</p>
         <button onclick="alert('${String(r.explanation).replace(/'/g,"\\'")}')">解説を見る</button>
+        <button onclick="retryReview(${i})">再挑戦</button>
       </div>
     `;
   }
 
-  box.innerHTML = html;
+  document.getElementById("panelArea").innerHTML = html;
 }
 
+function retryReview(i){
+  let r = playerData.reviewList[i];
+
+  if(!r) return;
+
+  current = {
+    q:r.q,
+    a:r.original ? r.original.a : r.a,
+    display:r.a,
+    explanation:r.explanation
+  };
+
+  mode = "review";
+
+  document.getElementById("homeScreen").classList.remove("active");
+  document.getElementById("gameScreen").classList.add("active");
+
+  document.getElementById("modeTitle").innerText = "📚 復習モード";
+  document.getElementById("result").innerHTML = "";
+  document.getElementById("q").innerText = current.q;
+  document.getElementById("ans").value = "";
+}
 function showStudyMenu(){
   document.getElementById("panelArea").innerHTML = `
     <h2>📚 学習モード</h2>
@@ -446,6 +505,11 @@ function showSettings(){
 
 function showProfile(){
   let playMin = Math.floor((playerData.playTime || 0) / 60);
+  let rate = 0;
+
+  if((playerData.totalQuestions || 0) > 0){
+    rate = Math.round(playerData.totalCorrect / playerData.totalQuestions * 100);
+  }
 
   document.getElementById("panelArea").innerHTML = `
     <h2>👤 プロフィール</h2>
@@ -466,9 +530,11 @@ function showProfile(){
       <p>EXP：${getExpPercent()}/100</p>
       <p>累計正解数：${playerData.totalCorrect || 0}問</p>
       <p>累計問題数：${playerData.totalQuestions || 0}問</p>
+      <p>正答率：${rate}%</p>
       <p>プレイ時間：約${playMin}分</p>
       <p>最大連勝：${playerData.maxCombo || 0}</p>
       <p>ベストスコア：${playerData.bestRandomScore || 0}問</p>
+      <p>連続プレイ：${playerData.consecutiveDays || 0}日</p>
     </div>
   `;
 }
@@ -481,6 +547,7 @@ function saveProfileFromPanel(){
 
   if(file){
     let reader = new FileReader();
+
     reader.onload = function(e){
       playerProfile.icon = e.target.result;
       saveAllData();
@@ -488,6 +555,7 @@ function saveProfileFromPanel(){
       showProfile();
       alert("保存したよ");
     };
+
     reader.readAsDataURL(file);
   }else{
     saveAllData();
@@ -496,6 +564,42 @@ function saveProfileFromPanel(){
     alert("保存したよ");
   }
 }
+
+function showContact(){
+  document.getElementById("panelArea").innerHTML = `
+    <h2>📩 お問い合わせ</h2>
+
+    <div class="profileItem">
+      <p>
+        数学マスターへのバグ報告・要望・お問い合わせはこちらからお願いします。
+      </p>
+
+      <p>
+        ✉️ メール：mathmaster.contact@gmail.com
+      </p>
+
+      <p>お問い合わせ内容の例：</p>
+
+      <ul>
+        <li>問題の答えが違う</li>
+        <li>ログインできない</li>
+        <li>ランキングが反映されない</li>
+        <li>追加してほしい機能</li>
+        <li>その他のご連絡</li>
+      </ul>
+
+      <p>
+        ※返信には時間がかかる場合があります。
+      </p>
+    </div>
+
+    <div class="profileItem">
+      <p><a href="terms.html">利用規約</a></p>
+      <p><a href="privacy.html">プライバシーポリシー</a></p>
+    </div>
+  `;
+}
+
 function recordPlayDay(){
   let today = getTodayKey();
 
@@ -549,6 +653,7 @@ function backHome(){
   document.getElementById("bgm").pause();
 
   checkTitles();
+  checkAchievements();
   saveAllData();
   updateHomeStatus();
 }
@@ -625,7 +730,7 @@ function generateIntegral(){
       q:`∫ ${coeff(a)}${qPower(n)} dx`,
       a:`${ans}*x^${n+1}`,
       display:`${term(ans,n+1)}+C`,
-      explanation:`べき乗の積分公式を使います。∫x^n dx = x^(n+1)/(n+1)+C なので、係数${a}をつけて ${term(ans,n+1)}+C です。`
+      explanation:`べき乗の積分公式 ∫x^n dx = x^(n+1)/(n+1)+C を使います。係数${a}をつけて ${term(ans,n+1)}+C です。`
     };
   }
 
@@ -664,7 +769,7 @@ function generateIntegral(){
       q:`∫[${l}→${r}] ${coeff(a)}${qPower(n)} dx`,
       a:`${ans}`,
       display:frac(ans),
-      explanation:`まず不定積分してから上端${r}と下端${l}を代入します。F(${r})-F(${l}) を計算すると ${frac(ans)} です。`
+      explanation:`まず不定積分してから上端${r}と下端${l}を代入します。F(${r})-F(${l})を計算すると ${frac(ans)} です。`
     };
   }
 
@@ -699,7 +804,7 @@ function generateIntegral(){
       q:`∫ ${coeff(a)}sin(${k===1?"x":k+"x"}) dx`,
       a:`-${a}*cos(${k}*x)/${k}`,
       display:`-${frac(a/k)}cos(${k===1?"x":k+"x"})+C`,
-      explanation:`sin(kx)の積分は -cos(kx)/k です。係数${a}をかけて答えになります。`
+      explanation:`sin(kx)の積分は -cos(kx)/k です。係数${a}をかけます。`
     };
   }
 
@@ -711,7 +816,7 @@ function generateIntegral(){
       q:`∫ ${coeff(a)}cos(${k===1?"x":k+"x"}) dx`,
       a:`${a}*sin(${k}*x)/${k}`,
       display:`${frac(a/k)}sin(${k===1?"x":k+"x"})+C`,
-      explanation:`cos(kx)の積分は sin(kx)/k です。係数${a}をかけて答えになります。`
+      explanation:`cos(kx)の積分は sin(kx)/k です。係数${a}をかけます。`
     };
   }
 
@@ -723,7 +828,7 @@ function generateIntegral(){
       q:`∫ ${coeff(a)}e^(${k===1?"x":k+"x"}) dx`,
       a:`${a}*exp(${k}*x)/${k}`,
       display:`${frac(a/k)}e^(${k===1?"x":k+"x"})+C`,
-      explanation:`e^(kx)の積分は e^(kx)/k です。係数${a}をかけて答えになります。`
+      explanation:`e^(kx)の積分は e^(kx)/k です。係数${a}をかけます。`
     };
   }
 
@@ -737,11 +842,10 @@ function generateIntegral(){
       q:`∫ (${a}x${b>=0?"+":""}${b})${n===2?"²":n===3?"³":"⁴"} dx`,
       a:`(${a}*x+${b})^${n+1}/${bottom}`,
       display:`(${a}x${b>=0?"+":""}${b})^${n+1}/${bottom}+C`,
-      explanation:`中身をt=${a}x${b>=0?"+":""}${b}と置くと、dt=${a}dxです。だから1/${a}をかけて、次数を1つ上げます。`
+      explanation:`中身をt=${a}x${b>=0?"+":""}${b}と置くとdt=${a}dxです。1/${a}をかけて、次数を1つ上げます。`
     };
   }
 }
-
 function generateDerivative(){
   let type = rand(1,12);
 
@@ -876,7 +980,7 @@ function generateDerivative(){
       q:`d/dx (${a}x²+1)/2`,
       a:`${a}*x`,
       display:`${coeff(a)}x`,
-      explanation:`(${a}x²+1)/2 を微分します。${a}x²の微分は${2*a}x、それを2で割るので${a}xです。`
+      explanation:`(${a}x²+1)/2を微分します。${a}x²の微分は${2*a}x、それを2で割るので${a}xです。`
     };
   }
 
@@ -945,9 +1049,11 @@ function generateFactor(){
 
 function isPrime(n){
   if(n<2) return false;
+
   for(let i=2;i*i<=n;i++){
     if(n%i===0) return false;
   }
+
   return true;
 }
 
@@ -960,6 +1066,7 @@ function primeFactors(n){
       arr.push(d);
       n = n/d;
     }
+
     d++;
   }
 
@@ -1014,14 +1121,17 @@ function checkPrimeAnswer(input,number){
         }
       }else{
         let n = Number(part);
+
         if(!Number.isInteger(n)) return false;
         if(!isPrime(n)) return false;
+
         nums.push(n);
       }
     }
 
     let product = nums.reduce((a,b)=>a*b,1);
     return product===number;
+
   }catch(e){
     return false;
   }
@@ -1076,7 +1186,6 @@ function generateExpand(){
     };
   }
 }
-
 function expressionsEqual(user,correct){
   try{
     let u = normalize(user);
@@ -1125,6 +1234,7 @@ function backHome(){
   document.getElementById("bgm").pause();
 
   checkTitles();
+  checkAchievements();
   saveAllData();
   updateHomeStatus();
 }
@@ -1170,8 +1280,34 @@ function updatePlayTime(){
   }
 }
 
+function generateQuestion(){
+  if(mode==="integral") return generateIntegral();
+  if(mode==="derivative") return generateDerivative();
+  if(mode==="factor") return generateFactor();
+  if(mode==="prime") return generatePrime();
+  if(mode==="expand") return generateExpand();
+
+  if(mode==="random"){
+    let r = rand(1,5);
+    if(r===1) return generateIntegral();
+    if(r===2) return generateDerivative();
+    if(r===3) return generateFactor();
+    if(r===4) return generatePrime();
+    if(r===5) return generateExpand();
+  }
+}
+
 function nextQ(){
-  current = generateQuestion();
+  let count = 0;
+
+  do{
+    current = generateQuestion();
+    count++;
+  }while(
+    usedQuestions.includes(current.q) &&
+    count < 100
+  );
+
   usedQuestions.push(current.q);
 
   let q = document.getElementById("q");
@@ -1247,6 +1383,7 @@ function submit(){
     question:current.q,
     your:u,
     answer:current.display,
+    explanation:current.explanation || "",
     ok:ok
   });
 
@@ -1267,7 +1404,7 @@ function submit(){
       updateMission("integral");
     }
 
-    if(mode!=="random"){
+    if(mode!=="random" && mode!=="review"){
       enemyHP--;
     }
 
@@ -1296,7 +1433,9 @@ function submit(){
       return;
     }
 
-    playerHP--;
+    if(mode!=="review"){
+      playerHP--;
+    }
 
     document.body.classList.add("playerHit");
 
@@ -1315,6 +1454,7 @@ function submit(){
   }
 
   checkTitles();
+  checkAchievements();
   saveAllData();
   updateHP();
   nextTurn();
@@ -1328,6 +1468,7 @@ async function finishRandom(){
   }
 
   checkTitles();
+  checkAchievements();
   saveAllData();
 
   document.getElementById("result").innerText = "記録送信中...";
@@ -1355,9 +1496,16 @@ function updateHP(){
     document.getElementById("enemy").style.display = "none";
     document.getElementById("enemyFrame").style.display = "none";
     document.getElementById("playerBar").style.width = "100%";
+  }else if(mode==="review"){
+    document.getElementById("enemy").style.display = "none";
+    document.getElementById("enemyFrame").style.display = "none";
+    document.getElementById("player").style.display = "none";
+    document.getElementById("playerFrame").style.display = "none";
   }else{
     document.getElementById("enemy").style.display = "block";
     document.getElementById("enemyFrame").style.display = "block";
+    document.getElementById("player").style.display = "block";
+    document.getElementById("playerFrame").style.display = "block";
 
     document.getElementById("enemyBar").style.width =
       (enemyHP/10*100)+"%";
@@ -1368,6 +1516,10 @@ function updateHP(){
 }
 
 function nextTurn(){
+  if(mode==="review"){
+    return;
+  }
+
   if(mode!=="random"){
     if(enemyHP<=0){
       showEnd("勝利！");
@@ -1437,7 +1589,11 @@ async function showEnd(text){
         <p>${i+1}. ${mark} 問題: ${history[i].question}</p>
         <p>あなたの答え: ${history[i].your}</p>
         <p>正解: ${history[i].answer}</p>
-        <p>${history[i].ok ? "" : current?.explanation || ""}</p>
+        ${
+          history[i].ok
+          ? ""
+          : `<p>解説：${history[i].explanation}</p>`
+        }
       </div>
     `;
   }

@@ -54,6 +54,10 @@ input{
   border:none;
 }
 
+a{
+  color:#00ffcc;
+}
+
 #profileIcon{
   width:90px;
   height:90px;
@@ -162,16 +166,6 @@ input{
   100%{opacity:0;transform:translate(-50%,-50%) scale(2);}
 }
 
-.enemyHit{animation:shake .4s;}
-
-@keyframes shake{
-  0%{transform:translateX(0);}
-  25%{transform:translateX(-20px);}
-  50%{transform:translateX(20px);}
-  75%{transform:translateX(-20px);}
-  100%{transform:translateX(0);}
-}
-
 .playerHit{animation:flash .4s;}
 
 @keyframes flash{
@@ -179,7 +173,7 @@ input{
   100%{background:radial-gradient(circle,#111,#000);}
 }
 
-.rankItem,.titleItem,.profileItem,.settingsItem,.missionItem,.reviewItem,.explainBox{
+.rankItem,.titleItem,.profileItem,.settingsItem,.missionItem,.reviewItem,.explainBox,.achievementItem{
   background:rgba(255,255,255,0.12);
   margin:10px auto;
   padding:10px;
@@ -229,8 +223,10 @@ input{
   <button class="modeBtn" onclick="showWorldRanking()">🌍 週間ランキング</button>
   <button class="modeBtn" onclick="showDailyMission()">🎯 デイリーミッション</button>
   <button class="modeBtn" onclick="showReviewList()">📚 復習リスト</button>
+  <button class="modeBtn" onclick="showAchievements()">🏆 実績一覧</button>
   <button class="modeBtn" onclick="showProfile()">👤 プロフィール</button>
   <button class="modeBtn" onclick="showSettings()">⚙️ 設定</button>
+  <button class="modeBtn" onclick="showContact()">📩 お問い合わせ</button>
 
   <div id="panelArea"></div>
 </div>
