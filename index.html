@@ -7,7 +7,7 @@
 <style>
 body{
   margin:0;
-  background: radial-gradient(circle, #111, #000);
+  background:radial-gradient(circle,#111,#000);
   color:white;
   text-align:center;
   font-family:sans-serif;
@@ -19,19 +19,22 @@ h1{
 }
 
 #q{
-  font-size:60px;
+  font-size:50px;
   margin:30px;
   text-shadow:0 0 20px #00ffcc;
 }
 
 input{
-  font-size:40px;
+  font-size:35px;
   width:80%;
   text-align:center;
+  border-radius:15px;
+  padding:10px;
+  border:none;
 }
 
 button{
-  font-size:30px;
+  font-size:28px;
   margin:10px;
   padding:10px 20px;
   background:#00ffcc;
@@ -39,14 +42,101 @@ button{
   border-radius:10px;
 }
 
-#timer{
-  font-size:25px;
-  color:yellow;
+button:hover{
+  transform:scale(1.08);
+  box-shadow:0 0 20px #00ffcc;
 }
 
-#enemy, #player{
+select{
+  font-size:22px;
+  padding:8px;
+  border-radius:10px;
+}
+
+#timer{
+  font-size:30px;
+  color:yellow;
+  margin:15px;
+}
+
+#enemy,#player{
   font-size:30px;
   margin:10px;
+}
+
+.hpFrame{
+  width:80%;
+  height:25px;
+  background:#333;
+  margin:10px auto 25px;
+  border-radius:20px;
+  overflow:hidden;
+  box-shadow:0 0 10px white;
+}
+
+.hpBar{
+  height:100%;
+  width:100%;
+  transition:width .4s;
+}
+
+#enemyBar{
+  background:linear-gradient(90deg,red,orange);
+}
+
+#playerBar{
+  background:linear-gradient(90deg,lime,#00ffcc);
+}
+
+#result{
+  font-size:30px;
+  margin-top:20px;
+  font-weight:bold;
+}
+
+@keyframes shake{
+  0%{transform:translateX(0);}
+  25%{transform:translateX(-20px);}
+  50%{transform:translateX(20px);}
+  75%{transform:translateX(-20px);}
+  100%{transform:translateX(0);}
+}
+
+.enemyHit{
+  animation:shake .4s;
+}
+
+@keyframes flash{
+  0%{background:red;}
+  100%{background:radial-gradient(circle,#111,#000);}
+}
+
+.playerHit{
+  animation:flash .4s;
+}
+
+#slash{
+  position:fixed;
+  left:50%;
+  top:40%;
+  font-size:120px;
+  opacity:0;
+  pointer-events:none;
+}
+
+.showSlash{
+  animation:slashAnim .5s;
+}
+
+@keyframes slashAnim{
+  0%{
+    opacity:1;
+    transform:translate(-50%,-50%) scale(0);
+  }
+  100%{
+    opacity:0;
+    transform:translate(-50%,-50%) scale(2);
+  }
 }
 </style>
 </head>
@@ -61,33 +151,32 @@ button{
   <option value="hard">むずかしい</option>
 </select>
 
-<div id="timer"></div>
+<div id="timer">⏰ 5:00</div>
 
 <div id="enemy">👾 敵HP: <span id="ehp">10</span></div>
+<div class="hpFrame">
+  <div id="enemyBar" class="hpBar"></div>
+</div>
+
 <div id="player">❤️ あなたHP: <span id="php">5</span></div>
+<div class="hpFrame">
+  <div id="playerBar" class="hpBar"></div>
+</div>
 
 <div id="q">START</div>
 
 <input id="ans" placeholder="答え">
-
 <br>
 
 <button onclick="start()">スタート</button>
 <button onclick="submit()">決定</button>
 
 <div id="result"></div>
+<div id="slash"></div>
 
-<audio id="bgm" loop>
-  <source src="bgm.mp3">
-</audio>
-
-<audio id="se_correct">
-  <source src="correct.mp3">
-</audio>
-
-<audio id="se_wrong">
-  <source src="wrong.mp3">
-</audio>
+<audio id="bgm" src="bgm.mp3" loop></audio>
+<audio id="se_correct" src="correct.mp3"></audio>
+<audio id="se_wrong" src="wrong.mp3"></audio>
 
 <script src="https://cdn.jsdelivr.net/npm/mathjs@11.11.0/lib/browser/math.js"></script>
 <script src="app.js"></script>

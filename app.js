@@ -8,19 +8,14 @@ function rand(min,max){
   return Math.floor(Math.random()*(max-min+1))+min;
 }
 
-function evalExpr(str){
-  try {
-    return math.evaluate(str);
-  } catch(e){
-    return null;
-  }
-}
-
 function normalize(str){
-  return str.replace(/\s/g,"").replace(/\+C/g,"").replace(/C/g,"");
+  return String(str)
+    .replace(/\s/g,"")
+    .replace(/\*/g,"")
+    .replace(/\+C/g,"")
+    .replace(/C/g,"");
 }
 
-// ===== 問題生成 =====
 function generateQuestion(){
 
   let diff = document.getElementById("difficulty").value;
@@ -30,26 +25,35 @@ function generateQuestion(){
   if(diff==="normal") type = rand(1,4);
   if(diff==="hard") type = rand(1,6);
 
-  // 不定積分
   if(type===1){
     let a = rand(-5,5);
+    if(a === 0) a = 1;
     let n = rand(1,3);
-    return { q:`∫ ${a}x^${n} dx`, a:`${a/(n+1)}x^${n+1}` };
+
+    return {
+      q:`∫ ${a}x^${n} dx`,
+      a:`${a/(n+1)}*x^${n+1}`
+    };
   }
 
-  // sin
   if(type===2){
     let a = rand(1,5);
-    return { q:`∫ ${a}sin(x) dx`, a:`-${a}cos(x)` };
+
+    return {
+      q:`∫ ${a}sin(x) dx`,
+      a:`-${a}*cos(x)`
+    };
   }
 
-  // e^x
   if(type===3){
     let a = rand(1,5);
-    return { q:`∫ ${a}e^x dx`, a:`${a}e^x` };
+
+    return {
+      q:`∫ ${a}e^x dx`,
+      a:`${a}*exp(x)`
+    };
   }
 
-  // 定積分
   if(type===4){
     let a = rand(1,3);
     let b = rand(4,8);
@@ -58,30 +62,27 @@ function generateQuestion(){
 
     let ans = (A/(n+1))*(Math.pow(b,n+1)-Math.pow(a,n+1));
 
-    return { q:`∫[${a}→${b}] ${A}x^${n} dx`, a:`${ans}` };
+    return {
+      q:`∫[${a}→${b}] ${A}x^${n} dx`,
+      a:`${ans}`
+    };
   }
 
-  // 四則演算
   if(type===5){
     let a = rand(-10,10);
     let b = rand(-10,10);
+    if(b === 0) b = 1;
+
     let op = rand(1,4);
 
     if(op===1) return {q:`${a}+${b}`, a:`${a+b}`};
     if(op===2) return {q:`${a}-${b}`, a:`${a-b}`};
     if(op===3) return {q:`${a}×${b}`, a:`${a*b}`};
-    return {q:`${a}÷${b||1}`, a:`${a/(b||1)}`};
+    return {q:`${a}÷${b}`, a:`${a/b}`};
   }
 
-  // 積分バトル
-  let a1 = rand(1,3);
-  let n1 = rand(1,2);
-  let v1 = a1/(n1+1);
-
-  let a2 = rand(1,3);
-  let n2 = rand(1,2);
-  let v2 = a2/(n2+1);
-
+  let v1 = 1/2;
+  let v2 = 1/3;
   let op = rand(1,4);
 
   if(op===1) return {q:"(∫x dx)+(∫x^2 dx)", a:`${v1+v2}`};
@@ -90,7 +91,6 @@ function generateQuestion(){
   return {q:"(∫x dx)÷(∫x^2 dx)", a:`${v1/v2}`};
 }
 
-// ===== スタート =====
 function start(){
   document.getElementById("bgm").volume = 0.2;
   document.getElementById("bgm").play();
@@ -98,80 +98,118 @@ function start(){
   enemyHP = 10;
   playerHP = 5;
 
+  document.getElementById("result").innerText = "";
+
   updateHP();
   nextQ();
   startTimer();
 }
 
-// ===== タイマー =====
 function startTimer(){
   clearInterval(timer);
   time = 300;
 
   timer = setInterval(()=>{
     time--;
-    document.getElementById("timer").innerText =
-    "⏰ "+Math.floor(time/60)+":"+String(time%60).padStart(2,"0");
 
-    if(time<=0) next();
+    document.getElementById("timer").innerText =
+      "⏰ " + Math.floor(time/60) + ":" + String(time%60).padStart(2,"0");
+
+    if(time<=0){
+      playerHP--;
+      updateHP();
+      nextTurn();
+    }
   },1000);
 }
 
-// ===== 出題 =====
 function nextQ(){
   current = generateQuestion();
   document.getElementById("q").innerText = current.q;
   document.getElementById("ans").value = "";
 }
 
-// ===== 回答 =====
 function submit(){
 
+  if(!current) return;
+
   let u = document.getElementById("ans").value;
-
-  let userVal = evalExpr(u);
-  let correctVal = evalExpr(current.a);
-
   let ok = false;
 
-  if(userVal!==null && correctVal!==null){
-    ok = Math.abs(userVal-correctVal)<1e-8;
-  }
+  try{
+    let userVal = math.evaluate(u);
+    let correctVal = math.evaluate(current.a);
+
+    if(
+      typeof userVal === "number" &&
+      typeof correctVal === "number" &&
+      Math.abs(userVal - correctVal) < 1e-8
+    ){
+      ok = true;
+    }
+  }catch(e){}
 
   if(!ok){
-    ok = normalize(u)===normalize(current.a);
+    ok = normalize(u) === normalize(current.a);
   }
 
   if(ok){
     enemyHP--;
+
+    let enemy = document.getElementById("enemy");
+    let slash = document.getElementById("slash");
+
+    enemy.classList.add("enemyHit");
+    slash.innerText = "⚔️";
+    slash.classList.add("showSlash");
+
+    setTimeout(()=>{
+      enemy.classList.remove("enemyHit");
+      slash.classList.remove("showSlash");
+    },500);
+
     document.getElementById("se_correct").play();
-    document.getElementById("result").innerText="○ 攻撃成功！";
-  } else {
+    document.getElementById("result").innerText = "○ 攻撃成功！";
+
+  }else{
     playerHP--;
+
+    document.body.classList.add("playerHit");
+
+    setTimeout(()=>{
+      document.body.classList.remove("playerHit");
+    },400);
+
     document.getElementById("se_wrong").play();
-    document.getElementById("result").innerText="× ダメージ！";
+    document.getElementById("result").innerText = "× ダメージ！";
   }
 
   updateHP();
-  next();
+  nextTurn();
 }
 
-// ===== HP更新 =====
 function updateHP(){
   document.getElementById("ehp").innerText = enemyHP;
   document.getElementById("php").innerText = playerHP;
+
+  document.getElementById("enemyBar").style.width =
+    (enemyHP / 10 * 100) + "%";
+
+  document.getElementById("playerBar").style.width =
+    (playerHP / 5 * 100) + "%";
 }
 
-// ===== 次 =====
-function next(){
+function nextTurn(){
+
+  clearInterval(timer);
 
   if(enemyHP<=0){
-    document.body.innerHTML="<h1>勝利！</h1>";
+    document.body.innerHTML = "<h1>勝利！</h1>";
     return;
   }
 
   if(playerHP<=0){
-    document.body.innerHTML="<h1>敗北...</h1>";
+    document.body.innerHTML = "<h1>敗北...</h1>";
     return;
   }
 
