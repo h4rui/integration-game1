@@ -50,6 +50,15 @@ function xPower(p){
   return "x^" + p;
 }
 
+function qPower(p){
+  if(p === 1) return "x";
+  if(p === 2) return "x²";
+  if(p === 3) return "x³";
+  if(p === 4) return "x⁴";
+  if(p === 5) return "x⁵";
+  return "x^" + p;
+}
+
 function term(c,p){
   if(p === 0) return frac(c);
   return coeff(c) + xPower(p);
@@ -66,17 +75,16 @@ function normalize(str){
 
 function generateQuestion(){
 
-  let type = rand(1,8);
+  let type = rand(1,21);
 
   if(type===1){
     let a = rand(-5,5);
     if(a === 0) a = 1;
-
     let n = rand(1,3);
     let ans = a/(n+1);
 
     return {
-      q:`∫ ${coeff(a)}${xPower(n)} dx`,
+      q:`∫ ${coeff(a)}${qPower(n)} dx`,
       a:`${ans}*x^${n+1}`,
       display:`${term(ans,n+1)}+C`
     };
@@ -84,7 +92,6 @@ function generateQuestion(){
 
   if(type===2){
     let a = rand(1,5);
-
     return {
       q:`∫ ${a}sin(x) dx`,
       a:`-${a}*cos(x)`,
@@ -94,7 +101,6 @@ function generateQuestion(){
 
   if(type===3){
     let a = rand(1,5);
-
     return {
       q:`∫ ${a}e^x dx`,
       a:`${a}*exp(x)`,
@@ -107,11 +113,10 @@ function generateQuestion(){
     let b = rand(4,8);
     let A = rand(1,3);
     let n = rand(1,2);
-
     let ans = (A/(n+1))*(Math.pow(b,n+1)-Math.pow(a,n+1));
 
     return {
-      q:`∫[${a}→${b}] ${coeff(A)}${xPower(n)} dx`,
+      q:`∫[${a}→${b}] ${coeff(A)}${qPower(n)} dx`,
       a:`${ans}`,
       display:frac(ans)
     };
@@ -120,7 +125,6 @@ function generateQuestion(){
   if(type===5){
     let a = rand(0,2);
     let b = rand(3,5);
-
     let ans =
       ((Math.pow(b,2)-Math.pow(a,2))/2) +
       ((Math.pow(b,3)-Math.pow(a,3))/3);
@@ -135,7 +139,6 @@ function generateQuestion(){
   if(type===6){
     let a = rand(0,2);
     let b = rand(3,5);
-
     let ans =
       ((Math.pow(b,3)-Math.pow(a,3))/3) -
       ((Math.pow(b,2)-Math.pow(a,2))/2);
@@ -150,7 +153,6 @@ function generateQuestion(){
   if(type===7){
     let a = rand(0,2);
     let b = rand(3,5);
-
     let ans =
       2*((Math.pow(b,2)-Math.pow(a,2))/2) +
       3*(b-a);
@@ -167,6 +169,110 @@ function generateQuestion(){
       q:`∫[0→π] sin(x) dx`,
       a:`2`,
       display:`2`
+    };
+  }
+
+  if(type===9){
+    return {
+      q:"∫ (2x+1)² dx",
+      a:"(4/3)*x^3+2*x^2+x",
+      display:"4x^3/3+2x^2+x+C"
+    };
+  }
+
+  if(type===10){
+    return {
+      q:"∫ (x+1)(x-1) dx",
+      a:"(1/3)*x^3-x",
+      display:"x^3/3-x+C"
+    };
+  }
+
+  if(type===11){
+    return {
+      q:"∫ (x²+1) dx",
+      a:"(1/3)*x^3+x",
+      display:"x^3/3+x+C"
+    };
+  }
+
+  if(type===12){
+    return {
+      q:"∫ (x²+2x+1) dx",
+      a:"(1/3)*x^3+x^2+x",
+      display:"x^3/3+x^2+x+C"
+    };
+  }
+
+  if(type===13){
+    return {
+      q:"∫[0→1] (3x²+2x+1) dx",
+      a:"3",
+      display:"3"
+    };
+  }
+
+  if(type===14){
+    return {
+      q:"∫ sin(2x) dx",
+      a:"-cos(2*x)/2",
+      display:"-cos(2x)/2+C"
+    };
+  }
+
+  if(type===15){
+    return {
+      q:"∫ cos(2x) dx",
+      a:"sin(2*x)/2",
+      display:"sin(2x)/2+C"
+    };
+  }
+
+  if(type===16){
+    return {
+      q:"∫ (3x²-2x) dx",
+      a:"x^3-x^2",
+      display:"x^3-x^2+C"
+    };
+  }
+
+  if(type===17){
+    return {
+      q:"∫ (x³-x²+x) dx",
+      a:"x^4/4-x^3/3+x^2/2",
+      display:"x^4/4-x^3/3+x^2/2+C"
+    };
+  }
+
+  if(type===18){
+    return {
+      q:"∫ (x²+1)/2 dx",
+      a:"x^3/6+x/2",
+      display:"x^3/6+x/2+C"
+    };
+  }
+
+  if(type===19){
+    return {
+      q:"∫ (3x²-2x+1)/3 dx",
+      a:"x^3-(1/3)*x^2+x/3",
+      display:"x^3-x^2/3+x/3+C"
+    };
+  }
+
+  if(type===20){
+    return {
+      q:"∫ (x+1)³ dx",
+      a:"x^4/4+x^3+(3/2)*x^2+x",
+      display:"x^4/4+x^3+3x^2/2+x+C"
+    };
+  }
+
+  if(type===21){
+    return {
+      q:"∫ (2x-1)² dx",
+      a:"(4/3)*x^3-2*x^2+x",
+      display:"4x^3/3-2x^2+x+C"
     };
   }
 }
