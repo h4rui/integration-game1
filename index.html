@@ -3,173 +3,37 @@
 <head>
 <meta charset="UTF-8">
 <title>積分バトル</title>
-
 <style>
-body{
-  margin:0;
-  background:radial-gradient(circle,#111,#000);
-  color:white;
-  text-align:center;
-  font-family:sans-serif;
-  min-height:100vh;
-  padding-bottom:150px;
-}
-
-h1{
-  color:#00ffcc;
-  text-shadow:0 0 10px #00ffcc;
-}
-
-#timer{
-  font-size:30px;
-  color:yellow;
-  margin:15px;
-}
-
-#enemy,#player{
-  font-size:28px;
-  margin:10px;
-}
-
-.hpFrame{
-  width:80%;
-  height:25px;
-  background:#333;
-  margin:10px auto 25px;
-  border-radius:20px;
-  overflow:hidden;
-  box-shadow:0 0 10px white;
-}
-
-.hpBar{
-  height:100%;
-  width:100%;
-  transition:width .4s;
-}
-
-#enemyBar{
-  background:linear-gradient(90deg,red,orange);
-}
-
-#playerBar{
-  background:linear-gradient(90deg,lime,#00ffcc);
-}
-
-#q{
-  font-size:42px;
-  margin:25px;
-  text-shadow:0 0 20px #00ffcc;
-}
-
-input{
-  font-size:30px;
-  width:80%;
-  text-align:center;
-  border-radius:15px;
-  padding:10px;
-  border:none;
-}
-
-button{
-  font-size:26px;
-  margin:10px;
-  padding:10px 20px;
-  background:#00ffcc;
-  border:none;
-  border-radius:10px;
-}
-
-#result{
-  font-size:22px;
-  margin-top:20px;
-  font-weight:bold;
-}
-
-@keyframes shake{
-  0%{transform:translateX(0);}
-  25%{transform:translateX(-20px);}
-  50%{transform:translateX(20px);}
-  75%{transform:translateX(-20px);}
-  100%{transform:translateX(0);}
-}
-
-.enemyHit{
-  animation:shake .4s;
-}
-
-@keyframes flash{
-  0%{background:red;}
-  100%{background:radial-gradient(circle,#111,#000);}
-}
-
-.playerHit{
-  animation:flash .4s;
-}
-
-#slash{
-  position:fixed;
-  left:50%;
-  top:40%;
-  font-size:120px;
-  opacity:0;
-  pointer-events:none;
-  z-index:20;
-}
-
-.showSlash{
-  animation:slashAnim .5s;
-}
-
-@keyframes slashAnim{
-  0%{opacity:1;transform:translate(-50%,-50%) scale(0);}
-  100%{opacity:0;transform:translate(-50%,-50%) scale(2);}
-}
-
-#samurai{
-  position:fixed;
-  bottom:-20px;
-  left:50%;
-  transform:translateX(-50%);
-  width:360px;
-  z-index:15;
-  pointer-events:none;
-  filter:drop-shadow(0 0 25px #00ffcc);
-  animation:samuraiIdle 1.8s infinite ease-in-out;
-}
-
-@keyframes samuraiIdle{
-  0%{transform:translateX(-50%) translateY(0);}
-  50%{transform:translateX(-50%) translateY(-8px);}
-  100%{transform:translateX(-50%) translateY(0);}
-}
-
-.samuraiAttack{
-  animation:samuraiSlash .45s !important;
-}
-
-@keyframes samuraiSlash{
-  0%{transform:translateX(-50%) translateY(0) rotate(0deg);}
-  35%{transform:translateX(-50%) translateY(-100px) rotate(-8deg) scale(1.18);}
-  70%{transform:translateX(-50%) translateY(-40px) rotate(8deg) scale(1.1);}
-  100%{transform:translateX(-50%) translateY(0) rotate(0deg) scale(1);}
-}
-
-.samuraiDamage{
-  animation:samuraiDamageAnim .45s !important;
-}
-
-@keyframes samuraiDamageAnim{
-  0%{transform:translateX(-50%) rotate(0deg);}
-  25%{transform:translateX(-70%) rotate(-12deg);}
-  50%{transform:translateX(-30%) rotate(12deg);}
-  100%{transform:translateX(-50%) rotate(0deg);}
-}
+body{margin:0;background:radial-gradient(circle,#111,#000);color:white;text-align:center;font-family:sans-serif;min-height:100vh;padding-bottom:150px;}
+h1{color:#00ffcc;text-shadow:0 0 10px #00ffcc;}
+#timer{font-size:30px;color:yellow;margin:15px;}
+#enemy,#player{font-size:28px;margin:10px;}
+.hpFrame{width:80%;height:25px;background:#333;margin:10px auto 25px;border-radius:20px;overflow:hidden;box-shadow:0 0 10px white;}
+.hpBar{height:100%;width:100%;transition:width .4s;}
+#enemyBar{background:linear-gradient(90deg,red,orange);}
+#playerBar{background:linear-gradient(90deg,lime,#00ffcc);}
+#q{font-size:42px;margin:25px;text-shadow:0 0 20px #00ffcc;}
+input{font-size:30px;width:80%;text-align:center;border-radius:15px;padding:10px;border:none;}
+button{font-size:26px;margin:10px;padding:10px 20px;background:#00ffcc;border:none;border-radius:10px;}
+#result{font-size:22px;margin-top:20px;font-weight:bold;}
+@keyframes shake{0%{transform:translateX(0);}25%{transform:translateX(-20px);}50%{transform:translateX(20px);}75%{transform:translateX(-20px);}100%{transform:translateX(0);}}
+.enemyHit{animation:shake .4s;}
+@keyframes flash{0%{background:red;}100%{background:radial-gradient(circle,#111,#000);}}
+.playerHit{animation:flash .4s;}
+#slash{position:fixed;left:50%;top:40%;font-size:120px;opacity:0;pointer-events:none;z-index:20;}
+.showSlash{animation:slashAnim .5s;}
+@keyframes slashAnim{0%{opacity:1;transform:translate(-50%,-50%) scale(0);}100%{opacity:0;transform:translate(-50%,-50%) scale(2);}}
+#samurai{position:fixed;bottom:-20px;left:50%;transform:translateX(-50%);width:360px;z-index:15;pointer-events:none;filter:drop-shadow(0 0 25px #00ffcc);animation:samuraiIdle 1.8s infinite ease-in-out;}
+@keyframes samuraiIdle{0%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(-8px);}100%{transform:translateX(-50%) translateY(0);}}
+.samuraiAttack{animation:samuraiSlash .45s !important;}
+@keyframes samuraiSlash{0%{transform:translateX(-50%) translateY(0) rotate(0deg);}35%{transform:translateX(-50%) translateY(-100px) rotate(-8deg) scale(1.18);}70%{transform:translateX(-50%) translateY(-40px) rotate(8deg) scale(1.1);}100%{transform:translateX(-50%) translateY(0) rotate(0deg) scale(1);}}
+.samuraiDamage{animation:samuraiDamageAnim .45s !important;}
+@keyframes samuraiDamageAnim{0%{transform:translateX(-50%) rotate(0deg);}25%{transform:translateX(-70%) rotate(-12deg);}50%{transform:translateX(-30%) rotate(12deg);}100%{transform:translateX(-50%) rotate(0deg);}}
 </style>
 </head>
-
 <body>
 
-<h1>積分バトルGO</h1>
+<h1>積分バトル</h1>
 
 <div id="timer">⏰ 5:00</div>
 
@@ -181,7 +45,7 @@ button{
 
 <div id="q">START</div>
 
-<input id="ans" placeholder="答え 例: 1/2, sqrt(2), pi">
+<input id="ans" placeholder="答え 例: 1/2, sqrt(2), sinx">
 <br>
 
 <button onclick="start()">スタート</button>

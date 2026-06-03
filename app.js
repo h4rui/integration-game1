@@ -9,27 +9,42 @@ function rand(min,max){
   return Math.floor(Math.random()*(max-min+1))+min;
 }
 
+function fixInput(str){
+  return String(str)
+    .replace(/sinx/g,"sin(x)")
+    .replace(/cosx/g,"cos(x)")
+    .replace(/tanx/g,"tan(x)")
+    .replace(/π/g,"pi")
+    .replace(/√/g,"sqrt");
+}
+
 function normalize(str){
   return String(str)
     .replace(/\s/g,"")
     .replace(/\*/g,"")
     .replace(/\+C/g,"")
-    .replace(/C/g,"");
+    .replace(/C/g,"")
+    .replace(/sin\(/g,"sin")
+    .replace(/cos\(/g,"cos")
+    .replace(/tan\(/g,"tan")
+    .replace(/\)/g,"");
 }
 
 function isCorrect(user, correct){
+  user = fixInput(user);
+  correct = fixInput(correct);
+
   try{
     let userVal = math.evaluate(user);
     let correctVal = math.evaluate(correct);
-
-    if(typeof userVal === "number" && typeof correctVal === "number"){
-      if(Math.abs(userVal - correctVal) < 1e-8) return true;
+    if(typeof userVal==="number" && typeof correctVal==="number"){
+      if(Math.abs(userVal-correctVal)<1e-8) return true;
     }
   }catch(e){}
 
   try{
     let diff = math.simplify("(" + user + ")-(" + correct + ")");
-    if(diff.toString() === "0") return true;
+    if(diff.toString()==="0") return true;
   }catch(e){}
 
   try{
@@ -42,14 +57,12 @@ function isCorrect(user, correct){
 }
 
 function generateQuestion(){
-
   let type = rand(1,8);
 
   if(type===1){
     let a = rand(2,5);
     let b = rand(-5,5);
     let c = rand(-5,5);
-
     return {
       q:`∫ (${a}x²+${b}x+${c}) dx`,
       a:`${a/3}*x^3+${b/2}*x^2+${c}*x`,
@@ -59,7 +72,6 @@ function generateQuestion(){
 
   if(type===2){
     let a = rand(2,6);
-
     return {
       q:`∫ ${a}/x dx`,
       a:`${a}*log(x)`,
@@ -70,7 +82,6 @@ function generateQuestion(){
   if(type===3){
     let a = rand(1,5);
     let b = rand(1,5);
-
     return {
       q:`∫ (${a}sin(x)+${b}cos(x)) dx`,
       a:`-${a}*cos(x)+${b}*sin(x)`,
@@ -81,7 +92,6 @@ function generateQuestion(){
   if(type===4){
     let a = rand(1,4);
     let b = rand(1,4);
-
     return {
       q:`∫ (${a}e^x+${b}x²) dx`,
       a:`${a}*exp(x)+${b/3}*x^3`,
@@ -95,10 +105,8 @@ function generateQuestion(){
     let C = rand(-5,5);
     let a = rand(0,2);
     let b = rand(3,6);
-
     let F = (x)=> A/3*x**3 + B/2*x**2 + C*x;
     let ans = F(b)-F(a);
-
     return {
       q:`∫[${a}→${b}] (${A}x²+${B}x+${C}) dx`,
       a:`${ans}`,
@@ -109,7 +117,6 @@ function generateQuestion(){
   if(type===6){
     let a = rand(1,4);
     let n = rand(2,4);
-
     return {
       q:`∫ ${a}x(x²+1)^${n} dx`,
       a:`${a/(2*(n+1))}*(x^2+1)^${n+1}`,
@@ -119,7 +126,6 @@ function generateQuestion(){
 
   if(type===7){
     let a = rand(1,5);
-
     return {
       q:`∫ ${a}x e^x dx`,
       a:`${a}*(x-1)*exp(x)`,
@@ -128,7 +134,6 @@ function generateQuestion(){
   }
 
   let a = rand(1,4);
-
   return {
     q:`∫[0→pi] ${a}sin(x) dx`,
     a:`${2*a}`,
@@ -138,7 +143,6 @@ function generateQuestion(){
 
 function start(){
   clearInterval(timer);
-
   enemyHP = 10;
   playerHP = 5;
   history = [];
@@ -161,23 +165,14 @@ function startTimer(){
 
   timer = setInterval(()=>{
     time--;
-
     document.getElementById("timer").innerText =
       "⏰ " + Math.floor(time/60) + ":" + String(time%60).padStart(2,"0");
 
     if(time<=0){
       playerHP--;
-
-      history.push({
-        question:current.q,
-        your:"時間切れ",
-        answer:current.display,
-        ok:false
-      });
-
+      history.push({question:current.q,your:"時間切れ",answer:current.display,ok:false});
       document.getElementById("result").innerText =
         "時間切れ！ 正解: " + current.display;
-
       updateHP();
       nextTurn();
     }
@@ -250,12 +245,8 @@ function submit(){
 function updateHP(){
   document.getElementById("ehp").innerText = enemyHP;
   document.getElementById("php").innerText = playerHP;
-
-  document.getElementById("enemyBar").style.width =
-    (enemyHP/10*100) + "%";
-
-  document.getElementById("playerBar").style.width =
-    (playerHP/5*100) + "%";
+  document.getElementById("enemyBar").style.width = (enemyHP/10*100) + "%";
+  document.getElementById("playerBar").style.width = (playerHP/5*100) + "%";
 }
 
 function nextTurn(){
@@ -279,7 +270,6 @@ function nextTurn(){
 
 function showEnd(text){
   clearInterval(timer);
-
   document.getElementById("q").innerText = text;
   document.getElementById("timer").innerText = "";
   document.getElementById("ans").value = "";
@@ -289,17 +279,8 @@ function showEnd(text){
 
   for(let i=0;i<history.length;i++){
     let mark = history[i].ok ? "○" : "×";
-
     html += `
-      <div style="
-        background:rgba(255,255,255,0.12);
-        margin:10px auto;
-        padding:10px;
-        border-radius:10px;
-        width:90%;
-        text-align:left;
-        font-size:18px;
-      ">
+      <div style="background:rgba(255,255,255,0.12);margin:10px auto;padding:10px;border-radius:10px;width:90%;text-align:left;font-size:18px;">
         <p>${i+1}. ${mark} 問題: ${history[i].question}</p>
         <p>あなたの答え: ${history[i].your}</p>
         <p>正解: ${history[i].answer}</p>
