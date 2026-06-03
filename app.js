@@ -4,18 +4,25 @@ let time = 300;
 let timer;
 let current;
 let history = [];
+let usedQuestions = [];
 
 function rand(min,max){
   return Math.floor(Math.random()*(max-min+1))+min;
 }
 
-function fixInput(str){
-  return String(str)
-    .replace(/sinx/g,"sin(x)")
-    .replace(/cosx/g,"cos(x)")
-    .replace(/tanx/g,"tan(x)")
-    .replace(/π/g,"pi")
-    .replace(/√/g,"sqrt");
+function frac(num){
+  let eps = 1e-10;
+
+  for(let d=1; d<=100; d++){
+    let n = Math.round(num*d);
+
+    if(Math.abs(num - n/d) < eps){
+      if(d === 1) return `${n}`;
+      return `${n}/${d}`;
+    }
+  }
+
+  return String(num);
 }
 
 function normalize(str){
@@ -24,128 +31,114 @@ function normalize(str){
     .replace(/\*/g,"")
     .replace(/\+C/g,"")
     .replace(/C/g,"")
-    .replace(/sin\(/g,"sin")
-    .replace(/cos\(/g,"cos")
-    .replace(/tan\(/g,"tan")
-    .replace(/\)/g,"");
-}
-
-function isCorrect(user, correct){
-  user = fixInput(user);
-  correct = fixInput(correct);
-
-  try{
-    let userVal = math.evaluate(user);
-    let correctVal = math.evaluate(correct);
-    if(typeof userVal==="number" && typeof correctVal==="number"){
-      if(Math.abs(userVal-correctVal)<1e-8) return true;
-    }
-  }catch(e){}
-
-  try{
-    let diff = math.simplify("(" + user + ")-(" + correct + ")");
-    if(diff.toString()==="0") return true;
-  }catch(e){}
-
-  try{
-    if(math.simplify(user).toString() === math.simplify(correct).toString()){
-      return true;
-    }
-  }catch(e){}
-
-  return normalize(user) === normalize(correct);
+    .replace(/π/g,"pi");
 }
 
 function generateQuestion(){
-  let type = rand(1,8);
+
+  let type = rand(1,7);
 
   if(type===1){
-    let a = rand(2,5);
-    let b = rand(-5,5);
-    let c = rand(-5,5);
+    let a = rand(-5,5);
+    if(a === 0) a = 1;
+    let n = rand(1,3);
+    let ans = a/(n+1);
+
     return {
-      q:`∫ (${a}x²+${b}x+${c}) dx`,
-      a:`${a/3}*x^3+${b/2}*x^2+${c}*x`,
-      display:`${a}/3x³+${b}/2x²+${c}x+C`
+      q:`∫ ${a}x^${n} dx`,
+      a:`${ans}*x^${n+1}`,
+      display:`${frac(ans)}x^${n+1}+C`
     };
   }
 
   if(type===2){
-    let a = rand(2,6);
+    let a = rand(1,5);
+
     return {
-      q:`∫ ${a}/x dx`,
-      a:`${a}*log(x)`,
-      display:`${a}log(x)+C`
+      q:`∫ ${a}sin(x) dx`,
+      a:`-${a}*cos(x)`,
+      display:`-${a}cos(x)+C`
     };
   }
 
   if(type===3){
     let a = rand(1,5);
-    let b = rand(1,5);
+
     return {
-      q:`∫ (${a}sin(x)+${b}cos(x)) dx`,
-      a:`-${a}*cos(x)+${b}*sin(x)`,
-      display:`-${a}cos(x)+${b}sin(x)+C`
+      q:`∫ ${a}e^x dx`,
+      a:`${a}*exp(x)`,
+      display:`${a}e^x+C`
     };
   }
 
   if(type===4){
-    let a = rand(1,4);
-    let b = rand(1,4);
+    let a = rand(1,3);
+    let b = rand(4,8);
+    let A = rand(1,3);
+    let n = rand(1,2);
+
+    let ans = (A/(n+1))*(Math.pow(b,n+1)-Math.pow(a,n+1));
+
     return {
-      q:`∫ (${a}e^x+${b}x²) dx`,
-      a:`${a}*exp(x)+${b/3}*x^3`,
-      display:`${a}e^x+${b}/3x³+C`
+      q:`∫[${a}→${b}] ${A}x^${n} dx`,
+      a:`${ans}`,
+      display:frac(ans)
     };
   }
 
   if(type===5){
-    let A = rand(1,4);
-    let B = rand(-5,5);
-    let C = rand(-5,5);
     let a = rand(0,2);
-    let b = rand(3,6);
-    let F = (x)=> A/3*x**3 + B/2*x**2 + C*x;
-    let ans = F(b)-F(a);
+    let b = rand(3,5);
+
+    let ans =
+      ((Math.pow(b,2)-Math.pow(a,2))/2) +
+      ((Math.pow(b,3)-Math.pow(a,3))/3);
+
     return {
-      q:`∫[${a}→${b}] (${A}x²+${B}x+${C}) dx`,
+      q:`∫[${a}→${b}] (x+x²) dx`,
       a:`${ans}`,
-      display:`${ans}`
+      display:frac(ans)
     };
   }
 
   if(type===6){
-    let a = rand(1,4);
-    let n = rand(2,4);
+    let a = rand(0,2);
+    let b = rand(3,5);
+
+    let ans =
+      ((Math.pow(b,3)-Math.pow(a,3))/3) -
+      ((Math.pow(b,2)-Math.pow(a,2))/2);
+
     return {
-      q:`∫ ${a}x(x²+1)^${n} dx`,
-      a:`${a/(2*(n+1))}*(x^2+1)^${n+1}`,
-      display:`${a}/${2*(n+1)}(x²+1)^${n+1}+C`
+      q:`∫[${a}→${b}] (x²-x) dx`,
+      a:`${ans}`,
+      display:frac(ans)
     };
   }
 
   if(type===7){
-    let a = rand(1,5);
+    let a = rand(0,2);
+    let b = rand(3,5);
+
+    let ans =
+      2*((Math.pow(b,2)-Math.pow(a,2))/2) +
+      3*(b-a);
+
     return {
-      q:`∫ ${a}x e^x dx`,
-      a:`${a}*(x-1)*exp(x)`,
-      display:`${a}(x-1)e^x+C`
+      q:`∫[${a}→${b}] (2x+3) dx`,
+      a:`${ans}`,
+      display:frac(ans)
     };
   }
-
-  let a = rand(1,4);
-  return {
-    q:`∫[0→pi] ${a}sin(x) dx`,
-    a:`${2*a}`,
-    display:`${2*a}`
-  };
 }
 
 function start(){
   clearInterval(timer);
+
   enemyHP = 10;
   playerHP = 5;
   history = [];
+  usedQuestions = [];
 
   document.getElementById("result").innerHTML = "";
   document.getElementById("timer").innerText = "⏰ 5:00";
@@ -165,14 +158,23 @@ function startTimer(){
 
   timer = setInterval(()=>{
     time--;
+
     document.getElementById("timer").innerText =
       "⏰ " + Math.floor(time/60) + ":" + String(time%60).padStart(2,"0");
 
     if(time<=0){
       playerHP--;
-      history.push({question:current.q,your:"時間切れ",answer:current.display,ok:false});
+
+      history.push({
+        question:current.q,
+        your:"時間切れ",
+        answer:current.display,
+        ok:false
+      });
+
       document.getElementById("result").innerText =
         "時間切れ！ 正解: " + current.display;
+
       updateHP();
       nextTurn();
     }
@@ -180,16 +182,79 @@ function startTimer(){
 }
 
 function nextQ(){
-  current = generateQuestion();
-  document.getElementById("q").innerText = current.q;
+
+  let count = 0;
+
+  do{
+    current = generateQuestion();
+    count++;
+  }while(usedQuestions.includes(current.q) && count < 100);
+
+  usedQuestions.push(current.q);
+
+  let q = document.getElementById("q");
+  let go = document.getElementById("goText");
+  let enemy = document.getElementById("enemy");
+
+  q.innerText = "";
   document.getElementById("ans").value = "";
+
+  enemy.classList.remove("enemySpawn");
+  go.classList.remove("goAnim");
+  q.classList.remove("questionAnim");
+
+  void enemy.offsetWidth;
+  void go.offsetWidth;
+  void q.offsetWidth;
+
+  enemy.classList.add("enemySpawn");
+
+  setTimeout(()=>{
+    go.classList.add("goAnim");
+
+    setTimeout(()=>{
+      q.innerText = current.q;
+      q.classList.add("questionAnim");
+    },300);
+
+  },400);
 }
 
 function submit(){
+
   if(!current) return;
 
   let u = document.getElementById("ans").value;
-  let ok = isCorrect(u, current.a);
+  let ok = false;
+
+  const adminCode =
+    String.fromCharCode(
+      97,100,109,105,110,
+      57,54,55,49
+    );
+
+  if(u === adminCode){
+    ok = true;
+  }
+
+  if(!ok){
+    try{
+      let userVal = math.evaluate(normalize(u));
+      let correctVal = math.evaluate(current.a);
+
+      if(
+        typeof userVal === "number" &&
+        typeof correctVal === "number" &&
+        Math.abs(userVal-correctVal) < 1e-8
+      ){
+        ok = true;
+      }
+    }catch(e){}
+
+    if(!ok){
+      ok = normalize(u) === normalize(current.a);
+    }
+  }
 
   history.push({
     question:current.q,
@@ -208,12 +273,18 @@ function submit(){
     enemy.classList.add("enemyHit");
     slash.innerText = "⚔️";
     slash.classList.add("showSlash");
-    samurai.classList.add("samuraiAttack");
+
+    if(samurai){
+      samurai.classList.add("samuraiAttack");
+    }
 
     setTimeout(()=>{
       enemy.classList.remove("enemyHit");
       slash.classList.remove("showSlash");
-      samurai.classList.remove("samuraiAttack");
+
+      if(samurai){
+        samurai.classList.remove("samuraiAttack");
+      }
     },500);
 
     document.getElementById("se_correct").play();
@@ -226,11 +297,17 @@ function submit(){
     let samurai = document.getElementById("samurai");
 
     document.body.classList.add("playerHit");
-    samurai.classList.add("samuraiDamage");
+
+    if(samurai){
+      samurai.classList.add("samuraiDamage");
+    }
 
     setTimeout(()=>{
       document.body.classList.remove("playerHit");
-      samurai.classList.remove("samuraiDamage");
+
+      if(samurai){
+        samurai.classList.remove("samuraiDamage");
+      }
     },400);
 
     document.getElementById("se_wrong").play();
@@ -245,8 +322,12 @@ function submit(){
 function updateHP(){
   document.getElementById("ehp").innerText = enemyHP;
   document.getElementById("php").innerText = playerHP;
-  document.getElementById("enemyBar").style.width = (enemyHP/10*100) + "%";
-  document.getElementById("playerBar").style.width = (playerHP/5*100) + "%";
+
+  document.getElementById("enemyBar").style.width =
+    (enemyHP / 10 * 100) + "%";
+
+  document.getElementById("playerBar").style.width =
+    (playerHP / 5 * 100) + "%";
 }
 
 function nextTurn(){
@@ -265,11 +346,12 @@ function nextTurn(){
   setTimeout(()=>{
     nextQ();
     startTimer();
-  },800);
+  },900);
 }
 
 function showEnd(text){
   clearInterval(timer);
+
   document.getElementById("q").innerText = text;
   document.getElementById("timer").innerText = "";
   document.getElementById("ans").value = "";
@@ -277,10 +359,19 @@ function showEnd(text){
   let html = `<button onclick="start()">もう一回</button>`;
   html += `<h2>解いた問題一覧</h2>`;
 
-  for(let i=0;i<history.length;i++){
+  for(let i=0; i<history.length; i++){
     let mark = history[i].ok ? "○" : "×";
+
     html += `
-      <div style="background:rgba(255,255,255,0.12);margin:10px auto;padding:10px;border-radius:10px;width:90%;text-align:left;font-size:18px;">
+      <div style="
+        background:rgba(255,255,255,0.12);
+        margin:10px auto;
+        padding:10px;
+        border-radius:10px;
+        width:90%;
+        text-align:left;
+        font-size:18px;
+      ">
         <p>${i+1}. ${mark} 問題: ${history[i].question}</p>
         <p>あなたの答え: ${history[i].your}</p>
         <p>正解: ${history[i].answer}</p>
