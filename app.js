@@ -30,7 +30,6 @@ function frac(num){
       let g = gcd(Math.abs(n), d);
       n /= g;
       d /= g;
-
       if(d === 1) return `${n}`;
       return `${n}/${d}`;
     }
@@ -71,7 +70,6 @@ function cleanDisplay(s){
   return s
     .replace(/\+\-/g,"-")
     .replace(/\+\+/g,"+")
-    .replace(/^＋/,"")
     .replace(/^\+/,"")
     .replace(/\+C/g,"+C");
 }
@@ -82,7 +80,12 @@ function normalize(str){
     .replace(/\*/g,"")
     .replace(/\+C/g,"")
     .replace(/C/g,"")
-    .replace(/π/g,"pi");
+    .replace(/π/g,"pi")
+    .replace(/²/g,"^2")
+    .replace(/³/g,"^3")
+    .replace(/⁴/g,"^4")
+    .replace(/⁵/g,"^5")
+    .replace(/⁶/g,"^6");
 }
 
 function selectMode(m){
@@ -92,22 +95,18 @@ function selectMode(m){
   document.getElementById("gameScreen").classList.add("active");
 
   let title = "⚔️ 積分バトル ⚔️";
-
   if(mode === "derivative") title = "⚔️ 微分バトル ⚔️";
   if(mode === "factor") title = "⚔️ 因数分解バトル ⚔️";
   if(mode === "expand") title = "⚔️ 展開バトル ⚔️";
 
   document.getElementById("modeTitle").innerText = title;
-
   start();
 }
 
 function backTitle(){
   clearInterval(timer);
-
   document.getElementById("gameScreen").classList.remove("active");
   document.getElementById("titleScreen").classList.add("active");
-
   document.getElementById("bgm").pause();
 }
 
@@ -119,13 +118,11 @@ function generateQuestion(){
 }
 
 function generateIntegral(){
-
   let type = rand(1,8);
 
   if(type===1){
     let a = rand(-6,6);
     if(a===0) a = 1;
-
     let n = rand(1,5);
     let ans = a/(n+1);
 
@@ -140,7 +137,6 @@ function generateIntegral(){
     let a = rand(-5,5);
     let b = rand(-5,5);
     let c = rand(-5,5);
-
     if(a===0 && b===0 && c===0) a = 1;
 
     let display = cleanDisplay(
@@ -159,7 +155,6 @@ function generateIntegral(){
     let r = rand(l+1,l+5);
     let a = rand(1,5);
     let n = rand(1,4);
-
     let ans = (a/(n+1))*(Math.pow(r,n+1)-Math.pow(l,n+1));
 
     return{
@@ -172,11 +167,9 @@ function generateIntegral(){
   if(type===4){
     let l = rand(0,2);
     let r = rand(l+1,l+4);
-
     let a = rand(-4,4);
     let b = rand(-4,4);
     let c = rand(-4,4);
-
     if(a===0 && b===0 && c===0) a = 1;
 
     let ans =
@@ -239,14 +232,12 @@ function generateIntegral(){
 }
 
 function generateDerivative(){
-
-  let type = rand(1,5);
+  let type = rand(1,12);
 
   if(type===1){
     let a = rand(-6,6);
     if(a===0) a = 1;
-    let n = rand(2,6);
-
+    let n = rand(2,7);
     let ansC = a*n;
 
     return{
@@ -262,9 +253,7 @@ function generateDerivative(){
     let c = rand(-5,5);
     if(a===0 && b===0) a = 1;
 
-    let display = cleanDisplay(
-      `${term(3*a,2)}+${term(2*b,1)}+${c}`
-    );
+    let display = cleanDisplay(`${term(3*a,2)}+${term(2*b,1)}+${c}`);
 
     return{
       q:`d/dx (${coeff(a)}x³${b>=0?"+":""}${coeff(b)}x²${c>=0?"+":""}${c}x)`,
@@ -305,10 +294,76 @@ function generateDerivative(){
       display:`${coeff(a*k)}e^(${k===1?"x":k+"x"})`
     };
   }
+
+  if(type===6){
+    let a = rand(2,5);
+    let b = rand(-5,5);
+    let n = rand(2,4);
+
+    return{
+      q:`d/dx (${a}x${b>=0?"+":""}${b})${n===2?"²":n===3?"³":"⁴"}`,
+      a:`${n*a}*(${a}*x+${b})^${n-1}`,
+      display:`${n*a}(${a}x${b>=0?"+":""}${b})^${n-1}`
+    };
+  }
+
+  if(type===7){
+    return{
+      q:`d/dx (x+1)(x-1)`,
+      a:`2*x`,
+      display:`2x`
+    };
+  }
+
+  if(type===8){
+    let a = rand(1,5);
+    let b = rand(1,5);
+
+    return{
+      q:`d/dx (x+${a})(x+${b})`,
+      a:`2*x+${a+b}`,
+      display:`2x+${a+b}`
+    };
+  }
+
+  if(type===9){
+    return{
+      q:`d/dx √x`,
+      a:`1/(2*sqrt(x))`,
+      display:`1/(2√x)`
+    };
+  }
+
+  if(type===10){
+    return{
+      q:`d/dx 1/x`,
+      a:`-1/x^2`,
+      display:`-1/x^2`
+    };
+  }
+
+  if(type===11){
+    let a = rand(1,5);
+
+    return{
+      q:`d/dx (${a}x²+1)/2`,
+      a:`${a}*x`,
+      display:`${coeff(a)}x`
+    };
+  }
+
+  if(type===12){
+    let a = rand(1,5);
+
+    return{
+      q:`d/dx ${a}x^(3/2)`,
+      a:`${a*3/2}*sqrt(x)`,
+      display:`${frac(a*3/2)}√x`
+    };
+  }
 }
 
 function generateFactor(){
-
   let type = rand(1,4);
 
   if(type===1){
@@ -356,7 +411,6 @@ function generateFactor(){
 }
 
 function generateExpand(){
-
   let type = rand(1,4);
 
   if(type===1){
@@ -399,6 +453,39 @@ function generateExpand(){
       a:`x^2-${2*a}*x+${a*a}`,
       display:`x^2-${2*a}x+${a*a}`
     };
+  }
+}
+
+function expressionsEqual(user, correct){
+  try{
+    let u = normalize(user);
+    let c = normalize(correct);
+
+    let values = [-3,-2,-1,0,1,2,3,4];
+
+    for(let x of values){
+      let uv = math.evaluate(u,{x:x});
+      let cv = math.evaluate(c,{x:x});
+
+      if(Math.abs(uv-cv)>1e-8){
+        return false;
+      }
+    }
+
+    return true;
+  }catch(e){
+    return false;
+  }
+}
+
+function factorsEqual(user, correct){
+  try{
+    let u = normalize(user);
+    let c = normalize(correct);
+
+    return expressionsEqual(u,c);
+  }catch(e){
+    return false;
   }
 }
 
@@ -452,7 +539,6 @@ function startTimer(){
 }
 
 function nextQ(){
-
   let count = 0;
 
   do{
@@ -491,7 +577,6 @@ function nextQ(){
 }
 
 function submit(){
-
   if(!current) return;
 
   let u = document.getElementById("ans").value;
@@ -508,18 +593,17 @@ function submit(){
   }
 
   if(!ok){
-    try{
-      let userVal = math.simplify(normalize(u)).toString();
-      let correctVal = math.simplify(current.a).toString();
-
-      if(userVal === correctVal){
-        ok = true;
-      }
-    }catch(e){}
-
-    if(!ok){
-      ok = normalize(u) === normalize(current.display);
+    if(mode === "factor"){
+      ok = factorsEqual(u,current.a);
+    }else if(mode === "expand"){
+      ok = expressionsEqual(u,current.a);
+    }else{
+      ok = expressionsEqual(u,current.a);
     }
+  }
+
+  if(!ok){
+    ok = normalize(u) === normalize(current.display);
   }
 
   history.push({

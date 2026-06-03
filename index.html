@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>積分バトル</title>
+<title>数学マスター</title>
 
 <style>
 body{
@@ -20,13 +20,8 @@ h1{
   text-shadow:0 0 10px #00ffcc;
 }
 
-.screen{
-  display:none;
-}
-
-.active{
-  display:block;
-}
+.screen{display:none;}
+.active{display:block;}
 
 .modeBtn{
   display:block;
@@ -63,13 +58,8 @@ h1{
   transition:width .4s;
 }
 
-#enemyBar{
-  background:linear-gradient(90deg,red,orange);
-}
-
-#playerBar{
-  background:linear-gradient(90deg,lime,#00ffcc);
-}
+#enemyBar{background:linear-gradient(90deg,red,orange);}
+#playerBar{background:linear-gradient(90deg,lime,#00ffcc);}
 
 #goText{
   position:fixed;
@@ -84,9 +74,7 @@ h1{
   z-index:50;
 }
 
-.goAnim{
-  animation:goPop .7s;
-}
+.goAnim{animation:goPop .7s;}
 
 @keyframes goPop{
   0%{opacity:0;transform:translate(-50%,-50%) scale(.2);}
@@ -100,9 +88,7 @@ h1{
   text-shadow:0 0 20px #00ffcc;
 }
 
-.questionAnim{
-  animation:questionPop .5s;
-}
+.questionAnim{animation:questionPop .5s;}
 
 @keyframes questionPop{
   0%{opacity:0;transform:scale(.5) rotate(-3deg);}
@@ -147,13 +133,9 @@ button:hover{
   100%{transform:translateX(0);}
 }
 
-.enemyHit{
-  animation:shake .4s;
-}
+.enemyHit{animation:shake .4s;}
 
-.enemySpawn{
-  animation:enemySpawnAnim .8s;
-}
+.enemySpawn{animation:enemySpawnAnim .8s;}
 
 @keyframes enemySpawnAnim{
   0%{opacity:0;transform:translateY(-200px) scale(.3);}
@@ -166,9 +148,7 @@ button:hover{
   100%{background:radial-gradient(circle,#111,#000);}
 }
 
-.playerHit{
-  animation:flash .4s;
-}
+.playerHit{animation:flash .4s;}
 
 #slash{
   position:fixed;
@@ -180,9 +160,7 @@ button:hover{
   z-index:20;
 }
 
-.showSlash{
-  animation:slashAnim .5s;
-}
+.showSlash{animation:slashAnim .5s;}
 
 @keyframes slashAnim{
   0%{opacity:1;transform:translate(-50%,-50%) scale(0);}
@@ -207,9 +185,7 @@ button:hover{
   100%{transform:translateX(-50%) translateY(0);}
 }
 
-.samuraiAttack{
-  animation:samuraiSlash .45s !important;
-}
+.samuraiAttack{animation:samuraiSlash .45s !important;}
 
 @keyframes samuraiSlash{
   0%{transform:translateX(-50%) translateY(0) rotate(0);}
@@ -218,9 +194,7 @@ button:hover{
   100%{transform:translateX(-50%) translateY(0) rotate(0) scale(1);}
 }
 
-.samuraiDamage{
-  animation:samuraiDamageAnim .45s !important;
-}
+.samuraiDamage{animation:samuraiDamageAnim .45s !important;}
 
 @keyframes samuraiDamageAnim{
   0%{transform:translateX(-50%) rotate(0);}
@@ -234,7 +208,7 @@ button:hover{
 <body>
 
 <div id="titleScreen" class="screen active">
-  <h1>⚔️ 数学バトル ⚔️</h1>
+  <h1>🏆 数学マスター 🏆</h1>
   <button class="modeBtn" onclick="selectMode('integral')">積分</button>
   <button class="modeBtn" onclick="selectMode('derivative')">微分</button>
   <button class="modeBtn" onclick="selectMode('factor')">因数分解</button>
@@ -242,20 +216,15 @@ button:hover{
 </div>
 
 <div id="gameScreen" class="screen">
-
-  <h1 id="modeTitle">⚔️ 積分バトル ⚔️</h1>
+  <h1 id="modeTitle">🏆 数学マスター 🏆</h1>
 
   <div id="timer">⏰ 5:00</div>
 
   <div id="enemy">👾 敵HP: <span id="ehp">10</span></div>
-  <div class="hpFrame">
-    <div id="enemyBar" class="hpBar"></div>
-  </div>
+  <div class="hpFrame"><div id="enemyBar" class="hpBar"></div></div>
 
   <div id="player">❤️ あなたHP: <span id="php">5</span></div>
-  <div class="hpFrame">
-    <div id="playerBar" class="hpBar"></div>
-  </div>
+  <div class="hpFrame"><div id="playerBar" class="hpBar"></div></div>
 
   <div id="goText">GO!</div>
   <div id="q">START</div>
@@ -268,7 +237,6 @@ button:hover{
   <button onclick="backTitle()">タイトルへ</button>
 
   <div id="result"></div>
-
 </div>
 
 <div id="slash"></div>
