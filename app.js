@@ -19,16 +19,11 @@ function normalize(str){
 
 function generateQuestion(){
 
-  let diff = document.getElementById("difficulty").value;
-  let type;
-
-  if(diff==="easy") type = rand(1,2);
-  if(diff==="normal") type = rand(1,4);
-  if(diff==="hard") type = rand(1,6);
+  let type = rand(1,6);
 
   if(type===1){
     let a = rand(-5,5);
-    if(a === 0) a = 1;
+    if(a===0) a = 1;
     let n = rand(1,3);
 
     return {
@@ -59,10 +54,10 @@ function generateQuestion(){
   }
 
   if(type===4){
-    let a = rand(1,3);
-    let b = rand(4,8);
-    let A = rand(1,3);
-    let n = rand(1,2);
+    let a = rand(0,2);
+    let b = rand(3,6);
+    let A = rand(1,4);
+    let n = rand(1,3);
 
     let ans = (A/(n+1))*(Math.pow(b,n+1)-Math.pow(a,n+1));
 
@@ -74,61 +69,89 @@ function generateQuestion(){
   }
 
   if(type===5){
-    let a = rand(-10,10);
-    let b = rand(-10,10);
-    if(b === 0) b = 1;
+    let a = rand(0,2);
+    let b = rand(3,6);
+    let mode = rand(1,4);
 
-    let op = rand(1,4);
+    if(mode===1){
+      let ans =
+        ((Math.pow(b,2)-Math.pow(a,2))/2) +
+        ((Math.pow(b,3)-Math.pow(a,3))/3);
 
-    if(op===1) return {q:`${a}+${b}`, a:`${a+b}`, display:`${a+b}`};
-    if(op===2) return {q:`${a}-${b}`, a:`${a-b}`, display:`${a-b}`};
-    if(op===3) return {q:`${a}×${b}`, a:`${a*b}`, display:`${a*b}`};
-    return {q:`${a}÷${b}`, a:`${a/b}`, display:`${a/b}`};
+      return {
+        q:`∫[${a}→${b}] (x+x²) dx`,
+        a:`${ans}`,
+        display:`${ans}`
+      };
+    }
+
+    if(mode===2){
+      let ans =
+        ((Math.pow(b,3)-Math.pow(a,3))/3) -
+        ((Math.pow(b,2)-Math.pow(a,2))/2);
+
+      return {
+        q:`∫[${a}→${b}] (x²-x) dx`,
+        a:`${ans}`,
+        display:`${ans}`
+      };
+    }
+
+    if(mode===3){
+      let ans =
+        2*((Math.pow(b,2)-Math.pow(a,2))/2) +
+        3*(b-a);
+
+      return {
+        q:`∫[${a}→${b}] (2x+3) dx`,
+        a:`${ans}`,
+        display:`${ans}`
+      };
+    }
+
+    let ans =
+      3*((Math.pow(b,3)-Math.pow(a,3))/3) +
+      2*((Math.pow(b,2)-Math.pow(a,2))/2) +
+      (b-a);
+
+    return {
+      q:`∫[${a}→${b}] (3x²+2x+1) dx`,
+      a:`${ans}`,
+      display:`${ans}`
+    };
   }
 
-  let v1 = 1/2;
-  let v2 = 1/3;
-  let op = rand(1,4);
+  let a = rand(0,2);
+  let b = rand(3,6);
 
-  if(op===1) return {
-    q:"(∫x dx)+(∫x^2 dx)",
-    a:`${v1+v2}`,
-    display:`${v1+v2}`
-  };
-
-  if(op===2) return {
-    q:"(∫x dx)-(∫x^2 dx)",
-    a:`${v1-v2}`,
-    display:`${v1-v2}`
-  };
-
-  if(op===3) return {
-    q:"(∫x dx)×(∫x^2 dx)",
-    a:`${v1*v2}`,
-    display:`${v1*v2}`
-  };
+  let ans =
+    (-(Math.cos(b)) + Math.cos(a)) +
+    (Math.exp(b) - Math.exp(a));
 
   return {
-    q:"(∫x dx)÷(∫x^2 dx)",
-    a:`${v1/v2}`,
-    display:`${v1/v2}`
+    q:`∫[${a}→${b}] (sin(x)+e^x) dx`,
+    a:`${ans}`,
+    display:`${ans}`
   };
 }
 
 function start(){
-  document.getElementById("bgm").volume = 0.2;
-  document.getElementById("bgm").play();
+  clearInterval(timer);
 
   enemyHP = 10;
   playerHP = 5;
   history = [];
 
-  document.getElementById("result").innerText = "";
+  document.getElementById("result").innerHTML = "";
   document.getElementById("timer").innerText = "⏰ 5:00";
 
   updateHP();
   nextQ();
   startTimer();
+
+  let bgm = document.getElementById("bgm");
+  bgm.volume = 0.2;
+  bgm.play();
 }
 
 function startTimer(){
@@ -145,10 +168,10 @@ function startTimer(){
       playerHP--;
 
       history.push({
-        question: current.q,
-        your: "時間切れ",
-        answer: current.display,
-        ok: false
+        question:current.q,
+        your:"時間切れ",
+        answer:current.display,
+        ok:false
       });
 
       document.getElementById("result").innerText =
@@ -167,7 +190,6 @@ function nextQ(){
 }
 
 function submit(){
-
   if(!current) return;
 
   let u = document.getElementById("ans").value;
@@ -180,7 +202,7 @@ function submit(){
     if(
       typeof userVal === "number" &&
       typeof correctVal === "number" &&
-      Math.abs(userVal - correctVal) < 1e-8
+      Math.abs(userVal-correctVal)<1e-8
     ){
       ok = true;
     }
@@ -191,10 +213,10 @@ function submit(){
   }
 
   history.push({
-    question: current.q,
-    your: u || "未入力",
-    answer: current.display,
-    ok: ok
+    question:current.q,
+    your:u || "未入力",
+    answer:current.display,
+    ok:ok
   });
 
   if(ok){
@@ -207,18 +229,12 @@ function submit(){
     enemy.classList.add("enemyHit");
     slash.innerText = "⚔️";
     slash.classList.add("showSlash");
-
-    if(samurai){
-      samurai.classList.add("samuraiAttack");
-    }
+    samurai.classList.add("samuraiAttack");
 
     setTimeout(()=>{
       enemy.classList.remove("enemyHit");
       slash.classList.remove("showSlash");
-
-      if(samurai){
-        samurai.classList.remove("samuraiAttack");
-      }
+      samurai.classList.remove("samuraiAttack");
     },500);
 
     document.getElementById("se_correct").play();
@@ -231,17 +247,11 @@ function submit(){
     let samurai = document.getElementById("samurai");
 
     document.body.classList.add("playerHit");
-
-    if(samurai){
-      samurai.classList.add("samuraiDamage");
-    }
+    samurai.classList.add("samuraiDamage");
 
     setTimeout(()=>{
       document.body.classList.remove("playerHit");
-
-      if(samurai){
-        samurai.classList.remove("samuraiDamage");
-      }
+      samurai.classList.remove("samuraiDamage");
     },400);
 
     document.getElementById("se_wrong").play();
@@ -258,10 +268,10 @@ function updateHP(){
   document.getElementById("php").innerText = playerHP;
 
   document.getElementById("enemyBar").style.width =
-    (enemyHP / 10 * 100) + "%";
+    (enemyHP/10*100) + "%";
 
   document.getElementById("playerBar").style.width =
-    (playerHP / 5 * 100) + "%";
+    (playerHP/5*100) + "%";
 }
 
 function nextTurn(){
@@ -280,7 +290,7 @@ function nextTurn(){
   setTimeout(()=>{
     nextQ();
     startTimer();
-  },700);
+  },800);
 }
 
 function showEnd(text){
@@ -292,17 +302,19 @@ function showEnd(text){
 
   let html = `<button onclick="start()">もう一回</button>`;
   html += `<h2>解いた問題一覧</h2>`;
-  html += `<div style="width:90%;margin:20px auto;text-align:left;">`;
 
-  for(let i=0; i<history.length; i++){
+  for(let i=0;i<history.length;i++){
     let mark = history[i].ok ? "○" : "×";
 
     html += `
       <div style="
-        background:rgba(255,255,255,0.1);
-        margin:10px;
+        background:rgba(255,255,255,0.12);
+        margin:10px auto;
         padding:10px;
         border-radius:10px;
+        width:90%;
+        text-align:left;
+        font-size:18px;
       ">
         <p>${i+1}. ${mark} 問題: ${history[i].question}</p>
         <p>あなたの答え: ${history[i].your}</p>
@@ -310,8 +322,6 @@ function showEnd(text){
       </div>
     `;
   }
-
-  html += `</div>`;
 
   document.getElementById("result").innerHTML = html;
 }

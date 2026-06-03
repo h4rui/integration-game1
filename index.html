@@ -12,7 +12,7 @@ body{
   text-align:center;
   font-family:sans-serif;
   min-height:100vh;
-  padding-bottom:120px;
+  padding-bottom:140px;
 }
 
 h1{
@@ -21,13 +21,13 @@ h1{
 }
 
 #q{
-  font-size:50px;
-  margin:30px;
+  font-size:45px;
+  margin:25px;
   text-shadow:0 0 20px #00ffcc;
 }
 
 input{
-  font-size:35px;
+  font-size:32px;
   width:80%;
   text-align:center;
   border-radius:15px;
@@ -36,22 +36,11 @@ input{
 }
 
 button{
-  font-size:28px;
+  font-size:26px;
   margin:10px;
   padding:10px 20px;
   background:#00ffcc;
   border:none;
-  border-radius:10px;
-}
-
-button:hover{
-  transform:scale(1.08);
-  box-shadow:0 0 20px #00ffcc;
-}
-
-select{
-  font-size:22px;
-  padding:8px;
   border-radius:10px;
 }
 
@@ -62,7 +51,7 @@ select{
 }
 
 #enemy,#player{
-  font-size:30px;
+  font-size:28px;
   margin:10px;
 }
 
@@ -91,7 +80,7 @@ select{
 }
 
 #result{
-  font-size:24px;
+  font-size:22px;
   margin-top:20px;
   font-weight:bold;
 }
@@ -132,44 +121,47 @@ select{
 }
 
 @keyframes slashAnim{
-  0%{
-    opacity:1;
-    transform:translate(-50%,-50%) scale(0);
-  }
-  100%{
-    opacity:0;
-    transform:translate(-50%,-50%) scale(2);
-  }
+  0%{opacity:1;transform:translate(-50%,-50%) scale(0);}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(2);}
 }
 
 #samurai{
   position:fixed;
-  bottom:15px;
+  bottom:-20px;
   left:50%;
   transform:translateX(-50%);
-  font-size:90px;
+  width:360px;
   z-index:15;
   pointer-events:none;
+  filter:drop-shadow(0 0 25px #00ffcc);
+  animation:samuraiIdle 1.8s infinite ease-in-out;
+}
+
+@keyframes samuraiIdle{
+  0%{transform:translateX(-50%) translateY(0);}
+  50%{transform:translateX(-50%) translateY(-8px);}
+  100%{transform:translateX(-50%) translateY(0);}
 }
 
 .samuraiAttack{
-  animation:samuraiAttackAnim .45s;
+  animation:samuraiSlash .45s !important;
 }
 
-@keyframes samuraiAttackAnim{
-  0%{transform:translateX(-50%) translateY(0) scale(1);}
-  40%{transform:translateX(-50%) translateY(-90px) scale(1.25);}
-  100%{transform:translateX(-50%) translateY(0) scale(1);}
+@keyframes samuraiSlash{
+  0%{transform:translateX(-50%) translateY(0) rotate(0deg);}
+  35%{transform:translateX(-50%) translateY(-100px) rotate(-8deg) scale(1.18);}
+  70%{transform:translateX(-50%) translateY(-40px) rotate(8deg) scale(1.1);}
+  100%{transform:translateX(-50%) translateY(0) rotate(0deg) scale(1);}
 }
 
 .samuraiDamage{
-  animation:samuraiDamageAnim .45s;
+  animation:samuraiDamageAnim .45s !important;
 }
 
 @keyframes samuraiDamageAnim{
   0%{transform:translateX(-50%) rotate(0deg);}
-  25%{transform:translateX(-65%) rotate(-10deg);}
-  50%{transform:translateX(-35%) rotate(10deg);}
+  25%{transform:translateX(-70%) rotate(-12deg);}
+  50%{transform:translateX(-30%) rotate(12deg);}
   100%{transform:translateX(-50%) rotate(0deg);}
 }
 </style>
@@ -178,12 +170,6 @@ select{
 <body>
 
 <h1>積分バトルGO</h1>
-
-<select id="difficulty">
-  <option value="easy">かんたん</option>
-  <option value="normal" selected>ふつう</option>
-  <option value="hard">むずかしい</option>
-</select>
 
 <div id="timer">⏰ 5:00</div>
 
@@ -208,7 +194,7 @@ select{
 <div id="result"></div>
 
 <div id="slash"></div>
-<div id="samurai">🧍‍♂️🗡️</div>
+<img id="samurai" src="samurai.png">
 
 <audio id="bgm" src="bgm.mp3" loop></audio>
 <audio id="se_correct" src="correct.mp3"></audio>
