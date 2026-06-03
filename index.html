@@ -3,264 +3,45 @@
 <head>
 <meta charset="UTF-8">
 <title>数学マスター</title>
-
 <style>
-body{
-  margin:0;
-  background:radial-gradient(circle,#111,#000);
-  color:white;
-  text-align:center;
-  font-family:sans-serif;
-  min-height:100vh;
-  padding-bottom:120px;
-}
-
-h1{
-  color:#00ffcc;
-  text-shadow:0 0 10px #00ffcc;
-}
-
-.screen{display:none;}
-.active{display:block;}
-
-.modeBtn{
-  display:block;
-  width:80%;
-  margin:18px auto;
-  font-size:30px;
-  padding:18px;
-}
-
-button{
-  font-size:24px;
-  margin:10px;
-  padding:10px 20px;
-  background:#00ffcc;
-  border:none;
-  border-radius:10px;
-}
-
-button:hover{
-  transform:scale(1.08);
-  box-shadow:0 0 20px #00ffcc;
-}
-
-input{
-  font-size:32px;
-  width:80%;
-  text-align:center;
-  border-radius:15px;
-  padding:10px;
-  border:none;
-  margin:8px;
-}
-
-a{color:#00ffcc;}
-
-#profileIcon{
-  width:90px;
-  height:90px;
-  border-radius:50%;
-  object-fit:cover;
-  background:#333;
-  border:2px solid #00ffcc;
-}
-
-#currentTitle,#levelInfo,#rateInfo{
-  font-size:20px;
-  margin:8px;
-}
-
-.founderTitle{
-  color:#FFD700;
-  font-weight:bold;
-  animation:founderGlow 2s infinite;
-}
-
-.meneruTitle{
-  color:#ff0000;
-  font-weight:bold;
-  text-shadow:
-    0 0 10px #ff0000,
-    0 0 20px #ff0000,
-    0 0 40px #ff0000;
-}
-
-@keyframes founderGlow{
-  0%{text-shadow:0 0 5px gold,0 0 10px gold;}
-  50%{text-shadow:0 0 20px gold,0 0 40px gold;}
-  100%{text-shadow:0 0 5px gold,0 0 10px gold;}
-}
-
-.levelUp{
-  position:fixed;
-  top:35%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  font-size:60px;
-  color:#FFD700;
-  text-shadow:0 0 30px gold;
-  z-index:100;
-  animation:levelPop 1.4s forwards;
-}
-
-@keyframes levelPop{
-  0%{opacity:0;transform:translate(-50%,-50%) scale(.3);}
-  30%{opacity:1;transform:translate(-50%,-50%) scale(1.3);}
-  100%{opacity:0;transform:translate(-50%,-50%) scale(2);}
-}
-
-#enemy,#player{
-  font-size:30px;
-  margin:10px;
-}
-
-.hpFrame{
-  width:80%;
-  height:25px;
-  background:#333;
-  margin:10px auto 25px;
-  border-radius:20px;
-  overflow:hidden;
-  box-shadow:0 0 10px white;
-}
-
-.hpBar{
-  height:100%;
-  width:100%;
-  transition:width .4s;
-}
-
-#enemyBar{
-  background:linear-gradient(90deg,red,orange);
-}
-
-#playerBar{
-  background:linear-gradient(90deg,lime,#00ffcc);
-}
-
-#q{
-  font-size:42px;
-  margin:30px;
-  text-shadow:0 0 20px #00ffcc;
-}
-
-.questionAnim{
-  animation:questionPop .5s;
-}
-
-@keyframes questionPop{
-  0%{opacity:0;transform:scale(.5) rotate(-3deg);}
-  70%{opacity:1;transform:scale(1.08) rotate(2deg);}
-  100%{opacity:1;transform:scale(1) rotate(0);}
-}
-
-#goText{
-  position:fixed;
-  top:35%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  font-size:90px;
-  color:#00ffcc;
-  text-shadow:0 0 30px #00ffcc;
-  opacity:0;
-  pointer-events:none;
-  z-index:50;
-}
-
-.goAnim{
-  animation:goPop .7s;
-}
-
-@keyframes goPop{
-  0%{opacity:0;transform:translate(-50%,-50%) scale(.2);}
-  35%{opacity:1;transform:translate(-50%,-50%) scale(1.4);}
-  100%{opacity:0;transform:translate(-50%,-50%) scale(2);}
-}
-
-#slash{
-  position:fixed;
-  left:50%;
-  top:40%;
-  font-size:120px;
-  opacity:0;
-  pointer-events:none;
-  z-index:20;
-}
-
-.showSlash{
-  animation:slashAnim .5s;
-}
-
-@keyframes slashAnim{
-  0%{opacity:1;transform:translate(-50%,-50%) scale(0);}
-  100%{opacity:0;transform:translate(-50%,-50%) scale(2);}
-}
-
-.playerHit{
-  animation:flash .4s;
-}
-
-@keyframes flash{
-  0%{background:red;}
-  100%{background:radial-gradient(circle,#111,#000);}
-}
-
-.rankItem,
-.titleItem,
-.profileItem,
-.settingsItem,
-.missionItem,
-.reviewItem,
-.explainBox,
-.achievementItem,
-.friendItem{
-  background:rgba(255,255,255,0.12);
-  margin:10px auto;
-  padding:10px;
-  border-radius:10px;
-  width:90%;
-  text-align:left;
-  font-size:18px;
-}
-
-.rankIcon{
-  width:34px;
-  height:34px;
-  border-radius:50%;
-  object-fit:cover;
-  vertical-align:middle;
-  margin-right:8px;
-}
-
-#adArea{
-  position:fixed;
-  bottom:20px;
-  left:50%;
-  transform:translateX(-50%);
-  width:320px;
-  height:50px;
-  background:white;
-  color:black;
-  border-radius:10px;
-  line-height:50px;
-  z-index:10;
-}
+body{margin:0;background:radial-gradient(circle,#111,#000);color:white;text-align:center;font-family:sans-serif;min-height:100vh;padding-bottom:120px}
+h1{color:#00ffcc;text-shadow:0 0 10px #00ffcc}
+.screen{display:none}.active{display:block}
+.modeBtn{display:block;width:80%;margin:18px auto;font-size:30px;padding:18px}
+button{font-size:24px;margin:10px;padding:10px 20px;background:#00ffcc;border:none;border-radius:10px}
+button:hover{transform:scale(1.08);box-shadow:0 0 20px #00ffcc}
+input{font-size:28px;width:80%;text-align:center;border-radius:15px;padding:10px;border:none;margin:8px}
+a{color:#00ffcc}
+#profileIcon{width:90px;height:90px;border-radius:50%;object-fit:cover;background:#333;border:2px solid #00ffcc}
+#currentTitle,#levelInfo,#rateInfo{font-size:20px;margin:8px}
+.founderTitle{color:#FFD700;font-weight:bold;animation:founderGlow 2s infinite}
+.meneruTitle{color:#ff0000;font-weight:bold;text-shadow:0 0 10px #ff0000,0 0 20px #ff0000,0 0 40px #ff0000}
+@keyframes founderGlow{0%{text-shadow:0 0 5px gold,0 0 10px gold}50%{text-shadow:0 0 20px gold,0 0 40px gold}100%{text-shadow:0 0 5px gold,0 0 10px gold}}
+.levelUp{position:fixed;top:35%;left:50%;transform:translate(-50%,-50%);font-size:60px;color:#FFD700;text-shadow:0 0 30px gold;z-index:100;animation:levelPop 1.4s forwards}
+@keyframes levelPop{0%{opacity:0;transform:translate(-50%,-50%) scale(.3)}30%{opacity:1;transform:translate(-50%,-50%) scale(1.3)}100%{opacity:0;transform:translate(-50%,-50%) scale(2)}}
+#enemy,#player{font-size:30px;margin:10px}
+.hpFrame{width:80%;height:25px;background:#333;margin:10px auto 25px;border-radius:20px;overflow:hidden;box-shadow:0 0 10px white}
+.hpBar{height:100%;width:100%;transition:width .4s}
+#enemyBar{background:linear-gradient(90deg,red,orange)}#playerBar{background:linear-gradient(90deg,lime,#00ffcc)}
+#q{font-size:42px;margin:30px;text-shadow:0 0 20px #00ffcc}
+.questionAnim{animation:questionPop .5s}@keyframes questionPop{0%{opacity:0;transform:scale(.5) rotate(-3deg)}70%{opacity:1;transform:scale(1.08) rotate(2deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
+#goText{position:fixed;top:35%;left:50%;transform:translate(-50%,-50%);font-size:90px;color:#00ffcc;text-shadow:0 0 30px #00ffcc;opacity:0;pointer-events:none;z-index:50}
+.goAnim{animation:goPop .7s}@keyframes goPop{0%{opacity:0;transform:translate(-50%,-50%) scale(.2)}35%{opacity:1;transform:translate(-50%,-50%) scale(1.4)}100%{opacity:0;transform:translate(-50%,-50%) scale(2)}}
+.rankItem,.titleItem,.profileItem,.settingsItem,.missionItem,.reviewItem,.explainBox,.achievementItem,.friendItem{background:rgba(255,255,255,.12);margin:10px auto;padding:10px;border-radius:10px;width:90%;text-align:left;font-size:18px}
+.rankIcon{width:34px;height:34px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:8px}
+#adArea{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);width:320px;height:50px;background:white;color:black;border-radius:10px;line-height:50px;z-index:10}
 </style>
 </head>
-
 <body>
-
 <div id="homeScreen" class="screen active">
   <h1>🏆 数学マスター 🏆</h1>
-
   <img id="profileIcon" src="">
   <div id="currentTitle">称号：初心者</div>
   <div id="levelInfo">Lv1</div>
   <div id="rateInfo">正答率：0%</div>
 
   <button class="modeBtn" onclick="showStudyMenu()">📚 学習モード</button>
-  <button class="modeBtn" onclick="selectMode('random')">⚔️ ランキングモード</button>
+  <button class="modeBtn" onclick="selectRankingMode()">⚔️ ランキングモード</button>
   <button class="modeBtn" onclick="showTitles()">🏅 称号一覧</button>
   <button class="modeBtn" onclick="showAchievements()">🏆 実績一覧</button>
   <button class="modeBtn" onclick="showWorldRanking()">🌍 週間ランキング</button>
@@ -270,36 +51,24 @@ a{color:#00ffcc;}
   <button class="modeBtn" onclick="showProfile()">👤 プロフィール</button>
   <button class="modeBtn" onclick="showSettings()">⚙️ 設定</button>
   <button class="modeBtn" onclick="showContact()">📩 お問い合わせ</button>
-
   <div id="panelArea"></div>
 </div>
 
 <div id="gameScreen" class="screen">
   <h1 id="modeTitle">🏆 数学マスター 🏆</h1>
-
   <div id="enemy">👾 敵HP: <span id="ehp">10</span></div>
-  <div class="hpFrame" id="enemyFrame">
-    <div id="enemyBar" class="hpBar"></div>
-  </div>
-
+  <div class="hpFrame" id="enemyFrame"><div id="enemyBar" class="hpBar"></div></div>
   <div id="player">❤️ あなたHP: <span id="php">5</span></div>
-  <div class="hpFrame" id="playerFrame">
-    <div id="playerBar" class="hpBar"></div>
-  </div>
-
+  <div class="hpFrame" id="playerFrame"><div id="playerBar" class="hpBar"></div></div>
   <div id="goText">GO!</div>
   <div id="q">START</div>
-
   <input id="ans" placeholder="答え">
   <br>
-
   <button onclick="submit()">決定</button>
   <button onclick="backHome()">ホームへ</button>
-
   <div id="result"></div>
 </div>
 
-<div id="slash"></div>
 <div id="levelUpArea"></div>
 <div id="adArea">広告スペース</div>
 
@@ -308,30 +77,10 @@ a{color:#00ffcc;}
 <audio id="se_wrong" src="wrong.mp3"></audio>
 
 <script src="https://cdn.jsdelivr.net/npm/mathjs@11.11.0/lib/browser/math.js"></script>
-
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-
-import {
-  getFirestore,
-  collection,
-  doc,
-  setDoc,
-  getDoc,
-  getDocs,
-  query,
-  where,
-  limit,
-  serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-
-import {
-  getAuth,
-  GoogleAuthProvider,
-  signInWithPopup,
-  signOut,
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import { getFirestore, collection, doc, setDoc, getDoc, getDocs, query, where, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDVXvWTGetf41ajd0KDwNPG-dH8pmsMIt8",
@@ -345,11 +94,9 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 provider.setCustomParameters({ prompt:"select_account" });
-
 window.currentUser = null;
 
 onAuthStateChanged(auth,user=>{
@@ -384,7 +131,6 @@ function getWeekKey(){
   const monday = new Date(japan);
   monday.setDate(japan.getDate()+diffToMonday);
   monday.setHours(0,0,0,0);
-
   const y = monday.getFullYear();
   const m = String(monday.getMonth()+1).padStart(2,"0");
   const d = String(monday.getDate()).padStart(2,"0");
@@ -392,93 +138,53 @@ function getWeekKey(){
 }
 
 function getPlayerId(){
-  if(window.currentUser){
-    return "google_" + window.currentUser.uid;
-  }
-
+  if(window.currentUser) return "google_" + window.currentUser.uid;
   let playerId = localStorage.getItem("playerId");
   if(!playerId){
     playerId = crypto.randomUUID();
     localStorage.setItem("playerId",playerId);
   }
-
   return "local_" + playerId;
 }
 
-window.getMyPlayerId = function(){
-  return getPlayerId();
-};
+window.getMyPlayerId = () => getPlayerId();
 
 window.saveWorldScore = async function(data){
   const week = getWeekKey();
   const playerId = getPlayerId();
-
   const docId = week + "_" + data.mode + "_" + playerId;
   const ref = doc(db,"rankings",docId);
-
   const old = await getDoc(ref);
-
-  if(old.exists()){
-    const oldData = old.data();
-    if(oldData.score >= data.score) return;
-  }
-
+  if(old.exists() && old.data().score >= data.score) return;
   await setDoc(ref,{
-    name:data.name,
-    icon:data.icon,
-    score:data.score,
-    title:data.title,
-    level:data.level,
-    mode:data.mode,
-    week:week,
-    playerId:playerId,
-    updatedAt:serverTimestamp()
+    name:data.name, icon:data.icon, score:data.score, title:data.title,
+    level:data.level, mode:data.mode, week, playerId, updatedAt:serverTimestamp()
   });
 };
 
 window.loadWorldRanking = async function(){
-  const q = query(
-    collection(db,"rankings"),
-    where("week","==",getWeekKey()),
-    where("mode","==","random"),
-    limit(100)
-  );
-
+  const q = query(collection(db,"rankings"), where("week","==",getWeekKey()), where("mode","==","random"), limit(100));
   const snap = await getDocs(q);
   let list = [];
-
-  snap.forEach(doc=>{
-    list.push(doc.data());
-  });
-
+  snap.forEach(doc=>list.push(doc.data()));
   list.sort((a,b)=>b.score-a.score);
   return list;
 };
 
 window.savePlayerPublicData = async function(data){
   const playerId = getPlayerId();
-
   await setDoc(doc(db,"players",playerId),{
-    playerId:playerId,
-    name:data.name,
-    icon:data.icon,
-    title:data.title,
-    level:data.level,
-    bestRandomScore:data.bestRandomScore,
-    updatedAt:serverTimestamp()
+    playerId, name:data.name, icon:data.icon, title:data.title,
+    level:data.level, bestRandomScore:data.bestRandomScore, updatedAt:serverTimestamp()
   });
 };
 
 window.loadFriendData = async function(friendId){
-  const ref = doc(db,"players",friendId);
-  const snap = await getDoc(ref);
-
+  const snap = await getDoc(doc(db,"players",friendId));
   if(!snap.exists()) return null;
   return snap.data();
 };
 </script>
-
 <script src="app.js"></script>
-
 </body>
 </html>
