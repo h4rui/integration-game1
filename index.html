@@ -12,7 +12,7 @@ body{
   text-align:center;
   font-family:sans-serif;
   min-height:100vh;
-  padding-bottom:170px;
+  padding-bottom:120px;
 }
 
 h1{
@@ -49,6 +49,23 @@ h1{
   padding:8px;
 }
 
+#currentTitle{
+  font-size:20px;
+  margin:10px;
+}
+
+.founderTitle{
+  color:#FFD700;
+  font-weight:bold;
+  animation:founderGlow 2s infinite;
+}
+
+@keyframes founderGlow{
+  0%{text-shadow:0 0 5px gold,0 0 10px gold;}
+  50%{text-shadow:0 0 20px gold,0 0 40px gold;}
+  100%{text-shadow:0 0 5px gold,0 0 10px gold;}
+}
+
 #timer{
   font-size:30px;
   color:yellow;
@@ -76,13 +93,8 @@ h1{
   transition:width .4s;
 }
 
-#enemyBar{
-  background:linear-gradient(90deg,red,orange);
-}
-
-#playerBar{
-  background:linear-gradient(90deg,lime,#00ffcc);
-}
+#enemyBar{background:linear-gradient(90deg,red,orange);}
+#playerBar{background:linear-gradient(90deg,lime,#00ffcc);}
 
 #goText{
   position:fixed;
@@ -97,9 +109,7 @@ h1{
   z-index:50;
 }
 
-.goAnim{
-  animation:goPop .7s;
-}
+.goAnim{animation:goPop .7s;}
 
 @keyframes goPop{
   0%{opacity:0;transform:translate(-50%,-50%) scale(.2);}
@@ -113,9 +123,7 @@ h1{
   text-shadow:0 0 20px #00ffcc;
 }
 
-.questionAnim{
-  animation:questionPop .5s;
-}
+.questionAnim{animation:questionPop .5s;}
 
 @keyframes questionPop{
   0%{opacity:0;transform:scale(.5) rotate(-3deg);}
@@ -146,13 +154,13 @@ button:hover{
   box-shadow:0 0 20px #00ffcc;
 }
 
-#result,#titleRanking{
+#result,#titleRanking,#titleList{
   font-size:22px;
   margin-top:20px;
   font-weight:bold;
 }
 
-.rankItem{
+.rankItem,.titleItem{
   background:rgba(255,255,255,0.12);
   margin:10px auto;
   padding:10px;
@@ -179,13 +187,8 @@ button:hover{
   100%{transform:translateX(0);}
 }
 
-.enemyHit{
-  animation:shake .4s;
-}
-
-.enemySpawn{
-  animation:enemySpawnAnim .8s;
-}
+.enemyHit{animation:shake .4s;}
+.enemySpawn{animation:enemySpawnAnim .8s;}
 
 @keyframes enemySpawnAnim{
   0%{opacity:0;transform:translateY(-200px) scale(.3);}
@@ -198,9 +201,7 @@ button:hover{
   100%{background:radial-gradient(circle,#111,#000);}
 }
 
-.playerHit{
-  animation:flash .4s;
-}
+.playerHit{animation:flash .4s;}
 
 #slash{
   position:fixed;
@@ -212,53 +213,25 @@ button:hover{
   z-index:20;
 }
 
-.showSlash{
-  animation:slashAnim .5s;
-}
+.showSlash{animation:slashAnim .5s;}
 
 @keyframes slashAnim{
   0%{opacity:1;transform:translate(-50%,-50%) scale(0);}
   100%{opacity:0;transform:translate(-50%,-50%) scale(2);}
 }
 
-#samurai{
+#adArea{
   position:fixed;
-  bottom:-20px;
+  bottom:20px;
   left:50%;
   transform:translateX(-50%);
-  width:360px;
-  z-index:15;
-  pointer-events:none;
-  filter:drop-shadow(0 0 25px #00ffcc);
-  animation:samuraiIdle 1.8s infinite ease-in-out;
-}
-
-@keyframes samuraiIdle{
-  0%{transform:translateX(-50%) translateY(0);}
-  50%{transform:translateX(-50%) translateY(-8px);}
-  100%{transform:translateX(-50%) translateY(0);}
-}
-
-.samuraiAttack{
-  animation:samuraiSlash .45s !important;
-}
-
-@keyframes samuraiSlash{
-  0%{transform:translateX(-50%) translateY(0) rotate(0);}
-  35%{transform:translateX(-50%) translateY(-100px) rotate(-8deg) scale(1.18);}
-  70%{transform:translateX(-50%) translateY(-40px) rotate(8deg) scale(1.1);}
-  100%{transform:translateX(-50%) translateY(0) rotate(0) scale(1);}
-}
-
-.samuraiDamage{
-  animation:samuraiDamageAnim .45s !important;
-}
-
-@keyframes samuraiDamageAnim{
-  0%{transform:translateX(-50%) rotate(0);}
-  25%{transform:translateX(-70%) rotate(-12deg);}
-  50%{transform:translateX(-30%) rotate(12deg);}
-  100%{transform:translateX(-50%) rotate(0);}
+  width:320px;
+  height:50px;
+  background:white;
+  color:black;
+  border-radius:10px;
+  line-height:50px;
+  z-index:10;
 }
 </style>
 </head>
@@ -276,6 +249,7 @@ button:hover{
     <input type="file" id="iconInput" accept="image/*">
     <br>
     <button onclick="saveProfile()">プロフィール保存</button>
+    <div id="currentTitle">称号：初心者</div>
   </div>
 
   <button class="modeBtn" onclick="selectMode('integral')">積分</button>
@@ -283,9 +257,12 @@ button:hover{
   <button class="modeBtn" onclick="selectMode('factor')">因数分解</button>
   <button class="modeBtn" onclick="selectMode('prime')">素因数分解</button>
   <button class="modeBtn" onclick="selectMode('expand')">展開</button>
-  <button class="modeBtn" onclick="selectMode('random')">ランダム問題</button>
+  <button class="modeBtn" onclick="selectMode('random')">タイムアタック</button>
 
+  <button onclick="showTitles()">称号一覧</button>
   <button onclick="showWorldRanking()">週間世界ランキング</button>
+
+  <div id="titleList"></div>
   <div id="titleRanking"></div>
 </div>
 
@@ -318,7 +295,7 @@ button:hover{
 </div>
 
 <div id="slash"></div>
-<img id="samurai" src="samurai.png">
+<div id="adArea">広告スペース</div>
 
 <audio id="bgm" src="bgm.mp3" loop></audio>
 <audio id="se_correct" src="correct.mp3"></audio>
@@ -407,6 +384,7 @@ window.saveWorldScore = async function(data){
     name:data.name,
     icon:data.icon,
     score:data.score,
+    title:data.title,
     mode:data.mode,
     week:week,
     playerId:playerId,

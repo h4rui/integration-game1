@@ -7,10 +7,23 @@ let history = [];
 let usedQuestions = [];
 let mode = "integral";
 let score = 0;
+let combo = 0;
+let playStartTime = 0;
 
 let playerProfile = {
   name:"名無し",
   icon:""
+};
+
+let playerData = {
+  totalCorrect:0,
+  playTime:0,
+  maxCombo:0,
+  consecutiveDays:0,
+  lastPlayDate:"",
+  unlockedTitles:["初心者"],
+  equippedTitle:"初心者",
+  bestRandomScore:0
 };
 
 function rand(min,max){
@@ -33,14 +46,10 @@ function frac(num){
     let n = Math.round(num*d);
 
     if(Math.abs(num-n/d)<eps){
-
       let g = gcd(Math.abs(n),d);
-
       n/=g;
       d/=g;
-
       if(d===1) return `${n}`;
-
       return `${n}/${d}`;
     }
   }
@@ -49,244 +58,365 @@ function frac(num){
 }
 
 function coeff(num){
-
   let s = frac(num);
-
   if(s==="1") return "";
   if(s==="-1") return "-";
-
   return s;
 }
 
 function qPower(p){
-
   if(p===1) return "x";
   if(p===2) return "x²";
   if(p===3) return "x³";
   if(p===4) return "x⁴";
   if(p===5) return "x⁵";
   if(p===6) return "x⁶";
-
   return "x^"+p;
 }
 
 function xPower(p){
-
   if(p===1) return "x";
-
   return "x^"+p;
 }
 
 function term(c,p){
-
   if(c===0) return "";
-
-  if(p===0){
-    return frac(c);
-  }
-
+  if(p===0) return frac(c);
   return coeff(c)+xPower(p);
 }
 
 function normalize(str){
-
   return String(str)
-  .replace(/\s/g,"")
-  .replace(/\*/g,"")
-  .replace(/\+C/g,"")
-  .replace(/C/g,"")
-  .replace(/π/g,"pi")
-  .replace(/²/g,"^2")
-  .replace(/³/g,"^3")
-  .replace(/⁴/g,"^4")
-  .replace(/⁵/g,"^5")
-  .replace(/⁶/g,"^6");
+    .replace(/\s/g,"")
+    .replace(/\*/g,"")
+    .replace(/\+C/g,"")
+    .replace(/C/g,"")
+    .replace(/π/g,"pi")
+    .replace(/²/g,"^2")
+    .replace(/³/g,"^3")
+    .replace(/⁴/g,"^4")
+    .replace(/⁵/g,"^5")
+    .replace(/⁶/g,"^6");
+}
+
+function loadAllData(){
+  let p = localStorage.getItem("playerProfile");
+  if(p){
+    playerProfile = JSON.parse(p);
+  }
+
+  let d = localStorage.getItem("playerData");
+  if(d){
+    playerData = JSON.parse(d);
+  }
+
+  if(!playerData.unlockedTitles){
+    playerData.unlockedTitles = ["初心者"];
+  }
+
+  if(!playerData.equippedTitle){
+    playerData.equippedTitle = "初心者";
+  }
+
+  document.getElementById("playerName").value = playerProfile.name;
+
+  if(playerProfile.icon){
+    document.getElementById("profileIcon").src = playerProfile.icon;
+  }
+
+  updateCurrentTitle();
+}
+
+function saveAllData(){
+  localStorage.setItem("playerProfile", JSON.stringify(playerProfile));
+  localStorage.setItem("playerData", JSON.stringify(playerData));
 }
 
 function saveProfile(){
-
-  let name =
-    document.getElementById("playerName").value.trim();
-
-  let file =
-    document.getElementById("iconInput").files[0];
+  let name = document.getElementById("playerName").value.trim();
+  let file = document.getElementById("iconInput").files[0];
 
   if(name){
     playerProfile.name = name;
   }
 
   if(file){
-
     let reader = new FileReader();
 
     reader.onload = function(e){
-
       playerProfile.icon = e.target.result;
-
-      localStorage.setItem(
-        "playerProfile",
-        JSON.stringify(playerProfile)
-      );
-
-      document.getElementById("profileIcon").src =
-        playerProfile.icon;
-
-      alert("保存したよ");
+      saveAllData();
+      document.getElementById("profileIcon").src = playerProfile.icon;
+      alert("プロフィールを保存したよ");
     };
 
     reader.readAsDataURL(file);
-
   }else{
-
-    localStorage.setItem(
-      "playerProfile",
-      JSON.stringify(playerProfile)
-    );
-
-    alert("保存したよ");
+    saveAllData();
+    alert("プロフィールを保存したよ");
   }
 }
 
-function loadProfile(){
+window.addEventListener("load", loadAllData);
 
-  let saved =
-    localStorage.getItem("playerProfile");
+function titleHTML(t){
+  if(t === "⚡️創設者"){
+    return `<span class="founderTitle">⚡️創設者</span>`;
+  }
+  return `🏅 ${t}`;
+}
 
-  if(saved){
+function updateCurrentTitle(){
+  document.getElementById("currentTitle").innerHTML =
+    "称号：" + titleHTML(playerData.equippedTitle || "初心者");
+}
 
-    playerProfile =
-      JSON.parse(saved);
-
-    document.getElementById("playerName").value =
-      playerProfile.name;
-
-    if(playerProfile.icon){
-
-      document.getElementById("profileIcon").src =
-        playerProfile.icon;
-    }
+function unlockTitle(t){
+  if(!playerData.unlockedTitles.includes(t)){
+    playerData.unlockedTitles.push(t);
   }
 }
 
-window.addEventListener(
-  "load",
-  loadProfile
-);
+function equipTitle(t){
+  if(playerData.unlockedTitles.includes(t)){
+    playerData.equippedTitle = t;
+    saveAllData();
+    updateCurrentTitle();
+    showTitles();
+  }
+}
+
+function checkTitles(){
+  let correct = playerData.totalCorrect || 0;
+  let play = playerData.playTime || 0;
+  let maxCombo = playerData.maxCombo || 0;
+  let best = playerData.bestRandomScore || 0;
+  let days = playerData.consecutiveDays || 0;
+
+  if(correct >= 5) unlockTitle("理系");
+  if(correct >= 10) unlockTitle("数学初心者");
+  if(correct >= 50) unlockTitle("数学中級者");
+  if(correct >= 100) unlockTitle("数学上級者");
+  if(correct >= 500) unlockTitle("数学の鬼👹");
+  if(correct >= 1000) unlockTitle("数学の申し子🪽");
+  if(correct >= 5000) unlockTitle("数学王👑");
+  if(correct >= 10000) unlockTitle("伝説");
+  if(correct >= 50000) unlockTitle("神話");
+  if(correct >= 100000) unlockTitle("創世神🌌");
+
+  if(play >= 15*60) unlockTitle("数学好き");
+  if(play >= 30*60) unlockTitle("数学大好き");
+  if(play >= 60*60) unlockTitle("数学者🎓");
+  if(play >= 3*60*60) unlockTitle("努力家");
+  if(play >= 5*60*60) unlockTitle("秀才");
+  if(play >= 10*60*60) unlockTitle("鬼才");
+  if(play >= 50*60*60) unlockTitle("天才");
+
+  if(maxCombo >= 10) unlockTitle("10連勝");
+  if(maxCombo >= 50) unlockTitle("50連勝");
+  if(maxCombo >= 100) unlockTitle("不敗神話");
+
+  if(best >= 20) unlockTitle("電光石火");
+  if(best >= 50) unlockTitle("疾風迅雷");
+  if(best >= 100) unlockTitle("数学の怪物");
+
+  if(days >= 7) unlockTitle("毎日勉強");
+  if(days >= 30) unlockTitle("継続は力なり");
+  if(days >= 100) unlockTitle("数学狂");
+
+  saveAllData();
+}
+
+function allTitles(){
+  return [
+    "⚡️創設者",
+
+    "理系",
+    "数学初心者",
+    "数学中級者",
+    "数学上級者",
+    "数学の鬼👹",
+    "数学の申し子🪽",
+    "数学王👑",
+    "伝説",
+    "神話",
+    "創世神🌌",
+
+    "数学好き",
+    "数学大好き",
+    "数学者🎓",
+    "努力家",
+    "秀才",
+    "鬼才",
+    "天才",
+
+    "10連勝",
+    "50連勝",
+    "不敗神話",
+
+    "電光石火",
+    "疾風迅雷",
+    "数学の怪物",
+
+    "TOP10",
+    "TOP3",
+    "週間王👑",
+
+    "毎日勉強",
+    "継続は力なり",
+    "数学狂"
+  ];
+}
+
+function showTitles(){
+  checkTitles();
+
+  let box = document.getElementById("titleList");
+  let html = "<h2>称号一覧</h2>";
+
+  for(let t of allTitles()){
+    let unlocked = playerData.unlockedTitles.includes(t);
+
+    html += `
+      <div class="titleItem">
+        ${unlocked ? titleHTML(t) : "❓？？？"}
+        ${
+          unlocked
+          ? `<button onclick="equipTitle('${t}')">装備</button>`
+          : ""
+        }
+      </div>
+    `;
+  }
+
+  box.innerHTML = html;
+}
+
+function recordPlayDay(){
+  let today = new Date().toLocaleDateString("ja-JP", {
+    timeZone:"Asia/Tokyo"
+  });
+
+  if(!playerData.lastPlayDate){
+    playerData.lastPlayDate = today;
+    playerData.consecutiveDays = 1;
+    return;
+  }
+
+  if(playerData.lastPlayDate === today){
+    return;
+  }
+
+  let yesterday = new Date();
+  yesterday.setDate(yesterday.getDate()-1);
+
+  let y = yesterday.toLocaleDateString("ja-JP", {
+    timeZone:"Asia/Tokyo"
+  });
+
+  if(playerData.lastPlayDate === y){
+    playerData.consecutiveDays++;
+  }else{
+    playerData.consecutiveDays = 1;
+  }
+
+  playerData.lastPlayDate = today;
+}
 
 function selectMode(m){
-
   mode = m;
 
-  document.getElementById("titleScreen")
-    .classList.remove("active");
-
-  document.getElementById("gameScreen")
-    .classList.add("active");
+  document.getElementById("titleScreen").classList.remove("active");
+  document.getElementById("gameScreen").classList.add("active");
 
   let title = "⚔️ 積分バトル ⚔️";
+  if(mode==="derivative") title="⚔️ 微分バトル ⚔️";
+  if(mode==="factor") title="⚔️ 因数分解バトル ⚔️";
+  if(mode==="prime") title="⚔️ 素因数分解バトル ⚔️";
+  if(mode==="expand") title="⚔️ 展開バトル ⚔️";
+  if(mode==="random") title="⚔️ タイムアタック ⚔️";
 
-  if(mode==="derivative")
-    title="⚔️ 微分バトル ⚔️";
-
-  if(mode==="factor")
-    title="⚔️ 因数分解バトル ⚔️";
-
-  if(mode==="prime")
-    title="⚔️ 素因数分解バトル ⚔️";
-
-  if(mode==="expand")
-    title="⚔️ 展開バトル ⚔️";
-
-  if(mode==="random")
-    title="⚔️ ランダム問題 ⚔️";
-
-  document.getElementById("modeTitle")
-    .innerText = title;
-
+  document.getElementById("modeTitle").innerText = title;
   start();
 }
 
 function backTitle(){
-
   clearInterval(timer);
+  updatePlayTime();
 
-  document.getElementById("gameScreen")
-    .classList.remove("active");
-
-  document.getElementById("titleScreen")
-    .classList.add("active");
+  document.getElementById("gameScreen").classList.remove("active");
+  document.getElementById("titleScreen").classList.add("active");
 
   document.getElementById("bgm").pause();
+
+  checkTitles();
+  updateCurrentTitle();
 }
 
 function start(){
-
   clearInterval(timer);
 
   history = [];
   usedQuestions = [];
   score = 0;
+  combo = 0;
+  playStartTime = Date.now();
+
+  document.getElementById("result").innerHTML = "";
+  document.getElementById("q").innerText = "START";
+  document.getElementById("timer").innerText = "⏰ 5:00";
+
+  recordPlayDay();
 
   if(mode==="random"){
-
     enemyHP = 9999;
     playerHP = 1;
-
   }else{
-
     enemyHP = 10;
     playerHP = 5;
   }
 
   updateHP();
-
   nextQ();
-
   startTimer();
 
-  let bgm =
-    document.getElementById("bgm");
-
+  let bgm = document.getElementById("bgm");
   bgm.volume = 0.2;
   bgm.play();
 }
 
+function updatePlayTime(){
+  if(playStartTime){
+    let sec = Math.floor((Date.now() - playStartTime)/1000);
+    playerData.playTime += sec;
+    playStartTime = 0;
+    saveAllData();
+  }
+}
+
 function startTimer(){
-
   clearInterval(timer);
-
   time = 300;
 
   timer = setInterval(()=>{
-
     time--;
 
-    document.getElementById("timer")
-      .innerText =
-      "⏰ " +
-      Math.floor(time/60) +
-      ":" +
-      String(time%60).padStart(2,"0");
+    document.getElementById("timer").innerText =
+      "⏰ " + Math.floor(time/60) + ":" + String(time%60).padStart(2,"0");
 
     if(time<=0){
-
       if(mode==="random"){
-
         finishRandom();
         return;
       }
 
       playerHP--;
-
       updateHP();
-
       nextTurn();
     }
-
   },1000);
 }
 function generateQuestion(){
-
   if(mode==="integral") return generateIntegral();
   if(mode==="derivative") return generateDerivative();
   if(mode==="factor") return generateFactor();
@@ -294,9 +424,7 @@ function generateQuestion(){
   if(mode==="expand") return generateExpand();
 
   if(mode==="random"){
-
     let r = rand(1,5);
-
     if(r===1) return generateIntegral();
     if(r===2) return generateDerivative();
     if(r===3) return generateFactor();
@@ -306,11 +434,9 @@ function generateQuestion(){
 }
 
 function generateIntegral(){
-
   let type = rand(1,8);
 
   if(type===1){
-
     let a = rand(-6,6);
     if(a===0) a = 1;
 
@@ -325,7 +451,6 @@ function generateIntegral(){
   }
 
   if(type===2){
-
     let a = rand(-5,5);
     let b = rand(-5,5);
     let c = rand(-5,5);
@@ -346,10 +471,8 @@ function generateIntegral(){
   }
 
   if(type===3){
-
     let l = rand(0,3);
     let r = rand(l+1,l+5);
-
     let a = rand(1,5);
     let n = rand(1,4);
 
@@ -365,7 +488,6 @@ function generateIntegral(){
   }
 
   if(type===4){
-
     let l = rand(0,2);
     let r = rand(l+1,l+4);
 
@@ -388,7 +510,6 @@ function generateIntegral(){
   }
 
   if(type===5){
-
     let a = rand(1,6);
     let k = rand(1,4);
 
@@ -400,7 +521,6 @@ function generateIntegral(){
   }
 
   if(type===6){
-
     let a = rand(1,6);
     let k = rand(1,4);
 
@@ -412,7 +532,6 @@ function generateIntegral(){
   }
 
   if(type===7){
-
     let a = rand(1,6);
     let k = rand(1,4);
 
@@ -424,11 +543,9 @@ function generateIntegral(){
   }
 
   if(type===8){
-
     let a = rand(1,5);
     let b = rand(-5,5);
     let n = rand(2,4);
-
     let bottom = a*(n+1);
 
     return{
@@ -440,11 +557,9 @@ function generateIntegral(){
 }
 
 function generateDerivative(){
-
   let type = rand(1,12);
 
   if(type===1){
-
     let a = rand(-6,6);
     if(a===0) a = 1;
 
@@ -459,7 +574,6 @@ function generateDerivative(){
   }
 
   if(type===2){
-
     let a = rand(-5,5);
     let b = rand(-5,5);
     let c = rand(-5,5);
@@ -480,7 +594,6 @@ function generateDerivative(){
   }
 
   if(type===3){
-
     let a = rand(1,6);
     let k = rand(1,4);
 
@@ -492,7 +605,6 @@ function generateDerivative(){
   }
 
   if(type===4){
-
     let a = rand(1,6);
     let k = rand(1,4);
 
@@ -504,7 +616,6 @@ function generateDerivative(){
   }
 
   if(type===5){
-
     let a = rand(1,6);
     let k = rand(1,4);
 
@@ -516,7 +627,6 @@ function generateDerivative(){
   }
 
   if(type===6){
-
     let a = rand(2,5);
     let b = rand(-5,5);
     let n = rand(2,4);
@@ -537,7 +647,6 @@ function generateDerivative(){
   }
 
   if(type===8){
-
     let a = rand(1,5);
     let b = rand(1,5);
 
@@ -565,7 +674,6 @@ function generateDerivative(){
   }
 
   if(type===11){
-
     let a = rand(1,5);
 
     return{
@@ -576,7 +684,6 @@ function generateDerivative(){
   }
 
   if(type===12){
-
     let a = rand(1,5);
 
     return{
@@ -588,11 +695,9 @@ function generateDerivative(){
 }
 
 function generateFactor(){
-
   let type = rand(1,4);
 
   if(type===1){
-
     let a = rand(1,8);
     let b = rand(1,8);
 
@@ -604,7 +709,6 @@ function generateFactor(){
   }
 
   if(type===2){
-
     let a = rand(1,8);
     let b = rand(1,8);
 
@@ -616,7 +720,6 @@ function generateFactor(){
   }
 
   if(type===3){
-
     let a = rand(1,8);
     let b = rand(1,8);
 
@@ -628,7 +731,6 @@ function generateFactor(){
   }
 
   if(type===4){
-
     let a = rand(2,9);
 
     return{
@@ -640,7 +742,6 @@ function generateFactor(){
 }
 
 function isPrime(n){
-
   if(n<2) return false;
 
   for(let i=2;i*i<=n;i++){
@@ -651,18 +752,14 @@ function isPrime(n){
 }
 
 function primeFactors(n){
-
   let arr = [];
   let d = 2;
 
   while(n>1){
-
     while(n%d===0){
-
       arr.push(d);
       n = n/d;
     }
-
     d++;
   }
 
@@ -670,7 +767,6 @@ function primeFactors(n){
 }
 
 function generatePrime(){
-
   let primes = [2,3,5,7,11,13];
   let count = rand(2,5);
   let num = 1;
@@ -690,9 +786,7 @@ function generatePrime(){
 }
 
 function checkPrimeAnswer(input,number){
-
   try{
-
     let s = input
       .replace(/\s/g,"")
       .replace(/×/g,"*")
@@ -704,9 +798,7 @@ function checkPrimeAnswer(input,number){
     let nums = [];
 
     for(let part of parts){
-
       if(part.includes("^")){
-
         let tmp = part.split("^");
         let base = Number(tmp[0]);
         let power = Number(tmp[1]);
@@ -719,9 +811,7 @@ function checkPrimeAnswer(input,number){
         for(let i=0;i<power;i++){
           nums.push(base);
         }
-
       }else{
-
         let n = Number(part);
 
         if(!Number.isInteger(n)) return false;
@@ -731,23 +821,18 @@ function checkPrimeAnswer(input,number){
       }
     }
 
-    let product =
-      nums.reduce((a,b)=>a*b,1);
+    let product = nums.reduce((a,b)=>a*b,1);
 
     return product===number;
-
   }catch(e){
-
     return false;
   }
 }
 
 function generateExpand(){
-
   let type = rand(1,4);
 
   if(type===1){
-
     let a = rand(1,8);
     let b = rand(1,8);
 
@@ -759,7 +844,6 @@ function generateExpand(){
   }
 
   if(type===2){
-
     let a = rand(1,8);
     let b = rand(1,8);
 
@@ -771,7 +855,6 @@ function generateExpand(){
   }
 
   if(type===3){
-
     let a = rand(1,8);
 
     return{
@@ -782,7 +865,6 @@ function generateExpand(){
   }
 
   if(type===4){
-
     let a = rand(1,8);
 
     return{
@@ -794,16 +876,13 @@ function generateExpand(){
 }
 
 function expressionsEqual(user,correct){
-
   try{
-
     let u = normalize(user);
     let c = normalize(correct);
 
     let values = [-3,-2,-1,1,2,3,4];
 
     for(let x of values){
-
       let uv = math.evaluate(u,{x:x});
       let cv = math.evaluate(c,{x:x});
 
@@ -813,22 +892,17 @@ function expressionsEqual(user,correct){
     }
 
     return true;
-
   }catch(e){
-
     return false;
   }
 }
 
 function nextQ(){
-
   let count = 0;
 
   do{
-
     current = generateQuestion();
     count++;
-
   }while(
     usedQuestions.includes(current.q) &&
     count<100
@@ -836,17 +910,11 @@ function nextQ(){
 
   usedQuestions.push(current.q);
 
-  let q =
-    document.getElementById("q");
-
-  let go =
-    document.getElementById("goText");
-
-  let enemy =
-    document.getElementById("enemy");
+  let q = document.getElementById("q");
+  let go = document.getElementById("goText");
+  let enemy = document.getElementById("enemy");
 
   q.innerText = "";
-
   document.getElementById("ans").value = "";
 
   enemy.classList.remove("enemySpawn");
@@ -860,46 +928,36 @@ function nextQ(){
   enemy.classList.add("enemySpawn");
 
   setTimeout(()=>{
-
     go.classList.add("goAnim");
 
     setTimeout(()=>{
-
       q.innerText = current.q;
       q.classList.add("questionAnim");
-
     },300);
 
   },400);
 }
 
 function submit(){
-
   if(!current) return;
 
-  let u =
-    document.getElementById("ans").value;
+  let u = document.getElementById("ans").value;
 
   if(u.trim()===""){
+    document.getElementById("result").innerText = "答えを入力して！";
+    return;
+  }
 
-    document.getElementById("result")
-      .innerText =
-      "答えを入力して！";
-
+  if(u === "adminadminadmin9671" && mode === "integral"){
+    unlockTitle("⚡️創設者");
+    playerData.equippedTitle = "⚡️創設者";
+    saveAllData();
+    updateCurrentTitle();
+    alert("⚡️創設者を解放しました！");
     return;
   }
 
   let ok = false;
-
-  const adminCode =
-    String.fromCharCode(
-      97,100,109,105,110,
-      57,54,55,49
-    );
-
-  if(u===adminCode){
-    ok = true;
-  }
 
   if(mode==="prime" && !ok){
     ok = checkPrimeAnswer(u,current.number);
@@ -910,9 +968,7 @@ function submit(){
   }
 
   if(!ok){
-    ok =
-      normalize(u) ===
-      normalize(current.display);
+    ok = normalize(u) === normalize(current.display);
   }
 
   history.push({
@@ -923,140 +979,104 @@ function submit(){
   });
 
   if(ok){
-
     score++;
+    combo++;
+
+    playerData.totalCorrect++;
+    if(combo > playerData.maxCombo){
+      playerData.maxCombo = combo;
+    }
 
     if(mode!=="random"){
       enemyHP--;
     }
 
-    let enemy =
-      document.getElementById("enemy");
-
-    let slash =
-      document.getElementById("slash");
-
-    let samurai =
-      document.getElementById("samurai");
+    let enemy = document.getElementById("enemy");
+    let slash = document.getElementById("slash");
 
     enemy.classList.add("enemyHit");
-
     slash.innerText = "⚔️";
     slash.classList.add("showSlash");
 
-    if(samurai){
-      samurai.classList.add("samuraiAttack");
-    }
-
     setTimeout(()=>{
-
       enemy.classList.remove("enemyHit");
       slash.classList.remove("showSlash");
-
-      if(samurai){
-        samurai.classList.remove("samuraiAttack");
-      }
-
     },500);
 
     document.getElementById("se_correct").play();
 
-    document.getElementById("result")
-      .innerText =
-      "○ 攻撃成功！ 正解: " + current.display;
+    document.getElementById("result").innerText =
+      "○ 正解！ 正解: " + current.display;
 
   }else{
+    combo = 0;
 
     if(mode==="random"){
-
       finishRandom();
       return;
     }
 
     playerHP--;
 
-    let samurai =
-      document.getElementById("samurai");
-
     document.body.classList.add("playerHit");
 
-    if(samurai){
-      samurai.classList.add("samuraiDamage");
-    }
-
     setTimeout(()=>{
-
       document.body.classList.remove("playerHit");
-
-      if(samurai){
-        samurai.classList.remove("samuraiDamage");
-      }
-
     },400);
 
     document.getElementById("se_wrong").play();
 
-    document.getElementById("result")
-      .innerText =
-      "× ダメージ！ 正解: " + current.display;
+    document.getElementById("result").innerText =
+      "× 不正解！ 正解: " + current.display;
   }
 
+  checkTitles();
+  saveAllData();
   updateHP();
   nextTurn();
 }
 
 async function finishRandom(){
-
   clearInterval(timer);
+  updatePlayTime();
 
-  document.getElementById("result")
-    .innerText =
-    "記録送信中...";
+  if(score > playerData.bestRandomScore){
+    playerData.bestRandomScore = score;
+  }
+
+  checkTitles();
+  saveAllData();
+
+  document.getElementById("result").innerText = "記録送信中...";
 
   try{
-
     await saveWorldScore({
-      name:playerProfile.name,
-      icon:playerProfile.icon,
+      name:playerProfile.name || "名無し",
+      icon:playerProfile.icon || "",
       score:score,
+      title:playerData.equippedTitle || "初心者",
       mode:"random"
     });
-
   }catch(e){
     console.log(e);
   }
+
+  await updateRankingTitles();
 
   showEnd("終了！");
 }
 
 function updateHP(){
-
-  document.getElementById("ehp").innerText =
-    enemyHP;
-
-  document.getElementById("php").innerText =
-    playerHP;
+  document.getElementById("ehp").innerText = enemyHP;
+  document.getElementById("php").innerText = playerHP;
 
   if(mode==="random"){
-
-    document.getElementById("enemy").style.display =
-      "none";
-
-    document.getElementById("enemyFrame").style.display =
-      "none";
-
-    document.getElementById("php").innerText = playerHP;
-
-    document.getElementById("playerBar").style.width =
-      (playerHP/1*100)+"%";
-
+    document.getElementById("enemy").style.display = "none";
+    document.getElementById("enemyFrame").style.display = "none";
+    document.getElementById("playerBar").style.width = "100%";
   }else{
-
-    document.getElementById("enemy").style.display =
-      "block";
-
-    document.getElementById("enemyFrame").style.display =
-      "block";
+    document.getElementById("enemy").style.display = "block";
+    document.getElementById("enemyFrame").style.display = "block";
 
     document.getElementById("enemyBar").style.width =
       (enemyHP/10*100)+"%";
@@ -1067,67 +1087,63 @@ function updateHP(){
 }
 
 function nextTurn(){
-
   clearInterval(timer);
 
   if(mode!=="random"){
-
     if(enemyHP<=0){
-
       showEnd("勝利！");
       return;
     }
 
     if(playerHP<=0){
-
       showEnd("敗北...");
       return;
     }
   }
 
   setTimeout(()=>{
-
     nextQ();
     startTimer();
-
   },900);
 }
 
+async function updateRankingTitles(){
+  try{
+    let ranking = await loadWorldRanking();
+
+    for(let i=0;i<ranking.length;i++){
+      if(i===0) unlockTitle("週間王👑");
+      if(i<3) unlockTitle("TOP3");
+      if(i<10) unlockTitle("TOP10");
+    }
+
+    saveAllData();
+  }catch(e){}
+}
+
 async function showEnd(text){
-
   clearInterval(timer);
+  updatePlayTime();
 
-  document.getElementById("q").innerText =
-    text;
+  document.getElementById("q").innerText = text;
+  document.getElementById("timer").innerText = "";
+  document.getElementById("ans").value = "";
 
-  document.getElementById("timer").innerText =
-    "";
-
-  document.getElementById("ans").value =
-    "";
-
-  let html =
-    `<button onclick="start()">もう一回</button>`;
-
-  html +=
-    `<button onclick="backTitle()">タイトルへ</button>`;
+  let html = `<button onclick="start()">もう一回</button>`;
+  html += `<button onclick="backTitle()">タイトルへ</button>`;
 
   if(mode==="random"){
-
     html += `<h2>スコア：${score}問</h2>`;
     html += `<h2>週間世界ランキング</h2>`;
 
     try{
-
-      let ranking =
-        await loadWorldRanking();
+      let ranking = await loadWorldRanking();
 
       if(ranking.length===0){
         html += `<p>まだ記録がありません</p>`;
       }
 
       for(let i=0;i<ranking.length;i++){
-
         html += `
           <div class="rankItem">
             ${i+1}位
@@ -1136,13 +1152,14 @@ async function showEnd(text){
               ? `<img class="rankIcon" src="${ranking[i].icon}">`
               : ""
             }
-            ${ranking[i].name}：${ranking[i].score}問
+            ${ranking[i].name}
+            <br>
+            ${titleHTML(ranking[i].title || "初心者")}
+            ：${ranking[i].score}問
           </div>
         `;
       }
-
     }catch(e){
-
       html += `<p>ランキング取得に失敗</p>`;
     }
   }
@@ -1150,9 +1167,7 @@ async function showEnd(text){
   html += `<h2>解いた問題一覧</h2>`;
 
   for(let i=0;i<history.length;i++){
-
-    let mark =
-      history[i].ok ? "○" : "×";
+    let mark = history[i].ok ? "○" : "×";
 
     html += `
       <div class="rankItem">
@@ -1163,32 +1178,23 @@ async function showEnd(text){
     `;
   }
 
-  document.getElementById("result").innerHTML =
-    html;
+  document.getElementById("result").innerHTML = html;
 }
 
 async function showWorldRanking(){
-
-  let box =
-    document.getElementById("titleRanking");
-
-  box.innerHTML =
-    "<h2>読み込み中...</h2>";
+  let box = document.getElementById("titleRanking");
+  box.innerHTML = "<h2>読み込み中...</h2>";
 
   try{
+    let ranking = await loadWorldRanking();
 
-    let ranking =
-      await loadWorldRanking();
-
-    let html =
-      "<h2>週間世界ランキング</h2>";
+    let html = "<h2>週間世界ランキング</h2>";
 
     if(ranking.length===0){
       html += "<p>まだ記録がありません</p>";
     }
 
     for(let i=0;i<ranking.length;i++){
-
       html += `
         <div class="rankItem">
           ${i+1}位
@@ -1197,16 +1203,16 @@ async function showWorldRanking(){
             ? `<img class="rankIcon" src="${ranking[i].icon}">`
             : ""
           }
-          ${ranking[i].name}：${ranking[i].score}問
+          ${ranking[i].name}
+          <br>
+          ${titleHTML(ranking[i].title || "初心者")}
+          ：${ranking[i].score}問
         </div>
       `;
     }
 
     box.innerHTML = html;
-
   }catch(e){
-
-    box.innerHTML =
-      "<p>ランキングを読み込めませんでした</p>";
+    box.innerHTML = "<p>ランキングを読み込めませんでした</p>";
   }
 }
