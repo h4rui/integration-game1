@@ -10,19 +10,45 @@ function rand(min,max){
   return Math.floor(Math.random()*(max-min+1))+min;
 }
 
+function gcd(a,b){
+  while(b){
+    let t = a % b;
+    a = b;
+    b = t;
+  }
+  return Math.abs(a);
+}
+
 function frac(num){
   let eps = 1e-10;
 
-  for(let d=1; d<=100; d++){
+  for(let d=1; d<=1000; d++){
     let n = Math.round(num*d);
 
     if(Math.abs(num - n/d) < eps){
+      let g = gcd(Math.abs(n), d);
+      n /= g;
+      d /= g;
+
       if(d === 1) return `${n}`;
       return `${n}/${d}`;
     }
   }
 
   return String(num);
+}
+
+function coeff(num){
+  let s = frac(num);
+  if(s === "1") return "";
+  if(s === "-1") return "-";
+  return s;
+}
+
+function term(c,p){
+  if(p === 0) return frac(c);
+  if(p === 1) return coeff(c) + "x";
+  return coeff(c) + "x^" + p;
 }
 
 function normalize(str){
@@ -36,18 +62,19 @@ function normalize(str){
 
 function generateQuestion(){
 
-  let type = rand(1,7);
+  let type = rand(1,8);
 
   if(type===1){
     let a = rand(-5,5);
     if(a === 0) a = 1;
+
     let n = rand(1,3);
     let ans = a/(n+1);
 
     return {
       q:`∫ ${a}x^${n} dx`,
       a:`${ans}*x^${n+1}`,
-      display:`${frac(ans)}x^${n+1}+C`
+      display:`${term(ans,n+1)}+C`
     };
   }
 
@@ -126,6 +153,16 @@ function generateQuestion(){
 
     return {
       q:`∫[${a}→${b}] (2x+3) dx`,
+      a:`${ans}`,
+      display:frac(ans)
+    };
+  }
+
+  if(type===8){
+    let ans = 2;
+
+    return {
+      q:`∫[0→π] sin(x) dx`,
       a:`${ans}`,
       display:frac(ans)
     };
