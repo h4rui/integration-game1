@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>積分バトルGO</title>
+<title>積分バトル</title>
 
 <style>
 body{
@@ -12,36 +12,12 @@ body{
   text-align:center;
   font-family:sans-serif;
   min-height:100vh;
-  padding-bottom:140px;
+  padding-bottom:150px;
 }
 
 h1{
   color:#00ffcc;
   text-shadow:0 0 10px #00ffcc;
-}
-
-#q{
-  font-size:45px;
-  margin:25px;
-  text-shadow:0 0 20px #00ffcc;
-}
-
-input{
-  font-size:32px;
-  width:80%;
-  text-align:center;
-  border-radius:15px;
-  padding:10px;
-  border:none;
-}
-
-button{
-  font-size:26px;
-  margin:10px;
-  padding:10px 20px;
-  background:#00ffcc;
-  border:none;
-  border-radius:10px;
 }
 
 #timer{
@@ -77,6 +53,30 @@ button{
 
 #playerBar{
   background:linear-gradient(90deg,lime,#00ffcc);
+}
+
+#q{
+  font-size:42px;
+  margin:25px;
+  text-shadow:0 0 20px #00ffcc;
+}
+
+input{
+  font-size:30px;
+  width:80%;
+  text-align:center;
+  border-radius:15px;
+  padding:10px;
+  border:none;
+}
+
+button{
+  font-size:26px;
+  margin:10px;
+  padding:10px 20px;
+  background:#00ffcc;
+  border:none;
+  border-radius:10px;
 }
 
 #result{
@@ -174,18 +174,14 @@ button{
 <div id="timer">⏰ 5:00</div>
 
 <div id="enemy">👾 敵HP: <span id="ehp">10</span></div>
-<div class="hpFrame">
-  <div id="enemyBar" class="hpBar"></div>
-</div>
+<div class="hpFrame"><div id="enemyBar" class="hpBar"></div></div>
 
 <div id="player">❤️ あなたHP: <span id="php">5</span></div>
-<div class="hpFrame">
-  <div id="playerBar" class="hpBar"></div>
-</div>
+<div class="hpFrame"><div id="playerBar" class="hpBar"></div></div>
 
 <div id="q">START</div>
 
-<input id="ans" placeholder="答え">
+<input id="ans" placeholder="答え 例: 1/2, sqrt(2), pi">
 <br>
 
 <button onclick="start()">スタート</button>

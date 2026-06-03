@@ -17,121 +17,122 @@ function normalize(str){
     .replace(/C/g,"");
 }
 
+function isCorrect(user, correct){
+  try{
+    let userVal = math.evaluate(user);
+    let correctVal = math.evaluate(correct);
+
+    if(typeof userVal === "number" && typeof correctVal === "number"){
+      if(Math.abs(userVal - correctVal) < 1e-8) return true;
+    }
+  }catch(e){}
+
+  try{
+    let diff = math.simplify("(" + user + ")-(" + correct + ")");
+    if(diff.toString() === "0") return true;
+  }catch(e){}
+
+  try{
+    if(math.simplify(user).toString() === math.simplify(correct).toString()){
+      return true;
+    }
+  }catch(e){}
+
+  return normalize(user) === normalize(correct);
+}
+
 function generateQuestion(){
 
-  let type = rand(1,6);
+  let type = rand(1,8);
 
   if(type===1){
-    let a = rand(-5,5);
-    if(a===0) a = 1;
-    let n = rand(1,3);
+    let a = rand(2,5);
+    let b = rand(-5,5);
+    let c = rand(-5,5);
 
     return {
-      q:`∫ ${a}x^${n} dx`,
-      a:`${a/(n+1)}*x^${n+1}`,
-      display:`${a/(n+1)}x^${n+1}+C`
+      q:`∫ (${a}x²+${b}x+${c}) dx`,
+      a:`${a/3}*x^3+${b/2}*x^2+${c}*x`,
+      display:`${a}/3x³+${b}/2x²+${c}x+C`
     };
   }
 
   if(type===2){
-    let a = rand(1,5);
+    let a = rand(2,6);
 
     return {
-      q:`∫ ${a}sin(x) dx`,
-      a:`-${a}*cos(x)`,
-      display:`-${a}cos(x)+C`
+      q:`∫ ${a}/x dx`,
+      a:`${a}*log(x)`,
+      display:`${a}log(x)+C`
     };
   }
 
   if(type===3){
     let a = rand(1,5);
+    let b = rand(1,5);
 
     return {
-      q:`∫ ${a}e^x dx`,
-      a:`${a}*exp(x)`,
-      display:`${a}e^x+C`
+      q:`∫ (${a}sin(x)+${b}cos(x)) dx`,
+      a:`-${a}*cos(x)+${b}*sin(x)`,
+      display:`-${a}cos(x)+${b}sin(x)+C`
     };
   }
 
   if(type===4){
-    let a = rand(0,2);
-    let b = rand(3,6);
-    let A = rand(1,4);
-    let n = rand(1,3);
-
-    let ans = (A/(n+1))*(Math.pow(b,n+1)-Math.pow(a,n+1));
+    let a = rand(1,4);
+    let b = rand(1,4);
 
     return {
-      q:`∫[${a}→${b}] ${A}x^${n} dx`,
-      a:`${ans}`,
-      display:`${ans}`
+      q:`∫ (${a}e^x+${b}x²) dx`,
+      a:`${a}*exp(x)+${b/3}*x^3`,
+      display:`${a}e^x+${b}/3x³+C`
     };
   }
 
   if(type===5){
+    let A = rand(1,4);
+    let B = rand(-5,5);
+    let C = rand(-5,5);
     let a = rand(0,2);
     let b = rand(3,6);
-    let mode = rand(1,4);
 
-    if(mode===1){
-      let ans =
-        ((Math.pow(b,2)-Math.pow(a,2))/2) +
-        ((Math.pow(b,3)-Math.pow(a,3))/3);
-
-      return {
-        q:`∫[${a}→${b}] (x+x²) dx`,
-        a:`${ans}`,
-        display:`${ans}`
-      };
-    }
-
-    if(mode===2){
-      let ans =
-        ((Math.pow(b,3)-Math.pow(a,3))/3) -
-        ((Math.pow(b,2)-Math.pow(a,2))/2);
-
-      return {
-        q:`∫[${a}→${b}] (x²-x) dx`,
-        a:`${ans}`,
-        display:`${ans}`
-      };
-    }
-
-    if(mode===3){
-      let ans =
-        2*((Math.pow(b,2)-Math.pow(a,2))/2) +
-        3*(b-a);
-
-      return {
-        q:`∫[${a}→${b}] (2x+3) dx`,
-        a:`${ans}`,
-        display:`${ans}`
-      };
-    }
-
-    let ans =
-      3*((Math.pow(b,3)-Math.pow(a,3))/3) +
-      2*((Math.pow(b,2)-Math.pow(a,2))/2) +
-      (b-a);
+    let F = (x)=> A/3*x**3 + B/2*x**2 + C*x;
+    let ans = F(b)-F(a);
 
     return {
-      q:`∫[${a}→${b}] (3x²+2x+1) dx`,
+      q:`∫[${a}→${b}] (${A}x²+${B}x+${C}) dx`,
       a:`${ans}`,
       display:`${ans}`
     };
   }
 
-  let a = rand(0,2);
-  let b = rand(3,6);
+  if(type===6){
+    let a = rand(1,4);
+    let n = rand(2,4);
 
-  let ans =
-    (-(Math.cos(b)) + Math.cos(a)) +
-    (Math.exp(b) - Math.exp(a));
+    return {
+      q:`∫ ${a}x(x²+1)^${n} dx`,
+      a:`${a/(2*(n+1))}*(x^2+1)^${n+1}`,
+      display:`${a}/${2*(n+1)}(x²+1)^${n+1}+C`
+    };
+  }
+
+  if(type===7){
+    let a = rand(1,5);
+
+    return {
+      q:`∫ ${a}x e^x dx`,
+      a:`${a}*(x-1)*exp(x)`,
+      display:`${a}(x-1)e^x+C`
+    };
+  }
+
+  let a = rand(1,4);
 
   return {
-    q:`∫[${a}→${b}] (sin(x)+e^x) dx`,
-    a:`${ans}`,
-    display:`${ans}`
+    q:`∫[0→pi] ${a}sin(x) dx`,
+    a:`${2*a}`,
+    display:`${2*a}`
   };
 }
 
@@ -193,24 +194,7 @@ function submit(){
   if(!current) return;
 
   let u = document.getElementById("ans").value;
-  let ok = false;
-
-  try{
-    let userVal = math.evaluate(u);
-    let correctVal = math.evaluate(current.a);
-
-    if(
-      typeof userVal === "number" &&
-      typeof correctVal === "number" &&
-      Math.abs(userVal-correctVal)<1e-8
-    ){
-      ok = true;
-    }
-  }catch(e){}
-
-  if(!ok){
-    ok = normalize(u) === normalize(current.a);
-  }
+  let ok = isCorrect(u, current.a);
 
   history.push({
     question:current.q,
