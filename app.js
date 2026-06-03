@@ -95,7 +95,7 @@ function normalize(str){
 }
 
 function saveProfile(){
-  let name = document.getElementById("playerName").value;
+  let name = document.getElementById("playerName").value.trim();
   let file = document.getElementById("iconInput").files[0];
 
   if(name){
@@ -516,7 +516,7 @@ function expressionsEqual(user, correct){
     let u = normalize(user);
     let c = normalize(correct);
 
-    let values = [-3,-2,-1,0,1,2,3,4];
+    let values = [-3,-2,-1,1,2,3,4];
 
     for(let x of values){
       let uv = math.evaluate(u,{x:x});
@@ -530,6 +530,44 @@ function expressionsEqual(user, correct){
     return true;
   }catch(e){
     return false;
+  }
+}
+
+function selectMode(m){
+  mode = m;
+
+  document.getElementById("titleScreen").classList.remove("active");
+  document.getElementById("gameScreen").classList.add("active");
+
+  let title = "⚔️ 積分バトル ⚔️";
+  if(mode === "derivative") title = "⚔️ 微分バトル ⚔️";
+  if(mode === "factor") title = "⚔️ 因数分解バトル ⚔️";
+  if(mode === "expand") title = "⚔️ 展開バトル ⚔️";
+  if(mode === "random") title = "⚔️ ランダム問題 ⚔️";
+
+  document.getElementById("modeTitle").innerText = title;
+  start();
+}
+
+function backTitle(){
+  clearInterval(timer);
+  document.getElementById("gameScreen").classList.remove("active");
+  document.getElementById("titleScreen").classList.add("active");
+  document.getElementById("bgm").pause();
+}
+
+function generateQuestion(){
+  if(mode === "integral") return generateIntegral();
+  if(mode === "derivative") return generateDerivative();
+  if(mode === "factor") return generateFactor();
+  if(mode === "expand") return generateExpand();
+
+  if(mode === "random"){
+    let r = rand(1,4);
+    if(r === 1) return generateIntegral();
+    if(r === 2) return generateDerivative();
+    if(r === 3) return generateFactor();
+    if(r === 4) return generateExpand();
   }
 }
 
@@ -630,6 +668,12 @@ function submit(){
   if(!current) return;
 
   let u = document.getElementById("ans").value;
+
+  if(u.trim() === ""){
+    document.getElementById("result").innerText = "答えを入力して！";
+    return;
+  }
+
   let ok = false;
 
   const adminCode =
@@ -652,7 +696,7 @@ function submit(){
 
   history.push({
     question:current.q,
-    your:u || "未入力",
+    your:u,
     answer:current.display,
     ok:ok
   });
@@ -793,7 +837,6 @@ async function showEnd(text){
           <div class="rankItem">
             ${i+1}位
             ${ranking[i].icon ? `<img class="rankIcon" src="${ranking[i].icon}">` : ""}
-            ${ranking[i].admin ? "👑 " : ""}
             ${ranking[i].name}：${ranking[i].score}問
           </div>
         `;
@@ -829,12 +872,15 @@ async function showWorldRanking(){
 
     let html = "<h2>週間世界ランキング</h2>";
 
+    if(ranking.length === 0){
+      html += "<p>まだ記録がありません</p>";
+    }
+
     for(let i=0; i<ranking.length; i++){
       html += `
         <div class="rankItem">
           ${i+1}位
           ${ranking[i].icon ? `<img class="rankIcon" src="${ranking[i].icon}">` : ""}
-          ${ranking[i].admin ? "👑 " : ""}
           ${ranking[i].name}：${ranking[i].score}問
         </div>
       `;

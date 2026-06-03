@@ -14,15 +14,12 @@ body{
   min-height:100vh;
   padding-bottom:170px;
 }
-
 h1{
   color:#00ffcc;
   text-shadow:0 0 10px #00ffcc;
 }
-
 .screen{display:none;}
 .active{display:block;}
-
 .modeBtn{
   display:block;
   width:80%;
@@ -30,7 +27,6 @@ h1{
   font-size:30px;
   padding:18px;
 }
-
 #profileIcon{
   width:90px;
   height:90px;
@@ -39,7 +35,6 @@ h1{
   background:#333;
   border:2px solid #00ffcc;
 }
-
 #playerName{
   font-size:24px;
   width:70%;
@@ -48,24 +43,15 @@ h1{
   border-radius:12px;
   padding:8px;
 }
-
-#loginInfo{
-  color:#ffff66;
-  font-size:14px;
-  word-break:break-all;
-}
-
 #timer{
   font-size:30px;
   color:yellow;
   margin:15px;
 }
-
 #enemy,#player{
   font-size:30px;
   margin:10px;
 }
-
 .hpFrame{
   width:80%;
   height:25px;
@@ -75,16 +61,13 @@ h1{
   overflow:hidden;
   box-shadow:0 0 10px white;
 }
-
 .hpBar{
   height:100%;
   width:100%;
   transition:width .4s;
 }
-
 #enemyBar{background:linear-gradient(90deg,red,orange);}
 #playerBar{background:linear-gradient(90deg,lime,#00ffcc);}
-
 #goText{
   position:fixed;
   top:35%;
@@ -97,29 +80,23 @@ h1{
   pointer-events:none;
   z-index:50;
 }
-
 .goAnim{animation:goPop .7s;}
-
 @keyframes goPop{
   0%{opacity:0;transform:translate(-50%,-50%) scale(.2);}
   35%{opacity:1;transform:translate(-50%,-50%) scale(1.4);}
   100%{opacity:0;transform:translate(-50%,-50%) scale(2);}
 }
-
 #q{
   font-size:42px;
   margin:30px;
   text-shadow:0 0 20px #00ffcc;
 }
-
 .questionAnim{animation:questionPop .5s;}
-
 @keyframes questionPop{
   0%{opacity:0;transform:scale(.5) rotate(-3deg);}
   70%{opacity:1;transform:scale(1.08) rotate(2deg);}
   100%{opacity:1;transform:scale(1) rotate(0);}
 }
-
 input{
   font-size:35px;
   width:80%;
@@ -128,7 +105,6 @@ input{
   padding:10px;
   border:none;
 }
-
 button{
   font-size:24px;
   margin:10px;
@@ -137,18 +113,15 @@ button{
   border:none;
   border-radius:10px;
 }
-
 button:hover{
   transform:scale(1.08);
   box-shadow:0 0 20px #00ffcc;
 }
-
-#result{
+#result,#titleRanking{
   font-size:22px;
   margin-top:20px;
   font-weight:bold;
 }
-
 .rankItem{
   background:rgba(255,255,255,0.12);
   margin:10px auto;
@@ -158,7 +131,6 @@ button:hover{
   text-align:left;
   font-size:18px;
 }
-
 .rankIcon{
   width:34px;
   height:34px;
@@ -167,7 +139,6 @@ button:hover{
   vertical-align:middle;
   margin-right:8px;
 }
-
 @keyframes shake{
   0%{transform:translateX(0);}
   25%{transform:translateX(-20px);}
@@ -175,23 +146,18 @@ button:hover{
   75%{transform:translateX(-20px);}
   100%{transform:translateX(0);}
 }
-
 .enemyHit{animation:shake .4s;}
 .enemySpawn{animation:enemySpawnAnim .8s;}
-
 @keyframes enemySpawnAnim{
   0%{opacity:0;transform:translateY(-200px) scale(.3);}
   60%{opacity:1;transform:translateY(20px) scale(1.2);}
   100%{opacity:1;transform:translateY(0) scale(1);}
 }
-
 @keyframes flash{
   0%{background:red;}
   100%{background:radial-gradient(circle,#111,#000);}
 }
-
 .playerHit{animation:flash .4s;}
-
 #slash{
   position:fixed;
   left:50%;
@@ -201,14 +167,11 @@ button:hover{
   pointer-events:none;
   z-index:20;
 }
-
 .showSlash{animation:slashAnim .5s;}
-
 @keyframes slashAnim{
   0%{opacity:1;transform:translate(-50%,-50%) scale(0);}
   100%{opacity:0;transform:translate(-50%,-50%) scale(2);}
 }
-
 #samurai{
   position:fixed;
   bottom:-20px;
@@ -220,24 +183,19 @@ button:hover{
   filter:drop-shadow(0 0 25px #00ffcc);
   animation:samuraiIdle 1.8s infinite ease-in-out;
 }
-
 @keyframes samuraiIdle{
   0%{transform:translateX(-50%) translateY(0);}
   50%{transform:translateX(-50%) translateY(-8px);}
   100%{transform:translateX(-50%) translateY(0);}
 }
-
 .samuraiAttack{animation:samuraiSlash .45s !important;}
-
 @keyframes samuraiSlash{
   0%{transform:translateX(-50%) translateY(0) rotate(0);}
   35%{transform:translateX(-50%) translateY(-100px) rotate(-8deg) scale(1.18);}
   70%{transform:translateX(-50%) translateY(-40px) rotate(8deg) scale(1.1);}
   100%{transform:translateX(-50%) translateY(0) rotate(0) scale(1);}
 }
-
 .samuraiDamage{animation:samuraiDamageAnim .45s !important;}
-
 @keyframes samuraiDamageAnim{
   0%{transform:translateX(-50%) rotate(0);}
   25%{transform:translateX(-70%) rotate(-12deg);}
@@ -252,7 +210,7 @@ button:hover{
 <div id="titleScreen" class="screen active">
   <h1>🏆 数学マスター 🏆</h1>
 
-  <div id="profileBox">
+  <div>
     <img id="profileIcon" src="">
     <br>
     <input id="playerName" placeholder="名前を入力">
@@ -260,8 +218,6 @@ button:hover{
     <input type="file" id="iconInput" accept="image/*">
     <br>
     <button onclick="saveProfile()">プロフィール保存</button>
-    <button onclick="loginGoogle()">Googleログイン</button>
-    <p id="loginInfo"></p>
   </div>
 
   <button class="modeBtn" onclick="selectMode('integral')">積分</button>
@@ -316,17 +272,9 @@ import {
   getDocs,
   query,
   where,
-  orderBy,
   limit,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-
-import {
-  getAuth,
-  GoogleAuthProvider,
-  signInWithPopup,
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDVXvWTGetf41ajd0KDwNPG-dH8pmsMIt8",
@@ -340,36 +288,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
-
-/*
-  ここに自分のUIDを入れる。
-  まずGoogleログインして画面に出た UID をコピー。
-*/
-window.ADMIN_UID = "ここに自分のUIDを入れる";
-
-window.currentUser = null;
-
-onAuthStateChanged(auth, user=>{
-  window.currentUser = user;
-
-  const info = document.getElementById("loginInfo");
-
-  if(user){
-    const isAdmin = user.uid === window.ADMIN_UID;
-    info.innerText =
-      (isAdmin ? "👑 管理者ログイン中\n" : "ログイン中\n") +
-      "UID: " + user.uid;
-  }else{
-    info.innerText = "未ログイン";
-  }
-});
-
-window.loginGoogle = async function(){
-  const result = await signInWithPopup(auth, provider);
-  window.currentUser = result.user;
-};
 
 function getWeekKey(){
   const now = new Date();
@@ -386,8 +304,6 @@ window.saveWorldScore = async function(data){
     score:data.score,
     mode:data.mode,
     week:getWeekKey(),
-    uid:window.currentUser ? window.currentUser.uid : "",
-    admin:window.currentUser ? window.currentUser.uid === window.ADMIN_UID : false,
     createdAt:serverTimestamp()
   });
 };
@@ -396,7 +312,6 @@ window.loadWorldRanking = async function(){
   const q = query(
     collection(db,"rankings"),
     where("week","==",getWeekKey()),
-    orderBy("score","desc"),
     limit(100)
   );
 
@@ -406,6 +321,8 @@ window.loadWorldRanking = async function(){
   snap.forEach(doc=>{
     list.push(doc.data());
   });
+
+  list.sort((a,b)=>b.score-a.score);
 
   return list;
 };
