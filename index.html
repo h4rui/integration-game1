@@ -31,6 +31,30 @@ h1{
   padding:18px;
 }
 
+#profileIcon{
+  width:90px;
+  height:90px;
+  border-radius:50%;
+  object-fit:cover;
+  background:#333;
+  border:2px solid #00ffcc;
+}
+
+#playerName{
+  font-size:24px;
+  width:70%;
+  margin:10px;
+  text-align:center;
+  border-radius:12px;
+  padding:8px;
+}
+
+#loginInfo{
+  color:#ffff66;
+  font-size:14px;
+  word-break:break-all;
+}
+
 #timer{
   font-size:30px;
   color:yellow;
@@ -106,7 +130,7 @@ input{
 }
 
 button{
-  font-size:26px;
+  font-size:24px;
   margin:10px;
   padding:10px 20px;
   background:#00ffcc;
@@ -125,6 +149,25 @@ button:hover{
   font-weight:bold;
 }
 
+.rankItem{
+  background:rgba(255,255,255,0.12);
+  margin:10px auto;
+  padding:10px;
+  border-radius:10px;
+  width:90%;
+  text-align:left;
+  font-size:18px;
+}
+
+.rankIcon{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  object-fit:cover;
+  vertical-align:middle;
+  margin-right:8px;
+}
+
 @keyframes shake{
   0%{transform:translateX(0);}
   25%{transform:translateX(-20px);}
@@ -134,7 +177,6 @@ button:hover{
 }
 
 .enemyHit{animation:shake .4s;}
-
 .enemySpawn{animation:enemySpawnAnim .8s;}
 
 @keyframes enemySpawnAnim{
@@ -209,10 +251,27 @@ button:hover{
 
 <div id="titleScreen" class="screen active">
   <h1>🏆 数学マスター 🏆</h1>
+
+  <div id="profileBox">
+    <img id="profileIcon" src="">
+    <br>
+    <input id="playerName" placeholder="名前を入力">
+    <br>
+    <input type="file" id="iconInput" accept="image/*">
+    <br>
+    <button onclick="saveProfile()">プロフィール保存</button>
+    <button onclick="loginGoogle()">Googleログイン</button>
+    <p id="loginInfo"></p>
+  </div>
+
   <button class="modeBtn" onclick="selectMode('integral')">積分</button>
   <button class="modeBtn" onclick="selectMode('derivative')">微分</button>
   <button class="modeBtn" onclick="selectMode('factor')">因数分解</button>
   <button class="modeBtn" onclick="selectMode('expand')">展開</button>
+  <button class="modeBtn" onclick="selectMode('random')">ランダム問題</button>
+
+  <button onclick="showWorldRanking()">週間世界ランキング</button>
+  <div id="titleRanking"></div>
 </div>
 
 <div id="gameScreen" class="screen">
@@ -247,6 +306,111 @@ button:hover{
 <audio id="se_wrong" src="wrong.mp3"></audio>
 
 <script src="https://cdn.jsdelivr.net/npm/mathjs@11.11.0/lib/browser/math.js"></script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  where,
+  orderBy,
+  limit,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDVXvWTGetf41ajd0KDwNPG-dH8pmsMIt8",
+  authDomain: "math-master-3c4df.firebaseapp.com",
+  projectId: "math-master-3c4df",
+  storageBucket: "math-master-3c4df.firebasestorage.app",
+  messagingSenderId: "374039148607",
+  appId: "1:374039148607:web:529bcba1879124436d208a",
+  measurementId: "G-4YFNNNT6CK"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+
+/*
+  ここに自分のUIDを入れる。
+  まずGoogleログインして画面に出た UID をコピー。
+*/
+window.ADMIN_UID = "ここに自分のUIDを入れる";
+
+window.currentUser = null;
+
+onAuthStateChanged(auth, user=>{
+  window.currentUser = user;
+
+  const info = document.getElementById("loginInfo");
+
+  if(user){
+    const isAdmin = user.uid === window.ADMIN_UID;
+    info.innerText =
+      (isAdmin ? "👑 管理者ログイン中\n" : "ログイン中\n") +
+      "UID: " + user.uid;
+  }else{
+    info.innerText = "未ログイン";
+  }
+});
+
+window.loginGoogle = async function(){
+  const result = await signInWithPopup(auth, provider);
+  window.currentUser = result.user;
+};
+
+function getWeekKey(){
+  const now = new Date();
+  const start = new Date(now.getFullYear(),0,1);
+  const diff = now - start;
+  const week = Math.floor(diff / (1000*60*60*24*7));
+  return now.getFullYear() + "-" + week;
+}
+
+window.saveWorldScore = async function(data){
+  await addDoc(collection(db,"rankings"), {
+    name:data.name,
+    icon:data.icon,
+    score:data.score,
+    mode:data.mode,
+    week:getWeekKey(),
+    uid:window.currentUser ? window.currentUser.uid : "",
+    admin:window.currentUser ? window.currentUser.uid === window.ADMIN_UID : false,
+    createdAt:serverTimestamp()
+  });
+};
+
+window.loadWorldRanking = async function(){
+  const q = query(
+    collection(db,"rankings"),
+    where("week","==",getWeekKey()),
+    orderBy("score","desc"),
+    limit(100)
+  );
+
+  const snap = await getDocs(q);
+  let list = [];
+
+  snap.forEach(doc=>{
+    list.push(doc.data());
+  });
+
+  return list;
+};
+</script>
+
 <script src="app.js"></script>
 
 </body>

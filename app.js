@@ -6,6 +6,12 @@ let current;
 let history = [];
 let usedQuestions = [];
 let mode = "integral";
+let score = 0;
+
+let playerProfile = {
+  name: "名無し",
+  icon: ""
+};
 
 function rand(min,max){
   return Math.floor(Math.random()*(max-min+1))+min;
@@ -88,6 +94,46 @@ function normalize(str){
     .replace(/⁶/g,"^6");
 }
 
+function saveProfile(){
+  let name = document.getElementById("playerName").value;
+  let file = document.getElementById("iconInput").files[0];
+
+  if(name){
+    playerProfile.name = name;
+  }
+
+  if(file){
+    let reader = new FileReader();
+
+    reader.onload = function(e){
+      playerProfile.icon = e.target.result;
+      localStorage.setItem("playerProfile", JSON.stringify(playerProfile));
+      document.getElementById("profileIcon").src = playerProfile.icon;
+      alert("プロフィールを保存したよ");
+    };
+
+    reader.readAsDataURL(file);
+  }else{
+    localStorage.setItem("playerProfile", JSON.stringify(playerProfile));
+    alert("プロフィールを保存したよ");
+  }
+}
+
+function loadProfile(){
+  let saved = localStorage.getItem("playerProfile");
+
+  if(saved){
+    playerProfile = JSON.parse(saved);
+    document.getElementById("playerName").value = playerProfile.name;
+
+    if(playerProfile.icon){
+      document.getElementById("profileIcon").src = playerProfile.icon;
+    }
+  }
+}
+
+window.addEventListener("load", loadProfile);
+
 function selectMode(m){
   mode = m;
 
@@ -98,6 +144,7 @@ function selectMode(m){
   if(mode === "derivative") title = "⚔️ 微分バトル ⚔️";
   if(mode === "factor") title = "⚔️ 因数分解バトル ⚔️";
   if(mode === "expand") title = "⚔️ 展開バトル ⚔️";
+  if(mode === "random") title = "⚔️ ランダム問題 ⚔️";
 
   document.getElementById("modeTitle").innerText = title;
   start();
@@ -115,6 +162,14 @@ function generateQuestion(){
   if(mode === "derivative") return generateDerivative();
   if(mode === "factor") return generateFactor();
   if(mode === "expand") return generateExpand();
+
+  if(mode === "random"){
+    let r = rand(1,4);
+    if(r === 1) return generateIntegral();
+    if(r === 2) return generateDerivative();
+    if(r === 3) return generateFactor();
+    if(r === 4) return generateExpand();
+  }
 }
 
 function generateIntegral(){
@@ -478,17 +533,6 @@ function expressionsEqual(user, correct){
   }
 }
 
-function factorsEqual(user, correct){
-  try{
-    let u = normalize(user);
-    let c = normalize(correct);
-
-    return expressionsEqual(u,c);
-  }catch(e){
-    return false;
-  }
-}
-
 function start(){
   clearInterval(timer);
 
@@ -496,6 +540,7 @@ function start(){
   playerHP = 5;
   history = [];
   usedQuestions = [];
+  score = 0;
 
   document.getElementById("result").innerHTML = "";
   document.getElementById("timer").innerText = "⏰ 5:00";
@@ -528,6 +573,11 @@ function startTimer(){
         answer:current.display,
         ok:false
       });
+
+      if(mode === "random"){
+        finishRandom();
+        return;
+      }
 
       document.getElementById("result").innerText =
         "時間切れ！ 正解: " + current.display;
@@ -593,13 +643,7 @@ function submit(){
   }
 
   if(!ok){
-    if(mode === "factor"){
-      ok = factorsEqual(u,current.a);
-    }else if(mode === "expand"){
-      ok = expressionsEqual(u,current.a);
-    }else{
-      ok = expressionsEqual(u,current.a);
-    }
+    ok = expressionsEqual(u,current.a);
   }
 
   if(!ok){
@@ -614,6 +658,7 @@ function submit(){
   });
 
   if(ok){
+    score++;
     enemyHP--;
 
     let enemy = document.getElementById("enemy");
@@ -642,6 +687,11 @@ function submit(){
       "○ 攻撃成功！ 正解: " + current.display;
 
   }else{
+    if(mode === "random"){
+      finishRandom();
+      return;
+    }
+
     playerHP--;
 
     let samurai = document.getElementById("samurai");
@@ -669,6 +719,26 @@ function submit(){
   nextTurn();
 }
 
+async function finishRandom(){
+  clearInterval(timer);
+
+  document.getElementById("result").innerText =
+    "記録送信中...";
+
+  try{
+    await saveWorldScore({
+      name:playerProfile.name,
+      icon:playerProfile.icon,
+      score:score,
+      mode:"random"
+    });
+  }catch(e){
+    console.log(e);
+  }
+
+  showEnd("終了！");
+}
+
 function updateHP(){
   document.getElementById("ehp").innerText = enemyHP;
   document.getElementById("php").innerText = playerHP;
@@ -683,14 +753,16 @@ function updateHP(){
 function nextTurn(){
   clearInterval(timer);
 
-  if(enemyHP<=0){
-    showEnd("勝利！");
-    return;
-  }
+  if(mode !== "random"){
+    if(enemyHP<=0){
+      showEnd("勝利！");
+      return;
+    }
 
-  if(playerHP<=0){
-    showEnd("敗北...");
-    return;
+    if(playerHP<=0){
+      showEnd("敗北...");
+      return;
+    }
   }
 
   setTimeout(()=>{
@@ -699,7 +771,7 @@ function nextTurn(){
   },900);
 }
 
-function showEnd(text){
+async function showEnd(text){
   clearInterval(timer);
 
   document.getElementById("q").innerText = text;
@@ -708,21 +780,36 @@ function showEnd(text){
 
   let html = `<button onclick="start()">もう一回</button>`;
   html += `<button onclick="backTitle()">タイトルへ</button>`;
+
+  if(mode === "random"){
+    html += `<h2>スコア：${score}問</h2>`;
+    html += `<h2>週間世界ランキング</h2>`;
+
+    try{
+      let ranking = await loadWorldRanking();
+
+      for(let i=0; i<ranking.length; i++){
+        html += `
+          <div class="rankItem">
+            ${i+1}位
+            ${ranking[i].icon ? `<img class="rankIcon" src="${ranking[i].icon}">` : ""}
+            ${ranking[i].admin ? "👑 " : ""}
+            ${ranking[i].name}：${ranking[i].score}問
+          </div>
+        `;
+      }
+    }catch(e){
+      html += `<p>ランキング取得に失敗</p>`;
+    }
+  }
+
   html += `<h2>解いた問題一覧</h2>`;
 
   for(let i=0; i<history.length; i++){
     let mark = history[i].ok ? "○" : "×";
 
     html += `
-      <div style="
-        background:rgba(255,255,255,0.12);
-        margin:10px auto;
-        padding:10px;
-        border-radius:10px;
-        width:90%;
-        text-align:left;
-        font-size:18px;
-      ">
+      <div class="rankItem">
         <p>${i+1}. ${mark} 問題: ${history[i].question}</p>
         <p>あなたの答え: ${history[i].your}</p>
         <p>正解: ${history[i].answer}</p>
@@ -731,4 +818,30 @@ function showEnd(text){
   }
 
   document.getElementById("result").innerHTML = html;
+}
+
+async function showWorldRanking(){
+  let box = document.getElementById("titleRanking");
+  box.innerHTML = "<h2>読み込み中...</h2>";
+
+  try{
+    let ranking = await loadWorldRanking();
+
+    let html = "<h2>週間世界ランキング</h2>";
+
+    for(let i=0; i<ranking.length; i++){
+      html += `
+        <div class="rankItem">
+          ${i+1}位
+          ${ranking[i].icon ? `<img class="rankIcon" src="${ranking[i].icon}">` : ""}
+          ${ranking[i].admin ? "👑 " : ""}
+          ${ranking[i].name}：${ranking[i].score}問
+        </div>
+      `;
+    }
+
+    box.innerHTML = html;
+  }catch(e){
+    box.innerHTML = "<p>ランキングを読み込めませんでした</p>";
+  }
 }
