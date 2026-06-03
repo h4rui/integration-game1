@@ -160,13 +160,32 @@ window.getMyPlayerId = () => getPlayerId();
 window.saveWorldScore = async function(data){
   const week = getWeekKey();
   const playerId = getPlayerId();
+
   const docId = week + "_" + data.mode + "_" + playerId;
   const ref = doc(db,"rankings",docId);
+
   const old = await getDoc(ref);
-  if(old.exists() && old.data().score >= data.score) return;
+
+  // その週・その端末/Googleアカウントの自己ベストだけ保存
+  // 例: 0問 → 4問 → 2問 なら、4問だけランキングに残る
+  if(old.exists()){
+    const oldScore = old.data().score || 0;
+
+    if(oldScore >= data.score){
+      return;
+    }
+  }
+
   await setDoc(ref,{
-    name:data.name, icon:data.icon, score:data.score, title:data.title,
-    level:data.level, mode:data.mode, week, playerId, updatedAt:serverTimestamp()
+    name:data.name,
+    icon:data.icon,
+    score:data.score,
+    title:data.title,
+    level:data.level,
+    mode:data.mode,
+    week:week,
+    playerId:playerId,
+    updatedAt:serverTimestamp()
   });
 };
 
