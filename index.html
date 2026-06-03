@@ -154,13 +154,13 @@ button:hover{
   box-shadow:0 0 20px #00ffcc;
 }
 
-#result,#titleRanking,#titleList{
+#result,#panelArea{
   font-size:22px;
   margin-top:20px;
   font-weight:bold;
 }
 
-.rankItem,.titleItem{
+.rankItem,.titleItem,.profileItem,.settingsItem{
   background:rgba(255,255,255,0.12);
   margin:10px auto;
   padding:10px;
@@ -238,32 +238,23 @@ button:hover{
 
 <body>
 
-<div id="titleScreen" class="screen active">
+<div id="homeScreen" class="screen active">
   <h1>🏆 数学マスター 🏆</h1>
 
   <div>
     <img id="profileIcon" src="">
     <br>
-    <input id="playerName" placeholder="名前を入力">
-    <br>
-    <input type="file" id="iconInput" accept="image/*">
-    <br>
-    <button onclick="saveProfile()">プロフィール保存</button>
     <div id="currentTitle">称号：初心者</div>
   </div>
 
-  <button class="modeBtn" onclick="selectMode('integral')">積分</button>
-  <button class="modeBtn" onclick="selectMode('derivative')">微分</button>
-  <button class="modeBtn" onclick="selectMode('factor')">因数分解</button>
-  <button class="modeBtn" onclick="selectMode('prime')">素因数分解</button>
-  <button class="modeBtn" onclick="selectMode('expand')">展開</button>
-  <button class="modeBtn" onclick="selectMode('random')">タイムアタック</button>
+  <button class="modeBtn" onclick="showStudyMenu()">📚 学習モード</button>
+  <button class="modeBtn" onclick="selectMode('random')">⚔️ ランキングモード</button>
+  <button class="modeBtn" onclick="showTitles()">🏅 称号一覧</button>
+  <button class="modeBtn" onclick="showWorldRanking()">🌍 週間ランキング</button>
+  <button class="modeBtn" onclick="showSettings()">⚙️ 設定</button>
+  <button class="modeBtn" onclick="showProfile()">👤 プロフィール</button>
 
-  <button onclick="showTitles()">称号一覧</button>
-  <button onclick="showWorldRanking()">週間世界ランキング</button>
-
-  <div id="titleList"></div>
-  <div id="titleRanking"></div>
+  <div id="panelArea"></div>
 </div>
 
 <div id="gameScreen" class="screen">
@@ -289,7 +280,7 @@ button:hover{
 
   <button onclick="start()">スタート</button>
   <button onclick="submit()">決定</button>
-  <button onclick="backTitle()">タイトルへ</button>
+  <button onclick="backHome()">ホームへ</button>
 
   <div id="result"></div>
 </div>
@@ -318,6 +309,14 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signOut,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
 const firebaseConfig = {
   apiKey: "AIzaSyDVXvWTGetf41ajd0KDwNPG-dH8pmsMIt8",
   authDomain: "math-master-3c4df.firebaseapp.com",
@@ -330,6 +329,36 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+
+window.currentUser = null;
+
+onAuthStateChanged(auth, user=>{
+  window.currentUser = user;
+  if(window.refreshLoginStatus){
+    window.refreshLoginStatus();
+  }
+});
+
+window.loginGoogle = async function(){
+  try{
+    const result = await signInWithPopup(auth, provider);
+    window.currentUser = result.user;
+    alert("Googleログイン成功");
+    if(window.refreshLoginStatus) window.refreshLoginStatus();
+  }catch(e){
+    console.log(e);
+    alert("Googleログインに失敗しました");
+  }
+};
+
+window.logoutGoogle = async function(){
+  await signOut(auth);
+  window.currentUser = null;
+  alert("ログアウトしました");
+  if(window.refreshLoginStatus) window.refreshLoginStatus();
+};
 
 function getWeekKey(){
   const now = new Date();
@@ -353,6 +382,10 @@ function getWeekKey(){
 }
 
 function getPlayerId(){
+  if(window.currentUser){
+    return "google_" + window.currentUser.uid;
+  }
+
   let playerId = localStorage.getItem("playerId");
 
   if(!playerId){
@@ -360,7 +393,7 @@ function getPlayerId(){
     localStorage.setItem("playerId", playerId);
   }
 
-  return playerId;
+  return "local_" + playerId;
 }
 
 window.saveWorldScore = async function(data){

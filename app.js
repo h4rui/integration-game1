@@ -15,6 +15,11 @@ let playerProfile = {
   icon:""
 };
 
+let settings = {
+  bgm:true,
+  se:true
+};
+
 let playerData = {
   totalCorrect:0,
   playTime:0,
@@ -99,16 +104,22 @@ function normalize(str){
     .replace(/⁶/g,"^6");
 }
 
+function titleHTML(t){
+  if(t === "⚡️創設者"){
+    return `<span class="founderTitle">⚡️創設者</span>`;
+  }
+  return `🏅 ${t}`;
+}
+
 function loadAllData(){
   let p = localStorage.getItem("playerProfile");
-  if(p){
-    playerProfile = JSON.parse(p);
-  }
+  if(p) playerProfile = JSON.parse(p);
 
   let d = localStorage.getItem("playerData");
-  if(d){
-    playerData = JSON.parse(d);
-  }
+  if(d) playerData = JSON.parse(d);
+
+  let s = localStorage.getItem("settings");
+  if(s) settings = JSON.parse(s);
 
   if(!playerData.unlockedTitles){
     playerData.unlockedTitles = ["初心者"];
@@ -118,57 +129,52 @@ function loadAllData(){
     playerData.equippedTitle = "初心者";
   }
 
-  document.getElementById("playerName").value = playerProfile.name;
-
-  if(playerProfile.icon){
-    document.getElementById("profileIcon").src = playerProfile.icon;
-  }
-
+  applySettings();
   updateCurrentTitle();
 }
 
 function saveAllData(){
   localStorage.setItem("playerProfile", JSON.stringify(playerProfile));
   localStorage.setItem("playerData", JSON.stringify(playerData));
-}
-
-function saveProfile(){
-  let name = document.getElementById("playerName").value.trim();
-  let file = document.getElementById("iconInput").files[0];
-
-  if(name){
-    playerProfile.name = name;
-  }
-
-  if(file){
-    let reader = new FileReader();
-
-    reader.onload = function(e){
-      playerProfile.icon = e.target.result;
-      saveAllData();
-      document.getElementById("profileIcon").src = playerProfile.icon;
-      alert("プロフィールを保存したよ");
-    };
-
-    reader.readAsDataURL(file);
-  }else{
-    saveAllData();
-    alert("プロフィールを保存したよ");
-  }
+  localStorage.setItem("settings", JSON.stringify(settings));
 }
 
 window.addEventListener("load", loadAllData);
 
-function titleHTML(t){
-  if(t === "⚡️創設者"){
-    return `<span class="founderTitle">⚡️創設者</span>`;
+function applySettings(){
+  const bgm = document.getElementById("bgm");
+  bgm.muted = !settings.bgm;
+}
+
+function toggleBGM(){
+  settings.bgm = !settings.bgm;
+  saveAllData();
+  applySettings();
+  showSettings();
+}
+
+function toggleSE(){
+  settings.se = !settings.se;
+  saveAllData();
+  showSettings();
+}
+
+function refreshLoginStatus(){
+  const el = document.getElementById("loginStatus");
+  if(!el) return;
+
+  if(window.currentUser){
+    el.innerText = "ログイン中：" + window.currentUser.displayName;
+  }else{
+    el.innerText = "未ログイン";
   }
-  return `🏅 ${t}`;
 }
 
 function updateCurrentTitle(){
-  document.getElementById("currentTitle").innerHTML =
-    "称号：" + titleHTML(playerData.equippedTitle || "初心者");
+  const el = document.getElementById("currentTitle");
+  if(el){
+    el.innerHTML = "称号：" + titleHTML(playerData.equippedTitle || "初心者");
+  }
 }
 
 function unlockTitle(t){
@@ -230,49 +236,22 @@ function checkTitles(){
 function allTitles(){
   return [
     "⚡️創設者",
-
-    "理系",
-    "数学初心者",
-    "数学中級者",
-    "数学上級者",
-    "数学の鬼👹",
-    "数学の申し子🪽",
-    "数学王👑",
-    "伝説",
-    "神話",
-    "創世神🌌",
-
-    "数学好き",
-    "数学大好き",
-    "数学者🎓",
-    "努力家",
-    "秀才",
-    "鬼才",
-    "天才",
-
-    "10連勝",
-    "50連勝",
-    "不敗神話",
-
-    "電光石火",
-    "疾風迅雷",
-    "数学の怪物",
-
-    "TOP10",
-    "TOP3",
-    "週間王👑",
-
-    "毎日勉強",
-    "継続は力なり",
-    "数学狂"
+    "理系","数学初心者","数学中級者","数学上級者",
+    "数学の鬼👹","数学の申し子🪽","数学王👑",
+    "伝説","神話","創世神🌌",
+    "数学好き","数学大好き","数学者🎓","努力家","秀才","鬼才","天才",
+    "10連勝","50連勝","不敗神話",
+    "電光石火","疾風迅雷","数学の怪物",
+    "TOP10","TOP3","週間王👑",
+    "毎日勉強","継続は力なり","数学狂"
   ];
 }
 
 function showTitles(){
   checkTitles();
 
-  let box = document.getElementById("titleList");
-  let html = "<h2>称号一覧</h2>";
+  let box = document.getElementById("panelArea");
+  let html = "<h2>🏅 称号一覧</h2>";
 
   for(let t of allTitles()){
     let unlocked = playerData.unlockedTitles.includes(t);
@@ -280,16 +259,91 @@ function showTitles(){
     html += `
       <div class="titleItem">
         ${unlocked ? titleHTML(t) : "❓？？？"}
-        ${
-          unlocked
-          ? `<button onclick="equipTitle('${t}')">装備</button>`
-          : ""
-        }
+        ${unlocked ? `<button onclick="equipTitle('${t}')">装備</button>` : ""}
       </div>
     `;
   }
 
   box.innerHTML = html;
+}
+
+function showStudyMenu(){
+  document.getElementById("panelArea").innerHTML = `
+    <h2>📚 学習モード</h2>
+    <button class="modeBtn" onclick="selectMode('integral')">積分</button>
+    <button class="modeBtn" onclick="selectMode('derivative')">微分</button>
+    <button class="modeBtn" onclick="selectMode('factor')">因数分解</button>
+    <button class="modeBtn" onclick="selectMode('prime')">素因数分解</button>
+    <button class="modeBtn" onclick="selectMode('expand')">展開</button>
+  `;
+}
+
+function showSettings(){
+  document.getElementById("panelArea").innerHTML = `
+    <h2>⚙️ 設定</h2>
+
+    <div class="settingsItem">
+      <button onclick="toggleBGM()">🎵 BGM ${settings.bgm ? "ON" : "OFF"}</button>
+      <button onclick="toggleSE()">🔊 効果音 ${settings.se ? "ON" : "OFF"}</button>
+    </div>
+
+    <div class="settingsItem">
+      <button onclick="loginGoogle()">Googleログイン</button>
+      <button onclick="logoutGoogle()">ログアウト</button>
+      <p id="loginStatus">確認中...</p>
+    </div>
+  `;
+
+  refreshLoginStatus();
+}
+
+function showProfile(){
+  let playMin = Math.floor((playerData.playTime || 0) / 60);
+
+  document.getElementById("panelArea").innerHTML = `
+    <h2>👤 プロフィール</h2>
+
+    <div class="profileItem">
+      <img id="profileIconEdit" src="${playerProfile.icon || ""}" class="rankIcon">
+      <br>
+      <input id="playerNameEdit" placeholder="名前" value="${playerProfile.name || "名無し"}">
+      <br>
+      <input type="file" id="iconInputEdit" accept="image/*">
+      <br>
+      <button onclick="saveProfileFromPanel()">保存</button>
+    </div>
+
+    <div class="profileItem">
+      <p>現在の称号：${titleHTML(playerData.equippedTitle || "初心者")}</p>
+      <p>累計正解数：${playerData.totalCorrect || 0}問</p>
+      <p>プレイ時間：約${playMin}分</p>
+      <p>最大連勝：${playerData.maxCombo || 0}</p>
+      <p>ベストスコア：${playerData.bestRandomScore || 0}問</p>
+      <p>連続プレイ：${playerData.consecutiveDays || 0}日</p>
+    </div>
+  `;
+}
+
+function saveProfileFromPanel(){
+  let name = document.getElementById("playerNameEdit").value.trim();
+  let file = document.getElementById("iconInputEdit").files[0];
+
+  if(name) playerProfile.name = name;
+
+  if(file){
+    let reader = new FileReader();
+    reader.onload = function(e){
+      playerProfile.icon = e.target.result;
+      saveAllData();
+      showProfile();
+      alert("プロフィールを保存したよ");
+    };
+    reader.readAsDataURL(file);
+  }else{
+    saveAllData();
+    showProfile();
+    alert("プロフィールを保存したよ");
+  }
 }
 
 function recordPlayDay(){
@@ -303,9 +357,7 @@ function recordPlayDay(){
     return;
   }
 
-  if(playerData.lastPlayDate === today){
-    return;
-  }
+  if(playerData.lastPlayDate === today) return;
 
   let yesterday = new Date();
   yesterday.setDate(yesterday.getDate()-1);
@@ -326,7 +378,7 @@ function recordPlayDay(){
 function selectMode(m){
   mode = m;
 
-  document.getElementById("titleScreen").classList.remove("active");
+  document.getElementById("homeScreen").classList.remove("active");
   document.getElementById("gameScreen").classList.add("active");
 
   let title = "⚔️ 積分バトル ⚔️";
@@ -334,25 +386,24 @@ function selectMode(m){
   if(mode==="factor") title="⚔️ 因数分解バトル ⚔️";
   if(mode==="prime") title="⚔️ 素因数分解バトル ⚔️";
   if(mode==="expand") title="⚔️ 展開バトル ⚔️";
-  if(mode==="random") title="⚔️ タイムアタック ⚔️";
+  if(mode==="random") title="⚔️ ランキングモード ⚔️";
 
   document.getElementById("modeTitle").innerText = title;
   start();
 }
 
-function backTitle(){
+function backHome(){
   clearInterval(timer);
   updatePlayTime();
 
   document.getElementById("gameScreen").classList.remove("active");
-  document.getElementById("titleScreen").classList.add("active");
+  document.getElementById("homeScreen").classList.add("active");
 
   document.getElementById("bgm").pause();
 
   checkTitles();
   updateCurrentTitle();
 }
-
 function start(){
   clearInterval(timer);
 
@@ -364,25 +415,28 @@ function start(){
 
   document.getElementById("result").innerHTML = "";
   document.getElementById("q").innerText = "START";
-  document.getElementById("timer").innerText = "⏰ 5:00";
 
   recordPlayDay();
 
   if(mode==="random"){
     enemyHP = 9999;
     playerHP = 1;
+    document.getElementById("timer").innerText = "";
   }else{
     enemyHP = 10;
     playerHP = 5;
+    document.getElementById("timer").innerText = "";
   }
 
   updateHP();
   nextQ();
-  startTimer();
 
   let bgm = document.getElementById("bgm");
   bgm.volume = 0.2;
-  bgm.play();
+
+  if(settings.bgm){
+    bgm.play();
+  }
 }
 
 function updatePlayTime(){
@@ -394,28 +448,6 @@ function updatePlayTime(){
   }
 }
 
-function startTimer(){
-  clearInterval(timer);
-  time = 300;
-
-  timer = setInterval(()=>{
-    time--;
-
-    document.getElementById("timer").innerText =
-      "⏰ " + Math.floor(time/60) + ":" + String(time%60).padStart(2,"0");
-
-    if(time<=0){
-      if(mode==="random"){
-        finishRandom();
-        return;
-      }
-
-      playerHP--;
-      updateHP();
-      nextTurn();
-    }
-  },1000);
-}
 function generateQuestion(){
   if(mode==="integral") return generateIntegral();
   if(mode==="derivative") return generateDerivative();
@@ -983,6 +1015,7 @@ function submit(){
     combo++;
 
     playerData.totalCorrect++;
+
     if(combo > playerData.maxCombo){
       playerData.maxCombo = combo;
     }
@@ -1003,7 +1036,9 @@ function submit(){
       slash.classList.remove("showSlash");
     },500);
 
-    document.getElementById("se_correct").play();
+    if(settings.se){
+      document.getElementById("se_correct").play();
+    }
 
     document.getElementById("result").innerText =
       "○ 正解！ 正解: " + current.display;
@@ -1024,7 +1059,9 @@ function submit(){
       document.body.classList.remove("playerHit");
     },400);
 
-    document.getElementById("se_wrong").play();
+    if(settings.se){
+      document.getElementById("se_wrong").play();
+    }
 
     document.getElementById("result").innerText =
       "× 不正解！ 正解: " + current.display;
@@ -1060,8 +1097,6 @@ async function finishRandom(){
   }catch(e){
     console.log(e);
   }
-
-  await updateRankingTitles();
 
   showEnd("終了！");
 }
@@ -1103,22 +1138,7 @@ function nextTurn(){
 
   setTimeout(()=>{
     nextQ();
-    startTimer();
   },900);
-}
-
-async function updateRankingTitles(){
-  try{
-    let ranking = await loadWorldRanking();
-
-    for(let i=0;i<ranking.length;i++){
-      if(i===0) unlockTitle("週間王👑");
-      if(i<3) unlockTitle("TOP3");
-      if(i<10) unlockTitle("TOP10");
-    }
-
-    saveAllData();
-  }catch(e){}
 }
 
 async function showEnd(text){
@@ -1130,7 +1150,7 @@ async function showEnd(text){
   document.getElementById("ans").value = "";
 
   let html = `<button onclick="start()">もう一回</button>`;
-  html += `<button onclick="backTitle()">タイトルへ</button>`;
+  html += `<button onclick="backHome()">ホームへ</button>`;
 
   if(mode==="random"){
     html += `<h2>スコア：${score}問</h2>`;
@@ -1182,13 +1202,13 @@ async function showEnd(text){
 }
 
 async function showWorldRanking(){
-  let box = document.getElementById("titleRanking");
+  let box = document.getElementById("panelArea");
   box.innerHTML = "<h2>読み込み中...</h2>";
 
   try{
     let ranking = await loadWorldRanking();
 
-    let html = "<h2>週間世界ランキング</h2>";
+    let html = "<h2>🌍 週間世界ランキング</h2>";
 
     if(ranking.length===0){
       html += "<p>まだ記録がありません</p>";
