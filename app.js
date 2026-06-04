@@ -1,5 +1,5 @@
 
-const VERSION = "2.1.5";
+const VERSION = "2.1.6";
 
 let enemyHP = 10;
 let playerHP = 5;
@@ -191,6 +191,7 @@ function updateHomeStatus(){
   if(rate)rate.innerHTML=`正答率：${getCorrectRate()}%`;
   if(coin)coin.innerHTML=`コイン：${playerData.coins||0}`;
   if(icon && playerProfile.icon)icon.src=playerProfile.icon;
+  refreshLoginStatus();
 }
 
 function applySettings(){
@@ -201,8 +202,29 @@ function toggleBGM(){settings.bgm=!settings.bgm;saveAllData();applySettings();sh
 function toggleSE(){settings.se=!settings.se;saveAllData();showSettings();}
 function refreshLoginStatus(){
   let el=document.getElementById("loginStatus");
-  if(!el)return;
-  el.innerText=window.currentUser?"ログイン中："+window.currentUser.displayName:"未ログイン";
+  let home=document.getElementById("homeLoginStatus");
+
+  if(window.currentUser){
+    let name=window.currentUser.displayName || "Googleユーザー";
+
+    if(el){
+      el.innerText="ログイン中：" + name;
+    }
+
+    if(home){
+      home.innerHTML="🟢 ログイン中：" + name;
+      home.className="loginOk";
+    }
+  }else{
+    if(el){
+      el.innerText="未ログイン";
+    }
+
+    if(home){
+      home.innerHTML="🔴 未ログイン";
+      home.className="loginNg";
+    }
+  }
 }
 function unlockTitle(t){if(!playerData.unlockedTitles.includes(t))playerData.unlockedTitles.push(t);}
 function equipTitle(t){if(playerData.unlockedTitles.includes(t)){playerData.equippedTitle=t;saveAllData();updateHomeStatus();showTitles();}}
@@ -792,7 +814,7 @@ function showSettings(){
     </div>
     <div class="settingsItem">
       <button onclick="loginGoogle()">Googleログイン</button>
-      <button onclick="logoutGoogle()">ログアウト</button>
+      <button onclick="logoutGoogle()">ログアウト</button><button onclick="checkGoogleLoginStatus()">ログイン状態確認</button>
       <p id="loginStatus">確認中...</p>
     </div>
   `;
@@ -2192,4 +2214,13 @@ async function finishMatch(room){
   `;
 
   document.getElementById("resultList").innerHTML="";
+}
+
+
+function checkGoogleLoginStatus(){
+  if(window.currentUser){
+    alert("ログイン中\\n名前：" + (window.currentUser.displayName || "Googleユーザー"));
+  }else{
+    alert("未ログインです");
+  }
 }
