@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5681066295421790"
 crossorigin="anonymous"></script>
-<title>数学マスター Ver 2.1.6</title>
+<title>数学マスター Ver 2.1.8</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 body{
@@ -322,7 +322,7 @@ h4rui.github.io
 </div>
 
 <div id="levelUpArea"></div>
-<div id="versionLabel">Ver 2.1.6</div>
+<div id="versionLabel">Ver 2.1.8</div>
 
 <audio id="bgm" src="bgm.mp3" loop></audio>
 <audio id="se_correct" src="correct.mp3"></audio>
@@ -332,7 +332,7 @@ h4rui.github.io
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import { getFirestore, collection, doc, setDoc, getDoc, getDocs, query, where, limit, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDVXwXTGeft41ajd0KDwNPG-dH8pmsMIt8",
@@ -347,21 +347,38 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
+window.firebaseAuth = auth;
+setPersistence(auth,browserLocalPersistence).catch((e)=>console.error(e));
 const provider = new GoogleAuthProvider();
 provider.setCustomParameters({ prompt:"select_account" });
 window.currentUser = null;
 
-onAuthStateChanged(auth,user=>{
-  window.currentUser = user;
+window.getGoogleLoginInfo = function(){
+  return auth.currentUser || window.currentUser || null;
+};
+
+function applyGoogleLoginState(user){
+  window.currentUser = user || null;
+
+  if(user){
+    localStorage.setItem("googleLoginName", user.displayName || "Googleユーザー");
+    console.log("Googleログイン中:", user.displayName);
+
+    if(window.unlockAchievement){
+      window.unlockAchievement("初ログイン");
+      if(window.saveAllData) window.saveAllData();
+    }
+  }else{
+    localStorage.removeItem("googleLoginName");
+    console.log("未ログイン");
+  }
 
   if(window.refreshLoginStatus) window.refreshLoginStatus();
   if(window.updateHomeStatus) window.updateHomeStatus();
+}
 
-  if(user){
-    console.log("Googleログイン中:", user.displayName);
-  }else{
-    console.log("未ログイン");
-  }
+onAuthStateChanged(auth,user=>{
+  applyGoogleLoginState(user);
 });
 
 window.loginGoogle = async function(){
@@ -376,13 +393,15 @@ window.loginGoogle = async function(){
 getRedirectResult(auth)
   .then((result)=>{
     if(result && result.user){
-      window.currentUser = result.user;
+      applyGoogleLoginState(result.user);
       alert("Googleログイン成功：" + (result.user.displayName || "Googleユーザー"));
-      if(window.refreshLoginStatus) window.refreshLoginStatus();
     }
   })
   .catch((e)=>{
     console.error(e);
+    if(e && e.code){
+      alert("Googleログイン確認エラー：" + e.code);
+    }
   });
 
 getRedirectResult(auth)
@@ -412,8 +431,10 @@ getRedirectResult(auth)
 window.logoutGoogle = async function(){
   await signOut(auth);
   window.currentUser = null;
+  localStorage.removeItem("googleLoginName");
   alert("ログアウトしました");
   if(window.refreshLoginStatus) window.refreshLoginStatus();
+  if(window.updateHomeStatus) window.updateHomeStatus();
 };
 
 function getWeekKey(){
