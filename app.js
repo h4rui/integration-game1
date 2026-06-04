@@ -1,5 +1,5 @@
 
-const VERSION = "2.3.0";
+const VERSION = "2.4.0";
 
 let enemyHP = 10;
 let playerHP = 5;
@@ -134,6 +134,7 @@ function loadAllData(){
   if(!playerData.gachaTitles)playerData.gachaTitles=[];
   if(!playerData.loginStampedDays)playerData.loginStampedDays=[];
   if(!playerData.coins)playerData.coins=0;
+  if(!playerData.bgTheme)playerData.bgTheme="space";
   if(!playerData.matchHistory)playerData.matchHistory=[];
   if(!playerData.genreStats)playerData.genreStats={};
   if(!playerData.loginBonusDay)playerData.loginBonusDay=1;
@@ -277,11 +278,13 @@ function updateHomeStatus(){
   let rate=document.getElementById("rateInfo");
   let coin=document.getElementById("coinInfo");
   let icon=document.getElementById("profileIcon");
+  let pname=document.getElementById("homePlayerName");
 
   if(title)title.innerHTML="称号："+titleHTML(playerData.equippedTitle||"初心者");
   if(level)level.innerHTML=`Lv${getLevel()}　EXP ${getExpPercent()}/100`;
   if(rate)rate.innerHTML=`正答率：${getCorrectRate()}%`;
   if(coin)coin.innerHTML=`コイン：${playerData.coins||0}`;
+  if(pname)pname.innerText=playerProfile.name||"名無し";
   if(icon && playerProfile.icon)icon.src=playerProfile.icon;
   refreshLoginStatus();
 }
@@ -887,9 +890,7 @@ function showGuide(){
     </div>
 
     <div class="guideItem">
-      <h3>🏅 称号</h3>
-      <p>称号は1つだけ装備できます。</p>
-      <p>👾MENERU👾、🧊なかなか🧊、⚡️創設者はコマンド限定です。</p>
+      <h3>🏅 称号</h3><p>称号は1つだけ装備できます。</p>
     </div>
 
     <div class="guideItem">
@@ -918,6 +919,7 @@ function showSettings(){
       <button onclick="logoutGoogle()">ログアウト</button><button onclick="checkGoogleLoginStatus()">ログイン状態確認</button><button onclick="testFirestoreConnection()">Firestore接続確認</button>
       <p id="loginStatus">確認中...</p>
     </div>
+${themeButtonsHTML()}
   `;
   refreshLoginStatus();
 }
@@ -2031,7 +2033,7 @@ function showProfileMenu(){
 function showOtherMenu(){
   document.getElementById("panelArea").innerHTML=`
     <h2>⚙️ その他</h2>
-    <button class="modeBtn" onclick="showGuide()">📖 遊び方</button>
+    <button class="modeBtn" onclick="showNewsPage()">📢 お知らせ</button><button class="modeBtn" onclick="showStatsPage()">📊 成績</button><button class="modeBtn" onclick="showGuide()">📖 遊び方</button>
     <button class="modeBtn" onclick="showDailyMission()">🎯 デイリーミッション</button>
     <button class="modeBtn" onclick="showLoginCalendar()">📅 ログボカレンダー</button>
     <button class="modeBtn" onclick="showSettings()">⚙️ 設定</button>
@@ -2774,4 +2776,133 @@ function updateSurrenderButton(){
   const btn=document.getElementById("surrenderBtn");
   if(!btn)return;
   btn.style.display=(matchState && matchState.active)?"block":"none";
+}
+
+
+function getBgTheme(){
+  return playerData.bgTheme || "space";
+}
+function applyBgTheme(){
+  document.body.classList.remove("theme-blue","theme-simple","theme-red","theme-neon","theme-gold","theme-ranker","theme-rainbow","theme-founder");
+  const t=getBgTheme();
+  if(t!=="space")document.body.classList.add("theme-"+t);
+}
+function canUseTheme(t){
+  if(["space","blue","simple","red","neon"].includes(t))return true;
+  if(t==="gold")return (playerData.coins||0)>=5000;
+  if(t==="ranker")return true;
+  if(t==="rainbow")return (playerData.achievements||[]).length>=50;
+  if(t==="founder")return (playerData.unlockedTitles||[]).includes("⚡️創設者");
+  return false;
+}
+function setBgTheme(t){
+  if(!canUseTheme(t)){
+    alert("まだ解放されていません");
+    return;
+  }
+  playerData.bgTheme=t;
+  saveAllData();
+  applyBgTheme();
+  showSettings();
+}
+function themeLabel(t){
+  return {
+    space:"🌌 宇宙背景",
+    blue:"📘 数式ブルー",
+    simple:"🌑 シンプル",
+    red:"🔥 バトルレッド",
+    neon:"💎 ネオン",
+    gold:"👑 ゴールド背景",
+    ranker:"🏆 ランカー背景",
+    rainbow:"🌈 レインボー背景",
+    founder:"⚡️ 創設者背景"
+  }[t]||t;
+}
+function themeButtonsHTML(){
+  const themes=["space","blue","simple","red","neon","gold","ranker","rainbow","founder"];
+  let html=`<div class="settingsItem"><h3>🎨 背景テーマ</h3><p>現在：${themeLabel(getBgTheme())}</p>`;
+  for(const t of themes){
+    const ok=canUseTheme(t);
+    html+=`<button class="themeBtn" onclick="setBgTheme('${t}')">${ok?"":"🔒 "}${themeLabel(t)}</button>`;
+  }
+  html+=`
+    <p>👑 ゴールド背景：5000コイン</p>
+    <p>🏆 ランカー背景：ランキング参加者向け</p>
+    <p>🌈 レインボー背景：実績50個</p>
+    <p>⚡️ 創設者背景：⚡️創設者⚡️所持</p>
+  </div>`;
+  return html;
+}
+function showStatsPage(){
+  const total=playerData.totalQuestions||0;
+  const correct=playerData.totalCorrect||0;
+  const rate=total?Math.round(correct/total*100):0;
+  const combo=playerData.maxCombo||0;
+  const level=getLevel();
+  const mh=playerData.matchHistory||[];
+  const wins=mh.filter(x=>x.result==="win").length;
+  const losses=mh.filter(x=>x.result==="loss").length;
+  const mt=wins+losses;
+  const wr=mt?Math.round(wins/mt*100):0;
+
+  let html=`
+    <h2>📊 成績</h2>
+    <div class="statsCard">
+      <h3>総合成績</h3>
+      <p>総回答数：${total}問</p>
+      <p>総正解数：${correct}問</p>
+      <p>正答率：${rate}%</p>
+      <p>最高連続正解：${combo}問</p>
+      <p>レベル：Lv.${level}</p>
+    </div>
+    <div class="statsCard">
+      <h3>対戦成績</h3>
+      <p>総試合数：${mt}</p>
+      <p>勝利：${wins}</p>
+      <p>敗北：${losses}</p>
+      <p>勝率：${wr}%</p>
+    </div>
+  `;
+
+  if(typeof showGenreStats==="function"){
+    html+=`<div class="statsCard"><button onclick="showGenreStats()">ジャンル別正答率を見る</button></div>`;
+  }
+
+  document.getElementById("panelArea").innerHTML=html;
+  if(typeof ensureHomeButton==="function")ensureHomeButton();
+}
+function showNewsPage(){
+  document.getElementById("panelArea").innerHTML=`
+    <h2>📢 お知らせ</h2>
+    <div class="newsCard">
+      <h3>🔴 最新情報</h3>
+      <p>Ver 2.4.0 ベータ版リリース</p>
+      <p>背景テーマ、成績ページ、お知らせページを追加しました。</p>
+    </div>
+    <div class="newsCard">
+      <h3>2026/06/04 Ver2.4.0 β</h3>
+      <p>・ホーム8カード化</p>
+      <p>・📊成績ページ追加</p>
+      <p>・📢お知らせ追加</p>
+      <p>・🎨背景テーマ追加</p>
+      <p>・名前表示追加</p>
+    </div>
+    <div class="newsCard">
+      <h3>2026/06/04 Ver2.3.0</h3>
+      <p>・青紫の宇宙背景追加</p>
+      <p>・浮かぶ数式アニメーション追加</p>
+      <p>・カード式ホーム追加</p>
+    </div>
+    <div class="newsCard">
+      <h3>2026/06/03 Ver2.2.x</h3>
+      <p>・対戦機能改善</p>
+      <p>・ヒント機能追加</p>
+      <p>・ホームへ戻るボタン追加</p>
+    </div>
+    <div class="newsCard">
+      <h3>不具合報告</h3>
+      <p>不具合があれば「お問い合わせ」から報告してください。</p>
+    </div>
+  `;
+  if(typeof ensureHomeButton==="function")ensureHomeButton();
 }

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5681066295421790"
 crossorigin="anonymous"></script>
-<title>数学マスター Ver 2.3.0</title>
+<title>数学マスター Ver 2.4.0</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 body{
@@ -198,14 +198,6 @@ a{color:#00ffcc}
   60%{transform:scale(1.25) rotate(10deg);opacity:1}
   100%{transform:scale(1) rotate(0)}
 }
-#versionLabel{
-  position:fixed;
-  right:10px;
-  bottom:8px;
-  color:#aaa;
-  font-size:12px;
-  z-index:999;
-}
 
 #homeMenu.hidden{display:none}
 .commonNavBtn{display:block;margin:12px auto;background:#333;color:white;border:1px solid #00ffcc}
@@ -304,7 +296,7 @@ a{color:#00ffcc}
   padding:9px 14px;
 }
 
-/* Ver 2.3.0 Space UI */
+/* Ver 2.4.0 Space UI */
 body{
   margin:0;
   color:white;
@@ -357,7 +349,7 @@ body{
   text-shadow:0 0 8px #60a5fa,0 0 18px #7c3aed,0 0 32px #38bdf8;
 }
 #homeScreen h1::after{
-  content:"Ver 2.3.0";display:block;font-size:18px;color:#67e8f9;margin-top:6px;text-shadow:0 0 10px #22d3ee;
+  content:"Ver 2.4.0";display:block;font-size:18px;color:#67e8f9;margin-top:6px;text-shadow:0 0 10px #22d3ee;
 }
 #homePlayerCard{
   width:88%;max-width:780px;margin:18px auto 22px;padding:18px;
@@ -416,6 +408,86 @@ body{
   #homeScreen h1{font-size:34px}
 }
 
+
+/* Ver 2.4.0 additions */
+#homePlayerName{
+  font-size:26px;
+  font-weight:900;
+  color:#fff;
+  margin:8px 0 4px;
+  text-shadow:0 0 12px #38bdf8;
+}
+#homeMenu .modeBtn:nth-child(6){
+  background:linear-gradient(135deg,#0891b2,#0ea5e9)!important;
+  box-shadow:0 0 22px rgba(14,165,233,.45), inset 0 0 30px rgba(255,255,255,.1)!important;
+}
+#homeMenu .modeBtn:nth-child(6)::before{content:"📊 成績"!important;font-size:30px!important;font-weight:900}
+#homeMenu .modeBtn:nth-child(6)::after{content:"正答率・勝率を\A確認しよう！"!important}
+
+#homeMenu .modeBtn:nth-child(7){
+  background:linear-gradient(135deg,#db2777,#f97316)!important;
+  box-shadow:0 0 22px rgba(249,115,22,.45), inset 0 0 30px rgba(255,255,255,.1)!important;
+}
+#homeMenu .modeBtn:nth-child(7)::before{content:"📢 お知らせ"!important;font-size:30px!important;font-weight:900}
+#homeMenu .modeBtn:nth-child(7)::after{content:"アップデート情報\Aベータ版情報"!important}
+
+#homeMenu .modeBtn:nth-child(8){
+  background:linear-gradient(135deg,#334155,#64748b)!important;
+}
+#homeMenu .modeBtn:nth-child(8)::before{content:"⚙️ その他"!important;font-size:30px!important;font-weight:900}
+#homeMenu .modeBtn:nth-child(8)::after{content:"設定・ヘルプ\Aお問い合わせなど"!important}
+
+.theme-blue{
+  background:linear-gradient(180deg,#071b34,#0f3b73,#102a43)!important;
+}
+.theme-simple{
+  background:#050505!important;
+}
+.theme-red{
+  background:radial-gradient(circle at 50% 20%,rgba(239,68,68,.45),transparent 30%),linear-gradient(180deg,#120506,#2a0808,#0a0202)!important;
+}
+.theme-neon{
+  background:radial-gradient(circle at 20% 20%,rgba(34,211,238,.4),transparent 30%),radial-gradient(circle at 80% 20%,rgba(236,72,153,.4),transparent 30%),linear-gradient(180deg,#030712,#111827,#1e1b4b)!important;
+}
+.theme-gold{
+  background:radial-gradient(circle at 50% 15%,rgba(250,204,21,.55),transparent 30%),linear-gradient(180deg,#1c1200,#3b2500,#0a0600)!important;
+}
+.theme-ranker{
+  background:radial-gradient(circle at 20% 20%,rgba(250,204,21,.38),transparent 28%),linear-gradient(180deg,#07112e,#102a5c,#030712)!important;
+}
+.theme-rainbow{
+  background:linear-gradient(120deg,#ef4444,#f59e0b,#22c55e,#06b6d4,#6366f1,#ec4899)!important;
+  background-size:400% 400%!important;
+  animation:rainbowBg 12s ease infinite!important;
+}
+@keyframes rainbowBg{
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
+}
+.theme-founder{
+  background:radial-gradient(circle at 50% 15%,rgba(250,204,21,.5),transparent 28%),radial-gradient(circle at 80% 70%,rgba(124,58,237,.45),transparent 30%),linear-gradient(180deg,#020617,#1e103b,#1a1000)!important;
+}
+.themeBtn{
+  display:block;
+  width:90%;
+  max-width:520px;
+  margin:10px auto;
+  font-size:20px;
+  padding:12px;
+  border-radius:12px;
+}
+.newsCard,.statsCard{
+  background:rgba(255,255,255,.12);
+  margin:12px auto;
+  padding:14px;
+  border-radius:14px;
+  width:90%;
+  max-width:760px;
+  text-align:left;
+  box-shadow:0 0 14px rgba(56,189,248,.15);
+}
+
 </style>
 <!--
 Googleログイン用メモ:
@@ -445,6 +517,7 @@ h4rui.github.io
   <h1>🏆 数学マスター 🏆</h1>
   <div id="homePlayerCard">
   <img id="profileIcon" src="">
+  <div id="homePlayerName">名無し</div>
   <div id="currentTitle">称号：初心者</div>
   <div id="levelInfo">Lv1</div>
   <div id="rateInfo">正答率：0%</div>
@@ -458,9 +531,11 @@ h4rui.github.io
   <button class="modeBtn" onclick="openPanelPage('showMatchMenu')">⚔️ 対戦</button>
   <button class="modeBtn" onclick="openPanelPage('showGacha')">🎰 ガチャ</button>
   <button class="modeBtn" onclick="openPanelPage('showProfileMenu')">👤 プロフィール</button>
+  <button class="modeBtn" onclick="showStatsPage()">📊 成績</button>
+  <button class="modeBtn" onclick="showNewsPage()">📢 お知らせ</button>
   <button class="modeBtn" onclick="openPanelPage('showOtherMenu')">⚙️ その他</button>
   </div>
-  <div id="panelArea"<div id="panelArea"<div id="panelArea"></div>
+  <div id="panelArea"<div id="panelArea"<div id="panelArea"<div id="panelArea"></div>
 </div>
 
 <div id="gameScreen" class="screen">
@@ -524,7 +599,6 @@ h4rui.github.io
 </div>
 
 <div id="levelUpArea"></div>
-<div id="versionLabel">Ver 2.3.0</div>
 
 <audio id="bgm" src="bgm.mp3" loop></audio>
 <audio id="se_correct" src="correct.mp3"></audio>
