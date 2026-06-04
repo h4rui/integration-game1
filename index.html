@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>数学マスター Ver 2.0.1</title>
+<title>数学マスター Ver 2.0.3</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 body{
@@ -12,7 +12,7 @@ body{
   text-align:center;
   font-family:sans-serif;
   min-height:100vh;
-  padding-bottom:180px;
+  padding-bottom:50px;
 }
 h1{color:#00ffcc;text-shadow:0 0 10px #00ffcc}
 .screen{display:none}.active{display:block}
@@ -142,7 +142,7 @@ a{color:#00ffcc}
   max-width:620px;
   margin:10px auto 15px;
   display:grid;
-  grid-template-columns:repeat(6,1fr);
+  grid-template-columns:repeat(7,1fr);
   gap:7px;
 }
 .keyBtn{
@@ -196,27 +196,19 @@ a{color:#00ffcc}
   60%{transform:scale(1.25) rotate(10deg);opacity:1}
   100%{transform:scale(1) rotate(0)}
 }
-#adArea{
-  position:fixed;
-  bottom:20px;
-  left:50%;
-  transform:translateX(-50%);
-  width:320px;
-  height:50px;
-  background:white;
-  color:black;
-  border-radius:10px;
-  line-height:50px;
-  z-index:10;
-}
 #versionLabel{
   position:fixed;
   right:10px;
-  bottom:78px;
+  bottom:8px;
   color:#aaa;
   font-size:12px;
   z-index:999;
 }
+
+#homeMenu.hidden{display:none}
+.panelBackBtn{display:block;margin:12px auto;background:#333;color:white;border:1px solid #00ffcc}
+
+.resultBtn{display:block;width:80%;max-width:420px;margin:14px auto;font-size:28px;padding:16px}
 </style>
 </head>
 <body>
@@ -228,21 +220,23 @@ a{color:#00ffcc}
   <div id="rateInfo">正答率：0%</div>
   <div id="coinInfo">コイン：0</div>
 
-  <button class="modeBtn" onclick="showStudyMenu()">📚 学習モード</button>
+  <div id="homeMenu">
+  <button class="modeBtn" onclick="openPanelPage('showStudyMenu')">📚 学習モード</button>
   <button class="modeBtn" onclick="selectRankingMode()">⚔️ ランキングモード</button>
-  <button class="modeBtn" onclick="showGacha()">🎰 ガチャ</button>
-  <button class="modeBtn" onclick="showGachaBook()">📖 ガチャ図鑑</button>
-  <button class="modeBtn" onclick="showLoginCalendar()">📅 ログボカレンダー</button>
-  <button class="modeBtn" onclick="showGuide()">📖 遊び方</button>
-  <button class="modeBtn" onclick="showTitles()">🏅 称号一覧</button>
-  <button class="modeBtn" onclick="showAchievements()">🏆 実績一覧</button>
-  <button class="modeBtn" onclick="showWorldRanking()">🌍 週間ランキング</button>
-  <button class="modeBtn" onclick="showFriendMenu()">🤝 フレンド</button>
-  <button class="modeBtn" onclick="showDailyMission()">🎯 デイリーミッション</button>
-  <button class="modeBtn" onclick="showReviewList()">📚 復習リスト</button>
-  <button class="modeBtn" onclick="showProfile()">👤 プロフィール</button>
-  <button class="modeBtn" onclick="showSettings()">⚙️ 設定</button>
-  <button class="modeBtn" onclick="showContact()">📩 お問い合わせ</button>
+  <button class="modeBtn" onclick="openPanelPage('showGacha')">🎰 ガチャ</button>
+  <button class="modeBtn" onclick="openPanelPage('showGachaBook')">📖 ガチャ図鑑</button>
+  <button class="modeBtn" onclick="openPanelPage('showLoginCalendar')">📅 ログボカレンダー</button>
+  <button class="modeBtn" onclick="openPanelPage('showGuide')">📖 遊び方</button>
+  <button class="modeBtn" onclick="openPanelPage('showTitles')">🏅 称号一覧</button>
+  <button class="modeBtn" onclick="openPanelPage('showAchievements')">🏆 実績一覧</button>
+  <button class="modeBtn" onclick="openPanelPage('showWorldRanking')">🌍 週間ランキング</button>
+  <button class="modeBtn" onclick="openPanelPage('showFriendMenu')">🤝 フレンド</button>
+  <button class="modeBtn" onclick="openPanelPage('showDailyMission')">🎯 デイリーミッション</button>
+  <button class="modeBtn" onclick="openPanelPage('showReviewList')">📚 復習リスト</button>
+  <button class="modeBtn" onclick="openPanelPage('showProfile')">👤 プロフィール</button>
+  <button class="modeBtn" onclick="openPanelPage('showSettings')">⚙️ 設定</button>
+  <button class="modeBtn" onclick="openPanelPage('showContact')">📩 お問い合わせ</button>
+  </div>
   <div id="panelArea"></div>
 </div>
 
@@ -264,32 +258,32 @@ a{color:#00ffcc}
     <button class="keyBtn" onclick="addKey('+')">+</button>
     <button class="keyBtn" onclick="addKey('*')">×</button>
     <button class="keyBtn" onclick="addKey('(')">(</button>
+    <button class="keyBtn" onclick="addKey(')')">)</button>
 
     <button class="keyBtn" onclick="addKey('4')">4</button>
     <button class="keyBtn" onclick="addKey('5')">5</button>
     <button class="keyBtn" onclick="addKey('6')">6</button>
     <button class="keyBtn" onclick="addKey('-')">-</button>
     <button class="keyBtn" onclick="addKey('/')">÷</button>
-    <button class="keyBtn" onclick="addKey(')')">)</button>
+    <button class="keyBtn" onclick="addKey('^')">^</button>
+    <button class="keyBtn" onclick="addKey('x')">x</button>
 
     <button class="keyBtn" onclick="addKey('1')">1</button>
     <button class="keyBtn" onclick="addKey('2')">2</button>
     <button class="keyBtn" onclick="addKey('3')">3</button>
-    <button class="keyBtn" onclick="addKey('^')">^</button>
     <button class="keyBtn" onclick="addKey('sqrt(')">√</button>
-    <button class="keyBtn" onclick="addKey('x')">x</button>
-
-    <button class="keyBtn" onclick="addKey('0')">0</button>
-    <button class="keyBtn" onclick="addKey('/')">/</button>
-    <button class="keyBtn" onclick="addKey('.')">.</button>
     <button class="keyBtn" onclick="addKey('sin(')">sin</button>
     <button class="keyBtn" onclick="addKey('cos(')">cos</button>
     <button class="keyBtn" onclick="addKey('tan(')">tan</button>
 
+    <button class="keyBtn" onclick="addKey('0')">0</button>
+    <button class="keyBtn" onclick="addKey('/')">/</button>
+    <button class="keyBtn" onclick="addKey('.')">.</button>
     <button class="keyBtn" onclick="addKey('e')">e</button>
     <button class="keyBtn" onclick="addKey('pi')">π</button>
-    <button class="keyBtn danger" onclick="clearInput()">C</button>
-    <button class="keyBtn danger" onclick="backspaceInput()">⌫</button>
+    <button class="keyBtn" onclick="addKey('C')">C</button>
+    <button class="keyBtn danger wide" onclick="backspaceInput()">⌫</button>
+
     <button class="keyBtn ok wide" onclick="submit()">決定</button>
   </div>
 
@@ -297,9 +291,14 @@ a{color:#00ffcc}
   <div id="result"></div>
 </div>
 
+<div id="resultScreen" class="screen">
+  <h1>📊 結果</h1>
+  <div id="resultSummary"></div>
+  <div id="resultList"></div>
+</div>
+
 <div id="levelUpArea"></div>
-<div id="adArea">広告スペース</div>
-<div id="versionLabel">Ver 2.0.1</div>
+<div id="versionLabel">Ver 2.0.3</div>
 
 <audio id="bgm" src="bgm.mp3" loop></audio>
 <audio id="se_correct" src="correct.mp3"></audio>

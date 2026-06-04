@@ -1,5 +1,5 @@
 
-const VERSION = "2.0.1";
+const VERSION = "2.0.3"
 
 let enemyHP = 10;
 let playerHP = 5;
@@ -149,6 +149,26 @@ function saveAllData(){
   localStorage.setItem("settings",JSON.stringify(settings));
 }
 window.addEventListener("load",loadAllData);
+
+function openPanelPage(fnName){
+  const menu=document.getElementById("homeMenu");
+  const panel=document.getElementById("panelArea");
+  if(menu)menu.classList.add("hidden");
+  if(panel)panel.innerHTML="";
+  eval(fnName+"()");
+  setTimeout(()=>{
+    if(panel && !document.getElementById("panelBackTop")){
+      panel.insertAdjacentHTML("afterbegin",`<button id="panelBackTop" class="panelBackBtn" onclick="closePanelPage()">← ホームメニューへ</button>`);
+    }
+  },0);
+}
+function closePanelPage(){
+  const menu=document.getElementById("homeMenu");
+  const panel=document.getElementById("panelArea");
+  if(menu)menu.classList.remove("hidden");
+  if(panel)panel.innerHTML="";
+}
+
 
 function updateHomeStatus(){
   let title=document.getElementById("currentTitle");
@@ -474,7 +494,7 @@ function showGacha(){
     <div class="profileItem">
       <p>所持コイン：${playerData.coins||0}</p>
       <p>1回：10コイン</p>
-      <button onclick="drawGacha()">10コインで引く</button>
+      <button onclick="drawGacha()">10コインで引く</button><button onclick="drawGacha10()">100コインで10連</button>
       <button onclick="showGachaBook()">ガチャ図鑑を見る</button>
     </div>
     <div class="profileItem">
@@ -539,6 +559,43 @@ function drawGacha(){
     }
   },100);
 }
+
+function drawGacha10(){
+  if((playerData.coins||0)<100){
+    alert("コインが足りません");
+    return;
+  }
+  playerData.coins-=100;
+  let results=[];
+  let hasUR=false;
+  for(let i=0;i<10;i++){
+    let item=getGachaResult();
+    results.push(item);
+    unlockTitle(item.title);
+    if(!playerData.gachaTitles)playerData.gachaTitles=[];
+    if(!playerData.gachaTitles.includes(item.title))playerData.gachaTitles.push(item.title);
+    if(item.rarity==="UR")hasUR=true;
+  }
+  unlockAchievement("初ガチャ");
+  if(hasUR){
+    unlockAchievement("UR獲得");
+    document.body.classList.add("urFlash");
+    setTimeout(()=>document.body.classList.remove("urFlash"),1000);
+  }
+  saveAllData();
+  updateHomeStatus();
+  let html=`<h2>🎰 10連ガチャ結果</h2>
+    <div class="profileItem">
+      <p>所持コイン：${playerData.coins||0}</p>
+      <button onclick="drawGacha10()">もう一度10連</button>
+      <button onclick="showGacha()">ガチャ画面へ</button>
+    </div>`;
+  for(let item of results){
+    html+=`<div class="titleItem"><b>${item.rarity}</b><br>${titleHTML(item.title)}</div>`;
+  }
+  document.getElementById("panelArea").innerHTML=html;
+}
+
 function showGachaBook(){
   let pool=gachaPool();
   let owned=playerData.gachaTitles||[];
@@ -1027,6 +1084,7 @@ function openGame(){
   document.getElementById("modeTitle").innerText=title;
 }
 function backHome(){
+  closePanelPage();
   setInputVisible(true);
   updatePlayTime();
   document.getElementById("gameScreen").classList.remove("active");
@@ -1053,7 +1111,7 @@ function start(){
 
   if(mode==="random"){
     enemyHP=9999;
-    playerHP=3;
+    playerHP=1;
   }else{
     enemyHP=10;
     playerHP=5;
@@ -1563,13 +1621,11 @@ function submit(){
     addReviewItem(current);
 
     if(mode==="random"){
-      playerHP--;
-      updateHP();
-      if(playerHP<=0){
-        finishRandom();
-        return;
-      }
-    }else if(mode!=="review")playerHP--;
+      finishRandom();
+      return;
+    }
+
+    if(mode!=="review")playerHP--;
 
     if(settings.se)document.getElementById("se_wrong").play();
 
@@ -1631,7 +1687,7 @@ function updateHP(){
     document.getElementById("playerFrame").style.display="none";
 
     let status=document.getElementById("scoreStatus");
-    if(status)status.innerHTML=`スコア：${score}　連勝：${combo}　残機：${playerHP}`;
+    if(status)status.innerHTML=`スコア：${score}　連勝：${combo}　残機：1`;
 
     return;
   }
@@ -1673,58 +1729,74 @@ function nextTurn(){
 }
 function showEnd(text){
   updatePlayTime();
-  setInputVisible(false);
-
-  document.getElementById("q").innerText=text;
-
-  let html=`
-    <h2>スコア：${score}</h2>
-    <button onclick="start()">もう一回</button>
-    <button onclick="backHome()">ホームへ</button>
-    <hr>
-    <h2>解いた問題一覧</h2>
-  `;
-
-  for(let h of history){
-    html+=`
-      <div class="rankItem">
-        ${h.ok?"○":"×"}<br>
-        問題：${h.question}<br>
-        あなた：${h.your}<br>
-        正解：${h.answer}
-      </div>
-    `;
-  }
-
-  document.getElementById("result").innerHTML=html;
+  showResultPage(text);
 }
 async function showWorldRanking(){
   let box=document.getElementById("panelArea");
-
   box.innerHTML="<h2>読み込み中...</h2>";
-
   try{
     let ranking=await loadWorldRanking();
-
-    let html="<h2>🌍 週間ランキング</h2>";
-
-    if(ranking.length===0)html+="<p>まだ記録がありません</p>";
-
+    let myName=playerProfile.name||"名無し";
+    let myBest=playerData.bestRandomScore||0;
+    let myRank="-";
     for(let i=0;i<ranking.length;i++){
-      html+=`
-        <div class="rankItem">
-          ${i+1}位
-          ${ranking[i].icon?`<img class="rankIcon" src="${ranking[i].icon}">`:""}
-          ${ranking[i].name}<br>
-          ${titleHTML(ranking[i].title||"初心者")}<br>
-          Lv${ranking[i].level||1}<br>
-          ${ranking[i].score}問
-        </div>
-      `;
+      if((ranking[i].score||0)===myBest && (ranking[i].name||"名無し")===myName){
+        myRank=i+1;
+        break;
+      }
     }
-
+    let html=`<h2>🌍 週間ランキング</h2>
+      <div class="profileItem">
+        <h3>あなたの順位</h3>
+        <p>順位：${myRank}位</p>
+        <p>自己ベスト：${myBest}問</p>
+      </div>`;
+    if(ranking.length===0)html+="<p>まだ記録がありません</p>";
+    for(let i=0;i<ranking.length;i++){
+      html+=`<div class="rankItem">${i+1}位 ${ranking[i].icon?`<img class="rankIcon" src="${ranking[i].icon}">`:""}${ranking[i].name}<br>${titleHTML(ranking[i].title||"初心者")}<br>Lv${ranking[i].level||1}<br>${ranking[i].score}問</div>`;
+    }
     box.innerHTML=html;
   }catch(e){
     box.innerHTML="<p>ランキング取得失敗</p>";
   }
+}
+
+function showResultPage(text){
+  setInputVisible(false);
+  document.getElementById("gameScreen").classList.remove("active");
+  document.getElementById("homeScreen").classList.remove("active");
+  document.getElementById("resultScreen").classList.add("active");
+
+  document.getElementById("resultSummary").innerHTML=`
+    <div class="profileItem">
+      <h2>${text}</h2>
+      <p>スコア：${score}</p>
+      <p>正解数：${history.filter(h=>h.ok).length}</p>
+      <p>問題数：${history.length}</p>
+      <button class="resultBtn" onclick="restartFromResult()">もう一回</button>
+      <button class="resultBtn" onclick="backHomeFromResult()">ホームへ</button>
+    </div>
+  `;
+
+  let html="<h2>解いた問題一覧</h2>";
+  for(let h of history){
+    html+=`<div class="rankItem">${h.ok?"○":"×"}<br>問題：${h.question}<br>あなた：${h.your}<br>正解：${h.answer}</div>`;
+  }
+  document.getElementById("resultList").innerHTML=html;
+}
+function restartFromResult(){
+  document.getElementById("resultScreen").classList.remove("active");
+  document.getElementById("gameScreen").classList.add("active");
+  setInputVisible(true);
+  start();
+}
+function backHomeFromResult(){
+  document.getElementById("resultScreen").classList.remove("active");
+  document.getElementById("homeScreen").classList.add("active");
+  setInputVisible(true);
+  checkTitles();
+  checkAchievements();
+  saveAllData();
+  savePublicProfile();
+  updateHomeStatus();
 }
