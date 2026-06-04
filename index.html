@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5681066295421790"
 crossorigin="anonymous"></script>
-<title>数学マスター Ver 2.2.4</title>
+<title>数学マスター Ver 2.3.0</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 body{
@@ -303,6 +303,119 @@ a{color:#00ffcc}
   font-size:18px;
   padding:9px 14px;
 }
+
+/* Ver 2.3.0 Space UI */
+body{
+  margin:0;
+  color:white;
+  text-align:center;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  min-height:100vh;
+  padding-bottom:50px;
+  background:
+    radial-gradient(circle at 20% 10%, rgba(99,102,241,.45), transparent 25%),
+    radial-gradient(circle at 80% 20%, rgba(236,72,153,.35), transparent 25%),
+    radial-gradient(circle at 50% 80%, rgba(6,182,212,.20), transparent 30%),
+    linear-gradient(180deg,#030712,#0f102c 40%,#1e1b4b 100%);
+  overflow-x:hidden;
+}
+#spaceBg{position:fixed;inset:0;z-index:-10;overflow:hidden;pointer-events:none}
+.stars{
+  position:absolute;inset:0;
+  background-image:radial-gradient(white 1px,transparent 1px),radial-gradient(rgba(255,255,255,.55) 1px,transparent 1px);
+  background-size:60px 60px,110px 110px;
+  background-position:0 0,30px 50px;
+  opacity:.55;
+  animation:starsMove 55s linear infinite;
+}
+@keyframes starsMove{from{transform:translateY(0)}to{transform:translateY(-220px)}}
+.nebula{position:absolute;width:520px;height:520px;border-radius:50%;filter:blur(60px);opacity:.36;animation:nebulaMove 12s ease-in-out infinite alternate}
+.nebula1{left:-160px;top:120px;background:#7c3aed}
+.nebula2{right:-170px;bottom:80px;background:#06b6d4;animation-delay:2s}
+@keyframes nebulaMove{from{transform:translate(0,0) scale(1)}to{transform:translate(35px,-30px) scale(1.15)}}
+.mathFloat{
+  position:absolute;color:rgba(147,197,253,.42);font-family:Georgia,serif;font-size:30px;
+  text-shadow:0 0 12px rgba(96,165,250,.65);
+  animation:floatFormula linear infinite;
+}
+@keyframes floatFormula{
+  from{transform:translateY(110vh) rotate(0deg);opacity:0}
+  10%{opacity:.9}
+  90%{opacity:.7}
+  to{transform:translateY(-180px) rotate(10deg);opacity:0}
+}
+.m1{left:8%;animation-duration:24s;animation-delay:-4s}
+.m2{left:45%;animation-duration:20s;animation-delay:-11s;font-size:44px;color:rgba(168,85,247,.55)}
+.m3{left:80%;animation-duration:26s;animation-delay:-9s;font-size:40px}
+.m4{left:18%;animation-duration:28s;animation-delay:-17s}
+.m5{left:67%;animation-duration:25s;animation-delay:-2s}
+.m6{left:33%;animation-duration:22s;animation-delay:-14s}
+.m7{left:88%;animation-duration:30s;animation-delay:-21s}
+.m8{left:55%;animation-duration:23s;animation-delay:-7s}
+#homeScreen h1{
+  margin:20px auto 4px;font-size:42px;letter-spacing:2px;color:#fff;
+  text-shadow:0 0 8px #60a5fa,0 0 18px #7c3aed,0 0 32px #38bdf8;
+}
+#homeScreen h1::after{
+  content:"Ver 2.3.0";display:block;font-size:18px;color:#67e8f9;margin-top:6px;text-shadow:0 0 10px #22d3ee;
+}
+#homePlayerCard{
+  width:88%;max-width:780px;margin:18px auto 22px;padding:18px;
+  border:1px solid rgba(168,85,247,.85);border-radius:24px;
+  background:linear-gradient(135deg,rgba(15,23,42,.82),rgba(30,27,75,.75));
+  box-shadow:0 0 22px rgba(124,58,237,.55),inset 0 0 28px rgba(59,130,246,.15);
+  backdrop-filter:blur(10px);
+}
+#profileIcon{
+  width:104px;height:104px;border-radius:50%;object-fit:cover;
+  background:radial-gradient(circle,#1f2937,#020617);
+  border:3px solid #facc15;
+  box-shadow:0 0 16px rgba(250,204,21,.8),0 0 28px rgba(168,85,247,.45);
+}
+#currentTitle,#levelInfo,#rateInfo,#coinInfo,#homeLoginStatus{font-size:20px;margin:7px}
+#levelInfo{font-weight:bold;color:#e0f2fe}
+#coinInfo{color:#fde68a;font-weight:bold}
+#homeMenu{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;
+  width:92%;max-width:820px;margin:10px auto 24px;
+}
+#homeMenu .modeBtn{
+  width:100%;min-height:132px;margin:0;padding:18px 12px;border-radius:22px;color:white;
+  border:1px solid rgba(255,255,255,.35);
+  box-shadow:0 0 18px rgba(255,255,255,.14),inset 0 0 30px rgba(255,255,255,.08);
+  font-size:0;position:relative;overflow:hidden;text-align:left;
+}
+#homeMenu .modeBtn::before{display:block;font-size:30px!important;line-height:1.2;margin-bottom:12px;font-weight:900}
+#homeMenu .modeBtn::after{display:block;font-size:17px;line-height:1.4;color:rgba(255,255,255,.92);white-space:pre-line;font-weight:700}
+#homeMenu .modeBtn:hover,#homeMenu .modeBtn:active{transform:translateY(-3px) scale(1.02);filter:brightness(1.15)}
+#homeMenu .modeBtn:nth-child(1){background:linear-gradient(135deg,#1d4ed8,#06b6d4)}
+#homeMenu .modeBtn:nth-child(1)::before{content:"📚 学習"}
+#homeMenu .modeBtn:nth-child(1)::after{content:"問題を解いて\Aレベルアップ！"}
+#homeMenu .modeBtn:nth-child(2){background:linear-gradient(135deg,#b45309,#f59e0b);box-shadow:0 0 22px rgba(245,158,11,.45),inset 0 0 30px rgba(255,255,255,.12)}
+#homeMenu .modeBtn:nth-child(2)::before{content:"🏆 ランキング"}
+#homeMenu .modeBtn:nth-child(2)::after{content:"全国のプレイヤーと\A順位を競おう！"}
+#homeMenu .modeBtn:nth-child(3){background:linear-gradient(135deg,#991b1b,#ef4444);box-shadow:0 0 22px rgba(239,68,68,.5),inset 0 0 30px rgba(255,255,255,.1)}
+#homeMenu .modeBtn:nth-child(3)::before{content:"⚔️ 対戦"}
+#homeMenu .modeBtn:nth-child(3)::after{content:"ランダム・フレンド\A対戦！"}
+#homeMenu .modeBtn:nth-child(4){background:linear-gradient(135deg,#6d28d9,#ec4899,#f59e0b);box-shadow:0 0 22px rgba(236,72,153,.55),inset 0 0 30px rgba(255,255,255,.12)}
+#homeMenu .modeBtn:nth-child(4)::before{content:"🎰 ガチャ"}
+#homeMenu .modeBtn:nth-child(4)::after{content:"ガチャを引いて\A称号を集めよう！"}
+#homeMenu .modeBtn:nth-child(5){background:linear-gradient(135deg,#047857,#22c55e);box-shadow:0 0 22px rgba(34,197,94,.45),inset 0 0 30px rgba(255,255,255,.1)}
+#homeMenu .modeBtn:nth-child(5)::before{content:"👤 プロフィール"}
+#homeMenu .modeBtn:nth-child(5)::after{content:"成績や称号を\A確認しよう！"}
+#homeMenu .modeBtn:nth-child(6){background:linear-gradient(135deg,#334155,#64748b)}
+#homeMenu .modeBtn:nth-child(6)::before{content:"⚙️ その他"}
+#homeMenu .modeBtn:nth-child(6)::after{content:"設定・ヘルプ\Aお問い合わせなど"}
+.modeBtn{transition:transform .18s ease,filter .18s ease,box-shadow .18s ease}
+.founderTitle{color:#FFD700!important;font-weight:bold;text-shadow:0 0 6px gold,0 0 14px orange,0 0 28px #f59e0b;animation:founderGlow 2s infinite}
+@media(max-width:520px){
+  #homeMenu{gap:12px}
+  #homeMenu .modeBtn{min-height:118px;padding:14px 10px}
+  #homeMenu .modeBtn::before{font-size:24px!important}
+  #homeMenu .modeBtn::after{font-size:14px}
+  #homeScreen h1{font-size:34px}
+}
+
 </style>
 <!--
 Googleログイン用メモ:
@@ -313,14 +426,31 @@ h4rui.github.io
 -->
 </head>
 <body>
+
+<div id="spaceBg">
+  <div class="stars"></div>
+  <div class="nebula nebula1"></div>
+  <div class="nebula nebula2"></div>
+  <div class="mathFloat m1">∫x²dx</div>
+  <div class="mathFloat m2">π</div>
+  <div class="mathFloat m3">Σ</div>
+  <div class="mathFloat m4">sinθ</div>
+  <div class="mathFloat m5">log x</div>
+  <div class="mathFloat m6">d/dx</div>
+  <div class="mathFloat m7">e^x</div>
+  <div class="mathFloat m8">√x</div>
+</div>
+
 <div id="homeScreen" class="screen active">
   <h1>🏆 数学マスター 🏆</h1>
+  <div id="homePlayerCard">
   <img id="profileIcon" src="">
   <div id="currentTitle">称号：初心者</div>
   <div id="levelInfo">Lv1</div>
   <div id="rateInfo">正答率：0%</div>
   <div id="coinInfo">コイン：0</div>
   <div id="homeLoginStatus">🔴 未ログイン</div>
+  </div>
 
   <div id="homeMenu">
   <button class="modeBtn" onclick="openPanelPage('showStudyMenu')">📚 学習</button>
@@ -394,7 +524,7 @@ h4rui.github.io
 </div>
 
 <div id="levelUpArea"></div>
-<div id="versionLabel">Ver 2.2.4</div>
+<div id="versionLabel">Ver 2.3.0</div>
 
 <audio id="bgm" src="bgm.mp3" loop></audio>
 <audio id="se_correct" src="correct.mp3"></audio>
