@@ -2,7 +2,9 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>数学マスター Ver 2.1.2</title>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5681066295421790"
+crossorigin="anonymous"></script>
+<title>数学マスター Ver 2.1.3</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 body{
@@ -230,6 +232,13 @@ a{color:#00ffcc}
   color:#ffd700;
 }
 </style>
+<!--
+Googleログイン用メモ:
+Firebase Authentication > Settings > Authorized domains に以下を追加:
+sugakumaster.com
+www.sugakumaster.com
+h4rui.github.io
+-->
 </head>
 <body>
 <div id="homeScreen" class="screen active">
@@ -309,7 +318,7 @@ a{color:#00ffcc}
 </div>
 
 <div id="levelUpArea"></div>
-<div id="versionLabel">Ver 2.1.2</div>
+<div id="versionLabel">Ver 2.1.3</div>
 
 <audio id="bgm" src="bgm.mp3" loop></audio>
 <audio id="se_correct" src="correct.mp3"></audio>
@@ -319,7 +328,7 @@ a{color:#00ffcc}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import { getFirestore, collection, doc, setDoc, getDoc, getDocs, query, where, limit, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDVXvWTGetf41ajd0KDwNPG-dH8pmsMIt8",
@@ -345,15 +354,25 @@ onAuthStateChanged(auth,user=>{
 
 window.loginGoogle = async function(){
   try{
-    const result = await signInWithPopup(auth,provider);
-    window.currentUser = result.user;
-    alert("Googleログイン成功：" + result.user.displayName);
-    if(window.refreshLoginStatus) window.refreshLoginStatus();
+    // iPhone/Safariではポップアップが失敗することがあるので、まずredirect方式を使う
+    await signInWithRedirect(auth,provider);
   }catch(e){
     console.error(e);
-    alert("Googleログイン失敗：" + e.code);
+    alert("Googleログイン開始に失敗：" + e.code);
   }
 };
+
+getRedirectResult(auth)
+  .then((result)=>{
+    if(result && result.user){
+      window.currentUser = result.user;
+      alert("Googleログイン成功：" + result.user.displayName);
+      if(window.refreshLoginStatus) window.refreshLoginStatus();
+    }
+  })
+  .catch((e)=>{
+    console.error(e);
+  });
 
 window.logoutGoogle = async function(){
   await signOut(auth);
