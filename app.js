@@ -1,5 +1,5 @@
 
-const VERSION = "2.2.3";
+const VERSION = "2.2.4";
 
 let enemyHP = 10;
 let playerHP = 5;
@@ -161,7 +161,7 @@ window.addEventListener("load",()=>{
 
 
 function panelBackButtonHTML(){
-  return `<button id="panelBackTop" class="panelBackBtn" onclick="closePanelPage()">← ホームメニューへ</button>`;
+  return `<button id="panelBackTop" class="commonNavBtn" onclick="closePanelPage()">← ホームメニューへ</button>`;
 }
 function ensurePanelBackButton(){
   const panel=document.getElementById("panelArea");
@@ -171,24 +171,57 @@ function ensurePanelBackButton(){
 }
 
 
-function homeButtonHTML(){
-  return `<button id="alwaysHomeBtn" class="alwaysHomeBtn" onclick="goHomeFromAnywhere()">🏠 ホームへ</button>`;
+
+
+
+
+
+
+
+
+
+function commonNavHTML(){
+  return `
+    <div id="commonNav" class="commonNav">
+      <button onclick="goBackPanel()">← 戻る</button>
+      <button onclick="goHomeFromAnywhere()">🏠 ホームへ</button>
+    </div>
+  `;
+}
+
+let panelHistoryStack=[];
+
+function pushPanelHistory(fnName){
+  if(!panelHistoryStack.length || panelHistoryStack[panelHistoryStack.length-1]!==fnName){
+    panelHistoryStack.push(fnName);
+  }
+}
+
+function goBackPanel(){
+  if(panelHistoryStack.length<=1){
+    goHomeFromAnywhere();
+    return;
+  }
+
+  panelHistoryStack.pop();
+  const prev=panelHistoryStack.pop();
+  openPanelPage(prev);
 }
 
 function ensureHomeButton(){
   const homeActive=document.getElementById("homeScreen")?.classList.contains("active");
   const gameActive=document.getElementById("gameScreen")?.classList.contains("active");
 
-  if(homeActive || gameActive) return;
+  if(gameActive) return;
 
   const panel=document.getElementById("panelArea");
-  if(panel && panel.innerHTML.trim() && !document.getElementById("alwaysHomeBtn")){
-    panel.insertAdjacentHTML("afterbegin", homeButtonHTML());
+  if(homeActive && panel && panel.innerHTML.trim() && !document.getElementById("commonNav")){
+    panel.insertAdjacentHTML("afterbegin", commonNavHTML());
   }
 
   const result=document.getElementById("resultScreen");
-  if(result && result.classList.contains("active") && !document.getElementById("alwaysHomeBtn")){
-    result.insertAdjacentHTML("afterbegin", homeButtonHTML());
+  if(result && result.classList.contains("active") && !document.getElementById("commonNav")){
+    result.insertAdjacentHTML("afterbegin", commonNavHTML());
   }
 }
 
@@ -208,14 +241,15 @@ function goHomeFromAnywhere(){
   const menu=document.getElementById("homeMenu");
   if(menu)menu.classList.remove("hidden");
 
+  panelHistoryStack=[];
   setInputVisible(true);
   updateHomeStatus();
 }
 
-function setPanelWithHome(html){
+function setPanelWithNav(html){
   const panel=document.getElementById("panelArea");
   if(!panel)return;
-  panel.innerHTML=homeButtonHTML()+html;
+  panel.innerHTML=commonNavHTML()+html;
 }
 
 function openPanelPage(fnName){
@@ -223,6 +257,7 @@ function openPanelPage(fnName){
   const panel=document.getElementById("panelArea");
   if(menu)menu.classList.add("hidden");
   if(panel)panel.innerHTML="";
+  pushPanelHistory(fnName);
   eval(fnName+"()");
   setTimeout(ensureHomeButton,0);
   setTimeout(ensureHomeButton,300);
@@ -2000,7 +2035,7 @@ function showOtherMenu(){
     <button class="modeBtn" onclick="showDailyMission()">🎯 デイリーミッション</button>
     <button class="modeBtn" onclick="showLoginCalendar()">📅 ログボカレンダー</button>
     <button class="modeBtn" onclick="showSettings()">⚙️ 設定</button>
-    <button class="modeBtn" onclick="showContact()">📩 お問い合わせ</button><button class="modeBtn" onclick="showImprovementIdeas()">💡 改善候補</button>
+    <button class="modeBtn" onclick="showContact()">📩 お問い合わせ</button>
   `;
 }
 
@@ -2663,20 +2698,7 @@ async function testFirestoreConnection(){
 setInterval(ensureHomeButton,1500);
 
 
-function showImprovementIdeas(){
-  document.getElementById("panelArea").innerHTML=`
-    <h2>💡 次の改善候補</h2>
-    <div class="guideItem">
-      <h3>おすすめ順</h3>
-      <p>① 対戦の途中退出表示</p>
-      <p>② 対戦履歴の勝率表示</p>
-      <p>③ ジャンル別正答率</p>
-      <p>④ デイリーミッション報酬強化</p>
-      <p>⑤ ガチャ図鑑の未入手だけ表示</p>
-    </div>
-  `;
-  ensureHomeButton();
-}
+
 
 
 function getModeLabel(m){
