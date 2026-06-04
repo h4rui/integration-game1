@@ -1,5 +1,5 @@
 
-const VERSION = "2.4.0";
+const VERSION = "2.5.0";
 
 let enemyHP = 10;
 let playerHP = 5;
@@ -135,6 +135,7 @@ function loadAllData(){
   if(!playerData.loginStampedDays)playerData.loginStampedDays=[];
   if(!playerData.coins)playerData.coins=0;
   if(!playerData.bgTheme)playerData.bgTheme="space";
+  if(!playerData.profileBg)playerData.profileBg="galaxy";
   if(!playerData.matchHistory)playerData.matchHistory=[];
   if(!playerData.genreStats)playerData.genreStats={};
   if(!playerData.loginBonusDay)playerData.loginBonusDay=1;
@@ -923,35 +924,156 @@ ${themeButtonsHTML()}
   `;
   refreshLoginStatus();
 }
+
+function getProfileBg(){
+  return playerData.profileBg || "galaxy";
+}
+function setProfileBg(bg){
+  playerData.profileBg=bg;
+  saveAllData();
+  showProfile();
+}
+function profileBgName(bg){
+  return {
+    galaxy:"🌌 銀河",
+    lightning:"⚡️ 稲妻",
+    gold:"👑 王座",
+    rainbow:"🌈 虹",
+    ice:"❄️ 氷",
+    fire:"🔥 炎",
+    formula:"📚 数式"
+  }[bg] || bg;
+}
+function profileBgButtonsHTML(){
+  const list=["galaxy","lightning","gold","rainbow","ice","fire","formula"];
+  let html=`<div class="profileBgSelector"><h3>🎨 プロフィール背景</h3><p>現在：${profileBgName(getProfileBg())}</p>`;
+  for(const bg of list){
+    html+=`<button class="profileBgBtn" onclick="setProfileBg('${bg}')">${profileBgName(bg)}</button>`;
+  }
+  html+=`</div>`;
+  return html;
+}
+function getWinRateText(){
+  const h=playerData.matchHistory||[];
+  const wins=h.filter(x=>x.result==="win").length;
+  const losses=h.filter(x=>x.result==="loss").length;
+  const total=wins+losses;
+  return total ? Math.round(wins/total*100)+"%" : "0%";
+}
+function getAccuracyText(){
+  const total=playerData.totalQuestions||0;
+  const correct=playerData.totalCorrect||0;
+  return total ? Math.round(correct/total*100)+"%" : "0%";
+}
+function getExpPercent(){
+  const level=getLevel();
+  const currentExp=playerData.exp||0;
+  const need=level*100;
+  return Math.min(100,Math.round((currentExp%need)/need*100));
+}
 function showProfile(){
-  let playMin=Math.floor((playerData.playTime||0)/60);
-  document.getElementById("panelArea").innerHTML=`
+  const name=playerProfile.name||"名無し";
+  const title=playerData.equippedTitle||"初心者";
+  const icon=playerProfile.icon||"";
+  const level=getLevel();
+  const exp=playerData.exp||0;
+  const rate=playerData.rating||1000;
+  const coin=playerData.coins||0;
+  const total=playerData.totalQuestions||0;
+  const maxCombo=playerData.maxCombo||0;
+  const achievements=(playerData.achievements||[]).length;
+  const percent=getExpPercent();
+
+  let html=`
     <h2>👤 プロフィール</h2>
-    <div class="profileItem">
-      <img src="${playerProfile.icon||""}" class="rankIcon">
-      <br>
-      <input id="playerNameEdit" placeholder="名前" value="${playerProfile.name||"名無し"}">
-      <br>
-      <input type="file" id="iconInputEdit" accept="image/*">
-      <br>
-      <button onclick="saveProfileFromPanel()">保存</button>
+    <div class="profileHero bg-${getProfileBg()}">
+      <div class="profileTop">
+        <div class="profileAvatarWrap">
+          ${icon?`<img class="profileAvatar" src="${icon}">`:`<div class="profileAvatar"></div>`}
+        </div>
+        <div>
+          <div class="profileName">${name}</div>
+          <div class="profileTitle">${titleHTML(title)}</div>
+          <div class="profileLv">Lv.${level}</div>
+          <div class="profileExpBar"><div class="profileExpFill" style="width:${percent}%"></div></div>
+          <div>EXP ${exp}</div>
+        </div>
+      </div>
+
+      <div class="profileStatsGrid">
+        <div class="profileStat">📚 総回答数 <b>${total}問</b></div>
+        <div class="profileStat">🎯 正答率 <b>${getAccuracyText()}</b></div>
+        <div class="profileStat">⚔️ 対戦勝率 <b>${getWinRateText()}</b></div>
+        <div class="profileStat">🔥 最高連続正解 <b>${maxCombo}問</b></div>
+        <div class="profileStat">🏆 レート <b>${rate}</b></div>
+        <div class="profileStat">🪙 コイン <b>${coin}</b></div>
+        <div class="profileStat">🏅 実績 <b>${achievements}個</b></div>
+        <div class="profileStat">🎨 背景 <b>${profileBgName(getProfileBg())}</b></div>
+      </div>
     </div>
 
-    <div class="profileItem">
-      <p>称号：${titleHTML(playerData.equippedTitle||"初心者")}</p>
-      <p>Lv：${getLevel()}</p>
-      <p>EXP：${getExpPercent()}/100</p>
-      <p>正答率：${getCorrectRate()}%</p>
-      <p>所持コイン：${playerData.coins||0}</p>
-      <p>累計正解数：${playerData.totalCorrect||0}問</p>
-      <p>累計問題数：${playerData.totalQuestions||0}問</p>
-      <p>プレイ時間：約${playMin}分</p>
-      <p>最大連勝：${playerData.maxCombo||0}</p>
-      <p>ベストスコア：${playerData.bestRandomScore||0}問</p>
-      <p>フレンドID：${window.getMyPlayerId?window.getMyPlayerId():"未取得"}</p>
+    <div class="equipTitles">
+      <h3>装備中の称号</h3>
+      <div class="equipTitleGrid">
+        <div class="equipTitleItem">${titleHTML(title)}</div>
+        <div class="equipTitleItem">🏆 Season1 TOP100</div>
+        <div class="equipTitleItem">📚 積分マスター</div>
+        <div class="equipTitleItem">🔥 連続正解 ${maxCombo}</div>
+      </div>
+    </div>
+
+    ${profileBgButtonsHTML()}
+
+    <div class="profileBgSelector">
+      <h3>プロフィール編集</h3>
+      <input id="nameInput" placeholder="名前" value="${name}">
+      <button onclick="saveProfileName()">名前を保存</button>
+      <button onclick="showTitles()">称号を変更</button>
+      <button onclick="showMatchHistory()">対戦履歴</button>
+      <button onclick="showStatsPage()">成績を見る</button>
     </div>
   `;
+
+  document.getElementById("panelArea").innerHTML=html;
+  if(typeof ensureHomeButton==="function")ensureHomeButton();
 }
+function saveProfileName(){
+  const v=document.getElementById("nameInput").value.trim();
+  if(!v){alert("名前を入力して");return;}
+  playerProfile.name=v;
+  saveAllData();
+  updateHomeStatus();
+  showProfile();
+}
+function showOpponentProfile(data){
+  const name=data.name||data.hostName||data.guestName||"相手";
+  const title=data.title||data.hostTitle||data.guestTitle||"初心者";
+  const level=data.level||1;
+  const rate=data.rating||1000;
+  const winRate=data.winRate||"---";
+  const accuracy=data.accuracy||"---";
+  document.getElementById("panelArea").innerHTML=`
+    <h2>相手プロフィール</h2>
+    <div class="profileHero bg-gold">
+      <div class="profileTop">
+        <div class="profileAvatarWrap"><div class="profileAvatar"></div></div>
+        <div>
+          <div class="profileName">${name}</div>
+          <div class="profileTitle">${titleHTML(title)}</div>
+          <div class="profileLv">Lv.${level}</div>
+        </div>
+      </div>
+      <div class="profileStatsGrid">
+        <div class="profileStat">🏆 レート <b>${rate}</b></div>
+        <div class="profileStat">⚔️ 勝率 <b>${winRate}</b></div>
+        <div class="profileStat">🎯 正答率 <b>${accuracy}</b></div>
+        <div class="profileStat">🏅 称号 <b>${title}</b></div>
+      </div>
+    </div>
+  `;
+  if(typeof ensureHomeButton==="function")ensureHomeButton();
+}
+
 function saveProfileFromPanel(){
   let name=document.getElementById("playerNameEdit").value.trim();
   let file=document.getElementById("iconInputEdit").files[0];
@@ -2530,7 +2652,7 @@ function showMatchHistory(){
           スコア：${h.score}<br>
           ${h.reason?`理由：${h.reason}<br>`:""}
           ${h.beforeRate!==null && h.beforeRate!==undefined?`レート：${h.beforeRate} → ${h.afterRate}<br>`:""}
-          ${h.date}
+          ${h.date}<br><button onclick="showOpponentProfile({name:\`${h.opponent}\`,title:\`初心者\`})">相手を見る</button>
         </div>
       `;
     }

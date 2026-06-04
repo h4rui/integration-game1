@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5681066295421790"
 crossorigin="anonymous"></script>
-<title>数学マスター Ver 2.4.0</title>
+<title>数学マスター Ver 2.5.0</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 body{
@@ -296,7 +296,7 @@ a{color:#00ffcc}
   padding:9px 14px;
 }
 
-/* Ver 2.4.0 Space UI */
+/* Ver 2.5.0 Space UI */
 body{
   margin:0;
   color:white;
@@ -349,7 +349,7 @@ body{
   text-shadow:0 0 8px #60a5fa,0 0 18px #7c3aed,0 0 32px #38bdf8;
 }
 #homeScreen h1::after{
-  content:"Ver 2.4.0";display:block;font-size:18px;color:#67e8f9;margin-top:6px;text-shadow:0 0 10px #22d3ee;
+  content:"Ver 2.5.0";display:block;font-size:18px;color:#67e8f9;margin-top:6px;text-shadow:0 0 10px #22d3ee;
 }
 #homePlayerCard{
   width:88%;max-width:780px;margin:18px auto 22px;padding:18px;
@@ -409,7 +409,7 @@ body{
 }
 
 
-/* Ver 2.4.0 additions */
+/* Ver 2.5.0 additions */
 #homePlayerName{
   font-size:26px;
   font-weight:900;
@@ -486,6 +486,173 @@ body{
   max-width:760px;
   text-align:left;
   box-shadow:0 0 14px rgba(56,189,248,.15);
+}
+
+
+/* Ver 2.5.0 Profile Card UI */
+.profileHero{
+  width:92%;
+  max-width:900px;
+  margin:14px auto;
+  border-radius:24px;
+  padding:18px;
+  position:relative;
+  overflow:hidden;
+  border:1px solid rgba(125,211,252,.7);
+  background:linear-gradient(135deg,rgba(15,23,42,.88),rgba(30,27,75,.8));
+  box-shadow:0 0 24px rgba(56,189,248,.35), inset 0 0 38px rgba(99,102,241,.18);
+}
+.profileHero::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(circle at 20% 20%,rgba(168,85,247,.55),transparent 25%),
+    radial-gradient(circle at 85% 10%,rgba(56,189,248,.35),transparent 26%),
+    linear-gradient(135deg,transparent,rgba(255,255,255,.08));
+  opacity:.9;
+  z-index:0;
+}
+.profileHero > *{position:relative;z-index:1}
+.profileTop{
+  display:grid;
+  grid-template-columns:130px 1fr;
+  gap:18px;
+  align-items:center;
+  text-align:left;
+}
+.profileAvatarWrap{
+  width:124px;
+  height:124px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:radial-gradient(circle,#172554,#020617);
+  border:4px solid #facc15;
+  box-shadow:0 0 18px rgba(250,204,21,.9),0 0 36px rgba(168,85,247,.55);
+  position:relative;
+}
+.profileAvatarWrap::after{
+  content:"◆";
+  position:absolute;
+  bottom:-12px;
+  color:#c084fc;
+  text-shadow:0 0 10px #c084fc;
+  font-size:30px;
+}
+.profileAvatar{
+  width:112px;
+  height:112px;
+  border-radius:50%;
+  object-fit:cover;
+}
+.profileName{
+  font-size:36px;
+  font-weight:900;
+  text-shadow:0 0 12px #38bdf8;
+}
+.profileTitle{
+  font-size:25px;
+  margin-top:8px;
+}
+.profileLv{
+  font-size:28px;
+  font-weight:900;
+  margin-top:14px;
+}
+.profileExpBar{
+  height:14px;
+  width:100%;
+  max-width:310px;
+  background:rgba(255,255,255,.15);
+  border:1px solid rgba(255,255,255,.25);
+  border-radius:999px;
+  overflow:hidden;
+  margin-top:8px;
+}
+.profileExpFill{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,#a855f7,#22d3ee);
+  box-shadow:0 0 15px #22d3ee;
+}
+.profileStatsGrid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+  margin:16px auto 0;
+}
+.profileStat{
+  background:rgba(0,0,0,.35);
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:14px;
+  padding:12px;
+  text-align:center;
+}
+.profileStat b{
+  display:block;
+  font-size:22px;
+  margin-top:5px;
+}
+.equipTitles{
+  width:92%;
+  max-width:900px;
+  margin:14px auto;
+  padding:16px;
+  border-radius:20px;
+  background:rgba(15,23,42,.72);
+  border:1px solid rgba(56,189,248,.35);
+  box-shadow:0 0 18px rgba(56,189,248,.18);
+}
+.equipTitleGrid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+}
+.equipTitleItem{
+  padding:12px;
+  border-radius:14px;
+  background:linear-gradient(135deg,rgba(30,41,59,.8),rgba(15,23,42,.8));
+  border:1px solid rgba(255,255,255,.18);
+  text-align:center;
+  font-weight:800;
+}
+.profileBgSelector{
+  width:92%;
+  max-width:900px;
+  margin:14px auto;
+  padding:16px;
+  border-radius:20px;
+  background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.2);
+}
+.profileBgBtn{
+  width:46%;
+  margin:6px;
+  padding:10px;
+  border-radius:12px;
+  font-size:16px;
+}
+.profileHero.bg-galaxy{border-color:#a78bfa}
+.profileHero.bg-lightning{border-color:#facc15;box-shadow:0 0 32px rgba(250,204,21,.45)}
+.profileHero.bg-lightning::before{background:radial-gradient(circle at 20% 20%,rgba(250,204,21,.5),transparent 25%),linear-gradient(135deg,rgba(30,27,75,.85),rgba(0,0,0,.55))}
+.profileHero.bg-gold{border-color:#f59e0b;box-shadow:0 0 34px rgba(245,158,11,.5)}
+.profileHero.bg-gold::before{background:radial-gradient(circle at 70% 20%,rgba(250,204,21,.65),transparent 28%),linear-gradient(135deg,rgba(59,37,0,.85),rgba(12,8,0,.55))}
+.profileHero.bg-rainbow{border-color:#fff;box-shadow:0 0 34px rgba(236,72,153,.45)}
+.profileHero.bg-rainbow::before{background:linear-gradient(120deg,rgba(239,68,68,.45),rgba(245,158,11,.35),rgba(34,197,94,.35),rgba(6,182,212,.35),rgba(168,85,247,.45));background-size:300% 300%;animation:rainbowBg 9s ease infinite}
+.profileHero.bg-ice{border-color:#7dd3fc}
+.profileHero.bg-ice::before{background:radial-gradient(circle at 60% 20%,rgba(125,211,252,.65),transparent 28%),linear-gradient(135deg,rgba(8,47,73,.85),rgba(2,6,23,.6))}
+.profileHero.bg-fire{border-color:#fb7185}
+.profileHero.bg-fire::before{background:radial-gradient(circle at 60% 20%,rgba(239,68,68,.65),transparent 28%),linear-gradient(135deg,rgba(69,10,10,.85),rgba(2,6,23,.6))}
+.profileHero.bg-formula{border-color:#22d3ee}
+.profileHero.bg-formula::before{background:radial-gradient(circle at 20% 20%,rgba(34,211,238,.4),transparent 25%),repeating-linear-gradient(45deg,rgba(255,255,255,.07) 0 1px,transparent 1px 18px)}
+@media(max-width:560px){
+  .profileTop{grid-template-columns:1fr;text-align:center}
+  .profileAvatarWrap{margin:auto}
+  .profileName{font-size:32px}
+  .profileStatsGrid{grid-template-columns:1fr}
+  .equipTitleGrid{grid-template-columns:1fr}
 }
 
 </style>
