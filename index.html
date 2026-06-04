@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5681066295421790"
 crossorigin="anonymous"></script>
-<title>数学マスター Ver 2.2.0</title>
+<title>数学マスター Ver 2.2.1</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 body{
@@ -344,7 +344,7 @@ h4rui.github.io
 </div>
 
 <div id="levelUpArea"></div>
-<div id="versionLabel">Ver 2.2.0</div>
+<div id="versionLabel">Ver 2.2.1</div>
 
 <audio id="bgm" src="bgm.mp3" loop></audio>
 <audio id="se_correct" src="correct.mp3"></audio>
@@ -538,45 +538,9 @@ window.loadFriendData = async function(friendId){
   return snap.data();
 };
 
-window.createMatchRoom = async function(data){
-  const roomId = Math.random().toString(36).slice(2,8).toUpperCase();
-  await setDoc(doc(db,"matches",roomId),{
-    roomId,
-    type:data.type,
-    status:"waiting",
-    hostId:getPlayerId(),
-    hostName:data.name,
-    hostTitle:data.title,
-    guestId:"",
-    guestName:"",
-    guestTitle:"",
-    hostPoints:0,
-    guestPoints:0,
-    round:0,
-    currentQuestion:data.questions[0],
-    questions:data.questions,
-    roundWinner:"",
-    winner:"",
-    updatedAt:serverTimestamp()
-  });
-  return roomId;
-};
 
-window.joinMatchRoom = async function(roomId,data){
-  const ref = doc(db,"matches",roomId);
-  const snap = await getDoc(ref);
-  if(!snap.exists()) throw new Error("room-not-found");
-  const room = snap.data();
-  if(room.status !== "waiting" && !room.guestId) throw new Error("room-not-waiting");
-  await updateDoc(ref,{
-    status:"playing",
-    guestId:getPlayerId(),
-    guestName:data.name,
-    guestTitle:data.title,
-    updatedAt:serverTimestamp()
-  });
-  return room;
-};
+
+
 
 window.loadMatchRoom = async function(roomId){
   const snap = await getDoc(doc(db,"matches",roomId));
@@ -672,15 +636,24 @@ window.loadRateRanking = async function(){
 };
 
 
+
+
+
+
+
+
+
+
+
 window.loadOpenMatchRooms = async function(){
-  const q = query(
+  const qOpen = query(
     collection(db,"matches"),
     where("type","==","online"),
     where("status","==","waiting"),
     limit(30)
   );
 
-  const snap = await getDocs(q);
+  const snap = await getDocs(qOpen);
   let list=[];
   const myId=getPlayerId();
 
@@ -693,6 +666,34 @@ window.loadOpenMatchRooms = async function(){
 
   list.sort((a,b)=>(b.createdAtText||"").localeCompare(a.createdAtText||""));
   return list;
+};
+
+window.createMatchRoom = async function(data){
+  const roomId = Math.random().toString(36).slice(2,8).toUpperCase();
+
+  await setDoc(doc(db,"matches",roomId),{
+    roomId:roomId,
+    type:data.type || "online",
+    status:"waiting",
+    hostId:getPlayerId(),
+    hostName:data.name || "名無し",
+    hostTitle:data.title || "初心者",
+    hostRate:data.rate || 1000,
+    guestId:"",
+    guestName:"",
+    guestTitle:"",
+    hostPoints:0,
+    guestPoints:0,
+    round:0,
+    currentQuestion:data.questions[0],
+    questions:data.questions,
+    roundWinner:"",
+    winner:"",
+    createdAtText:new Date().toISOString(),
+    updatedAt:serverTimestamp()
+  });
+
+  return roomId;
 };
 
 window.joinMatchRoom = async function(roomId,data){
@@ -711,8 +712,8 @@ window.joinMatchRoom = async function(roomId,data){
   await updateDoc(ref,{
     status:"playing",
     guestId:myId,
-    guestName:data.name,
-    guestTitle:data.title,
+    guestName:data.name || "名無し",
+    guestTitle:data.title || "初心者",
     updatedAt:serverTimestamp()
   });
 
@@ -724,6 +725,7 @@ window.cancelMatchRoom = async function(roomId){
   const ref = doc(db,"matches",roomId);
   const snap = await getDoc(ref);
   if(!snap.exists()) return;
+
   const room=snap.data();
   if(room.hostId !== getPlayerId()) throw new Error("not-host");
 
@@ -731,31 +733,6 @@ window.cancelMatchRoom = async function(roomId){
     status:"canceled",
     updatedAt:serverTimestamp()
   });
-};
-
-window.createMatchRoom = async function(data){
-  const roomId = Math.random().toString(36).slice(2,8).toUpperCase();
-  await setDoc(doc(db,"matches",roomId),{
-    roomId,
-    type:data.type,
-    status:"waiting",
-    hostId:getPlayerId(),
-    hostName:data.name,
-    hostTitle:data.title,
-    guestId:"",
-    guestName:"",
-    guestTitle:"",
-    hostPoints:0,
-    guestPoints:0,
-    round:0,
-    currentQuestion:data.questions[0],
-    questions:data.questions,
-    roundWinner:"",
-    winner:"",
-    createdAtText:new Date().toISOString(),
-    updatedAt:serverTimestamp()
-  });
-  return roomId;
 };
 
 </script>

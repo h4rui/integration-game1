@@ -1,5 +1,5 @@
 
-const VERSION = "2.2.0";
+const VERSION = "2.2.1";
 
 let enemyHP = 10;
 let playerHP = 5;
@@ -831,7 +831,7 @@ function showSettings(){
     </div>
     <div class="settingsItem">
       <button onclick="loginGoogle()">Googleログイン</button>
-      <button onclick="logoutGoogle()">ログアウト</button><button onclick="checkGoogleLoginStatus()">ログイン状態確認</button>
+      <button onclick="logoutGoogle()">ログアウト</button><button onclick="checkGoogleLoginStatus()">ログイン状態確認</button><button onclick="testFirestoreConnection()">Firestore接続確認</button>
       <p id="loginStatus">確認中...</p>
     </div>
   `;
@@ -2034,14 +2034,16 @@ async function joinFriendMatch(){
   await joinMatch(id,"friend");
 }
 
+
 async function createMatch(type){
   try{
     let questions=makeMatchQuestions();
     let roomId=await createMatchRoom({
-      type,
+      type:type,
       name:playerProfile.name||"名無し",
       title:playerData.equippedTitle||"初心者",
-      questions
+      rate:playerData.rating||1000,
+      questions:questions
     });
 
     matchState.active=true;
@@ -2054,10 +2056,11 @@ async function createMatch(type){
     showMatchWaiting(roomId,type);
     startMatchPolling();
   }catch(e){
-    alert("ルーム作成に失敗しました");
-    console.log(e);
+    alert("ルーム作成に失敗しました：" + (e.code || e.message || e));
+    console.error(e);
   }
 }
+
 
 async function joinMatch(roomId,type){
   if(!roomId){
@@ -2310,44 +2313,7 @@ function clearHint(){
   if(area)area.innerHTML="";
 }
 
-async function showOnlineMatchMenu(){
-  const box=document.getElementById("panelArea");
-  box.innerHTML=`
-    <h2>⚔️ ランダムマッチ</h2>
-    <div class="matchBox">
-      <p>募集中の部屋から参加できます。</p>
-      <p>先に1問正解で1ポイント。3ポイント先取で勝ち。</p>
-      <button onclick="createOnlineMatch()">新しく募集する</button>
-      <button onclick="showOnlineMatchMenu()">更新</button>
-    </div>
-    <h3>募集中一覧</h3>
-    <div id="openRoomList">読み込み中...</div>
-  `;
 
-  try{
-    const rooms=await loadOpenMatchRooms();
-    let html="";
-
-    if(!rooms.length){
-      html="<p>現在募集中の部屋はありません。</p>";
-    }
-
-    for(const r of rooms){
-      html+=`
-        <div class="openRoomItem">
-          <b>${r.hostName||"名無し"}</b><br>
-          ${titleHTML(r.hostTitle||"初心者")}<br>
-          レート：${r.hostRate||1000}<br>
-          <button onclick="joinOpenOnlineMatch('${r.roomId}')">参加する</button>
-        </div>
-      `;
-    }
-
-    document.getElementById("openRoomList").innerHTML=html;
-  }catch(e){
-    document.getElementById("openRoomList").innerHTML="<p>募集中一覧の取得に失敗しました。</p>";
-  }
-}
 
 async function joinOpenOnlineMatch(roomId){
   await joinMatch(roomId,"online");
@@ -2523,4 +2489,61 @@ async function finishMatch(room){
   `;
 
   document.getElementById("resultList").innerHTML="";
+}
+
+
+async function showOnlineMatchMenu(){
+  const box=document.getElementById("panelArea");
+  box.innerHTML=`
+    <h2>⚔️ ランダムマッチ</h2>
+    <div class="matchBox">
+      <p>募集中の部屋から参加できます。</p>
+      <p>先に1問正解で1ポイント。3ポイント先取で勝ち。</p>
+      <button onclick="createOnlineMatch()">新しく募集する</button>
+      <button onclick="showOnlineMatchMenu()">更新</button>
+    </div>
+    <h3>募集中一覧</h3>
+    <div id="openRoomList">読み込み中...</div>
+  `;
+
+  try{
+    const rooms=await loadOpenMatchRooms();
+    let html="";
+
+    if(!rooms.length){
+      html="<p>現在募集中の部屋はありません。</p>";
+    }
+
+    for(const r of rooms){
+      html+=`
+        <div class="openRoomItem">
+          <b>${r.hostName||"名無し"}</b><br>
+          ${titleHTML(r.hostTitle||"初心者")}<br>
+          レート：${r.hostRate||1000}<br>
+          <button onclick="joinOpenOnlineMatch('${r.roomId}')">参加する</button>
+        </div>
+      `;
+    }
+
+    document.getElementById("openRoomList").innerHTML=html;
+  }catch(e){
+    console.error(e);
+    document.getElementById("openRoomList").innerHTML=`<p>募集中一覧の取得に失敗しました。<br>${e.code || e.message || e}</p>`;
+  }
+}
+
+async function testFirestoreConnection(){
+  try{
+    const roomId=await createMatchRoom({
+      type:"test",
+      name:"接続テスト",
+      title:"テスト",
+      questions:[{q:"1+1",a:"2",display:"2",explanation:"テスト"}]
+    });
+    await cancelMatchRoom(roomId);
+    alert("Firestore接続OK");
+  }catch(e){
+    alert("Firestore接続NG：" + (e.code || e.message || e));
+    console.error(e);
+  }
 }
