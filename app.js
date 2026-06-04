@@ -1,5 +1,5 @@
 
-const VERSION = "2.1.0";
+const VERSION = "2.1.2";
 
 let enemyHP = 10;
 let playerHP = 5;
@@ -150,17 +150,26 @@ function saveAllData(){
 }
 window.addEventListener("load",loadAllData);
 
+
+function panelBackButtonHTML(){
+  return `<button id="panelBackTop" class="panelBackBtn" onclick="closePanelPage()">← ホームメニューへ</button>`;
+}
+function ensurePanelBackButton(){
+  const panel=document.getElementById("panelArea");
+  if(panel && !document.getElementById("panelBackTop")){
+    panel.insertAdjacentHTML("afterbegin", panelBackButtonHTML());
+  }
+}
+
 function openPanelPage(fnName){
   const menu=document.getElementById("homeMenu");
   const panel=document.getElementById("panelArea");
   if(menu)menu.classList.add("hidden");
   if(panel)panel.innerHTML="";
   eval(fnName+"()");
-  setTimeout(()=>{
-    if(panel && !document.getElementById("panelBackTop")){
-      panel.insertAdjacentHTML("afterbegin",`<button id="panelBackTop" class="panelBackBtn" onclick="closePanelPage()">← ホームメニューへ</button>`);
-    }
-  },0);
+  setTimeout(ensurePanelBackButton,0);
+  setTimeout(ensurePanelBackButton,500);
+  setTimeout(ensurePanelBackButton,1200);
 }
 function closePanelPage(){
   const menu=document.getElementById("homeMenu");
@@ -1784,8 +1793,10 @@ async function showWorldRanking(){
       html+=`<div class="rankItem">${i+1}位 ${ranking[i].icon?`<img class="rankIcon" src="${ranking[i].icon}">`:""}${ranking[i].name}<br>${titleHTML(ranking[i].title||"初心者")}<br>Lv${ranking[i].level||1}<br>${ranking[i].score}問</div>`;
     }
     box.innerHTML=html;
+    ensurePanelBackButton();
   }catch(e){
     box.innerHTML="<p>ランキング取得失敗</p>";
+    ensurePanelBackButton();
   }
 }
 
@@ -1830,14 +1841,25 @@ function backHomeFromResult(){
 }
 
 
+
 function showRankingMenu(){
   document.getElementById("panelArea").innerHTML=`
-    <h2>🏆 ランキング・対戦</h2>
+    <h2>🏆 ランキング</h2>
     <button class="modeBtn" onclick="showWorldRanking()">🌍 週間ランキング</button>
     <button class="modeBtn" onclick="showFriendRanking()">🤝 フレンドランキング</button>
     <button class="modeBtn" onclick="showRateRanking()">🏅 レートランキング</button>
-    <button class="modeBtn" onclick="showOnlineMatchMenu()">⚔️ オンラインマッチ</button>
+  `;
+}
+
+function showMatchMenu(){
+  document.getElementById("panelArea").innerHTML=`
+    <h2>⚔️ 対戦</h2>
+    <button class="modeBtn" onclick="showOnlineMatchMenu()">⚔️ ランダムマッチ</button>
     <button class="modeBtn" onclick="showFriendMatchMenu()">🤝 フレンドマッチ</button>
+    <div class="matchBox">
+      <p>対戦ルール：1問先に正解した方が1ポイント。</p>
+      <p>先に3ポイント取った方が勝ち。</p>
+    </div>
   `;
 }
 
@@ -1883,14 +1905,16 @@ async function showRateRanking(){
       `;
     }
     box.innerHTML=html;
+    ensurePanelBackButton();
   }catch(e){
     box.innerHTML="<p>レートランキング取得失敗</p>";
+    ensurePanelBackButton();
   }
 }
 
 function showOnlineMatchMenu(){
   document.getElementById("panelArea").innerHTML=`
-    <h2>⚔️ オンラインマッチ</h2>
+    <h2>⚔️ ランダムマッチ</h2>
     <div class="matchBox">
       <p>先に3ポイント取った方が勝ち。</p>
       <p>1問先に正解した方が1ポイント。</p>
@@ -1906,7 +1930,7 @@ function showFriendMatchMenu(){
   document.getElementById("panelArea").innerHTML=`
     <h2>🤝 フレンドマッチ</h2>
     <div class="matchBox">
-      <p>オンラインマッチと同じルール。</p>
+      <p>ランダムマッチと同じルール。</p>
       <p>レート変動なし。</p>
       <button onclick="createFriendMatch()">ルーム作成</button>
       <input id="joinRoomIdFriend" placeholder="ルームID">
@@ -2014,7 +2038,7 @@ function showMatchWaiting(roomId,type){
   document.getElementById("homeScreen").classList.add("active");
   document.getElementById("gameScreen").classList.remove("active");
   document.getElementById("panelArea").innerHTML=`
-    <h2>${type==="online"?"⚔️ オンラインマッチ":"🤝 フレンドマッチ"}</h2>
+    <h2>${type==="online"?"⚔️ ランダムマッチ":"🤝 フレンドマッチ"}</h2>
     <div class="matchBox">
       <h3>ルーム作成完了</h3>
       <p>ルームID</p>
@@ -2066,7 +2090,7 @@ function showMatchQuestion(room){
   setInputVisible(true);
 
   document.getElementById("modeTitle").innerText=
-    room.type==="online" ? "⚔️ オンラインマッチ" : "🤝 フレンドマッチ";
+    room.type==="online" ? "⚔️ ランダムマッチ" : "🤝 フレンドマッチ";
 
   enemyHP=9999;
   playerHP=1;
