@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5681066295421790"
 crossorigin="anonymous"></script>
-<title>数学マスター Ver 2.1.4</title>
+<title>数学マスター Ver 2.1.5</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 body{
@@ -318,7 +318,7 @@ h4rui.github.io
 </div>
 
 <div id="levelUpArea"></div>
-<div id="versionLabel">Ver 2.1.4</div>
+<div id="versionLabel">Ver 2.1.5</div>
 
 <audio id="bgm" src="bgm.mp3" loop></audio>
 <audio id="se_correct" src="correct.mp3"></audio>
@@ -331,7 +331,7 @@ import { getFirestore, collection, doc, setDoc, getDoc, getDocs, query, where, l
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDVXwXTGeFt41ajd0KDwNPG-dH8pmsMTt8",
+  apiKey: "AIzaSyDVXwXTGeft41ajd0KDwNPG-dH8pmsMIt8",
   authDomain: "math-master-3c4df.firebaseapp.com",
   projectId: "math-master-3c4df",
   storageBucket: "math-master-3c4df.firebasestorage.app",
@@ -360,6 +360,18 @@ window.loginGoogle = async function(){
     alert("Googleログイン開始に失敗：" + e.code);
   }
 };
+
+getRedirectResult(auth)
+  .then((result)=>{
+    if(result && result.user){
+      window.currentUser = result.user;
+      alert("Googleログイン成功：" + result.user.displayName);
+      if(window.refreshLoginStatus) window.refreshLoginStatus();
+    }
+  })
+  .catch((e)=>{
+    console.error(e);
+  });
 
 getRedirectResult(auth)
   .then((result)=>{
