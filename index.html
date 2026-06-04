@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5681066295421790"
 crossorigin="anonymous"></script>
-<title>数学マスター Ver 2.1.8</title>
+<title>数学マスター Ver 2.2.0</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 body{
@@ -234,6 +234,26 @@ a{color:#00ffcc}
 
 .loginOk{color:#00ff99;font-weight:bold;text-shadow:0 0 8px #00ff99}
 .loginNg{color:#ff7777;font-weight:bold}
+
+.openRoomItem{
+  background:rgba(255,255,255,.12);
+  margin:10px auto;
+  padding:12px;
+  border-radius:12px;
+  width:90%;
+  max-width:760px;
+  text-align:left;
+}
+.hintBox{
+  background:rgba(0,255,204,.12);
+  border:1px solid #00ffcc;
+  margin:10px auto;
+  padding:12px;
+  border-radius:12px;
+  width:90%;
+  max-width:760px;
+  font-size:18px;
+}
 </style>
 <!--
 Googleログイン用メモ:
@@ -312,6 +332,8 @@ h4rui.github.io
   </div>
 
   <button id="gameHomeBtn" onclick="backHome()">ホームへ</button>
+  <button id="hintBtn" onclick="showHint()">💡 ヒント</button>
+  <div id="hintArea"></div>
   <div id="result"></div>
 </div>
 
@@ -322,7 +344,7 @@ h4rui.github.io
 </div>
 
 <div id="levelUpArea"></div>
-<div id="versionLabel">Ver 2.1.8</div>
+<div id="versionLabel">Ver 2.2.0</div>
 
 <audio id="bgm" src="bgm.mp3" loop></audio>
 <audio id="se_correct" src="correct.mp3"></audio>
@@ -647,6 +669,93 @@ window.loadRateRanking = async function(){
   snap.forEach(d=>list.push(d.data()));
   list.sort((a,b)=>(b.rating||1000)-(a.rating||1000));
   return list.slice(0,100);
+};
+
+
+window.loadOpenMatchRooms = async function(){
+  const q = query(
+    collection(db,"matches"),
+    where("type","==","online"),
+    where("status","==","waiting"),
+    limit(30)
+  );
+
+  const snap = await getDocs(q);
+  let list=[];
+  const myId=getPlayerId();
+
+  snap.forEach(d=>{
+    const data=d.data();
+    if(!data.guestId && data.hostId !== myId){
+      list.push(data);
+    }
+  });
+
+  list.sort((a,b)=>(b.createdAtText||"").localeCompare(a.createdAtText||""));
+  return list;
+};
+
+window.joinMatchRoom = async function(roomId,data){
+  const ref = doc(db,"matches",roomId);
+  const snap = await getDoc(ref);
+
+  if(!snap.exists()) throw new Error("room-not-found");
+
+  const room = snap.data();
+  const myId = getPlayerId();
+
+  if(room.hostId === myId) throw new Error("own-room");
+  if(room.guestId) throw new Error("already-full");
+  if(room.status === "finished" || room.status === "canceled") throw new Error("room-closed");
+
+  await updateDoc(ref,{
+    status:"playing",
+    guestId:myId,
+    guestName:data.name,
+    guestTitle:data.title,
+    updatedAt:serverTimestamp()
+  });
+
+  const after = await getDoc(ref);
+  return after.data();
+};
+
+window.cancelMatchRoom = async function(roomId){
+  const ref = doc(db,"matches",roomId);
+  const snap = await getDoc(ref);
+  if(!snap.exists()) return;
+  const room=snap.data();
+  if(room.hostId !== getPlayerId()) throw new Error("not-host");
+
+  await updateDoc(ref,{
+    status:"canceled",
+    updatedAt:serverTimestamp()
+  });
+};
+
+window.createMatchRoom = async function(data){
+  const roomId = Math.random().toString(36).slice(2,8).toUpperCase();
+  await setDoc(doc(db,"matches",roomId),{
+    roomId,
+    type:data.type,
+    status:"waiting",
+    hostId:getPlayerId(),
+    hostName:data.name,
+    hostTitle:data.title,
+    guestId:"",
+    guestName:"",
+    guestTitle:"",
+    hostPoints:0,
+    guestPoints:0,
+    round:0,
+    currentQuestion:data.questions[0],
+    questions:data.questions,
+    roundWinner:"",
+    winner:"",
+    createdAtText:new Date().toISOString(),
+    updatedAt:serverTimestamp()
+  });
+  return roomId;
 };
 
 </script>

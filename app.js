@@ -1,5 +1,5 @@
 
-const VERSION = "2.1.8";
+const VERSION = "2.2.0";
 
 let enemyHP = 10;
 let playerHP = 5;
@@ -134,6 +134,7 @@ function loadAllData(){
   if(!playerData.gachaTitles)playerData.gachaTitles=[];
   if(!playerData.loginStampedDays)playerData.loginStampedDays=[];
   if(!playerData.coins)playerData.coins=0;
+  if(!playerData.matchHistory)playerData.matchHistory=[];
   if(!playerData.loginBonusDay)playerData.loginBonusDay=1;
   if(!playerData.lastCoinBonusDate)playerData.lastCoinBonusDate="";
   if(!playerData.exp)playerData.exp=0;
@@ -1578,6 +1579,7 @@ function expressionsEqual(user,correct){
   }
 }
 function nextQ(){
+  clearHint();
   let count=0;
 
   do{
@@ -1904,7 +1906,7 @@ function showMatchMenu(){
   document.getElementById("panelArea").innerHTML=`
     <h2>⚔️ 対戦</h2>
     <button class="modeBtn" onclick="showOnlineMatchMenu()">⚔️ ランダムマッチ</button>
-    <button class="modeBtn" onclick="showFriendMatchMenu()">🤝 フレンドマッチ</button>
+    <button class="modeBtn" onclick="showFriendMatchMenu()">🤝 フレンドマッチ</button><button class="modeBtn" onclick="showMatchHistory()">📜 対戦履歴</button>
     <div class="matchBox">
       <p>対戦ルール：1問先に正解した方が1ポイント。</p>
       <p>先に3ポイント取った方が勝ち。</p>
@@ -1919,7 +1921,7 @@ function showProfileMenu(){
     <button class="modeBtn" onclick="showTitles()">🏅 称号一覧</button>
     <button class="modeBtn" onclick="showAchievements()">🏆 実績一覧</button>
     <button class="modeBtn" onclick="showFriendMenu()">🤝 フレンド</button>
-    <button class="modeBtn" onclick="showReviewList()">📚 復習リスト</button>
+    <button class="modeBtn" onclick="showReviewList()">📚 復習リスト</button><button class="modeBtn" onclick="showMatchHistory()">📜 対戦履歴</button>
   `;
 }
 
@@ -2258,4 +2260,267 @@ function checkGoogleLoginStatus(){
   }else{
     alert("未ログインです");
   }
+}
+
+
+function getQuestionHint(q){
+  if(!q)return "問題をよく見て、使う公式を考えよう。";
+
+  const text=String(q.q||"");
+
+  if(text.includes("素因数分解")) return "2、3、5、7のような小さい素数から順に割ってみよう。";
+  if(text.includes("因数分解")){
+    if(text.includes("x²-")) return "平方差なら (x-a)(x+a)、2次式なら足して真ん中・かけて最後を探そう。";
+    return "共通因数でくくれるか、足して真ん中・かけて最後になる数を探そう。";
+  }
+  if(text.includes("展開")) return "分配法則を使う。公式 (a+b)^2、(a-b)^2、(a+b)(a-b) も確認しよう。";
+  if(text.includes("∫")){
+    if(text.includes("sin")) return "sin(kx) の積分は -cos(kx)/k。";
+    if(text.includes("cos")) return "cos(kx) の積分は sin(kx)/k。";
+    if(text.includes("/x")) return "1/x の積分は log(x)。";
+    if(text.includes("√")) return "√x は x^(1/2) に直して積分しよう。";
+    return "x^n の積分は x^(n+1)/(n+1)。最後に +C を忘れずに。";
+  }
+  if(text.includes("d/dx")){
+    if(text.includes("sin")) return "sin(kx) の微分は kcos(kx)。";
+    if(text.includes("cos")) return "cos(kx) の微分は -ksin(kx)。";
+    if(text.includes("log")) return "log(x) の微分は 1/x。";
+    if(text.includes("tan")) return "tan(x) の微分は 1/cos(x)^2。";
+    return "x^n の微分は n x^(n-1)。係数も忘れないように。";
+  }
+  if(text.includes("+") || text.includes("-") || text.includes("×") || text.includes("÷")) return "かっこがあれば先に計算。×と÷を先に処理しよう。";
+
+  return "式の形から使える公式を探そう。";
+}
+
+function showHint(){
+  const area=document.getElementById("hintArea");
+  if(!area)return;
+
+  if(mode==="random" || mode==="review" || (matchState && matchState.active)){
+    area.innerHTML=`<div class="hintBox">ヒントは学習モードだけで使えます。</div>`;
+    return;
+  }
+
+  area.innerHTML=`<div class="hintBox">💡 ${getQuestionHint(current)}</div>`;
+}
+
+function clearHint(){
+  const area=document.getElementById("hintArea");
+  if(area)area.innerHTML="";
+}
+
+async function showOnlineMatchMenu(){
+  const box=document.getElementById("panelArea");
+  box.innerHTML=`
+    <h2>⚔️ ランダムマッチ</h2>
+    <div class="matchBox">
+      <p>募集中の部屋から参加できます。</p>
+      <p>先に1問正解で1ポイント。3ポイント先取で勝ち。</p>
+      <button onclick="createOnlineMatch()">新しく募集する</button>
+      <button onclick="showOnlineMatchMenu()">更新</button>
+    </div>
+    <h3>募集中一覧</h3>
+    <div id="openRoomList">読み込み中...</div>
+  `;
+
+  try{
+    const rooms=await loadOpenMatchRooms();
+    let html="";
+
+    if(!rooms.length){
+      html="<p>現在募集中の部屋はありません。</p>";
+    }
+
+    for(const r of rooms){
+      html+=`
+        <div class="openRoomItem">
+          <b>${r.hostName||"名無し"}</b><br>
+          ${titleHTML(r.hostTitle||"初心者")}<br>
+          レート：${r.hostRate||1000}<br>
+          <button onclick="joinOpenOnlineMatch('${r.roomId}')">参加する</button>
+        </div>
+      `;
+    }
+
+    document.getElementById("openRoomList").innerHTML=html;
+  }catch(e){
+    document.getElementById("openRoomList").innerHTML="<p>募集中一覧の取得に失敗しました。</p>";
+  }
+}
+
+async function joinOpenOnlineMatch(roomId){
+  await joinMatch(roomId,"online");
+}
+
+async function cancelMyMatchRoom(){
+  if(!matchState.roomId){
+    alert("取り消せる部屋がありません");
+    return;
+  }
+
+  try{
+    await cancelMatchRoom(matchState.roomId);
+    if(matchState.poll){
+      clearInterval(matchState.poll);
+      matchState.poll=null;
+    }
+    matchState.active=false;
+    alert("募集を取り消しました");
+    showOnlineMatchMenu();
+  }catch(e){
+    alert("募集の取り消しに失敗しました");
+    console.log(e);
+  }
+}
+
+function getJoinErrorMessage(e){
+  const msg=String(e && e.message ? e.message : e);
+  if(msg.includes("room-not-found")) return "部屋が見つかりません。";
+  if(msg.includes("already-full")) return "この部屋はすでに満員です。";
+  if(msg.includes("own-room")) return "自分の部屋には参加できません。";
+  if(msg.includes("room-closed")) return "この部屋は終了または取り消し済みです。";
+  return "通信エラーです。";
+}
+
+function addMatchHistory(result,room,beforeRate=null,afterRate=null){
+  if(!playerData.matchHistory)playerData.matchHistory=[];
+
+  const mySide=matchState.side;
+  const opponent = mySide==="host" ? (room.guestName||"相手") : (room.hostName||"相手");
+
+  playerData.matchHistory.unshift({
+    date:new Date().toLocaleString("ja-JP"),
+    type:room.type,
+    result,
+    score:`${room.hostPoints||0}-${room.guestPoints||0}`,
+    opponent,
+    beforeRate,
+    afterRate
+  });
+
+  playerData.matchHistory=playerData.matchHistory.slice(0,20);
+  saveAllData();
+}
+
+function showMatchHistory(){
+  let html="<h2>⚔️ 対戦履歴</h2>";
+
+  if(!playerData.matchHistory || playerData.matchHistory.length===0){
+    html+="<p>まだ履歴がありません。</p>";
+  }else{
+    for(const h of playerData.matchHistory){
+      html+=`
+        <div class="rankItem">
+          ${h.result==="win"?"○ 勝利":"× 敗北"}<br>
+          種類：${h.type==="online"?"ランダムマッチ":"フレンドマッチ"}<br>
+          相手：${h.opponent}<br>
+          スコア：${h.score}<br>
+          ${h.beforeRate!==null?`レート：${h.beforeRate} → ${h.afterRate}<br>`:""}
+          ${h.date}
+        </div>
+      `;
+    }
+  }
+
+  document.getElementById("panelArea").innerHTML=html;
+}
+
+
+function showMatchWaiting(roomId,type){
+  document.getElementById("homeScreen").classList.add("active");
+  document.getElementById("gameScreen").classList.remove("active");
+  document.getElementById("panelArea").innerHTML=`
+    <h2>${type==="online"?"⚔️ ランダムマッチ":"🤝 フレンドマッチ"}</h2>
+    <div class="matchBox">
+      <h3>募集作成完了</h3>
+      <p>相手が参加すると自動で試合開始します。</p>
+      ${type==="friend"?`<p>ルームID</p><input value="${roomId}" readonly><p>友達にこのIDを送ってください。</p>`:""}
+      ${type==="online"?`<button onclick="cancelMyMatchRoom()">募集を取り消す</button>`:""}
+      <p>相手待ち...</p>
+    </div>
+  `;
+}
+
+
+async function joinMatch(roomId,type){
+  if(!roomId){
+    alert("ルームIDを入力して");
+    return;
+  }
+
+  try{
+    await joinMatchRoom(roomId,{
+      name:playerProfile.name||"名無し",
+      title:playerData.equippedTitle||"初心者"
+    });
+
+    matchState.active=true;
+    matchState.roomId=roomId;
+    matchState.type=type;
+    matchState.side="guest";
+    matchState.currentRound=-1;
+    matchState.localLocked=false;
+
+    startMatchPolling();
+  }catch(e){
+    alert(getJoinErrorMessage(e));
+    console.log(e);
+  }
+}
+
+
+async function finishMatch(room){
+  if(matchState.poll){
+    clearInterval(matchState.poll);
+    matchState.poll=null;
+  }
+
+  matchState.active=false;
+
+  if(room.status==="canceled"){
+    setInputVisible(false);
+    document.getElementById("gameScreen").classList.remove("active");
+    document.getElementById("homeScreen").classList.add("active");
+    document.getElementById("panelArea").innerHTML=`<div class="matchBox">相手が退出、または募集が取り消されました。</div>`;
+    return;
+  }
+
+  let mySide=matchState.side;
+  let win=room.winner===mySide;
+  let beforeRate=null;
+  let afterRate=null;
+
+  if(room.type==="online"){
+    try{
+      beforeRate=1000;
+      let rate=await saveRateData(win?"win":"loss");
+      afterRate=rate.rating;
+    }catch(e){
+      console.log(e);
+    }
+  }
+
+  addMatchHistory(win?"win":"loss",room,beforeRate,afterRate);
+
+  setInputVisible(false);
+
+  document.getElementById("gameScreen").classList.remove("active");
+  document.getElementById("resultScreen").classList.add("active");
+
+  let host=room.hostName||"ホスト";
+  let guest=room.guestName||"ゲスト";
+
+  document.getElementById("resultSummary").innerHTML=`
+    <div class="profileItem">
+      <h2>${win?"勝利！":"敗北..."}</h2>
+      <p>${host}：${room.hostPoints||0} ポイント</p>
+      <p>${guest}：${room.guestPoints||0} ポイント</p>
+      <p>${room.type==="online"?"レート変動あり":"レート変動なし"}</p>
+      ${afterRate!==null?`<p>現在レート：${afterRate}</p>`:""}
+      <button class="resultBtn" onclick="backHomeFromResult()">ホームへ</button>
+    </div>
+  `;
+
+  document.getElementById("resultList").innerHTML="";
 }
