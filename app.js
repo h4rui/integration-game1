@@ -1,5 +1,5 @@
 
-const VERSION = "2.2.1";
+const VERSION = "2.2.3";
 
 let enemyHP = 10;
 let playerHP = 5;
@@ -135,6 +135,7 @@ function loadAllData(){
   if(!playerData.loginStampedDays)playerData.loginStampedDays=[];
   if(!playerData.coins)playerData.coins=0;
   if(!playerData.matchHistory)playerData.matchHistory=[];
+  if(!playerData.genreStats)playerData.genreStats={};
   if(!playerData.loginBonusDay)playerData.loginBonusDay=1;
   if(!playerData.lastCoinBonusDate)playerData.lastCoinBonusDate="";
   if(!playerData.exp)playerData.exp=0;
@@ -169,15 +170,63 @@ function ensurePanelBackButton(){
   }
 }
 
+
+function homeButtonHTML(){
+  return `<button id="alwaysHomeBtn" class="alwaysHomeBtn" onclick="goHomeFromAnywhere()">🏠 ホームへ</button>`;
+}
+
+function ensureHomeButton(){
+  const homeActive=document.getElementById("homeScreen")?.classList.contains("active");
+  const gameActive=document.getElementById("gameScreen")?.classList.contains("active");
+
+  if(homeActive || gameActive) return;
+
+  const panel=document.getElementById("panelArea");
+  if(panel && panel.innerHTML.trim() && !document.getElementById("alwaysHomeBtn")){
+    panel.insertAdjacentHTML("afterbegin", homeButtonHTML());
+  }
+
+  const result=document.getElementById("resultScreen");
+  if(result && result.classList.contains("active") && !document.getElementById("alwaysHomeBtn")){
+    result.insertAdjacentHTML("afterbegin", homeButtonHTML());
+  }
+}
+
+function goHomeFromAnywhere(){
+  if(matchState && matchState.poll){
+    clearInterval(matchState.poll);
+    matchState.poll=null;
+    matchState.active=false;
+  }
+
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById("homeScreen").classList.add("active");
+
+  const panel=document.getElementById("panelArea");
+  if(panel)panel.innerHTML="";
+
+  const menu=document.getElementById("homeMenu");
+  if(menu)menu.classList.remove("hidden");
+
+  setInputVisible(true);
+  updateHomeStatus();
+}
+
+function setPanelWithHome(html){
+  const panel=document.getElementById("panelArea");
+  if(!panel)return;
+  panel.innerHTML=homeButtonHTML()+html;
+}
+
 function openPanelPage(fnName){
   const menu=document.getElementById("homeMenu");
   const panel=document.getElementById("panelArea");
   if(menu)menu.classList.add("hidden");
   if(panel)panel.innerHTML="";
   eval(fnName+"()");
-  setTimeout(ensurePanelBackButton,0);
-  setTimeout(ensurePanelBackButton,500);
-  setTimeout(ensurePanelBackButton,1200);
+  setTimeout(ensureHomeButton,0);
+  setTimeout(ensureHomeButton,300);
+  setTimeout(ensureHomeButton,1000);
 }
 function closePanelPage(){
   const menu=document.getElementById("homeMenu");
@@ -889,22 +938,28 @@ function saveProfileFromPanel(){
     alert("保存したよ");
   }
 }
+
 function showContact(){
   document.getElementById("panelArea").innerHTML=`
     <h2>📩 お問い合わせ</h2>
-    <div class="profileItem">
-      <p>バグ報告・要望・不具合報告はこちら</p>
+    <div class="guideItem">
+      <h3>不具合報告・要望</h3>
+      <p>バグ、ログイン問題、対戦の不具合、追加してほしい機能はこちらから送ってください。</p>
       <button onclick="window.open('https://docs.google.com/forms/d/e/1FAIpQLSfWnEWXYipQy-x5Vn69yrcOPrlHrKCjHvFblvu-he9HqHhnAA/viewform','_blank')">
         お問い合わせフォームを開く
       </button>
-      <p>回答には時間がかかる場合があります。</p>
     </div>
-    <div class="profileItem">
-      <p><a href="terms.html">利用規約</a></p>
-      <p><a href="privacy.html">プライバシーポリシー</a></p>
+    <div class="guideItem">
+      <h3>送ると助かる情報</h3>
+      <p>・何を押したか</p>
+      <p>・どんなエラーが出たか</p>
+      <p>・スクショ</p>
+      <p>・使っている端末</p>
     </div>
   `;
+  if(typeof ensureHomeButton==="function")ensureHomeButton();
 }
+
 async function savePublicProfile(){
   try{
     if(window.savePlayerPublicData){
@@ -1165,6 +1220,8 @@ function openGame(){
   document.getElementById("modeTitle").innerText=title;
 }
 function backHome(){
+  if(matchState && matchState.active && matchState.roomId){try{leaveMatchRoom(matchState.roomId,matchState.side);}catch(e){}}
+  if(typeof updateSurrenderButton==='function')updateSurrenderButton();
   if(matchState && matchState.poll){clearInterval(matchState.poll);matchState.poll=null;matchState.active=false;}
   closePanelPage();
   setInputVisible(true);
@@ -1179,6 +1236,7 @@ function backHome(){
   updateHomeStatus();
 }
 function start(){
+  if(typeof updateSurrenderButton==='function')updateSurrenderButton();
   setInputVisible(true);
   history=[];
   usedQuestions=[];
@@ -1675,6 +1733,7 @@ async function submit(){
   if(!ok)ok=normalize(u)===normalize(current.display);
 
   playerData.totalQuestions++;
+  recordGenreResult(mode,ok);
 
   history.push({
     question:current.q,
@@ -1844,9 +1903,12 @@ async function showWorldRanking(){
       html+=`<div class="rankItem">${i+1}位 ${ranking[i].icon?`<img class="rankIcon" src="${ranking[i].icon}">`:""}${ranking[i].name}<br>${titleHTML(ranking[i].title||"初心者")}<br>Lv${ranking[i].level||1}<br>${ranking[i].score}問</div>`;
     }
     box.innerHTML=html;
-    ensurePanelBackButton();
+    
+    ensureHomeButton();
+ensurePanelBackButton();
   }catch(e){
     box.innerHTML="<p>ランキング取得失敗</p>";
+    ensureHomeButton();
     ensurePanelBackButton();
   }
 }
@@ -1856,6 +1918,7 @@ function showResultPage(text){
   document.getElementById("gameScreen").classList.remove("active");
   document.getElementById("homeScreen").classList.remove("active");
   document.getElementById("resultScreen").classList.add("active");
+  setTimeout(ensureHomeButton,0);
 
   document.getElementById("resultSummary").innerHTML=`
     <div class="profileItem">
@@ -1897,21 +1960,26 @@ function showRankingMenu(){
   document.getElementById("panelArea").innerHTML=`
     <h2>🏆 ランキング</h2>
     <button class="modeBtn" onclick="showWorldRanking()">🌍 週間ランキング</button>
+    <button class="modeBtn" onclick="selectRankingMode()">🏆 週間ランキングモードで遊ぶ</button>
     <button class="modeBtn" onclick="showFriendRanking()">🤝 フレンドランキング</button>
     <button class="modeBtn" onclick="showRateRanking()">🏅 レートランキング</button>
   `;
 }
 
+
 function showMatchMenu(){
   document.getElementById("panelArea").innerHTML=`
     <h2>⚔️ 対戦</h2>
+    <button class="modeBtn" onclick="selectRankingMode()">🏆 週間ランキングモード</button>
     <button class="modeBtn" onclick="showOnlineMatchMenu()">⚔️ ランダムマッチ</button>
-    <button class="modeBtn" onclick="showFriendMatchMenu()">🤝 フレンドマッチ</button><button class="modeBtn" onclick="showMatchHistory()">📜 対戦履歴</button>
+    <button class="modeBtn" onclick="showFriendMatchMenu()">🤝 フレンドマッチ</button>
+    <button class="modeBtn" onclick="showMatchHistory()">📜 対戦履歴</button><button class="modeBtn" onclick="showGenreStats()">📊 ジャンル別正答率</button>
     <div class="matchBox">
-      <p>対戦ルール：1問先に正解した方が1ポイント。</p>
-      <p>先に3ポイント取った方が勝ち。</p>
+      <p>週間ランキングモード：1ミスで終了。自己ベストをランキングに保存。</p>
+      <p>対戦ルール：1問先に正解した方が1ポイント。3ポイント先取で勝ち。</p>
     </div>
   `;
+  ensureHomeButton();
 }
 
 function showProfileMenu(){
@@ -1932,7 +2000,7 @@ function showOtherMenu(){
     <button class="modeBtn" onclick="showDailyMission()">🎯 デイリーミッション</button>
     <button class="modeBtn" onclick="showLoginCalendar()">📅 ログボカレンダー</button>
     <button class="modeBtn" onclick="showSettings()">⚙️ 設定</button>
-    <button class="modeBtn" onclick="showContact()">📩 お問い合わせ</button>
+    <button class="modeBtn" onclick="showContact()">📩 お問い合わせ</button><button class="modeBtn" onclick="showImprovementIdeas()">💡 改善候補</button>
   `;
 }
 
@@ -2122,7 +2190,7 @@ async function pollMatchRoom(){
     return;
   }
 
-  if(room.status==="finished"){
+  if(room.status==="finished" || room.status==="canceled"){
     finishMatch(room);
     return;
   }
@@ -2138,6 +2206,7 @@ async function pollMatchRoom(){
 }
 
 function showMatchQuestion(room){
+  updateSurrenderButton();
   document.getElementById("homeScreen").classList.remove("active");
   document.getElementById("resultScreen")?.classList.remove("active");
   document.getElementById("gameScreen").classList.add("active");
@@ -2208,6 +2277,7 @@ async function submitMatchAnswer(u){
   return true;
 }
 
+
 async function finishMatch(room){
   if(matchState.poll){
     clearInterval(matchState.poll);
@@ -2215,17 +2285,39 @@ async function finishMatch(room){
   }
 
   matchState.active=false;
+  if(typeof updateSurrenderButton==="function")updateSurrenderButton();
+
+  if(room.status==="canceled"){
+    setInputVisible(false);
+    document.getElementById("gameScreen").classList.remove("active");
+    document.getElementById("homeScreen").classList.add("active");
+    document.getElementById("panelArea").innerHTML=`<div class="matchBox">相手が退出、または募集が取り消されました。</div>`;
+    return;
+  }
 
   let mySide=matchState.side;
   let win=room.winner===mySide;
+  let beforeRate=null;
+  let afterRate=null;
+  let reason="";
+
+  if(room.surrenderedBy){
+    reason=room.surrenderedBy===mySide?"自分が降参":"相手が降参";
+  }else if(room.leftBy){
+    reason=room.leftBy===mySide?"自分が退出":"相手が退出";
+  }
 
   if(room.type==="online"){
     try{
+      beforeRate=1000;
       let rate=await saveRateData(win?"win":"loss");
-      document.getElementById("result").innerHTML=
-        `${win?"勝利！":"敗北..."}<br>現在レート：${rate.rating}`;
-    }catch(e){}
+      afterRate=rate.rating;
+    }catch(e){
+      console.log(e);
+    }
   }
+
+  addMatchHistory(win?"win":"loss",room,beforeRate,afterRate,reason);
 
   setInputVisible(false);
 
@@ -2238,15 +2330,19 @@ async function finishMatch(room){
   document.getElementById("resultSummary").innerHTML=`
     <div class="profileItem">
       <h2>${win?"勝利！":"敗北..."}</h2>
+      ${reason?`<p>${reason}</p>`:""}
       <p>${host}：${room.hostPoints||0} ポイント</p>
       <p>${guest}：${room.guestPoints||0} ポイント</p>
       <p>${room.type==="online"?"レート変動あり":"レート変動なし"}</p>
+      ${afterRate!==null?`<p>現在レート：${afterRate}</p>`:""}
       <button class="resultBtn" onclick="backHomeFromResult()">ホームへ</button>
     </div>
   `;
 
   document.getElementById("resultList").innerHTML="";
+  if(typeof ensureHomeButton==="function")setTimeout(ensureHomeButton,0);
 }
+
 
 
 function checkGoogleLoginStatus(){
@@ -2349,7 +2445,8 @@ function getJoinErrorMessage(e){
   return "通信エラーです。";
 }
 
-function addMatchHistory(result,room,beforeRate=null,afterRate=null){
+
+function addMatchHistory(result,room,beforeRate=null,afterRate=null,reason=""){
   if(!playerData.matchHistory)playerData.matchHistory=[];
 
   const mySide=matchState.side;
@@ -2362,15 +2459,27 @@ function addMatchHistory(result,room,beforeRate=null,afterRate=null){
     score:`${room.hostPoints||0}-${room.guestPoints||0}`,
     opponent,
     beforeRate,
-    afterRate
+    afterRate,
+    reason
   });
 
   playerData.matchHistory=playerData.matchHistory.slice(0,20);
   saveAllData();
 }
 
+
+
 function showMatchHistory(){
-  let html="<h2>⚔️ 対戦履歴</h2>";
+  const st=getMatchHistoryStats();
+  let html=`
+    <h2>⚔️ 対戦履歴</h2>
+    <div class="statGrid">
+      <div class="statCard"><h3>総試合数</h3><p>${st.total}</p></div>
+      <div class="statCard"><h3>勝利</h3><p>${st.wins}</p></div>
+      <div class="statCard"><h3>敗北</h3><p>${st.losses}</p></div>
+      <div class="statCard"><h3>勝率</h3><p>${st.rate}%</p></div>
+    </div>
+  `;
 
   if(!playerData.matchHistory || playerData.matchHistory.length===0){
     html+="<p>まだ履歴がありません。</p>";
@@ -2382,7 +2491,8 @@ function showMatchHistory(){
           種類：${h.type==="online"?"ランダムマッチ":"フレンドマッチ"}<br>
           相手：${h.opponent}<br>
           スコア：${h.score}<br>
-          ${h.beforeRate!==null?`レート：${h.beforeRate} → ${h.afterRate}<br>`:""}
+          ${h.reason?`理由：${h.reason}<br>`:""}
+          ${h.beforeRate!==null && h.beforeRate!==undefined?`レート：${h.beforeRate} → ${h.afterRate}<br>`:""}
           ${h.date}
         </div>
       `;
@@ -2390,7 +2500,9 @@ function showMatchHistory(){
   }
 
   document.getElementById("panelArea").innerHTML=html;
+  if(typeof ensureHomeButton==="function")ensureHomeButton();
 }
+
 
 
 function showMatchWaiting(roomId,type){
@@ -2546,4 +2658,98 @@ async function testFirestoreConnection(){
     alert("Firestore接続NG：" + (e.code || e.message || e));
     console.error(e);
   }
+}
+
+setInterval(ensureHomeButton,1500);
+
+
+function showImprovementIdeas(){
+  document.getElementById("panelArea").innerHTML=`
+    <h2>💡 次の改善候補</h2>
+    <div class="guideItem">
+      <h3>おすすめ順</h3>
+      <p>① 対戦の途中退出表示</p>
+      <p>② 対戦履歴の勝率表示</p>
+      <p>③ ジャンル別正答率</p>
+      <p>④ デイリーミッション報酬強化</p>
+      <p>⑤ ガチャ図鑑の未入手だけ表示</p>
+    </div>
+  `;
+  ensureHomeButton();
+}
+
+
+function getModeLabel(m){
+  const map={
+    arithmetic:"四則演算",
+    prime:"素因数分解",
+    factor:"因数分解",
+    expand:"展開",
+    derivative:"微分",
+    integral:"積分",
+    random:"ランキング",
+    review:"復習"
+  };
+  return map[m]||m;
+}
+
+function recordGenreResult(m,ok){
+  if(!playerData.genreStats)playerData.genreStats={};
+  if(!playerData.genreStats[m])playerData.genreStats[m]={correct:0,total:0};
+  playerData.genreStats[m].total++;
+  if(ok)playerData.genreStats[m].correct++;
+}
+
+function showGenreStats(){
+  let html=`<h2>📊 ジャンル別正答率</h2><div class="statGrid">`;
+  const order=["arithmetic","prime","factor","expand","derivative","integral","random"];
+  for(const m of order){
+    const s=(playerData.genreStats&&playerData.genreStats[m])?playerData.genreStats[m]:{correct:0,total:0};
+    const rate=s.total?Math.round(s.correct/s.total*100):0;
+    html+=`
+      <div class="statCard">
+        <h3>${getModeLabel(m)}</h3>
+        <p>${rate}%</p>
+        <p>${s.correct}/${s.total}</p>
+      </div>
+    `;
+  }
+  html+=`</div>`;
+  document.getElementById("panelArea").innerHTML=html;
+  if(typeof ensureHomeButton==="function")ensureHomeButton();
+}
+
+function getMatchHistoryStats(){
+  const list=playerData.matchHistory||[];
+  const wins=list.filter(x=>x.result==="win").length;
+  const losses=list.filter(x=>x.result==="loss").length;
+  const total=wins+losses;
+  const rate=total?Math.round(wins/total*100):0;
+  return {wins,losses,total,rate};
+}
+
+
+async function surrenderMatch(){
+  if(!matchState || !matchState.active){
+    alert("対戦中ではありません");
+    return;
+  }
+
+  if(!confirm("本当に降参しますか？"))return;
+
+  try{
+    const room=await surrenderMatchRoom(matchState.roomId,matchState.side);
+    if(room){
+      finishMatch(room);
+    }
+  }catch(e){
+    alert("降参に失敗しました：" + (e.code || e.message || e));
+    console.error(e);
+  }
+}
+
+function updateSurrenderButton(){
+  const btn=document.getElementById("surrenderBtn");
+  if(!btn)return;
+  btn.style.display=(matchState && matchState.active)?"block":"none";
 }
