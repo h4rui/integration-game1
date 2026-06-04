@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>数学マスター Ver 2.0.3</title>
+<title>数学マスター Ver 2.1.0</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 body{
@@ -209,6 +209,26 @@ a{color:#00ffcc}
 .panelBackBtn{display:block;margin:12px auto;background:#333;color:white;border:1px solid #00ffcc}
 
 .resultBtn{display:block;width:80%;max-width:420px;margin:14px auto;font-size:28px;padding:16px}
+
+.matchScore{
+  display:flex;
+  justify-content:center;
+  gap:18px;
+  font-size:26px;
+  margin:14px;
+}
+.matchBox{
+  background:rgba(255,255,255,.12);
+  margin:10px auto;
+  padding:14px;
+  border-radius:12px;
+  width:90%;
+  max-width:760px;
+}
+.matchPoint{
+  font-size:34px;
+  color:#ffd700;
+}
 </style>
 </head>
 <body>
@@ -221,23 +241,13 @@ a{color:#00ffcc}
   <div id="coinInfo">コイン：0</div>
 
   <div id="homeMenu">
-  <button class="modeBtn" onclick="openPanelPage('showStudyMenu')">📚 学習モード</button>
-  <button class="modeBtn" onclick="selectRankingMode()">⚔️ ランキングモード</button>
+  <button class="modeBtn" onclick="openPanelPage('showStudyMenu')">📚 学習</button>
+  <button class="modeBtn" onclick="openPanelPage('showRankingMenu')">🏆 ランキング・対戦</button>
   <button class="modeBtn" onclick="openPanelPage('showGacha')">🎰 ガチャ</button>
-  <button class="modeBtn" onclick="openPanelPage('showGachaBook')">📖 ガチャ図鑑</button>
-  <button class="modeBtn" onclick="openPanelPage('showLoginCalendar')">📅 ログボカレンダー</button>
-  <button class="modeBtn" onclick="openPanelPage('showGuide')">📖 遊び方</button>
-  <button class="modeBtn" onclick="openPanelPage('showTitles')">🏅 称号一覧</button>
-  <button class="modeBtn" onclick="openPanelPage('showAchievements')">🏆 実績一覧</button>
-  <button class="modeBtn" onclick="openPanelPage('showWorldRanking')">🌍 週間ランキング</button>
-  <button class="modeBtn" onclick="openPanelPage('showFriendMenu')">🤝 フレンド</button>
-  <button class="modeBtn" onclick="openPanelPage('showDailyMission')">🎯 デイリーミッション</button>
-  <button class="modeBtn" onclick="openPanelPage('showReviewList')">📚 復習リスト</button>
-  <button class="modeBtn" onclick="openPanelPage('showProfile')">👤 プロフィール</button>
-  <button class="modeBtn" onclick="openPanelPage('showSettings')">⚙️ 設定</button>
-  <button class="modeBtn" onclick="openPanelPage('showContact')">📩 お問い合わせ</button>
+  <button class="modeBtn" onclick="openPanelPage('showProfileMenu')">👤 プロフィール</button>
+  <button class="modeBtn" onclick="openPanelPage('showOtherMenu')">⚙️ その他</button>
   </div>
-  <div id="panelArea"></div>
+  <div id="panelArea"<div id="panelArea"></div>
 </div>
 
 <div id="gameScreen" class="screen">
@@ -298,7 +308,7 @@ a{color:#00ffcc}
 </div>
 
 <div id="levelUpArea"></div>
-<div id="versionLabel">Ver 2.0.3</div>
+<div id="versionLabel">Ver 2.1.0</div>
 
 <audio id="bgm" src="bgm.mp3" loop></audio>
 <audio id="se_correct" src="correct.mp3"></audio>
@@ -307,7 +317,7 @@ a{color:#00ffcc}
 <script src="https://cdn.jsdelivr.net/npm/mathjs@11.11.0/lib/browser/math.js"></script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-import { getFirestore, collection, doc, setDoc, getDoc, getDocs, query, where, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+import { getFirestore, collection, doc, setDoc, getDoc, getDocs, query, where, limit, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
 const firebaseConfig = {
@@ -429,6 +439,140 @@ window.loadFriendData = async function(friendId){
   if(!snap.exists()) return null;
   return snap.data();
 };
+
+window.createMatchRoom = async function(data){
+  const roomId = Math.random().toString(36).slice(2,8).toUpperCase();
+  await setDoc(doc(db,"matches",roomId),{
+    roomId,
+    type:data.type,
+    status:"waiting",
+    hostId:getPlayerId(),
+    hostName:data.name,
+    hostTitle:data.title,
+    guestId:"",
+    guestName:"",
+    guestTitle:"",
+    hostPoints:0,
+    guestPoints:0,
+    round:0,
+    currentQuestion:data.questions[0],
+    questions:data.questions,
+    roundWinner:"",
+    winner:"",
+    updatedAt:serverTimestamp()
+  });
+  return roomId;
+};
+
+window.joinMatchRoom = async function(roomId,data){
+  const ref = doc(db,"matches",roomId);
+  const snap = await getDoc(ref);
+  if(!snap.exists()) throw new Error("room-not-found");
+  const room = snap.data();
+  if(room.status !== "waiting" && !room.guestId) throw new Error("room-not-waiting");
+  await updateDoc(ref,{
+    status:"playing",
+    guestId:getPlayerId(),
+    guestName:data.name,
+    guestTitle:data.title,
+    updatedAt:serverTimestamp()
+  });
+  return room;
+};
+
+window.loadMatchRoom = async function(roomId){
+  const snap = await getDoc(doc(db,"matches",roomId));
+  if(!snap.exists()) return null;
+  return snap.data();
+};
+
+window.claimMatchPoint = async function(roomId,side,round){
+  const ref = doc(db,"matches",roomId);
+  const snap = await getDoc(ref);
+  if(!snap.exists()) return null;
+  const room = snap.data();
+
+  if(room.status !== "playing") return room;
+  if(room.round !== round) return room;
+  if(room.roundWinner) return room;
+
+  let hostPoints = room.hostPoints || 0;
+  let guestPoints = room.guestPoints || 0;
+
+  if(side === "host") hostPoints++;
+  if(side === "guest") guestPoints++;
+
+  let winner = "";
+  let status = "playing";
+  let nextRound = round + 1;
+  let nextQuestion = room.questions[nextRound] || null;
+
+  if(hostPoints >= 3){
+    winner = "host";
+    status = "finished";
+  }else if(guestPoints >= 3){
+    winner = "guest";
+    status = "finished";
+  }else if(!nextQuestion){
+    winner = hostPoints >= guestPoints ? "host" : "guest";
+    status = "finished";
+  }
+
+  await updateDoc(ref,{
+    hostPoints,
+    guestPoints,
+    roundWinner:side,
+    round:nextRound,
+    currentQuestion:nextQuestion,
+    winner,
+    status,
+    updatedAt:serverTimestamp()
+  });
+
+  const after = await getDoc(ref);
+  return after.data();
+};
+
+window.saveRateData = async function(result){
+  const playerId = getPlayerId();
+  const ref = doc(db,"ratings",playerId);
+  const snap = await getDoc(ref);
+  let data = snap.exists() ? snap.data() : {};
+  let rating = data.rating || 1000;
+  let wins = data.wins || 0;
+  let losses = data.losses || 0;
+
+  if(result === "win"){
+    rating += 25;
+    wins++;
+  }else if(result === "loss"){
+    rating = Math.max(100, rating - 25);
+    losses++;
+  }
+
+  await setDoc(ref,{
+    playerId,
+    name:playerProfile.name || "名無し",
+    icon:playerProfile.icon || "",
+    title:playerData.equippedTitle || "初心者",
+    level:getLevel(),
+    rating,
+    wins,
+    losses,
+    updatedAt:serverTimestamp()
+  });
+
+  return {rating,wins,losses};
+};
+
+window.loadRateRanking = async function(){
+  const snap = await getDocs(collection(db,"ratings"));
+  let list=[];
+  snap.forEach(d=>list.push(d.data()));
+  list.sort((a,b)=>(b.rating||1000)-(a.rating||1000));
+  return list.slice(0,100);
+};
+
 </script>
 <script src="app.js"></script>
 </body>

@@ -1,5 +1,5 @@
 
-const VERSION = "2.0.3"
+const VERSION = "2.1.0";
 
 let enemyHP = 10;
 let playerHP = 5;
@@ -478,6 +478,26 @@ function gachaPool(){
     {title:"👑究極数学王👑", rarity:"UR"}
   ];
 }
+
+function getGachaResultNoDuplicate(){
+  let owned=playerData.gachaTitles||[];
+  let remaining=gachaPool().filter(x=>!owned.includes(x.title));
+  if(remaining.length===0)return null;
+
+  let r=Math.random()*100;
+  let order=[];
+  if(r<2)order=["UR","SSR","SR","R"];
+  else if(r<10)order=["SSR","SR","R","UR"];
+  else if(r<30)order=["SR","R","SSR","UR"];
+  else order=["R","SR","SSR","UR"];
+
+  for(let rarity of order){
+    let pool=remaining.filter(x=>x.rarity===rarity);
+    if(pool.length>0)return pool[Math.floor(Math.random()*pool.length)];
+  }
+  return remaining[Math.floor(Math.random()*remaining.length)];
+}
+
 function getGachaResult(){
   let r=Math.random()*100;
   let rarity="R";
@@ -528,7 +548,8 @@ function drawGacha(){
 
     if(count>=25){
       clearInterval(anim);
-      let item=getGachaResult();
+      let item=getGachaResultNoDuplicate();
+      if(!item){alert('ガチャ称号をすべて入手済みです');showGacha();return;}
 
       unlockTitle(item.title);
 
@@ -569,7 +590,8 @@ function drawGacha10(){
   let results=[];
   let hasUR=false;
   for(let i=0;i<10;i++){
-    let item=getGachaResult();
+    let item=getGachaResultNoDuplicate();
+      if(!item){alert('ガチャ称号をすべて入手済みです');showGacha();return;}
     results.push(item);
     unlockTitle(item.title);
     if(!playerData.gachaTitles)playerData.gachaTitles=[];
@@ -1084,6 +1106,7 @@ function openGame(){
   document.getElementById("modeTitle").innerText=title;
 }
 function backHome(){
+  if(matchState && matchState.poll){clearInterval(matchState.poll);matchState.poll=null;matchState.active=false;}
   closePanelPage();
   setInputVisible(true);
   updatePlayTime();
@@ -1528,10 +1551,15 @@ function nextQ(){
   },200);
 }
 
-function submit(){
+async function submit(){
   if(!current)return;
 
   let u=document.getElementById("ans").value.trim();
+
+  if(matchState && matchState.active){
+    await submitMatchAnswer(u);
+    return;
+  }
 
   if(u===""){
     alert("答えを入力して");
@@ -1799,4 +1827,345 @@ function backHomeFromResult(){
   saveAllData();
   savePublicProfile();
   updateHomeStatus();
+}
+
+
+function showRankingMenu(){
+  document.getElementById("panelArea").innerHTML=`
+    <h2>🏆 ランキング・対戦</h2>
+    <button class="modeBtn" onclick="showWorldRanking()">🌍 週間ランキング</button>
+    <button class="modeBtn" onclick="showFriendRanking()">🤝 フレンドランキング</button>
+    <button class="modeBtn" onclick="showRateRanking()">🏅 レートランキング</button>
+    <button class="modeBtn" onclick="showOnlineMatchMenu()">⚔️ オンラインマッチ</button>
+    <button class="modeBtn" onclick="showFriendMatchMenu()">🤝 フレンドマッチ</button>
+  `;
+}
+
+function showProfileMenu(){
+  document.getElementById("panelArea").innerHTML=`
+    <h2>👤 プロフィール</h2>
+    <button class="modeBtn" onclick="showProfile()">👤 プロフィール編集</button>
+    <button class="modeBtn" onclick="showTitles()">🏅 称号一覧</button>
+    <button class="modeBtn" onclick="showAchievements()">🏆 実績一覧</button>
+    <button class="modeBtn" onclick="showFriendMenu()">🤝 フレンド</button>
+    <button class="modeBtn" onclick="showReviewList()">📚 復習リスト</button>
+  `;
+}
+
+function showOtherMenu(){
+  document.getElementById("panelArea").innerHTML=`
+    <h2>⚙️ その他</h2>
+    <button class="modeBtn" onclick="showGuide()">📖 遊び方</button>
+    <button class="modeBtn" onclick="showDailyMission()">🎯 デイリーミッション</button>
+    <button class="modeBtn" onclick="showLoginCalendar()">📅 ログボカレンダー</button>
+    <button class="modeBtn" onclick="showSettings()">⚙️ 設定</button>
+    <button class="modeBtn" onclick="showContact()">📩 お問い合わせ</button>
+  `;
+}
+
+async function showRateRanking(){
+  let box=document.getElementById("panelArea");
+  box.innerHTML="<h2>読み込み中...</h2>";
+  try{
+    let list=await loadRateRanking();
+    let html="<h2>🏅 レートランキング</h2>";
+    if(list.length===0)html+="<p>まだ記録がありません</p>";
+    for(let i=0;i<list.length;i++){
+      html+=`
+        <div class="rankItem">
+          ${i+1}位
+          ${list[i].icon?`<img class="rankIcon" src="${list[i].icon}">`:""}
+          ${list[i].name}<br>
+          ${titleHTML(list[i].title||"初心者")}<br>
+          レート：${list[i].rating||1000}<br>
+          ${list[i].wins||0}勝 ${list[i].losses||0}敗
+        </div>
+      `;
+    }
+    box.innerHTML=html;
+  }catch(e){
+    box.innerHTML="<p>レートランキング取得失敗</p>";
+  }
+}
+
+function showOnlineMatchMenu(){
+  document.getElementById("panelArea").innerHTML=`
+    <h2>⚔️ オンラインマッチ</h2>
+    <div class="matchBox">
+      <p>先に3ポイント取った方が勝ち。</p>
+      <p>1問先に正解した方が1ポイント。</p>
+      <p>レート変動あり：勝ち +25 / 負け -25</p>
+      <button onclick="createOnlineMatch()">ルーム作成</button>
+      <input id="joinRoomIdOnline" placeholder="ルームID">
+      <button onclick="joinOnlineMatch()">ルーム参加</button>
+    </div>
+  `;
+}
+
+function showFriendMatchMenu(){
+  document.getElementById("panelArea").innerHTML=`
+    <h2>🤝 フレンドマッチ</h2>
+    <div class="matchBox">
+      <p>オンラインマッチと同じルール。</p>
+      <p>レート変動なし。</p>
+      <button onclick="createFriendMatch()">ルーム作成</button>
+      <input id="joinRoomIdFriend" placeholder="ルームID">
+      <button onclick="joinFriendMatch()">ルーム参加</button>
+    </div>
+  `;
+}
+
+let matchState={
+  active:false,
+  roomId:"",
+  type:"",
+  side:"",
+  room:null,
+  currentRound:-1,
+  currentQuestion:null,
+  poll:null,
+  localLocked:false
+};
+
+function makeMatchQuestions(){
+  let oldMode=mode;
+  let oldDifficulty=difficulty;
+  let list=[];
+  let modes=["arithmetic","prime","factor","expand","derivative","integral"];
+
+  for(let i=0;i<9;i++){
+    mode=modes[rand(0,modes.length-1)];
+    difficulty="normal";
+    list.push(generateQuestion());
+  }
+
+  mode=oldMode;
+  difficulty=oldDifficulty;
+  return list;
+}
+
+async function createOnlineMatch(){
+  await createMatch("online");
+}
+async function createFriendMatch(){
+  await createMatch("friend");
+}
+async function joinOnlineMatch(){
+  let id=document.getElementById("joinRoomIdOnline").value.trim().toUpperCase();
+  await joinMatch(id,"online");
+}
+async function joinFriendMatch(){
+  let id=document.getElementById("joinRoomIdFriend").value.trim().toUpperCase();
+  await joinMatch(id,"friend");
+}
+
+async function createMatch(type){
+  try{
+    let questions=makeMatchQuestions();
+    let roomId=await createMatchRoom({
+      type,
+      name:playerProfile.name||"名無し",
+      title:playerData.equippedTitle||"初心者",
+      questions
+    });
+
+    matchState.active=true;
+    matchState.roomId=roomId;
+    matchState.type=type;
+    matchState.side="host";
+    matchState.currentRound=-1;
+    matchState.localLocked=false;
+
+    showMatchWaiting(roomId,type);
+    startMatchPolling();
+  }catch(e){
+    alert("ルーム作成に失敗しました");
+    console.log(e);
+  }
+}
+
+async function joinMatch(roomId,type){
+  if(!roomId){
+    alert("ルームIDを入力して");
+    return;
+  }
+
+  try{
+    await joinMatchRoom(roomId,{
+      name:playerProfile.name||"名無し",
+      title:playerData.equippedTitle||"初心者"
+    });
+
+    matchState.active=true;
+    matchState.roomId=roomId;
+    matchState.type=type;
+    matchState.side="guest";
+    matchState.currentRound=-1;
+    matchState.localLocked=false;
+
+    startMatchPolling();
+  }catch(e){
+    alert("参加できませんでした");
+    console.log(e);
+  }
+}
+
+function showMatchWaiting(roomId,type){
+  document.getElementById("homeScreen").classList.add("active");
+  document.getElementById("gameScreen").classList.remove("active");
+  document.getElementById("panelArea").innerHTML=`
+    <h2>${type==="online"?"⚔️ オンラインマッチ":"🤝 フレンドマッチ"}</h2>
+    <div class="matchBox">
+      <h3>ルーム作成完了</h3>
+      <p>ルームID</p>
+      <input value="${roomId}" readonly>
+      <p>友達にこのIDを送ってください。</p>
+      <p>相手が入ると自動で始まります。</p>
+    </div>
+  `;
+}
+
+function startMatchPolling(){
+  if(matchState.poll)clearInterval(matchState.poll);
+  matchState.poll=setInterval(pollMatchRoom,1000);
+  pollMatchRoom();
+}
+
+async function pollMatchRoom(){
+  if(!matchState.active)return;
+
+  let room=await loadMatchRoom(matchState.roomId);
+  if(!room)return;
+
+  matchState.room=room;
+
+  if(room.status==="waiting"){
+    showMatchWaiting(room.roomId,room.type);
+    return;
+  }
+
+  if(room.status==="finished"){
+    finishMatch(room);
+    return;
+  }
+
+  if(room.round!==matchState.currentRound){
+    matchState.currentRound=room.round;
+    matchState.currentQuestion=room.currentQuestion;
+    matchState.localLocked=false;
+    showMatchQuestion(room);
+  }else{
+    updateMatchHeader(room);
+  }
+}
+
+function showMatchQuestion(room){
+  document.getElementById("homeScreen").classList.remove("active");
+  document.getElementById("resultScreen")?.classList.remove("active");
+  document.getElementById("gameScreen").classList.add("active");
+  setInputVisible(true);
+
+  document.getElementById("modeTitle").innerText=
+    room.type==="online" ? "⚔️ オンラインマッチ" : "🤝 フレンドマッチ";
+
+  enemyHP=9999;
+  playerHP=1;
+
+  updateMatchHeader(room);
+
+  current=room.currentQuestion;
+  document.getElementById("q").innerText=current.q;
+  document.getElementById("ans").value="";
+  document.getElementById("result").innerHTML=
+    `<p>第${(room.round||0)+1}問　先に正解した方が1ポイント</p>`;
+}
+
+function updateMatchHeader(room){
+  let host=room.hostName||"ホスト";
+  let guest=room.guestName||"ゲスト";
+  let header=document.getElementById("scoreStatus");
+  if(header){
+    header.innerHTML=`
+      <div class="matchScore">
+        <div>${host}<br><span class="matchPoint">${room.hostPoints||0}</span></div>
+        <div>VS</div>
+        <div>${guest}<br><span class="matchPoint">${room.guestPoints||0}</span></div>
+      </div>
+    `;
+  }
+
+  document.getElementById("enemy").style.display="none";
+  document.getElementById("enemyFrame").style.display="none";
+  document.getElementById("player").style.display="none";
+  document.getElementById("playerFrame").style.display="none";
+}
+
+async function submitMatchAnswer(u){
+  if(matchState.localLocked)return true;
+
+  let ok=false;
+
+  if(!current)return false;
+
+  if(current.number)ok=checkPrimeAnswer(u,current.number);
+  if(!ok)ok=expressionsEqual(u,current.a);
+  if(!ok)ok=normalize(u)===normalize(current.display);
+
+  if(!ok){
+    document.getElementById("result").innerHTML="× 不正解。もう一度！";
+    return true;
+  }
+
+  matchState.localLocked=true;
+
+  document.getElementById("result").innerHTML="○ 正解！ポイント判定中...";
+
+  let room=await claimMatchPoint(matchState.roomId,matchState.side,matchState.currentRound);
+
+  if(room){
+    matchState.room=room;
+    updateMatchHeader(room);
+  }
+
+  return true;
+}
+
+async function finishMatch(room){
+  if(matchState.poll){
+    clearInterval(matchState.poll);
+    matchState.poll=null;
+  }
+
+  matchState.active=false;
+
+  let mySide=matchState.side;
+  let win=room.winner===mySide;
+
+  if(room.type==="online"){
+    try{
+      let rate=await saveRateData(win?"win":"loss");
+      document.getElementById("result").innerHTML=
+        `${win?"勝利！":"敗北..."}<br>現在レート：${rate.rating}`;
+    }catch(e){}
+  }
+
+  setInputVisible(false);
+
+  document.getElementById("gameScreen").classList.remove("active");
+  document.getElementById("resultScreen").classList.add("active");
+
+  let host=room.hostName||"ホスト";
+  let guest=room.guestName||"ゲスト";
+
+  document.getElementById("resultSummary").innerHTML=`
+    <div class="profileItem">
+      <h2>${win?"勝利！":"敗北..."}</h2>
+      <p>${host}：${room.hostPoints||0} ポイント</p>
+      <p>${guest}：${room.guestPoints||0} ポイント</p>
+      <p>${room.type==="online"?"レート変動あり":"レート変動なし"}</p>
+      <button class="resultBtn" onclick="backHomeFromResult()">ホームへ</button>
+    </div>
+  `;
+
+  document.getElementById("resultList").innerHTML="";
 }
