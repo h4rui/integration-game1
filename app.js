@@ -1,5 +1,25 @@
 
-const VERSION = "2.5.0";
+// Ver2.6.1 formula display fix
+function fixFormulaSigns(s){
+  if(s===undefined || s===null)return s;
+  return String(s)
+    .replace(/\+\s*-/g,"-")
+    .replace(/-\s*\+/g,"-")
+    .replace(/\+\s*\+/g,"+")
+    .replace(/--/g,"+")
+    .replace(/^\+/,"");
+}
+function cleanQuestionObject(q){
+  if(!q)return q;
+  if(q.q)q.q=fixFormulaSigns(q.q);
+  if(q.display)q.display=fixFormulaSigns(q.display);
+  if(q.a)q.a=fixFormulaSigns(q.a);
+  if(q.answer)q.answer=fixFormulaSigns(q.answer);
+  return q;
+}
+
+
+const VERSION = "2.6.3";
 
 let enemyHP = 10;
 let playerHP = 5;
@@ -1310,6 +1330,7 @@ function retryReview(i){
   document.getElementById("gameScreen").classList.add("active");
   document.getElementById("modeTitle").innerText="📚 復習モード";
   document.getElementById("result").innerHTML="";
+  current=cleanQuestionObject(current);
   document.getElementById("q").innerText=current.q;
   document.getElementById("ans").value="";
   updateHP();
@@ -1800,7 +1821,7 @@ function nextQ(){
   let count=0;
 
   do{
-    current=generateQuestion();
+    current=cleanQuestionObject(generateQuestion());
     count++;
   }while(usedQuestions.includes(current.q)&&count<100);
 
@@ -2092,7 +2113,7 @@ function showResultPage(text){
 
   let html="<h2>解いた問題一覧</h2>";
   for(let h of history){
-    html+=`<div class="rankItem">${h.ok?"○":"×"}<br>問題：${h.question}<br>あなた：${h.your}<br>正解：${h.answer}</div>`;
+    html+=`<div class="rankItem">${h.ok?"○":"×"}<br>問題：${fixFormulaSigns(h.question)}<br>あなた：${h.your}<br>正解：${fixFormulaSigns(h.answer)}</div>`;
   }
   document.getElementById("resultList").innerHTML=html;
 }
@@ -2238,7 +2259,7 @@ function makeMatchQuestions(){
   for(let i=0;i<9;i++){
     mode=modes[rand(0,modes.length-1)];
     difficulty="normal";
-    list.push(generateQuestion());
+    list.push(cleanQuestionObject(generateQuestion()));
   }
 
   mode=oldMode;
@@ -2380,6 +2401,7 @@ function showMatchQuestion(room){
   updateMatchHeader(room);
 
   current=room.currentQuestion;
+  current=cleanQuestionObject(current);
   document.getElementById("q").innerText=current.q;
   document.getElementById("ans").value="";
   document.getElementById("result").innerHTML=
@@ -3028,3 +3050,80 @@ function showNewsPage(){
   `;
   if(typeof ensureHomeButton==="function")ensureHomeButton();
 }
+
+
+// Ver2.6.0 Message Collection
+const MESSAGE_COLLECTION = [
+"数学勉強中","まだまだこれから","初心者です","のんびり挑戦中","一歩ずつ前進",
+"今日も頑張る","問題募集中","成長中です","練習あるのみ","地道に攻略",
+"毎日コツコツ","努力は裏切らない","数学探究中","解き続ける者","積み重ねが力になる",
+"学ぶことが好き","知識を集める者","問題を愛する者","解法研究中","数学の旅人",
+"対戦受付中","挑戦者求む","勝利を掴む","連勝中","ライバル募集中",
+"実力勝負","真剣勝負希望","全力で挑む","勝負あるのみ","負けても前進",
+"数学マスターへの道","限界突破","頂点を目指して","壁を越える者","高みを目指す",
+"まだ強くなれる","さらなる高みへ","継続こそ力","実力を磨く","努力継続中",
+"伝説はここから始まる","このゲームの古参","歴史の証人","最初の挑戦者","栄光をその手に",
+"王者への道","不屈の挑戦者","数学界の探検家","新たな伝説を刻む","このゲームの始まりを知る者"
+];
+
+
+// Ver2.6.2 iPhone double tap zoom guard
+let __lastTouchEnd = 0;
+document.addEventListener("touchend", function(e){
+  const now = Date.now();
+  if(now - __lastTouchEnd <= 300){
+    const t = e.target;
+    if(t && (t.tagName === "BUTTON" || t.classList.contains("keyBtn") || t.closest("#customKeyboard"))){
+      e.preventDefault();
+    }
+  }
+  __lastTouchEnd = now;
+}, {passive:false});
+
+document.addEventListener("dblclick", function(e){
+  const t = e.target;
+  if(t && (t.tagName === "BUTTON" || t.classList.contains("keyBtn") || t.closest("#customKeyboard"))){
+    e.preventDefault();
+  }
+}, {passive:false});
+
+
+// Ver2.6.3 stronger iPhone zoom block
+document.addEventListener("gesturestart", function(e){
+  e.preventDefault();
+}, {passive:false});
+
+document.addEventListener("gesturechange", function(e){
+  e.preventDefault();
+}, {passive:false});
+
+document.addEventListener("gestureend", function(e){
+  e.preventDefault();
+}, {passive:false});
+
+let __lastTouchStart = 0;
+document.addEventListener("touchstart", function(e){
+  if(e.touches && e.touches.length > 1){
+    e.preventDefault();
+    return;
+  }
+
+  const now = Date.now();
+  const t = e.target;
+
+  if(now - __lastTouchStart < 300){
+    if(t && (t.tagName === "BUTTON" || t.classList.contains("keyBtn") || t.closest("#customKeyboard"))){
+      e.preventDefault();
+    }
+  }
+
+  __lastTouchStart = now;
+}, {passive:false});
+
+document.addEventListener("touchend", function(e){
+  const t = e.target;
+  if(t && (t.tagName === "BUTTON" || t.classList.contains("keyBtn") || t.closest("#customKeyboard"))){
+    e.preventDefault();
+    if(t.click) t.click();
+  }
+}, {passive:false});
