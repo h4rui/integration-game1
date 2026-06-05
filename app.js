@@ -44,7 +44,7 @@ function cleanQuestionObject(q){
 }
 
 
-const VERSION = "2.6.7";
+const VERSION = "2.6.9";
 
 let enemyHP = 10;
 let playerHP = 5;
@@ -3041,59 +3041,7 @@ function showStatsPage(){
   document.getElementById("panelArea").innerHTML=html;
   if(typeof ensureHomeButton==="function")ensureHomeButton();
 }
-function showNewsPage(){
-  document.getElementById("panelArea").innerHTML=`
-    <h2>📢 お知らせ</h2>
-    <div class="newsCard">
-      <h3>🔴 最新情報</h3>
-      <p>Ver2.6.5 修正版を公開しました。</p>
-      <p>Ver 2.4.0 ベータ版リリース</p>
-      <p>背景テーマ、成績ページ、お知らせページを追加しました。</p>
-    </div>
 
-    
-    <div class="newsCard">
-      <h3>2026/06/05 Ver2.6.7</h3>
-      <p>・+ - × ÷ の演算子をオレンジ色で表示</p>
-      <p>・4連続正解からダメージが増えるコンボシステムを追加</p>
-      <p>・1〜3問目は1ダメージ、4問目から2、3、4…と上昇</p>
-    </div>
-
-    <div class="newsCard">
-      <h3>2026/06/05 Ver2.6.5</h3>
-      <p>・Googleログインボタンが反応しない問題を修正</p>
-      <p>・モード選択ボタンの誤タップ対策を調整</p>
-      <p>・テンキーのダブルタップ拡大対策を維持</p>
-      <p>・お知らせにアップデート履歴を追加</p>
-    </div>
-
-    <div class="newsCard">
-      <h3>2026/06/04 Ver2.4.0 β</h3>
-      <p>・ホーム8カード化</p>
-      <p>・📊成績ページ追加</p>
-      <p>・📢お知らせ追加</p>
-      <p>・🎨背景テーマ追加</p>
-      <p>・名前表示追加</p>
-    </div>
-    <div class="newsCard">
-      <h3>2026/06/04 Ver2.3.0</h3>
-      <p>・青紫の宇宙背景追加</p>
-      <p>・浮かぶ数式アニメーション追加</p>
-      <p>・カード式ホーム追加</p>
-    </div>
-    <div class="newsCard">
-      <h3>2026/06/03 Ver2.2.x</h3>
-      <p>・対戦機能改善</p>
-      <p>・ヒント機能追加</p>
-      <p>・ホームへ戻るボタン追加</p>
-    </div>
-    <div class="newsCard">
-      <h3>不具合報告</h3>
-      <p>不具合があれば「お問い合わせ」から報告してください。</p>
-    </div>
-  `;
-  if(typeof ensureHomeButton==="function")ensureHomeButton();
-}
 
 
 // Ver2.6.0 Message Collection
@@ -3309,3 +3257,108 @@ function addHardDifficultyButtonIfNeeded(){
   }
 }
 setInterval(addHardDifficultyButtonIfNeeded,800);
+
+
+// Ver2.6.9 auto update news system
+const UPDATE_NOTES = {
+  "2.6.9": [
+    "お知らせの自動表示機能を追加",
+    "VERSIONを変えると最新アップデートに反映",
+    "アップデート履歴を管理しやすく改善"
+  ],
+  "2.6.8": [
+    "3連続正解からダメージ増加に変更",
+    "コンボ火力を調整"
+  ],
+  "2.6.7": [
+    "演算子 + - × ÷ をオレンジ表示",
+    "コンボダメージシステムを追加"
+  ],
+  "2.6.6": [
+    "難易度「難問」を追加",
+    "積分に部分積分・置換積分の問題を追加"
+  ],
+  "2.6.5": [
+    "Googleログインボタンの反応を修正",
+    "モード選択の誤タップ対策を調整"
+  ],
+  "2.6.4": [
+    "Googleログイン状態の反映を改善"
+  ],
+  "2.6.3": [
+    "iPhoneの拡大対策を強化"
+  ],
+  "2.6.2": [
+    "テンキーのダブルタップ拡大対策を追加"
+  ],
+  "2.6.1": [
+    "問題表示の +- を - に修正"
+  ],
+  "2.6.0": [
+    "プロフィールメッセージコレクションを追加"
+  ],
+  "2.5.0": [
+    "モンスト風プロフィールカードを追加",
+    "プロフィール背景変更を追加"
+  ],
+  "2.4.0": [
+    "お知らせページを追加",
+    "成績ページを追加",
+    "背景テーマを追加"
+  ],
+  "2.3.0": [
+    "青紫の宇宙背景を追加",
+    "浮かぶ数式アニメーションを追加",
+    "カード式ホームを追加"
+  ]
+};
+
+function getUpdateDateText(){
+  const d=new Date();
+  const y=d.getFullYear();
+  const m=String(d.getMonth()+1).padStart(2,"0");
+  const day=String(d.getDate()).padStart(2,"0");
+  return `${y}/${m}/${day}`;
+}
+
+function updateNotesHTML(){
+  const v = (typeof VERSION !== "undefined") ? VERSION : "2.6.9";
+  let html = `
+    <h2>📢 お知らせ</h2>
+    <div class="newsCard">
+      <h3>🔴 最新アップデート Ver${v}</h3>
+      <p>${getUpdateDateText()}</p>
+  `;
+
+  const latest = UPDATE_NOTES[v] || ["アップデートを適用しました"];
+  for(const note of latest){
+    html += `<p>・${note}</p>`;
+  }
+  html += `</div>`;
+
+  html += `<div class="newsCard"><h3>📝 アップデート履歴</h3></div>`;
+
+  const versions = Object.keys(UPDATE_NOTES).sort((a,b)=>{
+    const pa=a.split(".").map(Number);
+    const pb=b.split(".").map(Number);
+    for(let i=0;i<3;i++){
+      if(pb[i]!==pa[i])return pb[i]-pa[i];
+    }
+    return 0;
+  });
+
+  for(const ver of versions){
+    html += `<div class="newsCard"><h3>Ver${ver}</h3>`;
+    for(const note of UPDATE_NOTES[ver]){
+      html += `<p>・${note}</p>`;
+    }
+    html += `</div>`;
+  }
+
+  return html;
+}
+
+function showNewsPage(){
+  document.getElementById("panelArea").innerHTML = updateNotesHTML();
+  if(typeof ensureHomeButton==="function")ensureHomeButton();
+}
