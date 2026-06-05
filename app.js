@@ -44,7 +44,7 @@ function cleanQuestionObject(q){
 }
 
 
-const VERSION = "2.7.1";
+const VERSION = "2.7.2";
 
 let enemyHP = 10;
 let playerHP = 5;
@@ -3222,7 +3222,7 @@ function addHardDifficultyButtonIfNeeded(){
 setInterval(addHardDifficultyButtonIfNeeded,800);
 
 
-// Ver2.7.1 keyboard-only double tap guard
+
 let __mmLastKeyTouch = 0;
 document.addEventListener("touchend", function(e){
   const t = e.target;
@@ -3236,11 +3236,79 @@ document.addEventListener("touchend", function(e){
 
 
 // Ver2.7.1 stable pages
+
+
+function openSimplePage(html){
+  const menu=document.getElementById("homeMenu");
+  const panel=document.getElementById("panelArea");
+  if(menu)menu.classList.add("hidden");
+  if(panel)panel.innerHTML=html;
+  if(typeof ensureHomeButton==="function")setTimeout(ensureHomeButton,0);
+}
+
+
+
+function showStatsPage(){
+  const total=playerData.totalQuestions||0;
+  const correct=playerData.totalCorrect||0;
+  const rate=total?Math.round(correct/total*100):0;
+  const combo=playerData.maxCombo||0;
+  const level=(typeof getLevel==="function")?getLevel():1;
+  const mh=playerData.matchHistory||[];
+  const wins=mh.filter(x=>x.result==="win").length;
+  const losses=mh.filter(x=>x.result==="loss").length;
+  const mt=wins+losses;
+  const wr=mt?Math.round(wins/mt*100):0;
+
+  let html=`
+    <h2>📊 成績</h2>
+    <div class="statsCard">
+      <h3>総合成績</h3>
+      <p>総回答数：${total}問</p>
+      <p>総正解数：${correct}問</p>
+      <p>正答率：${rate}%</p>
+      <p>最高連続正解：${combo}問</p>
+      <p>レベル：Lv.${level}</p>
+    </div>
+    <div class="statsCard">
+      <h3>対戦成績</h3>
+      <p>総試合数：${mt}</p>
+      <p>勝利：${wins}</p>
+      <p>敗北：${losses}</p>
+      <p>勝率：${wr}%</p>
+    </div>
+  `;
+  openSimplePage(html);
+}
+
+window.showNewsPage=showNewsPage;
+window.showStatsPage=showStatsPage;
+
+
+// Ver2.7.2 keypad operator orange only
+function colorKeypadOperators(){
+  const keys = document.querySelectorAll("#customKeyboard button, #customKeyboard .keyBtn");
+  keys.forEach(btn=>{
+    const t=(btn.textContent||"").trim();
+    if(["+","-","−","×","÷"].includes(t)){
+      btn.classList.add("keyOpOrange");
+    }
+  });
+}
+setInterval(colorKeypadOperators,800);
+window.addEventListener("load",()=>setTimeout(colorKeypadOperators,500));
+
+
+// Ver2.7.2 auto update news system
 const UPDATE_NOTES = {
+  "2.7.2": [
+    "テンキーの + × ÷ - をオレンジ色に変更",
+    "お知らせをVERSION連動の自動表示に変更",
+    "通常ボタンの反応を邪魔しない方式に調整"
+  ],
   "2.7.1": [
     "反応しない問題が出たため安定版から作り直し",
-    "お知らせ・成績ページを安全な方式に修正",
-    "テンキー以外のタップ制御を弱めました"
+    "お知らせ・成績ページを安全な方式に修正"
   ],
   "2.6.9": [
     "お知らせ自動表示の仕組みを追加"
@@ -3280,27 +3348,19 @@ const UPDATE_NOTES = {
   ]
 };
 
-function openSimplePage(html){
-  const menu=document.getElementById("homeMenu");
-  const panel=document.getElementById("panelArea");
-  if(menu)menu.classList.add("hidden");
-  if(panel)panel.innerHTML=html;
-  if(typeof ensureHomeButton==="function")setTimeout(ensureHomeButton,0);
-}
-
-function showNewsPage(){
-  const v = (typeof VERSION !== "undefined") ? VERSION : "2.7.1";
-  let html = `<h2>📢 お知らせ</h2>
+function updateNotesHTML(){
+  const v = (typeof VERSION !== "undefined") ? VERSION : "2.7.2";
+  let html = `
+    <h2>📢 お知らせ</h2>
     <div class="newsCard">
-      <h3>🔴 最新アップデート Ver${v}</h3>`;
+      <h3>🔴 最新アップデート Ver${v}</h3>
+  `;
 
   const latest = UPDATE_NOTES[v] || ["アップデートを適用しました"];
   for(const note of latest){
     html += `<p>・${note}</p>`;
   }
-  html += `</div>`;
-
-  html += `<div class="newsCard"><h3>📝 アップデート履歴</h3></div>`;
+  html += `</div><div class="newsCard"><h3>📝 アップデート履歴</h3></div>`;
 
   const versions = Object.keys(UPDATE_NOTES).sort((a,b)=>{
     const pa=a.split(".").map(Number);
@@ -3318,42 +3378,14 @@ function showNewsPage(){
     }
     html += `</div>`;
   }
-
-  openSimplePage(html);
+  return html;
 }
 
-function showStatsPage(){
-  const total=playerData.totalQuestions||0;
-  const correct=playerData.totalCorrect||0;
-  const rate=total?Math.round(correct/total*100):0;
-  const combo=playerData.maxCombo||0;
-  const level=(typeof getLevel==="function")?getLevel():1;
-  const mh=playerData.matchHistory||[];
-  const wins=mh.filter(x=>x.result==="win").length;
-  const losses=mh.filter(x=>x.result==="loss").length;
-  const mt=wins+losses;
-  const wr=mt?Math.round(wins/mt*100):0;
-
-  let html=`
-    <h2>📊 成績</h2>
-    <div class="statsCard">
-      <h3>総合成績</h3>
-      <p>総回答数：${total}問</p>
-      <p>総正解数：${correct}問</p>
-      <p>正答率：${rate}%</p>
-      <p>最高連続正解：${combo}問</p>
-      <p>レベル：Lv.${level}</p>
-    </div>
-    <div class="statsCard">
-      <h3>対戦成績</h3>
-      <p>総試合数：${mt}</p>
-      <p>勝利：${wins}</p>
-      <p>敗北：${losses}</p>
-      <p>勝率：${wr}%</p>
-    </div>
-  `;
-  openSimplePage(html);
+function showNewsPage(){
+  const menu=document.getElementById("homeMenu");
+  const panel=document.getElementById("panelArea");
+  if(menu)menu.classList.add("hidden");
+  if(panel)panel.innerHTML = updateNotesHTML();
+  if(typeof ensureHomeButton==="function")setTimeout(ensureHomeButton,0);
 }
-
 window.showNewsPage=showNewsPage;
-window.showStatsPage=showStatsPage;
