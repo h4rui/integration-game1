@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5681066295421790"
 crossorigin="anonymous"></script>
-<title>数学マスター Ver 2.6.9</title>
+<title>数学マスター Ver 2.7.0</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <style>
 body{
@@ -296,7 +296,7 @@ a{color:#00ffcc}
   padding:9px 14px;
 }
 
-/* Ver 2.6.9 Space UI */
+/* Ver 2.7.0 Space UI */
 body{
   margin:0;
   color:white;
@@ -349,7 +349,7 @@ body{
   text-shadow:0 0 8px #60a5fa,0 0 18px #7c3aed,0 0 32px #38bdf8;
 }
 #homeScreen h1::after{
-  content:"Ver 2.6.9";display:block;font-size:18px;color:#67e8f9;margin-top:6px;text-shadow:0 0 10px #22d3ee;
+  content:"Ver 2.7.0";display:block;font-size:18px;color:#67e8f9;margin-top:6px;text-shadow:0 0 10px #22d3ee;
 }
 #homePlayerCard{
   width:88%;max-width:780px;margin:18px auto 22px;padding:18px;
@@ -409,7 +409,7 @@ body{
 }
 
 
-/* Ver 2.6.9 additions */
+/* Ver 2.7.0 additions */
 #homePlayerName{
   font-size:26px;
   font-weight:900;
@@ -489,7 +489,7 @@ body{
 }
 
 
-/* Ver 2.6.9 Profile Card UI */
+/* Ver 2.7.0 Profile Card UI */
 .profileHero{
   width:92%;
   max-width:900px;
@@ -764,6 +764,18 @@ button{
   text-shadow:0 0 8px rgba(250,204,21,.4);
 }
 
+
+/* Ver2.7.0 tap/page navigation fix */
+button,.modeBtn{
+  touch-action:manipulation;
+}
+#customKeyboard,#customKeyboard *, .keyBtn{
+  touch-action:manipulation!important;
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;
+  -webkit-user-select:none;
+}
+
 </style>
 <!--
 Googleログイン用メモ:
@@ -807,8 +819,8 @@ h4rui.github.io
   <button class="modeBtn" onclick="openPanelPage('showMatchMenu')">⚔️ 対戦</button>
   <button class="modeBtn" onclick="openPanelPage('showGacha')">🎰 ガチャ</button>
   <button class="modeBtn" onclick="openPanelPage('showProfileMenu')">👤 プロフィール</button>
-  <button class="modeBtn" onclick="showStatsPage()">📊 成績</button>
-  <button class="modeBtn" onclick="showNewsPage()">📢 お知らせ</button>
+  <button class="modeBtn" onclick="openPanelPage('showStatsPage')">📊 成績</button>
+  <button class="modeBtn" onclick="openPanelPage('showNewsPage')">📢 お知らせ</button>
   <button class="modeBtn" onclick="openPanelPage('showOtherMenu')">⚙️ その他</button>
   </div>
   <div id="panelArea"<div id="panelArea"<div id="panelArea"<div id="panelArea"></div>

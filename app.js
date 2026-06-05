@@ -44,7 +44,7 @@ function cleanQuestionObject(q){
 }
 
 
-const VERSION = "2.6.9";
+const VERSION = "2.7.0";
 
 let enemyHP = 10;
 let playerHP = 5;
@@ -299,17 +299,28 @@ function setPanelWithNav(html){
   panel.innerHTML=commonNavHTML()+html;
 }
 
+
 function openPanelPage(fnName){
   const menu=document.getElementById("homeMenu");
   const panel=document.getElementById("panelArea");
   if(menu)menu.classList.add("hidden");
   if(panel)panel.innerHTML="";
-  pushPanelHistory(fnName);
-  eval(fnName+"()");
-  setTimeout(ensureHomeButton,0);
-  setTimeout(ensureHomeButton,300);
-  setTimeout(ensureHomeButton,1000);
+
+  try{
+    if(typeof window[fnName] === "function"){
+      window[fnName]();
+    }else{
+      eval(fnName+"()");
+    }
+  }catch(e){
+    console.error(e);
+    if(panel)panel.innerHTML="<p>ページを開けませんでした。</p>";
+  }
+
+  setTimeout(()=>{ if(typeof ensureHomeButton==="function")ensureHomeButton(); },0);
+  setTimeout(()=>{ if(typeof ensureHomeButton==="function")ensureHomeButton(); },300);
 }
+
 function closePanelPage(){
   const menu=document.getElementById("homeMenu");
   const panel=document.getElementById("panelArea");
@@ -1072,7 +1083,7 @@ function showProfile(){
       <button onclick="saveProfileName()">名前を保存</button>
       <button onclick="showTitles()">称号を変更</button>
       <button onclick="showMatchHistory()">対戦履歴</button>
-      <button onclick="showStatsPage()">成績を見る</button>
+      <button onclick="openPanelPage('showStatsPage')">成績を見る</button>
     </div>
   `;
 
@@ -2200,7 +2211,7 @@ function showProfileMenu(){
 function showOtherMenu(){
   document.getElementById("panelArea").innerHTML=`
     <h2>⚙️ その他</h2>
-    <button class="modeBtn" onclick="showNewsPage()">📢 お知らせ</button><button class="modeBtn" onclick="showStatsPage()">📊 成績</button><button class="modeBtn" onclick="showGuide()">📖 遊び方</button>
+    <button class="modeBtn" onclick="openPanelPage('showNewsPage')">📢 お知らせ</button><button class="modeBtn" onclick="openPanelPage('showStatsPage')">📊 成績</button><button class="modeBtn" onclick="showGuide()">📖 遊び方</button>
     <button class="modeBtn" onclick="showDailyMission()">🎯 デイリーミッション</button>
     <button class="modeBtn" onclick="showLoginCalendar()">📅 ログボカレンダー</button>
     <button class="modeBtn" onclick="showSettings()">⚙️ 設定</button>
@@ -3112,7 +3123,7 @@ document.addEventListener("touchend", function(e){
 }, {passive:false});
 
 
-// Ver2.6.5 safe tap guard
+
 let __safeLastTouchEnd = 0;
 document.addEventListener("touchend", function(e){
   const now = Date.now();
@@ -3325,6 +3336,14 @@ function updateNotesHTML(){
   const v = (typeof VERSION !== "undefined") ? VERSION : "2.6.9";
   let html = `
     <h2>📢 お知らせ</h2>
+
+    <div class="newsCard">
+      <h3>2026/06/05 Ver2.7.0</h3>
+      <p>・タップして次のページに進めない問題を修正</p>
+      <p>・お知らせと成績を独立ページとして開くように修正</p>
+      <p>・テンキー以外のボタン反応を調整</p>
+    </div>
+
     <div class="newsCard">
       <h3>🔴 最新アップデート Ver${v}</h3>
       <p>${getUpdateDateText()}</p>
@@ -3362,3 +3381,40 @@ function showNewsPage(){
   document.getElementById("panelArea").innerHTML = updateNotesHTML();
   if(typeof ensureHomeButton==="function")ensureHomeButton();
 }
+
+
+// Ver2.7.0 safe keyboard-only zoom guard
+let __keyLastTouch = 0;
+document.addEventListener("touchend", function(e){
+  const t = e.target;
+  if(!(t && t.closest && t.closest("#customKeyboard"))) return;
+
+  const now = Date.now();
+  if(now - __keyLastTouch < 300){
+    e.preventDefault();
+  }
+  __keyLastTouch = now;
+}, {passive:false});
+
+document.addEventListener("dblclick", function(e){
+  const t = e.target;
+  if(t && t.closest && t.closest("#customKeyboard")){
+    e.preventDefault();
+  }
+}, {passive:false});
+
+window.showStatsPage = showStatsPage;
+
+window.showNewsPage = showNewsPage;
+
+window.showStudyMenu = showStudyMenu;
+
+window.showRankingMenu = showRankingMenu;
+
+window.showMatchMenu = showMatchMenu;
+
+window.showGacha = showGacha;
+
+window.showProfileMenu = showProfileMenu;
+
+window.showOtherMenu = showOtherMenu;
