@@ -44,7 +44,7 @@ function cleanQuestionObject(q){
 }
 
 
-const VERSION = "2.7.2";
+const VERSION = "2.7.3";
 
 let enemyHP = 10;
 let playerHP = 5;
@@ -299,17 +299,27 @@ function setPanelWithNav(html){
   panel.innerHTML=commonNavHTML()+html;
 }
 
+
 function openPanelPage(fnName){
   const menu=document.getElementById("homeMenu");
   const panel=document.getElementById("panelArea");
   if(menu)menu.classList.add("hidden");
   if(panel)panel.innerHTML="";
   pushPanelHistory(fnName);
-  eval(fnName+"()");
+  try{
+    if(typeof window[fnName]==="function"){
+      window[fnName]();
+    }else{
+      eval(fnName+"()");
+    }
+  }catch(e){
+    console.error(e);
+    if(panel)panel.innerHTML="<p>ページを開けませんでした。</p>";
+  }
   setTimeout(ensureHomeButton,0);
   setTimeout(ensureHomeButton,300);
-  setTimeout(ensureHomeButton,1000);
 }
+
 function closePanelPage(){
   const menu=document.getElementById("homeMenu");
   const panel=document.getElementById("panelArea");
@@ -1396,6 +1406,7 @@ function selectDifficulty(m){
     <button class="modeBtn" onclick="startMode('easy')">🟢 初級</button>
     <button class="modeBtn" onclick="startMode('normal')">🟡 中級</button>
     <button class="modeBtn" onclick="startMode('hard')">🔴 上級</button>
+    <button class="modeBtn hardBtn" onclick="startMode(\'veryHard\')">🔥 難問</button>
   `;
 }
 function startMode(diff){
@@ -1866,7 +1877,7 @@ function nextQ(){
     go.classList.add("goAnim");
 
     setTimeout(()=>{
-      q.innerText=current.q;
+      q.innerHTML=colorOperatorsHTML(current.q);
       q.classList.add("questionAnim");
     },300);
   },200);
@@ -3023,91 +3034,6 @@ const MESSAGE_COLLECTION = [
 
 
 
-let __lastTouchEnd = 0;
-document.addEventListener("touchend", function(e){
-  const now = Date.now();
-  if(now - __lastTouchEnd <= 300){
-    const t = e.target;
-    if(t && (t.tagName === "BUTTON" || t.classList.contains("keyBtn") || t.closest("#customKeyboard"))){
-      e.preventDefault();
-    }
-  }
-  __lastTouchEnd = now;
-}, {passive:false});
-
-document.addEventListener("dblclick", function(e){
-  const t = e.target;
-  if(t && (t.tagName === "BUTTON" || t.classList.contains("keyBtn") || t.closest("#customKeyboard"))){
-    e.preventDefault();
-  }
-}, {passive:false});
-
-
-
-let __lastTouchStart = 0;
-document.addEventListener("touchstart", function(e){
-  if(e.touches && e.touches.length > 1){
-    e.preventDefault();
-    return;
-  }
-
-  const now = Date.now();
-  const t = e.target;
-
-  if(now - __lastTouchStart < 300){
-    if(t && (t.tagName === "BUTTON" || t.classList.contains("keyBtn") || t.closest("#customKeyboard"))){
-      e.preventDefault();
-    }
-  }
-
-  __lastTouchStart = now;
-}, {passive:false});
-
-document.addEventListener("touchend", function(e){
-  const t = e.target;
-  if(t && (t.classList && t.classList.contains("googleLoginBtn"))){
-    return;
-  }
-  if(t && (t.tagName === "BUTTON" || t.classList.contains("keyBtn") || t.closest("#customKeyboard"))){
-    e.preventDefault();
-    if(t.click) t.click();
-  }
-}, {passive:false});
-
-
-
-let __safeLastTouchEnd = 0;
-document.addEventListener("touchend", function(e){
-  const now = Date.now();
-  const t = e.target;
-
-  // Googleログインは絶対に邪魔しない
-  if(t && t.closest && t.closest(".googleLoginBtn")) return;
-
-  // テンキーだけダブルタップ拡大を止める。クリックの再実行はしない。
-  if(t && t.closest && t.closest("#customKeyboard")){
-    if(now - __safeLastTouchEnd <= 320){
-      e.preventDefault();
-    }
-  }
-
-  __safeLastTouchEnd = now;
-}, {passive:false});
-
-document.addEventListener("dblclick", function(e){
-  const t = e.target;
-  if(t && t.closest && t.closest("#customKeyboard")){
-    e.preventDefault();
-  }
-}, {passive:false});
-
-document.addEventListener("gesturestart", function(e){
-  if(e.target && e.target.closest && e.target.closest("#customKeyboard")){
-    e.preventDefault();
-  }
-}, {passive:false});
-
-
 // Ver2.6.6 偏差値55くらいの積分難問
 const HARD_INTEGRAL_QUESTIONS = [
   {
@@ -3212,29 +3138,6 @@ function difficultyLabel(d){
 }
 
 
-function addHardDifficultyButtonIfNeeded(){
-  const panel=document.getElementById("panelArea");
-  if(!panel || panel.innerHTML.includes("veryHard"))return;
-  if(panel.innerHTML.includes("上級") && panel.innerHTML.includes("startStudyMode")){
-    panel.innerHTML = panel.innerHTML.replace(/(<button[^>]*上級<\/button>)/, '$1<button class="hardBtn" onclick="startStudyMode(selectedStudyMode,\\'veryHard\\')">難問</button>');
-  }
-}
-setInterval(addHardDifficultyButtonIfNeeded,800);
-
-
-
-let __mmLastKeyTouch = 0;
-document.addEventListener("touchend", function(e){
-  const t = e.target;
-  if(!(t && t.closest && t.closest("#customKeyboard"))) return;
-  const now = Date.now();
-  if(now - __mmLastKeyTouch < 300){
-    e.preventDefault();
-  }
-  __mmLastKeyTouch = now;
-}, {passive:false});
-
-
 // Ver2.7.1 stable pages
 
 
@@ -3285,33 +3188,38 @@ window.showNewsPage=showNewsPage;
 window.showStatsPage=showStatsPage;
 
 
-// Ver2.7.2 keypad operator orange only
-function colorKeypadOperators(){
-  const keys = document.querySelectorAll("#customKeyboard button, #customKeyboard .keyBtn");
-  keys.forEach(btn=>{
-    const t=(btn.textContent||"").trim();
-    if(["+","-","−","×","÷"].includes(t)){
-      btn.classList.add("keyOpOrange");
-    }
-  });
-}
-setInterval(colorKeypadOperators,800);
-window.addEventListener("load",()=>setTimeout(colorKeypadOperators,500));
+// Ver2.7.3 keypad-only double tap guard
+let __mmKeyLastTouch = 0;
+document.addEventListener("touchend", function(e){
+  const t = e.target;
+  if(!(t && t.closest && t.closest("#customKeyboard"))) return;
+  const now = Date.now();
+  if(now - __mmKeyLastTouch < 300){
+    e.preventDefault();
+  }
+  __mmKeyLastTouch = now;
+}, {passive:false});
+
+document.addEventListener("dblclick", function(e){
+  const t=e.target;
+  if(t && t.closest && t.closest("#customKeyboard")){
+    e.preventDefault();
+  }
+}, {passive:false});
 
 
-// Ver2.7.2 auto update news system
+// Ver2.7.3 auto update news system
 const UPDATE_NOTES = {
-  "2.7.2": [
+  "2.7.3": [
+    "壊れていたpanelAreaのHTMLを修正",
+    "強すぎるタップ制御を削除",
     "テンキーの + × ÷ - をオレンジ色に変更",
     "お知らせをVERSION連動の自動表示に変更",
-    "通常ボタンの反応を邪魔しない方式に調整"
+    "成績・お知らせページを開けるように修正"
   ],
-  "2.7.1": [
-    "反応しない問題が出たため安定版から作り直し",
-    "お知らせ・成績ページを安全な方式に修正"
-  ],
-  "2.6.9": [
-    "お知らせ自動表示の仕組みを追加"
+  "2.7.2": [
+    "テンキーの + × ÷ - をオレンジ色に変更",
+    "お知らせをVERSION連動の自動表示に変更"
   ],
   "2.6.8": [
     "3連続正解からダメージ増加に変更",
@@ -3324,10 +3232,6 @@ const UPDATE_NOTES = {
   "2.6.6": [
     "難易度「難問」を追加",
     "積分に部分積分・置換積分の問題を追加"
-  ],
-  "2.6.5": [
-    "Googleログインボタンの反応を修正",
-    "モード選択の誤タップ対策を調整"
   ],
   "2.6.1": [
     "問題表示の +- を - に修正"
@@ -3349,7 +3253,7 @@ const UPDATE_NOTES = {
 };
 
 function updateNotesHTML(){
-  const v = (typeof VERSION !== "undefined") ? VERSION : "2.7.2";
+  const v = (typeof VERSION !== "undefined") ? VERSION : "2.7.3";
   let html = `
     <h2>📢 お知らせ</h2>
     <div class="newsCard">
@@ -3389,3 +3293,29 @@ function showNewsPage(){
   if(typeof ensureHomeButton==="function")setTimeout(ensureHomeButton,0);
 }
 window.showNewsPage=showNewsPage;
+
+
+// Ver2.7.3 keypad operator orange only
+function colorKeypadOperators(){
+  const keys = document.querySelectorAll("#customKeyboard button, #customKeyboard .keyBtn");
+  keys.forEach(btn=>{
+    const t=(btn.textContent||"").trim();
+    if(["+","-","−","×","÷"].includes(t)){
+      btn.classList.add("keyOpOrange");
+    }
+  });
+}
+setInterval(colorKeypadOperators,800);
+window.addEventListener("load",()=>setTimeout(colorKeypadOperators,500));
+
+window.showStudyMenu=showStudyMenu;
+
+window.showRankingMenu=showRankingMenu;
+
+window.showMatchMenu=showMatchMenu;
+
+window.showGacha=showGacha;
+
+window.showProfileMenu=showProfileMenu;
+
+window.showOtherMenu=showOtherMenu;
