@@ -1,4 +1,29 @@
 
+// Ver2.6.7 operator color and combo damage
+function colorOperatorsHTML(s){
+  if(s===undefined || s===null)return "";
+  return String(s)
+    .replace(/\+/g,'<span class="operatorOrange">+</span>')
+    .replace(/-/g,'<span class="operatorOrange">-</span>')
+    .replace(/×/g,'<span class="operatorOrange">×</span>')
+    .replace(/÷/g,'<span class="operatorOrange">÷</span>');
+}
+function comboDamageValue(combo){
+  combo = combo || 0;
+  if(combo <= 2)return 1;
+  return combo - 1;
+}
+function showComboDamage(){
+  const result=document.getElementById("result");
+  if(!result)return;
+  const dmg=comboDamageValue(combo||0);
+  const html=`<div class="comboDamageBox">🔥 ${combo||0} COMBO　⚔️ ${dmg} DAMAGE</div>`;
+  if(!result.innerHTML.includes("comboDamageBox")){
+    result.innerHTML = html + result.innerHTML;
+  }
+}
+
+
 // Ver2.6.1 formula display fix
 function fixFormulaSigns(s){
   if(s===undefined || s===null)return s;
@@ -19,7 +44,7 @@ function cleanQuestionObject(q){
 }
 
 
-const VERSION = "2.6.4";
+const VERSION = "2.6.7";
 
 let enemyHP = 10;
 let playerHP = 5;
@@ -1328,9 +1353,10 @@ function retryReview(i){
   document.getElementById("modeTitle").innerText="📚 復習モード";
   document.getElementById("result").innerHTML="";
   current=cleanQuestionObject(current);
-  document.getElementById("q").innerText=current.q;
+  document.getElementById("q").innerHTML=colorOperatorsHTML(current.q);
   document.getElementById("ans").value="";
   updateHP();
+    showComboDamage();
 }
 
 function recordPlayDay(){
@@ -1934,7 +1960,8 @@ async function submit(){
 
     if(mode==="integral")updateMission("integral");
 
-    if(mode!=="random"&&mode!=="review")enemyHP--;
+    if(mode!=="random"&&mode!=="review")enemyHP-=comboDamageValue(combo);
+    if(enemyHP<0)enemyHP=0;
 
     if(settings.se)document.getElementById("se_correct").play();
 
@@ -2399,7 +2426,7 @@ function showMatchQuestion(room){
 
   current=room.currentQuestion;
   current=cleanQuestionObject(current);
-  document.getElementById("q").innerText=current.q;
+  document.getElementById("q").innerHTML=colorOperatorsHTML(current.q);
   document.getElementById("ans").value="";
   document.getElementById("result").innerHTML=
     `<p>第${(room.round||0)+1}問　先に正解した方が1ポイント</p>`;
@@ -2437,6 +2464,7 @@ async function submitMatchAnswer(u){
   if(!ok)ok=normalize(u)===normalize(current.display);
 
   if(!ok){
+    combo=0; // reset combo
     document.getElementById("result").innerHTML="× 不正解。もう一度！";
     return true;
   }
@@ -3018,9 +3046,27 @@ function showNewsPage(){
     <h2>📢 お知らせ</h2>
     <div class="newsCard">
       <h3>🔴 最新情報</h3>
+      <p>Ver2.6.5 修正版を公開しました。</p>
       <p>Ver 2.4.0 ベータ版リリース</p>
       <p>背景テーマ、成績ページ、お知らせページを追加しました。</p>
     </div>
+
+    
+    <div class="newsCard">
+      <h3>2026/06/05 Ver2.6.7</h3>
+      <p>・+ - × ÷ の演算子をオレンジ色で表示</p>
+      <p>・4連続正解からダメージが増えるコンボシステムを追加</p>
+      <p>・1〜3問目は1ダメージ、4問目から2、3、4…と上昇</p>
+    </div>
+
+    <div class="newsCard">
+      <h3>2026/06/05 Ver2.6.5</h3>
+      <p>・Googleログインボタンが反応しない問題を修正</p>
+      <p>・モード選択ボタンの誤タップ対策を調整</p>
+      <p>・テンキーのダブルタップ拡大対策を維持</p>
+      <p>・お知らせにアップデート履歴を追加</p>
+    </div>
+
     <div class="newsCard">
       <h3>2026/06/04 Ver2.4.0 β</h3>
       <p>・ホーム8カード化</p>
@@ -3065,7 +3111,7 @@ const MESSAGE_COLLECTION = [
 ];
 
 
-// Ver2.6.2 iPhone double tap zoom guard
+
 let __lastTouchEnd = 0;
 document.addEventListener("touchend", function(e){
   const now = Date.now();
@@ -3086,18 +3132,6 @@ document.addEventListener("dblclick", function(e){
 }, {passive:false});
 
 
-// Ver2.6.3 stronger iPhone zoom block
-document.addEventListener("gesturestart", function(e){
-  e.preventDefault();
-}, {passive:false});
-
-document.addEventListener("gesturechange", function(e){
-  e.preventDefault();
-}, {passive:false});
-
-document.addEventListener("gestureend", function(e){
-  e.preventDefault();
-}, {passive:false});
 
 let __lastTouchStart = 0;
 document.addEventListener("touchstart", function(e){
@@ -3128,3 +3162,150 @@ document.addEventListener("touchend", function(e){
     if(t.click) t.click();
   }
 }, {passive:false});
+
+
+// Ver2.6.5 safe tap guard
+let __safeLastTouchEnd = 0;
+document.addEventListener("touchend", function(e){
+  const now = Date.now();
+  const t = e.target;
+
+  // Googleログインは絶対に邪魔しない
+  if(t && t.closest && t.closest(".googleLoginBtn")) return;
+
+  // テンキーだけダブルタップ拡大を止める。クリックの再実行はしない。
+  if(t && t.closest && t.closest("#customKeyboard")){
+    if(now - __safeLastTouchEnd <= 320){
+      e.preventDefault();
+    }
+  }
+
+  __safeLastTouchEnd = now;
+}, {passive:false});
+
+document.addEventListener("dblclick", function(e){
+  const t = e.target;
+  if(t && t.closest && t.closest("#customKeyboard")){
+    e.preventDefault();
+  }
+}, {passive:false});
+
+document.addEventListener("gesturestart", function(e){
+  if(e.target && e.target.closest && e.target.closest("#customKeyboard")){
+    e.preventDefault();
+  }
+}, {passive:false});
+
+
+// Ver2.6.6 偏差値55くらいの積分難問
+const HARD_INTEGRAL_QUESTIONS = [
+  {
+    q:"難問：∫xsinx dx",
+    a:"-xcosx+sinx+C",
+    display:"-xcosx+sinx+C",
+    explanation:"部分積分。xを微分、sinxを積分する。∫xsinx dx = -xcosx+∫cosx dx = -xcosx+sinx+C"
+  },
+  {
+    q:"難問：∫xcosx dx",
+    a:"xsinx+cosx+C",
+    display:"xsinx+cosx+C",
+    explanation:"部分積分。xを微分、cosxを積分する。∫xcosx dx = xsinx-∫sinx dx = xsinx+cosx+C"
+  },
+  {
+    q:"難問：∫2x(x²+1)^3 dx",
+    a:"(x²+1)^4/4+C",
+    display:"(x²+1)^4/4+C",
+    explanation:"置換積分。t=x²+1 とおくと dt=2x dx。∫t^3dt=t^4/4+C"
+  },
+  {
+    q:"難問：∫x/(x²+4) dx",
+    a:"1/2log(x²+4)+C",
+    display:"1/2log(x²+4)+C",
+    explanation:"置換積分。t=x²+4 とおくと dt=2x dx。答えは 1/2log(x²+4)+C"
+  },
+  {
+    q:"難問：∫(3x+1)^4 dx",
+    a:"(3x+1)^5/15+C",
+    display:"(3x+1)^5/15+C",
+    explanation:"置換積分。t=3x+1 とおくと dt=3dx。∫(3x+1)^4dx=(3x+1)^5/15+C"
+  },
+  {
+    q:"難問：∫sin²x dx",
+    a:"x/2-sin2x/4+C",
+    display:"x/2-sin2x/4+C",
+    explanation:"半角公式 sin²x=(1-cos2x)/2 を使う。"
+  },
+  {
+    q:"難問：∫cos²x dx",
+    a:"x/2+sin2x/4+C",
+    display:"x/2+sin2x/4+C",
+    explanation:"半角公式 cos²x=(1+cos2x)/2 を使う。"
+  },
+  {
+    q:"難問：∫e^x(x+1) dx",
+    a:"xe^x+C",
+    display:"xe^x+C",
+    explanation:"xe^x を微分すると e^x(x+1)。逆に見れば答えは xe^x+C。"
+  },
+  {
+    q:"難問：∫xe^(x²) dx",
+    a:"1/2e^(x²)+C",
+    display:"1/2e^(x²)+C",
+    explanation:"置換積分。t=x² とおくと dt=2x dx。"
+  },
+  {
+    q:"難問：∫1/(2x+1) dx",
+    a:"1/2log(2x+1)+C",
+    display:"1/2log(2x+1)+C",
+    explanation:"log型。分母の微分が2なので、係数1/2を付ける。"
+  },
+  {
+    q:"難問：∫₀¹ 2x(x²+1)^2 dx",
+    a:"7/3",
+    display:"7/3",
+    explanation:"t=x²+1 と置換。範囲は x=0→t=1, x=1→t=2。∫₁²t²dt=7/3。"
+  },
+  {
+    q:"難問：∫₀¹ x/(x²+1) dx",
+    a:"1/2log2",
+    display:"1/2log2",
+    explanation:"t=x²+1 と置換。範囲は1から2。答えは 1/2log2。"
+  }
+];
+
+function generateHardIntegralQuestion(){
+  const q = HARD_INTEGRAL_QUESTIONS[rand(0,HARD_INTEGRAL_QUESTIONS.length-1)];
+  return cleanQuestionObject ? cleanQuestionObject({...q}) : {...q};
+}
+
+
+// Ver2.6.6 難問モード差し込み
+if(typeof generateQuestion === "function" && !window.__hardQuestionWrapped){
+  window.__hardQuestionWrapped = true;
+  const __originalGenerateQuestion = generateQuestion;
+  generateQuestion = function(){
+    if((difficulty==="veryHard" || difficulty==="difficult" || difficulty==="難問") && mode==="integral"){
+      return generateHardIntegralQuestion();
+    }
+    return __originalGenerateQuestion();
+  };
+}
+
+
+function difficultyLabel(d){
+  if(d==="easy")return "初級";
+  if(d==="normal")return "中級";
+  if(d==="hard")return "上級";
+  if(d==="veryHard")return "難問";
+  return d;
+}
+
+
+function addHardDifficultyButtonIfNeeded(){
+  const panel=document.getElementById("panelArea");
+  if(!panel || panel.innerHTML.includes("veryHard"))return;
+  if(panel.innerHTML.includes("上級") && panel.innerHTML.includes("startStudyMode")){
+    panel.innerHTML = panel.innerHTML.replace(/(<button[^>]*上級<\/button>)/, '$1<button class="hardBtn" onclick="startStudyMode(selectedStudyMode,\\'veryHard\\')">難問</button>');
+  }
+}
+setInterval(addHardDifficultyButtonIfNeeded,800);
