@@ -1,4 +1,18 @@
 
+// Ver2.7.9 expression cleanup
+function cleanMathExpression(expr){
+  if(expr===undefined || expr===null) return expr;
+  let s = String(expr);
+  s = s.replace(/\+\s*-/g,"-").replace(/-\s*\+/g,"-").replace(/\+\s*\+/g,"+").replace(/--/g,"+");
+  s = s.replace(/(^|[+\-(])1x/g, "$1x");
+  s = s.replace(/(^|[+\-(])-1x/g, "$1-x");
+  s = s.replace(/(^|[+\-])0x(\^?\d*)?/g, "");
+  s = s.replace(/\(\+/g,"(").replace(/^\+/,"");
+  s = s.replace(/\s+/g," ").trim();
+  return s;
+}
+
+
 // Ver2.6.7 operator color and combo damage
 function colorOperatorsHTML(s){
   if(s===undefined || s===null)return "";
@@ -44,7 +58,7 @@ function cleanQuestionObject(q){
 }
 
 
-const VERSION = "2.7.6";
+const VERSION = "2.7.9";
 
 let enemyHP = 10;
 let playerHP = 5;
@@ -1013,6 +1027,7 @@ function getExpPercent(){
   const need=level*100;
   return Math.min(100,Math.round((currentExp%need)/need*100));
 }
+
 function showProfile(){
   const name=playerProfile.name||"名無し";
   const title=playerData.equippedTitle||"初心者";
@@ -1069,7 +1084,13 @@ function showProfile(){
     <div class="profileBgSelector">
       <h3>プロフィール編集</h3>
       <input id="nameInput" placeholder="名前" value="${name}">
-      <button onclick="saveProfileName()">名前を保存</button>
+      <div class="iconPreviewWrap">
+        <img id="iconPreview" class="iconPreview" src="${icon || ""}">
+        <br>
+        <label class="fileInputLabel" for="iconInputEdit">画像を選ぶ</label>
+        <input id="iconInputEdit" type="file" accept="image/*" onchange="previewProfileIcon()">
+      </div>
+      <button onclick="saveProfileFromPanel()">名前・アイコンを保存</button>
       <button onclick="showTitles()">称号を変更</button>
       <button onclick="showMatchHistory()">対戦履歴</button>
       <button onclick="showStatsPage()">成績を見る</button>
@@ -1079,6 +1100,7 @@ function showProfile(){
   document.getElementById("panelArea").innerHTML=html;
   if(typeof ensureHomeButton==="function")ensureHomeButton();
 }
+
 function saveProfileName(){
   const v=document.getElementById("nameInput").value.trim();
   if(!v){alert("名前を入力して");return;}
@@ -1116,29 +1138,7 @@ function showOpponentProfile(data){
   if(typeof ensureHomeButton==="function")ensureHomeButton();
 }
 
-function saveProfileFromPanel(){
-  let name=document.getElementById("playerNameEdit").value.trim();
-  let file=document.getElementById("iconInputEdit").files[0];
 
-  if(name)playerProfile.name=name;
-
-  if(file){
-    let reader=new FileReader();
-    reader.onload=function(e){
-      playerProfile.icon=e.target.result;
-      saveAllData();
-      updateHomeStatus();
-      showProfile();
-      alert("保存したよ");
-    };
-    reader.readAsDataURL(file);
-  }else{
-    saveAllData();
-    updateHomeStatus();
-    showProfile();
-    alert("保存したよ");
-  }
-}
 
 function showContact(){
   document.getElementById("panelArea").innerHTML=`
@@ -1353,7 +1353,7 @@ function retryReview(i){
   document.getElementById("modeTitle").innerText="📚 復習モード";
   document.getElementById("result").innerHTML="";
   current=cleanQuestionObject(current);
-  document.getElementById("q").innerText=current.q;
+  document.getElementById("q").innerText=cleanMathExpression(current.q);
   document.getElementById("ans").value="";
   updateHP();
     showComboDamage();
@@ -1869,7 +1869,7 @@ function nextQ(){
     go.classList.add("goAnim");
 
     setTimeout(()=>{
-      q.innerText=current.q;
+      q.innerText=cleanMathExpression(current.q);
       q.classList.add("questionAnim");
     },300);
   },200);
@@ -2431,7 +2431,7 @@ function showMatchQuestion(room){
 
   current=room.currentQuestion;
   current=cleanQuestionObject(current);
-  document.getElementById("q").innerText=current.q;
+  document.getElementById("q").innerText=cleanMathExpression(current.q);
   document.getElementById("ans").value="";
   document.getElementById("result").innerHTML=
     `<p>第${(room.round||0)+1}問　先に正解した方が1ポイント</p>`;
@@ -3419,10 +3419,10 @@ function showAchievements(){
 
 // Ver2.7.6 enemy mob system
 function getEnemyInfo(){
-  if(difficulty==="normal")return {key:"normal", name:"ゴブリン", img:"images/enemy_goblin.png", label:"中級"};
-  if(difficulty==="hard")return {key:"hard", name:"オーガ", img:"images/enemy_ogre.png", label:"上級"};
-  if(difficulty==="veryHard")return {key:"veryHard", name:"ドラゴン", img:"images/enemy_dragon.png", label:"難問"};
-  return {key:"easy", name:"スライム", img:"images/enemy_slime.png", label:"初級"};
+  if(difficulty==="normal")return {key:"normal", name:"ゴブリン", img:"enemy_goblin.png", label:"中級"};
+  if(difficulty==="hard")return {key:"hard", name:"オーガ", img:"enemy_ogre.png", label:"上級"};
+  if(difficulty==="veryHard")return {key:"veryHard", name:"ドラゴン", img:"enemy_dragon.png", label:"難問"};
+  return {key:"easy", name:"スライム", img:"enemy_slime.png", label:"初級"};
 }
 function renderEnemyMob(){
   const area=document.getElementById("enemyMobArea");
@@ -3435,7 +3435,8 @@ function renderEnemyMob(){
   area.innerHTML=`
     <div id="enemyMobCard" class="enemyMobWrap enemy-${e.key}">
       <div class="enemyMobName">${e.label}　${e.name}</div>
-      <img class="enemyMobImg" src="${e.img}" alt="${e.name}">
+      <img class="enemyMobImg ${e.key==='easy'?'slime':''}" src="${e.img}" alt="${e.name}"
+        onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<div style=&quot;font-size:82px&quot;>👾</div>')">
       <div>HP 10 / 10</div>
     </div>
   `;
@@ -3444,3 +3445,66 @@ function playEnemyDefeat(){
   const card=document.getElementById("enemyMobCard");
   if(card)card.classList.add("enemyMobDefeated");
 }
+
+
+// Ver2.7.9 profile icon preview/save
+function previewProfileIcon(){
+  const input=document.getElementById("iconInputEdit");
+  const preview=document.getElementById("iconPreview");
+  if(!input || !input.files || !input.files[0])return;
+  const file=input.files[0];
+  const reader=new FileReader();
+  reader.onload=function(e){
+    if(preview)preview.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function resizeImageDataUrl(file, maxSize=360){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=function(e){
+      const img=new Image();
+      img.onload=function(){
+        let w=img.width, h=img.height;
+        if(w>h && w>maxSize){h=Math.round(h*maxSize/w);w=maxSize;}
+        else if(h>=w && h>maxSize){w=Math.round(w*maxSize/h);h=maxSize;}
+        const canvas=document.createElement("canvas");
+        canvas.width=w; canvas.height=h;
+        const ctx=canvas.getContext("2d");
+        ctx.drawImage(img,0,0,w,h);
+        resolve(canvas.toDataURL("image/png"));
+      };
+      img.onerror=reject;
+      img.src=e.target.result;
+    };
+    reader.onerror=reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function saveProfileFromPanel(){
+  let nameInput=document.getElementById("nameInput") || document.getElementById("playerNameEdit");
+  let name=nameInput ? nameInput.value.trim() : "";
+  let input=document.getElementById("iconInputEdit");
+
+  if(name)playerProfile.name=name;
+
+  if(input && input.files && input.files[0]){
+    try{
+      playerProfile.icon=await resizeImageDataUrl(input.files[0],360);
+    }catch(e){
+      alert("画像の保存に失敗しました");
+      console.error(e);
+      return;
+    }
+  }
+
+  saveAllData();
+  updateHomeStatus();
+  if(typeof savePublicProfile==="function")savePublicProfile();
+  showProfile();
+  alert("保存したよ");
+}
+window.previewProfileIcon=previewProfileIcon;
+window.saveProfileFromPanel=saveProfileFromPanel;
