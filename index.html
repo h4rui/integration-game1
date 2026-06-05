@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5681066295421790"
 crossorigin="anonymous"></script>
-<title>数学マスター Ver 2.6.3</title>
+<title>数学マスター Ver 2.6.4</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
 <style>
 body{
@@ -296,7 +296,7 @@ a{color:#00ffcc}
   padding:9px 14px;
 }
 
-/* Ver 2.6.3 Space UI */
+/* Ver 2.6.4 Space UI */
 body{
   margin:0;
   color:white;
@@ -349,7 +349,7 @@ body{
   text-shadow:0 0 8px #60a5fa,0 0 18px #7c3aed,0 0 32px #38bdf8;
 }
 #homeScreen h1::after{
-  content:"Ver 2.6.3";display:block;font-size:18px;color:#67e8f9;margin-top:6px;text-shadow:0 0 10px #22d3ee;
+  content:"Ver 2.6.4";display:block;font-size:18px;color:#67e8f9;margin-top:6px;text-shadow:0 0 10px #22d3ee;
 }
 #homePlayerCard{
   width:88%;max-width:780px;margin:18px auto 22px;padding:18px;
@@ -409,7 +409,7 @@ body{
 }
 
 
-/* Ver 2.6.3 additions */
+/* Ver 2.6.4 additions */
 #homePlayerName{
   font-size:26px;
   font-weight:900;
@@ -489,7 +489,7 @@ body{
 }
 
 
-/* Ver 2.6.3 Profile Card UI */
+/* Ver 2.6.4 Profile Card UI */
 .profileHero{
   width:92%;
   max-width:900px;
@@ -813,7 +813,7 @@ h4rui.github.io
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import { getFirestore, collection, doc, setDoc, getDoc, getDocs, query, where, limit, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDVXwXTGeft41ajd0KDwNPG-dH8pmsMIt8",
@@ -832,11 +832,83 @@ window.firebaseAuth = auth;
 setPersistence(auth,browserLocalPersistence).catch((e)=>console.error(e));
 const provider = new GoogleAuthProvider();
 provider.setCustomParameters({ prompt:"select_account" });
-window.currentUser = null;
+
+window.loginGoogle = async function(){
+  try{
+    localStorage.setItem("loginTrying","1");
+    await setPersistence(auth,browserLocalPersistence);
+    await signInWithRedirect(auth,provider);
+  }catch(e){
+    console.error(e);
+    alert("Googleログイン開始に失敗：" + (e.code || e.message || e));
+  }
+};
+
+function applyGoogleLoginState(user){
+  window.currentUser = user || null;
+
+  if(user){
+    localStorage.setItem("googleLoginName", user.displayName || "Googleユーザー");
+    localStorage.setItem("googleLoginUid", user.uid);
+    localStorage.removeItem("loginTrying");
+
+    if(window.unlockAchievement){
+      window.unlockAchievement("初ログイン");
+      if(window.saveAllData) window.saveAllData();
+    }
+  }
+
+  if(window.refreshLoginStatus) window.refreshLoginStatus();
+  if(window.updateHomeStatus) window.updateHomeStatus();
+}
+
+getRedirectResult(auth)
+  .then((result)=>{
+    if(result && result.user){
+      applyGoogleLoginState(result.user);
+      alert("Googleログイン成功：" + (result.user.displayName || "Googleユーザー"));
+    }
+  })
+  .catch((e)=>{
+    console.error(e);
+    localStorage.removeItem("loginTrying");
+    alert("Googleログイン確認エラー：" + (e.code || e.message || e));
+  });
+
+onAuthStateChanged(auth,user=>{
+  applyGoogleLoginState(user);
+
+  if(!user && localStorage.getItem("loginTrying")==="1"){
+    setTimeout(()=>{
+      if(!auth.currentUser){
+        alert("Googleログイン後に認証状態を取得できませんでした。Safariの設定でサイト越えトラッキング防止が強い場合があります。もう一度ログインを押してください。");
+        localStorage.removeItem("loginTrying");
+      }
+    },2500);
+  }
+});
+
+window.logoutGoogle = async function(){
+  try{
+    await signOut(auth);
+  }finally{
+    window.currentUser=null;
+    localStorage.removeItem("googleLoginName");
+    localStorage.removeItem("googleLoginUid");
+    localStorage.removeItem("loginTrying");
+    if(window.refreshLoginStatus) window.refreshLoginStatus();
+    if(window.updateHomeStatus) window.updateHomeStatus();
+    alert("ログアウトしました");
+  }
+};
 
 window.getGoogleLoginInfo = function(){
   return auth.currentUser || window.currentUser || null;
 };
+
+window.currentUser = null;
+
+
 
 function applyGoogleLoginState(user){
   window.currentUser = user || null;
@@ -858,65 +930,17 @@ function applyGoogleLoginState(user){
   if(window.updateHomeStatus) window.updateHomeStatus();
 }
 
-onAuthStateChanged(auth,user=>{
-  applyGoogleLoginState(user);
-});
 
-window.loginGoogle = async function(){
-  try{
-    await signInWithRedirect(auth,provider);
-  }catch(e){
-    console.error(e);
-    alert("Googleログイン開始に失敗：" + e.code);
-  }
-};
 
-getRedirectResult(auth)
-  .then((result)=>{
-    if(result && result.user){
-      applyGoogleLoginState(result.user);
-      alert("Googleログイン成功：" + (result.user.displayName || "Googleユーザー"));
-    }
-  })
-  .catch((e)=>{
-    console.error(e);
-    if(e && e.code){
-      alert("Googleログイン確認エラー：" + e.code);
-    }
-  });
 
-getRedirectResult(auth)
-  .then((result)=>{
-    if(result && result.user){
-      window.currentUser = result.user;
-      alert("Googleログイン成功：" + (result.user.displayName || "Googleユーザー"));
-      if(window.refreshLoginStatus) window.refreshLoginStatus();
-    }
-  })
-  .catch((e)=>{
-    console.error(e);
-  });
 
-getRedirectResult(auth)
-  .then((result)=>{
-    if(result && result.user){
-      window.currentUser = result.user;
-      alert("Googleログイン成功：" + (result.user.displayName || "Googleユーザー"));
-      if(window.refreshLoginStatus) window.refreshLoginStatus();
-    }
-  })
-  .catch((e)=>{
-    console.error(e);
-  });
 
-window.logoutGoogle = async function(){
-  await signOut(auth);
-  window.currentUser = null;
-  localStorage.removeItem("googleLoginName");
-  alert("ログアウトしました");
-  if(window.refreshLoginStatus) window.refreshLoginStatus();
-  if(window.updateHomeStatus) window.updateHomeStatus();
-};
+
+
+
+
+
+
 
 function getWeekKey(){
   const now = new Date();

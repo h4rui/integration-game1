@@ -19,7 +19,7 @@ function cleanQuestionObject(q){
 }
 
 
-const VERSION = "2.6.3";
+const VERSION = "2.6.4";
 
 let enemyHP = 10;
 let playerHP = 5;
@@ -316,6 +316,7 @@ function applySettings(){
 }
 function toggleBGM(){settings.bgm=!settings.bgm;saveAllData();applySettings();showSettings();}
 function toggleSE(){settings.se=!settings.se;saveAllData();showSettings();}
+
 function refreshLoginStatus(){
   let el=document.getElementById("loginStatus");
   let home=document.getElementById("homeLoginStatus");
@@ -328,28 +329,24 @@ function refreshLoginStatus(){
   }
 
   let savedName=localStorage.getItem("googleLoginName");
+  let uid=localStorage.getItem("googleLoginUid");
   let name=user ? (user.displayName || "Googleユーザー") : savedName;
 
-  if(name){
-    if(el){
-      el.innerText="ログイン中：" + name;
-    }
-
+  if(user || uid || name){
+    if(el)el.innerText="ログイン中：" + (name || "Googleユーザー");
     if(home){
-      home.innerHTML="🟢 ログイン中：" + name;
+      home.innerHTML="🟢 ログイン中：" + (name || "Googleユーザー");
       home.className="loginOk";
     }
   }else{
-    if(el){
-      el.innerText="未ログイン";
-    }
-
+    if(el)el.innerText="未ログイン";
     if(home){
       home.innerHTML="🔴 未ログイン";
       home.className="loginNg";
     }
   }
 }
+
 function unlockTitle(t){if(!playerData.unlockedTitles.includes(t))playerData.unlockedTitles.push(t);}
 function equipTitle(t){if(playerData.unlockedTitles.includes(t)){playerData.equippedTitle=t;saveAllData();updateHomeStatus();showTitles();}}
 function unlockAchievement(a){if(!playerData.achievements.includes(a))playerData.achievements.push(a);}
@@ -936,7 +933,7 @@ function showSettings(){
       <button onclick="toggleSE()">🔊 効果音 ${settings.se?"ON":"OFF"}</button>
     </div>
     <div class="settingsItem">
-      <button onclick="loginGoogle()">Googleログイン</button>
+      <button class="googleLoginBtn" onclick="loginGoogle()">Googleログイン</button>
       <button onclick="logoutGoogle()">ログアウト</button><button onclick="checkGoogleLoginStatus()">ログイン状態確認</button><button onclick="testFirestoreConnection()">Firestore接続確認</button>
       <p id="loginStatus">確認中...</p>
     </div>
@@ -2526,21 +2523,22 @@ async function finishMatch(room){
 
 
 
+
 function checkGoogleLoginStatus(){
   let user=null;
-  if(window.getGoogleLoginInfo){
-    user=window.getGoogleLoginInfo();
-  }else if(window.currentUser){
-    user=window.currentUser;
-  }
-  let savedName=localStorage.getItem("googleLoginName");
+  if(window.getGoogleLoginInfo)user=window.getGoogleLoginInfo();
+  else if(window.currentUser)user=window.currentUser;
 
-  if(user || savedName){
-    alert("ログイン中\n名前：" + ((user && user.displayName) || savedName || "Googleユーザー"));
+  const savedName=localStorage.getItem("googleLoginName");
+  const uid=localStorage.getItem("googleLoginUid");
+
+  if(user || uid || savedName){
+    alert("ログイン中\n名前：" + ((user&&user.displayName)||savedName||"Googleユーザー") + "\nUID保存：" + (uid ? "あり" : "なし"));
   }else{
     alert("未ログインです");
   }
 }
+
 
 
 function getQuestionHint(q){
@@ -3122,6 +3120,9 @@ document.addEventListener("touchstart", function(e){
 
 document.addEventListener("touchend", function(e){
   const t = e.target;
+  if(t && (t.classList && t.classList.contains("googleLoginBtn"))){
+    return;
+  }
   if(t && (t.tagName === "BUTTON" || t.classList.contains("keyBtn") || t.closest("#customKeyboard"))){
     e.preventDefault();
     if(t.click) t.click();
