@@ -44,7 +44,7 @@ function cleanQuestionObject(q){
 }
 
 
-const VERSION = "2.7.5";
+const VERSION = "2.7.6";
 
 let enemyHP = 10;
 let playerHP = 5;
@@ -1422,6 +1422,7 @@ function openGame(){
   if(mode==="arithmetic")title="⚔️ 四則演算バトル ⚔️";
   if(mode==="random")title="⚔️ ランキングモード ⚔️";
   document.getElementById("modeTitle").innerText=title;
+  renderEnemyMob();
 }
 function backHome(){
   if(matchState && matchState.active && matchState.roomId){try{leaveMatchRoom(matchState.roomId,matchState.side);}catch(e){}}
@@ -2069,7 +2070,8 @@ function nextTurn(){
 
   if(mode!=="random"){
     if(enemyHP<=0){
-      showEnd("勝利！");
+      playEnemyDefeat();
+      setTimeout(()=>showEnd("勝利！"),450);
       return;
     }
 
@@ -3412,4 +3414,33 @@ function showAchievements(){
     `;
   }
   document.getElementById("panelArea").innerHTML=html;
+}
+
+
+// Ver2.7.6 enemy mob system
+function getEnemyInfo(){
+  if(difficulty==="normal")return {key:"normal", name:"ゴブリン", img:"images/enemy_goblin.png", label:"中級"};
+  if(difficulty==="hard")return {key:"hard", name:"オーガ", img:"images/enemy_ogre.png", label:"上級"};
+  if(difficulty==="veryHard")return {key:"veryHard", name:"ドラゴン", img:"images/enemy_dragon.png", label:"難問"};
+  return {key:"easy", name:"スライム", img:"images/enemy_slime.png", label:"初級"};
+}
+function renderEnemyMob(){
+  const area=document.getElementById("enemyMobArea");
+  if(!area)return;
+  if(mode==="random" || mode==="review" || (matchState && matchState.active)){
+    area.innerHTML="";
+    return;
+  }
+  const e=getEnemyInfo();
+  area.innerHTML=`
+    <div id="enemyMobCard" class="enemyMobWrap enemy-${e.key}">
+      <div class="enemyMobName">${e.label}　${e.name}</div>
+      <img class="enemyMobImg" src="${e.img}" alt="${e.name}">
+      <div>HP 10 / 10</div>
+    </div>
+  `;
+}
+function playEnemyDefeat(){
+  const card=document.getElementById("enemyMobCard");
+  if(card)card.classList.add("enemyMobDefeated");
 }
