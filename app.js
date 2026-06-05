@@ -44,7 +44,7 @@ function cleanQuestionObject(q){
 }
 
 
-const VERSION = "2.7.0";
+const VERSION = "2.7.1";
 
 let enemyHP = 10;
 let playerHP = 5;
@@ -299,28 +299,17 @@ function setPanelWithNav(html){
   panel.innerHTML=commonNavHTML()+html;
 }
 
-
 function openPanelPage(fnName){
   const menu=document.getElementById("homeMenu");
   const panel=document.getElementById("panelArea");
   if(menu)menu.classList.add("hidden");
   if(panel)panel.innerHTML="";
-
-  try{
-    if(typeof window[fnName] === "function"){
-      window[fnName]();
-    }else{
-      eval(fnName+"()");
-    }
-  }catch(e){
-    console.error(e);
-    if(panel)panel.innerHTML="<p>ページを開けませんでした。</p>";
-  }
-
-  setTimeout(()=>{ if(typeof ensureHomeButton==="function")ensureHomeButton(); },0);
-  setTimeout(()=>{ if(typeof ensureHomeButton==="function")ensureHomeButton(); },300);
+  pushPanelHistory(fnName);
+  eval(fnName+"()");
+  setTimeout(ensureHomeButton,0);
+  setTimeout(ensureHomeButton,300);
+  setTimeout(ensureHomeButton,1000);
 }
-
 function closePanelPage(){
   const menu=document.getElementById("homeMenu");
   const panel=document.getElementById("panelArea");
@@ -1083,7 +1072,7 @@ function showProfile(){
       <button onclick="saveProfileName()">名前を保存</button>
       <button onclick="showTitles()">称号を変更</button>
       <button onclick="showMatchHistory()">対戦履歴</button>
-      <button onclick="openPanelPage('showStatsPage')">成績を見る</button>
+      <button onclick="showStatsPage()">成績を見る</button>
     </div>
   `;
 
@@ -2211,7 +2200,7 @@ function showProfileMenu(){
 function showOtherMenu(){
   document.getElementById("panelArea").innerHTML=`
     <h2>⚙️ その他</h2>
-    <button class="modeBtn" onclick="openPanelPage('showNewsPage')">📢 お知らせ</button><button class="modeBtn" onclick="openPanelPage('showStatsPage')">📊 成績</button><button class="modeBtn" onclick="showGuide()">📖 遊び方</button>
+    <button class="modeBtn" onclick="showNewsPage()">📢 お知らせ</button><button class="modeBtn" onclick="showStatsPage()">📊 成績</button><button class="modeBtn" onclick="showGuide()">📖 遊び方</button>
     <button class="modeBtn" onclick="showDailyMission()">🎯 デイリーミッション</button>
     <button class="modeBtn" onclick="showLoginCalendar()">📅 ログボカレンダー</button>
     <button class="modeBtn" onclick="showSettings()">⚙️ 設定</button>
@@ -3014,44 +3003,7 @@ function themeButtonsHTML(){
   </div>`;
   return html;
 }
-function showStatsPage(){
-  const total=playerData.totalQuestions||0;
-  const correct=playerData.totalCorrect||0;
-  const rate=total?Math.round(correct/total*100):0;
-  const combo=playerData.maxCombo||0;
-  const level=getLevel();
-  const mh=playerData.matchHistory||[];
-  const wins=mh.filter(x=>x.result==="win").length;
-  const losses=mh.filter(x=>x.result==="loss").length;
-  const mt=wins+losses;
-  const wr=mt?Math.round(wins/mt*100):0;
 
-  let html=`
-    <h2>📊 成績</h2>
-    <div class="statsCard">
-      <h3>総合成績</h3>
-      <p>総回答数：${total}問</p>
-      <p>総正解数：${correct}問</p>
-      <p>正答率：${rate}%</p>
-      <p>最高連続正解：${combo}問</p>
-      <p>レベル：Lv.${level}</p>
-    </div>
-    <div class="statsCard">
-      <h3>対戦成績</h3>
-      <p>総試合数：${mt}</p>
-      <p>勝利：${wins}</p>
-      <p>敗北：${losses}</p>
-      <p>勝率：${wr}%</p>
-    </div>
-  `;
-
-  if(typeof showGenreStats==="function"){
-    html+=`<div class="statsCard"><button onclick="showGenreStats()">ジャンル別正答率を見る</button></div>`;
-  }
-
-  document.getElementById("panelArea").innerHTML=html;
-  if(typeof ensureHomeButton==="function")ensureHomeButton();
-}
 
 
 
@@ -3270,12 +3222,28 @@ function addHardDifficultyButtonIfNeeded(){
 setInterval(addHardDifficultyButtonIfNeeded,800);
 
 
-// Ver2.6.9 auto update news system
+// Ver2.7.1 keyboard-only double tap guard
+let __mmLastKeyTouch = 0;
+document.addEventListener("touchend", function(e){
+  const t = e.target;
+  if(!(t && t.closest && t.closest("#customKeyboard"))) return;
+  const now = Date.now();
+  if(now - __mmLastKeyTouch < 300){
+    e.preventDefault();
+  }
+  __mmLastKeyTouch = now;
+}, {passive:false});
+
+
+// Ver2.7.1 stable pages
 const UPDATE_NOTES = {
+  "2.7.1": [
+    "反応しない問題が出たため安定版から作り直し",
+    "お知らせ・成績ページを安全な方式に修正",
+    "テンキー以外のタップ制御を弱めました"
+  ],
   "2.6.9": [
-    "お知らせの自動表示機能を追加",
-    "VERSIONを変えると最新アップデートに反映",
-    "アップデート履歴を管理しやすく改善"
+    "お知らせ自動表示の仕組みを追加"
   ],
   "2.6.8": [
     "3連続正解からダメージ増加に変更",
@@ -3293,20 +3261,8 @@ const UPDATE_NOTES = {
     "Googleログインボタンの反応を修正",
     "モード選択の誤タップ対策を調整"
   ],
-  "2.6.4": [
-    "Googleログイン状態の反映を改善"
-  ],
-  "2.6.3": [
-    "iPhoneの拡大対策を強化"
-  ],
-  "2.6.2": [
-    "テンキーのダブルタップ拡大対策を追加"
-  ],
   "2.6.1": [
     "問題表示の +- を - に修正"
-  ],
-  "2.6.0": [
-    "プロフィールメッセージコレクションを追加"
   ],
   "2.5.0": [
     "モンスト風プロフィールカードを追加",
@@ -3324,30 +3280,19 @@ const UPDATE_NOTES = {
   ]
 };
 
-function getUpdateDateText(){
-  const d=new Date();
-  const y=d.getFullYear();
-  const m=String(d.getMonth()+1).padStart(2,"0");
-  const day=String(d.getDate()).padStart(2,"0");
-  return `${y}/${m}/${day}`;
+function openSimplePage(html){
+  const menu=document.getElementById("homeMenu");
+  const panel=document.getElementById("panelArea");
+  if(menu)menu.classList.add("hidden");
+  if(panel)panel.innerHTML=html;
+  if(typeof ensureHomeButton==="function")setTimeout(ensureHomeButton,0);
 }
 
-function updateNotesHTML(){
-  const v = (typeof VERSION !== "undefined") ? VERSION : "2.6.9";
-  let html = `
-    <h2>📢 お知らせ</h2>
-
+function showNewsPage(){
+  const v = (typeof VERSION !== "undefined") ? VERSION : "2.7.1";
+  let html = `<h2>📢 お知らせ</h2>
     <div class="newsCard">
-      <h3>2026/06/05 Ver2.7.0</h3>
-      <p>・タップして次のページに進めない問題を修正</p>
-      <p>・お知らせと成績を独立ページとして開くように修正</p>
-      <p>・テンキー以外のボタン反応を調整</p>
-    </div>
-
-    <div class="newsCard">
-      <h3>🔴 最新アップデート Ver${v}</h3>
-      <p>${getUpdateDateText()}</p>
-  `;
+      <h3>🔴 最新アップデート Ver${v}</h3>`;
 
   const latest = UPDATE_NOTES[v] || ["アップデートを適用しました"];
   for(const note of latest){
@@ -3374,47 +3319,41 @@ function updateNotesHTML(){
     html += `</div>`;
   }
 
-  return html;
+  openSimplePage(html);
 }
 
-function showNewsPage(){
-  document.getElementById("panelArea").innerHTML = updateNotesHTML();
-  if(typeof ensureHomeButton==="function")ensureHomeButton();
+function showStatsPage(){
+  const total=playerData.totalQuestions||0;
+  const correct=playerData.totalCorrect||0;
+  const rate=total?Math.round(correct/total*100):0;
+  const combo=playerData.maxCombo||0;
+  const level=(typeof getLevel==="function")?getLevel():1;
+  const mh=playerData.matchHistory||[];
+  const wins=mh.filter(x=>x.result==="win").length;
+  const losses=mh.filter(x=>x.result==="loss").length;
+  const mt=wins+losses;
+  const wr=mt?Math.round(wins/mt*100):0;
+
+  let html=`
+    <h2>📊 成績</h2>
+    <div class="statsCard">
+      <h3>総合成績</h3>
+      <p>総回答数：${total}問</p>
+      <p>総正解数：${correct}問</p>
+      <p>正答率：${rate}%</p>
+      <p>最高連続正解：${combo}問</p>
+      <p>レベル：Lv.${level}</p>
+    </div>
+    <div class="statsCard">
+      <h3>対戦成績</h3>
+      <p>総試合数：${mt}</p>
+      <p>勝利：${wins}</p>
+      <p>敗北：${losses}</p>
+      <p>勝率：${wr}%</p>
+    </div>
+  `;
+  openSimplePage(html);
 }
 
-
-// Ver2.7.0 safe keyboard-only zoom guard
-let __keyLastTouch = 0;
-document.addEventListener("touchend", function(e){
-  const t = e.target;
-  if(!(t && t.closest && t.closest("#customKeyboard"))) return;
-
-  const now = Date.now();
-  if(now - __keyLastTouch < 300){
-    e.preventDefault();
-  }
-  __keyLastTouch = now;
-}, {passive:false});
-
-document.addEventListener("dblclick", function(e){
-  const t = e.target;
-  if(t && t.closest && t.closest("#customKeyboard")){
-    e.preventDefault();
-  }
-}, {passive:false});
-
-window.showStatsPage = showStatsPage;
-
-window.showNewsPage = showNewsPage;
-
-window.showStudyMenu = showStudyMenu;
-
-window.showRankingMenu = showRankingMenu;
-
-window.showMatchMenu = showMatchMenu;
-
-window.showGacha = showGacha;
-
-window.showProfileMenu = showProfileMenu;
-
-window.showOtherMenu = showOtherMenu;
+window.showNewsPage=showNewsPage;
+window.showStatsPage=showStatsPage;
