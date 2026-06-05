@@ -44,7 +44,7 @@ function cleanQuestionObject(q){
 }
 
 
-const VERSION = "2.7.3";
+const VERSION = "2.7.5";
 
 let enemyHP = 10;
 let playerHP = 5;
@@ -437,17 +437,7 @@ function checkAchievements(){
   if(getLevel()>=1000)unlockAchievement("伝説の数学神");
   saveAllData();
 }
-function showAchievements(){
-  checkAchievements();
-  let html="<h2>🏆 実績一覧</h2>";
-  for(let a of achievementList()){
-    let got=playerData.achievements.includes(a);
-    if(a==="MENERU発見者"&&got){html+=`<div class="achievementItem">✅ <span class="meneruTitle">👾MENERU発見者👾</span></div>`;continue;}
-    if(a==="なかなか発見者"&&got){html+=`<div class="achievementItem">✅ <span class="nakanakaTitle">🧊なかなか発見者🧊</span></div>`;continue;}
-    html+=`<div class="achievementItem">${got?"✅":"⬜"} ${a}</div>`;
-  }
-  document.getElementById("panelArea").innerHTML=html;
-}
+
 
 function allTitles(){
   return [
@@ -1363,7 +1353,7 @@ function retryReview(i){
   document.getElementById("modeTitle").innerText="📚 復習モード";
   document.getElementById("result").innerHTML="";
   current=cleanQuestionObject(current);
-  document.getElementById("q").innerHTML=colorOperatorsHTML(current.q);
+  document.getElementById("q").innerText=current.q;
   document.getElementById("ans").value="";
   updateHP();
     showComboDamage();
@@ -1406,7 +1396,7 @@ function selectDifficulty(m){
     <button class="modeBtn" onclick="startMode('easy')">🟢 初級</button>
     <button class="modeBtn" onclick="startMode('normal')">🟡 中級</button>
     <button class="modeBtn" onclick="startMode('hard')">🔴 上級</button>
-    <button class="modeBtn hardBtn" onclick="startMode(\'veryHard\')">🔥 難問</button>
+    <button class="modeBtn hardBtn" onclick="startMode('veryHard')">🔥 難問</button>
   `;
 }
 function startMode(diff){
@@ -1542,6 +1532,7 @@ function generateArithmetic(){
 }
 
 function generateIntegral(){
+  if(difficulty==="veryHard")return generateHardIntegralQuestion();
   let type=difficulty==="easy"?rand(1,3):difficulty==="normal"?rand(1,8):rand(1,12);
 
   if(type===1){
@@ -1877,7 +1868,7 @@ function nextQ(){
     go.classList.add("goAnim");
 
     setTimeout(()=>{
-      q.innerHTML=colorOperatorsHTML(current.q);
+      q.innerText=current.q;
       q.classList.add("questionAnim");
     },300);
   },200);
@@ -1960,6 +1951,7 @@ async function submit(){
   if(ok){
     score++;
     combo++;
+    showComboPop();
 
     playerData.totalCorrect++;
     addExp(10);
@@ -2437,7 +2429,7 @@ function showMatchQuestion(room){
 
   current=room.currentQuestion;
   current=cleanQuestionObject(current);
-  document.getElementById("q").innerHTML=colorOperatorsHTML(current.q);
+  document.getElementById("q").innerText=current.q;
   document.getElementById("ans").value="";
   document.getElementById("result").innerHTML=
     `<p>第${(room.round||0)+1}問　先に正解した方が1ポイント</p>`;
@@ -3237,7 +3229,6 @@ const UPDATE_NOTES = {
     "問題表示の +- を - に修正"
   ],
   "2.5.0": [
-    "モンスト風プロフィールカードを追加",
     "プロフィール背景変更を追加"
   ],
   "2.4.0": [
@@ -3319,3 +3310,106 @@ window.showGacha=showGacha;
 window.showProfileMenu=showProfileMenu;
 
 window.showOtherMenu=showOtherMenu;
+
+
+// Ver2.7.5 combo animation
+function showComboPop(){
+  if((combo||0) < 2)return;
+  const old=document.getElementById("comboPop");
+  if(old)old.remove();
+
+  const dmg = (typeof comboDamageValue==="function") ? comboDamageValue(combo) : 1;
+  const div=document.createElement("div");
+  div.id="comboPop";
+  div.className="comboPop";
+  div.innerHTML=`🔥 ${combo} COMBO<br><span style="font-size:28px">⚔️ ${dmg} DAMAGE</span>`;
+  document.body.appendChild(div);
+  setTimeout(()=>div.remove(),950);
+}
+
+
+// Ver2.7.5 achievement progress
+function getAchievementProgress(a){
+  const correct=playerData.totalCorrect||0;
+  const best=playerData.bestRandomScore||0;
+  const maxCombo=playerData.maxCombo||0;
+  const play=playerData.playTime||0;
+  const days=playerData.consecutiveDays||0;
+  const review=(playerData.reviewList||[]).length;
+  const level=(typeof getLevel==="function")?getLevel():1;
+
+  const map={
+    "初正解":[correct,1],
+    "10問正解":[correct,10],
+    "100問正解":[correct,100],
+    "1000問正解":[correct,1000],
+    "初ランキング登録":[best,1],
+    "週間ランキング参加":[best,1],
+    "プロフィール設定完了":[(playerProfile.name!=="名無し"||playerProfile.icon)?1:0,1],
+    "3連勝":[maxCombo,3],
+    "5連勝":[maxCombo,5],
+    "10連勝":[maxCombo,10],
+    "25連勝":[maxCombo,25],
+    "50連勝":[maxCombo,50],
+    "100連勝":[maxCombo,100],
+    "無双":[maxCombo,200],
+    "15分プレイ":[play,15*60],
+    "1時間プレイ":[play,60*60],
+    "10時間プレイ":[play,10*60*60],
+    "50時間プレイ":[play,50*60*60],
+    "100時間プレイ":[play,100*60*60],
+    "数学廃人":[play,500*60*60],
+    "3日連続":[days,3],
+    "7日連続":[days,7],
+    "30日連続":[days,30],
+    "100日連続":[days,100],
+    "毎日数学生活":[days,365],
+    "初復習":[review,1],
+    "復習10問":[review,10],
+    "復習50問":[review,50],
+    "復習100問":[review,100],
+    "数学神":[level,300],
+    "伝説の数学神":[level,1000]
+  };
+
+  const v=map[a] || [(playerData.achievements||[]).includes(a)?1:0,1];
+  const now=Math.min(v[0],v[1]);
+  const need=v[1] || 1;
+  const pct=Math.min(100,Math.round(now/need*100));
+  return {now,need,pct};
+}
+
+function showAchievements(){
+  checkAchievements();
+  let gotCount=(playerData.achievements||[]).length;
+  let totalCount=achievementList().length;
+  let totalPct=Math.round(gotCount/totalCount*100);
+
+  let html=`
+    <h2>🏆 実績一覧</h2>
+    <div class="achievementItem">
+      <h3>達成率 <span class="achievementPct">${totalPct}%</span></h3>
+      <p>${gotCount}/${totalCount}</p>
+      <div class="achievementProgress"><div class="achievementProgressFill" style="width:${totalPct}%"></div></div>
+    </div>
+  `;
+
+  for(let a of achievementList()){
+    let got=playerData.achievements.includes(a);
+    const pr=getAchievementProgress(a);
+
+    let label=a;
+    if(a==="MENERU発見者"&&got)label=`<span class="meneruTitle">👾MENERU発見者👾</span>`;
+    if(a==="なかなか発見者"&&got)label=`<span class="nakanakaTitle">🧊なかなか発見者🧊</span>`;
+
+    html+=`
+      <div class="achievementItem">
+        ${got?"✅":"⬜"} ${label}
+        <div class="achievementProgress"><div class="achievementProgressFill" style="width:${pr.pct}%"></div></div>
+        <div class="achievementPct">${pr.pct}%</div>
+        <small>${pr.now}/${pr.need}</small>
+      </div>
+    `;
+  }
+  document.getElementById("panelArea").innerHTML=html;
+}
