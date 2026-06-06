@@ -68,7 +68,7 @@ function cleanQuestionObject(q){
 }
 
 
-const VERSION = "2.8.8";
+const VERSION = "3.0.0";
 
 let enemyHP = 10;
 let playerHP = 5;
@@ -1004,6 +1004,7 @@ function showSettings(){
       <button class="googleLoginBtn" onclick="loginGoogle()">Googleログイン</button>
       <button onclick="logoutGoogle()">ログアウト</button>
       <button onclick="forceCloudSave()">Googleセーブ</button>
+      <button onclick="overwriteCloudWithThisDevice()">この端末でクラウド上書き</button>
       <p id="loginStatus">確認中...</p>
     </div>
     <div class="settingsItem">
@@ -1367,6 +1368,7 @@ function showReviewList(){
         <button onclick="alert('${String(r.explanation).replace(/'/g,"\\'")}')">解説</button>
         <button onclick="alert('${String(r.ai).replace(/'/g,"\\'")}')">🤖AI解説</button>
         <button onclick="retryReview(${i})">再挑戦</button>
+        <button onclick="postReviewToBoard(${i})">💬 掲示板へ投稿</button>
       </div>
     `;
   }
@@ -3227,6 +3229,12 @@ document.addEventListener("dblclick", function(e){
 // Ver2.7.3 auto update news system
 // Ver2.8.7+ private fixes are intentionally hidden from public update history
 const UPDATE_NOTES = {
+  "3.0.0": [
+    "数学掲示板βを追加",
+    "復習リストから掲示板へ投稿できるように変更",
+    "ログイン済みの保存データを自動で読み込むように改善",
+    "お知らせを右上の小さいボタンへ移動"
+  ],
   "2.7.3": [
     "壊れていたpanelAreaのHTMLを修正",
     "強すぎるタップ制御を削除",
