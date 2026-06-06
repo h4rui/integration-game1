@@ -58,7 +58,7 @@ function cleanQuestionObject(q){
 }
 
 
-const VERSION = "2.7.9";
+const VERSION = "2.8.0";
 
 let enemyHP = 10;
 let playerHP = 5;
@@ -973,7 +973,7 @@ function showSettings(){
     </div>
     <div class="settingsItem">
       <button class="googleLoginBtn" onclick="loginGoogle()">Googleログイン</button>
-      <button onclick="logoutGoogle()">ログアウト</button><button onclick="checkGoogleLoginStatus()">ログイン状態確認</button><button onclick="testFirestoreConnection()">Firestore接続確認</button>
+      <button onclick="logoutGoogle()">ログアウト</button><button onclick="checkGoogleLoginStatus()">ログイン状態確認</button><button onclick="testFirestoreConnection()">Firestore接続確認</button><button onclick="showFirebaseDebug()">Firebase情報</button>
       <p id="loginStatus">確認中...</p>
     </div>
 ${themeButtonsHTML()}
@@ -2858,6 +2858,12 @@ async function showOnlineMatchMenu(){
 
 async function testFirestoreConnection(){
   try{
+    if(window.testFirestoreDirect){
+      const r = await window.testFirestoreDirect();
+      alert("Firestore接続OK\nconnectionTests に書き込み成功：" + r.id);
+      return;
+    }
+
     const roomId=await createMatchRoom({
       type:"test",
       name:"接続テスト",
@@ -2867,10 +2873,21 @@ async function testFirestoreConnection(){
     await cancelMatchRoom(roomId);
     alert("Firestore接続OK");
   }catch(e){
-    alert("Firestore接続NG：" + (e.code || e.message || e));
+    const msg = e && (e.code || e.message) ? (e.code || e.message) : String(e);
+    alert("Firestore接続NG：" + msg + "\n\nFirebaseのFirestoreルール、またはプロジェクトIDを確認して。詳しくはPCのConsoleを見て。");
     console.error(e);
   }
 }
+
+function showFirebaseDebug(){
+  try{
+    const info = window.getFirebaseDebugInfo ? window.getFirebaseDebugInfo() : {error:"Firebase module not ready"};
+    alert(JSON.stringify(info,null,2));
+  }catch(e){
+    alert("Firebase情報取得失敗：" + (e.code || e.message || e));
+  }
+}
+window.showFirebaseDebug=showFirebaseDebug;
 
 setInterval(ensureHomeButton,1500);
 

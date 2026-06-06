@@ -4,8 +4,9 @@
 <meta charset="UTF-8">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5681066295421790"
 crossorigin="anonymous"></script>
-<title>数学マスター Ver 2.7.9</title>
+<title>数学マスター Ver 2.8.0</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <style>
 body{
   margin:0;
@@ -296,7 +297,7 @@ a{color:#00ffcc}
   padding:9px 14px;
 }
 
-/* Ver 2.7.9 Space UI */
+/* Ver 2.8.0 Space UI */
 body{
   margin:0;
   color:white;
@@ -349,7 +350,7 @@ body{
   text-shadow:0 0 8px #60a5fa,0 0 18px #7c3aed,0 0 32px #38bdf8;
 }
 #homeScreen h1::after{
-  content:"Ver 2.7.9";display:block;font-size:18px;color:#67e8f9;margin-top:6px;text-shadow:0 0 10px #22d3ee;
+  content:"Ver 2.8.0";display:block;font-size:18px;color:#67e8f9;margin-top:6px;text-shadow:0 0 10px #22d3ee;
 }
 #homePlayerCard{
   width:88%;max-width:780px;margin:18px auto 22px;padding:18px;
@@ -409,7 +410,7 @@ body{
 }
 
 
-/* Ver 2.7.9 additions */
+/* Ver 2.8.0 additions */
 #homePlayerName{
   font-size:26px;
   font-weight:900;
@@ -489,7 +490,7 @@ body{
 }
 
 
-/* Ver 2.7.9 Profile Card UI */
+/* Ver 2.8.0 Profile Card UI */
 .profileHero{
   width:92%;
   max-width:900px;
@@ -1017,11 +1018,16 @@ function applyGoogleLoginState(user){
     localStorage.setItem("googleLoginName", user.displayName || "Googleユーザー");
     localStorage.setItem("googleLoginUid", user.uid);
     localStorage.removeItem("loginTrying");
+    console.log("Googleログイン中:", user.displayName, user.uid);
 
     if(window.unlockAchievement){
       window.unlockAchievement("初ログイン");
       if(window.saveAllData) window.saveAllData();
     }
+  }else{
+    localStorage.removeItem("googleLoginName");
+    localStorage.removeItem("googleLoginUid");
+    console.log("未ログイン");
   }
 
   if(window.refreshLoginStatus) window.refreshLoginStatus();
@@ -1081,7 +1087,9 @@ function applyGoogleLoginState(user){
 
   if(user){
     localStorage.setItem("googleLoginName", user.displayName || "Googleユーザー");
-    console.log("Googleログイン中:", user.displayName);
+    localStorage.setItem("googleLoginUid", user.uid);
+    localStorage.removeItem("loginTrying");
+    console.log("Googleログイン中:", user.displayName, user.uid);
 
     if(window.unlockAchievement){
       window.unlockAchievement("初ログイン");
@@ -1089,6 +1097,7 @@ function applyGoogleLoginState(user){
     }
   }else{
     localStorage.removeItem("googleLoginName");
+    localStorage.removeItem("googleLoginUid");
     console.log("未ログイン");
   }
 
@@ -1431,7 +1440,31 @@ window.leaveMatchRoom = async function(roomId,side){
   return after.data();
 };
 
+
+window.testFirestoreDirect = async function(){
+  const id = "test_" + Date.now();
+  const ref = doc(db,"connectionTests",id);
+  await setDoc(ref,{
+    ok:true,
+    from:location.hostname,
+    createdAt:serverTimestamp()
+  });
+  const snap = await getDoc(ref);
+  if(!snap.exists()) throw new Error("write-read-failed");
+  return {ok:true,id};
+};
+
+window.getFirebaseDebugInfo = function(){
+  return {
+    host: location.hostname,
+    projectId: firebaseConfig.projectId,
+    authDomain: firebaseConfig.authDomain,
+    login: !!auth.currentUser,
+    uid: auth.currentUser ? auth.currentUser.uid : null
+  };
+};
+
 </script>
-<script src="app.js"></script>
+<script src="app.js?v=2.8.0"></script>
 </body>
 </html>
