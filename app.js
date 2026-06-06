@@ -1,5 +1,5 @@
 
-// Ver2.8.2 expression cleanup
+// Ver2.8.3 expression cleanup
 function cleanMathExpression(expr){
   if(expr===undefined || expr===null) return expr;
   let s = String(expr);
@@ -68,7 +68,7 @@ function cleanQuestionObject(q){
 }
 
 
-const VERSION = "2.8.0";
+const VERSION = "2.8.3";
 
 let enemyHP = 10;
 let playerHP = 5;
@@ -220,8 +220,27 @@ function saveAllData(){
   localStorage.setItem("playerProfile",JSON.stringify(playerProfile));
   localStorage.setItem("playerData",JSON.stringify(playerData));
   localStorage.setItem("settings",JSON.stringify(settings));
+  if(window.queueCloudSave) window.queueCloudSave();
 }
 window.saveAllData = saveAllData;
+window.getLevel = getLevel;
+window.getLocalGameData = function(){
+  return {
+    playerProfile: playerProfile,
+    playerData: playerData,
+    settings: settings
+  };
+};
+window.applyCloudGameData = function(data){
+  if(data.playerProfile) playerProfile = Object.assign(playerProfile || {}, data.playerProfile);
+  if(data.playerData) playerData = Object.assign(playerData || {}, data.playerData);
+  if(data.settings) settings = Object.assign(settings || {}, data.settings);
+  localStorage.setItem("playerProfile",JSON.stringify(playerProfile));
+  localStorage.setItem("playerData",JSON.stringify(playerData));
+  localStorage.setItem("settings",JSON.stringify(settings));
+  applySettings();
+  updateHomeStatus();
+};
 window.updateHomeStatus = updateHomeStatus;
 window.addEventListener("load",()=>{
   loadAllData();
@@ -983,7 +1002,7 @@ function showSettings(){
     </div>
     <div class="settingsItem">
       <button class="googleLoginBtn" onclick="loginGoogle()">Googleログイン</button>
-      <button onclick="logoutGoogle()">ログアウト</button><button onclick="checkGoogleLoginStatus()">ログイン状態確認</button>
+      <button onclick="logoutGoogle()">ログアウト</button><button onclick="checkGoogleLoginStatus()">ログイン状態確認</button><button onclick="forceCloudSave()">Googleセーブ</button><button onclick="forceCloudLoad()">Google読込</button>
       <p id="loginStatus">確認中...</p>
     </div>
 ${themeButtonsHTML()}
@@ -3199,6 +3218,12 @@ document.addEventListener("dblclick", function(e){
 
 // Ver2.7.3 auto update news system
 const UPDATE_NOTES = {
+  "2.8.3": [
+    "Firebase初期化をwindowに公開して接続確認を修正",
+    "Googleログイン後にクラウドセーブを自動読み込み",
+    "localStorage保存時にGoogle連動セーブを自動同期",
+    "ランキング・対戦で使うFirebase関数を復旧"
+  ],
   "2.7.3": [
     "壊れていたpanelAreaのHTMLを修正",
     "強すぎるタップ制御を削除",
@@ -3442,7 +3467,7 @@ function playEnemyDefeat(){
 }
 
 
-// Ver2.8.2 profile icon preview/save
+// Ver2.8.3 profile icon preview/save
 function previewProfileIcon(){
   const input=document.getElementById("iconInputEdit");
   const preview=document.getElementById("iconPreview");

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5681066295421790"
 crossorigin="anonymous"></script>
-<title>数学マスター Ver 2.8.0</title>
+<title>数学マスター Ver 2.8.3</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <style>
@@ -297,7 +297,7 @@ a{color:#00ffcc}
   padding:9px 14px;
 }
 
-/* Ver 2.8.0 Space UI */
+/* Ver 2.8.3 Space UI */
 body{
   margin:0;
   color:white;
@@ -350,7 +350,7 @@ body{
   text-shadow:0 0 8px #60a5fa,0 0 18px #7c3aed,0 0 32px #38bdf8;
 }
 #homeScreen h1::after{
-  content:"Ver 2.8.0";display:block;font-size:18px;color:#67e8f9;margin-top:6px;text-shadow:0 0 10px #22d3ee;
+  content:"Ver 2.8.3";display:block;font-size:18px;color:#67e8f9;margin-top:6px;text-shadow:0 0 10px #22d3ee;
 }
 #homePlayerCard{
   width:88%;max-width:780px;margin:18px auto 22px;padding:18px;
@@ -410,7 +410,7 @@ body{
 }
 
 
-/* Ver 2.8.0 additions */
+/* Ver 2.8.3 additions */
 #homePlayerName{
   font-size:26px;
   font-weight:900;
@@ -490,7 +490,7 @@ body{
 }
 
 
-/* Ver 2.8.0 Profile Card UI */
+/* Ver 2.8.3 Profile Card UI */
 .profileHero{
   width:92%;
   max-width:900px;
@@ -978,7 +978,7 @@ h4rui.github.io
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import { getFirestore, collection, doc, setDoc, getDoc, getDocs, query, where, limit, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDVXwXTGeft41ajd0KDwNPG-dH8pmsMIt8",
@@ -993,6 +993,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
+window.firebaseApp = app;
+window.db = db;
+window.firebaseDb = db;
 window.firebaseAuth = auth;
 setPersistence(auth,browserLocalPersistence).catch((e)=>console.error(e));
 const provider = new GoogleAuthProvider();
@@ -1003,7 +1006,16 @@ window.loginGoogle = async function(){
   try{
     localStorage.setItem("loginTrying","1");
     await setPersistence(auth,browserLocalPersistence);
-    await signInWithRedirect(auth,provider);
+    try{
+      const result = await signInWithPopup(auth,provider);
+      if(result && result.user){
+        applyGoogleLoginState(result.user);
+        alert("Googleログイン成功：" + (result.user.displayName || "Googleユーザー"));
+      }
+    }catch(popupError){
+      console.warn("Popup login failed, fallback to redirect:", popupError);
+      await signInWithRedirect(auth,provider);
+    }
   }catch(e){
     console.error(e);
     alert("Googleログイン開始に失敗：" + (e.code || e.message || e));
@@ -1032,6 +1044,14 @@ function applyGoogleLoginState(user){
 
   if(window.refreshLoginStatus) window.refreshLoginStatus();
   if(window.updateHomeStatus) window.updateHomeStatus();
+
+  if(user){
+    setTimeout(()=>{
+      if(window.loadCloudPlayerDataAndApply){
+        window.loadCloudPlayerDataAndApply().catch(e=>console.warn("cloud load failed",e));
+      }
+    },1200);
+  }
 }
 
 getRedirectResult(auth)
@@ -1103,6 +1123,14 @@ function applyGoogleLoginState(user){
 
   if(window.refreshLoginStatus) window.refreshLoginStatus();
   if(window.updateHomeStatus) window.updateHomeStatus();
+
+  if(user){
+    setTimeout(()=>{
+      if(window.loadCloudPlayerDataAndApply){
+        window.loadCloudPlayerDataAndApply().catch(e=>console.warn("cloud load failed",e));
+      }
+    },1200);
+  }
 }
 
 
@@ -1272,10 +1300,10 @@ window.saveRateData = async function(result){
 
   await setDoc(ref,{
     playerId,
-    name:playerProfile.name || "名無し",
-    icon:playerProfile.icon || "",
-    title:playerData.equippedTitle || "初心者",
-    level:getLevel(),
+    name:((window.getLocalGameData&&window.getLocalGameData().playerProfile&&window.getLocalGameData().playerProfile.name) || "名無し"),
+    icon:((window.getLocalGameData&&window.getLocalGameData().playerProfile&&window.getLocalGameData().playerProfile.icon) || ""),
+    title:((window.getLocalGameData&&window.getLocalGameData().playerData&&window.getLocalGameData().playerData.equippedTitle) || "初心者"),
+    level:(window.getLevel ? window.getLevel() : 1),
     rating,
     wins,
     losses,
@@ -1454,6 +1482,87 @@ window.testFirestoreDirect = async function(){
   return {ok:true,id};
 };
 
+
+// Ver2.8.3 Googleログイン連動セーブ
+function getLocalBundleForCloud(){
+  if(window.getLocalGameData){
+    return window.getLocalGameData();
+  }
+  return null;
+}
+
+window.saveCloudPlayerDataNow = async function(){
+  const user = auth.currentUser;
+  if(!user) return false;
+
+  const bundle = getLocalBundleForCloud();
+  if(!bundle) return false;
+
+  await setDoc(doc(db,"userSaves",user.uid),{
+    uid:user.uid,
+    name:(bundle.playerProfile && bundle.playerProfile.name) || user.displayName || "名無し",
+    playerProfile:bundle.playerProfile || {},
+    playerData:bundle.playerData || {},
+    settings:bundle.settings || {},
+    updatedAt:serverTimestamp()
+  },{merge:true});
+
+  return true;
+};
+
+let cloudSaveTimer = null;
+window.queueCloudSave = function(){
+  if(!auth.currentUser) return;
+  if(cloudSaveTimer) clearTimeout(cloudSaveTimer);
+  cloudSaveTimer = setTimeout(()=>{
+    window.saveCloudPlayerDataNow().catch(e=>console.warn("cloud save failed",e));
+  },800);
+};
+
+window.loadCloudPlayerDataAndApply = async function(){
+  const user = auth.currentUser;
+  if(!user) return false;
+
+  const ref = doc(db,"userSaves",user.uid);
+  const snap = await getDoc(ref);
+
+  if(!snap.exists()){
+    await window.saveCloudPlayerDataNow();
+    return false;
+  }
+
+  const data = snap.data();
+  if(window.applyCloudGameData){
+    window.applyCloudGameData({
+      playerProfile:data.playerProfile || {},
+      playerData:data.playerData || {},
+      settings:data.settings || {}
+    });
+  }
+  return true;
+};
+
+window.forceCloudSave = async function(){
+  try{
+    const ok = await window.saveCloudPlayerDataNow();
+    alert(ok ? "Google連動セーブ完了" : "Googleログインしていません");
+  }catch(e){
+    console.error(e);
+    alert("Google連動セーブ失敗：" + (e.code || e.message || e));
+  }
+};
+
+window.forceCloudLoad = async function(){
+  try{
+    const ok = await window.loadCloudPlayerDataAndApply();
+    alert(ok ? "Googleセーブを読み込みました" : "クラウドデータがないので現在データを作成しました");
+  }catch(e){
+    console.error(e);
+    alert("Googleセーブ読み込み失敗：" + (e.code || e.message || e));
+  }
+};
+
+
 window.getFirebaseDebugInfo = function(){
   return {
     host: location.hostname,
@@ -1465,6 +1574,6 @@ window.getFirebaseDebugInfo = function(){
 };
 
 </script>
-<script src="app.js?v=2.8.0"></script>
+<script src="app.js?v=2.8.3"></script>
 </body>
 </html>
