@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5681066295421790"
 crossorigin="anonymous"></script>
-<title>数学マスター Ver 3.0.8</title>
+<title>数学マスター Ver 3.1.0</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <style>
@@ -350,7 +350,7 @@ body{
   text-shadow:0 0 8px #60a5fa,0 0 18px #7c3aed,0 0 32px #38bdf8;
 }
 #homeScreen h1::after{
-  content:"Ver 3.0.8";display:block;font-size:18px;color:#67e8f9;margin-top:6px;text-shadow:0 0 10px #22d3ee;
+  content:"Ver 3.1.0";display:block;font-size:18px;color:#67e8f9;margin-top:6px;text-shadow:0 0 10px #22d3ee;
 }
 #homePlayerCard{
   width:88%;max-width:780px;margin:18px auto 22px;padding:18px;
@@ -932,6 +932,24 @@ button,.modeBtn{
 .genreChoice input{width:auto;margin-right:8px;transform:scale(1.25)}
 .matchVoteBox{text-align:center}
 @media(max-width:520px){.genreGrid{grid-template-columns:1fr}.genreChoice{font-size:17px}}
+
+/* Ver3.0.9 serial titles */
+.oldGuardTitle{color:#ff3333!important;font-weight:900;text-shadow:0 0 8px #ff3333,0 0 16px #ff0000;}
+.serialLoginBox{background:rgba(255,215,0,.14);border:1px solid #ffd700;border-radius:12px;padding:10px;margin:10px auto;max-width:520px;cursor:pointer;box-shadow:0 0 12px rgba(255,215,0,.25);}
+.serialLoginBox b{color:#ffd700;letter-spacing:1px;}
+
+
+
+/* Ver3.1.0 serial titles */
+.maidIceTitle{color:#66ccff;font-weight:900;text-shadow:0 0 8px #66ccff,0 0 18px #00aaff;}
+.gameBetaTitle{color:#00cc66;font-weight:900;text-shadow:0 0 8px #00cc66,0 0 18px #00ff99;}
+.oldGuardTitle{color:#ff3333;font-weight:900;text-shadow:0 0 8px #ff3333,0 0 18px #ff0000;}
+.serialLoginBox{background:rgba(255,215,0,.14);border:1px solid #ffd700;border-radius:12px;padding:10px;margin:10px auto;max-width:520px;cursor:pointer;box-shadow:0 0 12px rgba(255,215,0,.25);}
+.serialLoginBox b{color:#ffd700;letter-spacing:1px;font-size:22px;}
+.betaSerialBox{background:rgba(0,204,102,.13);border-color:#00cc66;box-shadow:0 0 12px rgba(0,204,102,.25);}
+.betaSerialBox b{color:#00ff99;}
+.serialSmallText{font-size:13px;opacity:.82;margin-top:4px;}
+.serialResultBox{text-align:center;}
 
 </style>
 <!--
@@ -2012,6 +2030,6 @@ window.finalizeMatchVote = async function(roomId, finalGenre, questions){
 };
 
 </script>
-<script src="app.js?v=3.0.8"></script>
+<script src="app.js?v=3.1.0"></script>
 </body>
 </html>
