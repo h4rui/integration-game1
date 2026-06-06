@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5681066295421790"
 crossorigin="anonymous"></script>
-<title>数学マスター Ver 3.0.0</title>
+<title>数学マスター Ver 3.0.2</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <style>
@@ -297,7 +297,7 @@ a{color:#00ffcc}
   padding:9px 14px;
 }
 
-/* Ver 2.8.8 Space UI */
+/* Ver 3.0.2 Space UI */
 body{
   margin:0;
   color:white;
@@ -350,7 +350,7 @@ body{
   text-shadow:0 0 8px #60a5fa,0 0 18px #7c3aed,0 0 32px #38bdf8;
 }
 #homeScreen h1::after{
-  content:"Ver 3.0.0";display:block;font-size:18px;color:#67e8f9;margin-top:6px;text-shadow:0 0 10px #22d3ee;
+  content:"Ver 3.0.2";display:block;font-size:18px;color:#67e8f9;margin-top:6px;text-shadow:0 0 10px #22d3ee;
 }
 #homePlayerCard{
   width:88%;max-width:780px;margin:18px auto 22px;padding:18px;
@@ -490,7 +490,7 @@ body{
 }
 
 
-/* Ver 2.8.8 Profile Card UI */
+/* Ver 3.0.2 Profile Card UI */
 .profileHero{
   width:92%;
   max-width:900px;
@@ -1060,18 +1060,39 @@ function makeFriendCode(){
 }
 async function ensureFriendCode(user){
   if(!user) return "";
-  const saved = normalizeFriendCode(localStorage.getItem("friendCode"));
-  if(saved && saved.length === 8) return saved;
 
   const profileRef = doc(db,"userProfiles",user.uid);
-  const profileSnap = await getDoc(profileRef);
-  const existing = profileSnap.exists() ? normalizeFriendCode(profileSnap.data().friendCode) : "";
+  const profileSnap = await getDoc(profileRef).catch(()=>null);
+  const existing = profileSnap && profileSnap.exists() ? normalizeFriendCode(profileSnap.data().friendCode) : "";
+
   if(existing && existing.length === 8){
     localStorage.setItem("friendCode", existing);
+    await setDoc(doc(db,"friendCodes",existing),{
+      code: existing,
+      uid: user.uid,
+      playerId: "google_" + user.uid,
+      updatedAt: serverTimestamp()
+    },{merge:true}).catch(()=>{});
     return existing;
   }
 
-  for(let i=0;i<20;i++){
+  const saved = normalizeFriendCode(localStorage.getItem("friendCode"));
+  if(saved && saved.length === 8){
+    await setDoc(doc(db,"friendCodes",saved),{
+      code: saved,
+      uid: user.uid,
+      playerId: "google_" + user.uid,
+      updatedAt: serverTimestamp()
+    },{merge:true});
+    await setDoc(profileRef,{
+      uid:user.uid,
+      friendCode:saved,
+      updatedAt:serverTimestamp()
+    },{merge:true});
+    return saved;
+  }
+
+  for(let i=0;i<30;i++){
     const code = makeFriendCode();
     const codeRef = doc(db,"friendCodes",code);
     const codeSnap = await getDoc(codeRef);
@@ -1080,7 +1101,8 @@ async function ensureFriendCode(user){
         code,
         uid:user.uid,
         playerId:"google_" + user.uid,
-        createdAt:serverTimestamp()
+        createdAt:serverTimestamp(),
+        updatedAt:serverTimestamp()
       });
       await setDoc(profileRef,{
         uid:user.uid,
@@ -1088,6 +1110,7 @@ async function ensureFriendCode(user){
         updatedAt:serverTimestamp()
       },{merge:true});
       localStorage.setItem("friendCode", code);
+      if(window.updateHomeStatus) window.updateHomeStatus();
       return code;
     }
   }
@@ -1708,16 +1731,15 @@ window.showBoardPage = async function(){
   const panel=document.getElementById("panelArea");
   if(menu) menu.classList.add("hidden");
   if(!panel) return;
-  panel.innerHTML = `<h2>💬 数学掲示板 β</h2>
+  panel.innerHTML = `
+    <h2>💬 数学掲示板</h2>
     <div class="boardPost">
-      <p>わからない問題を投稿して、みんなで教え合えます。</p>
-      <p>投稿・回答・いいねはログイン必須。投稿は1日5件まで。</p>
-      <button class="boardSmallBtn" onclick="showBoardPostForm()">質問を投稿する</button>
-      <button class="boardSmallBtn" onclick="showBoardPage()">更新</button>
+      <h3>準備中</h3>
+      <p>掲示板機能は現在準備中です。</p>
+      <p>公開までしばらくお待ちください。</p>
     </div>
-    <div id="boardList">読み込み中...</div>`;
+  `;
   if(typeof ensureHomeButton==="function") setTimeout(ensureHomeButton,0);
-  await loadBoardPosts();
 };
 
 window.loadBoardPosts = async function(){
@@ -1768,53 +1790,48 @@ window.showBoardPostForm = function(prefill={}){
 };
 
 window.submitBoardPost = async function(){
-  const user=getLoginUser();
-  if(!user){ alert("投稿するにはログインが必要です"); return; }
-  const question=(document.getElementById("boardQuestionInput")?.value||"").trim();
-  const answer=(document.getElementById("boardAnswerInput")?.value||"").trim();
-  const genre=(document.getElementById("boardGenreInput")?.value||"質問").trim().slice(0,20) || "質問";
-  if(!question){ alert("質問内容を入力してください"); return; }
+  try{
+    const user=getLoginUser();
+    if(!user){ alert("投稿するにはログインが必要です"); return; }
+    const question=(document.getElementById("boardQuestionInput")?.value||"").trim();
+    const answer=(document.getElementById("boardAnswerInput")?.value||"").trim();
+    const genre=(document.getElementById("boardGenreInput")?.value||"質問").trim().slice(0,20) || "質問";
+    if(!question){ alert("質問内容を入力してください"); return; }
 
-  const limitId=user.uid + "_" + todayBoardKey();
-  const limitRef=doc(db,"boardDailyLimit",limitId);
-  const limitSnap=await getDoc(limitRef);
-  const count=limitSnap.exists() ? (limitSnap.data().count||0) : 0;
-  if(count>=5){ alert("今日の投稿上限は5件です"); return; }
+    await ensureFriendCode(user).catch(()=>{});
 
-  const id=boardPostId();
-  await setDoc(doc(db,"boardPosts",id),{
-    postId:id,
-    uid:user.uid,
-    playerName:getBoardPlayerName(),
-    genre,
-    question:question.slice(0,1000),
-    answer:answer.slice(0,1000),
-    answerCount:0,
-    likes:0,
-    bestAnswerId:"",
-    createdAtMs:Date.now(),
-    createdAt:serverTimestamp()
-  });
-  await setDoc(limitRef,{uid:user.uid,date:todayBoardKey(),count:count+1,updatedAt:serverTimestamp()},{merge:true});
-  alert("投稿しました");
-  showBoardPage();
+    const limitId=user.uid + "_" + todayBoardKey();
+    const limitRef=doc(db,"boardDailyLimit",limitId);
+    const limitSnap=await getDoc(limitRef);
+    const count=limitSnap.exists() ? (limitSnap.data().count||0) : 0;
+    if(count>=5){ alert("今日の投稿上限は5件です"); return; }
+
+    const id=boardPostId();
+    await setDoc(doc(db,"boardPosts",id),{
+      postId:id,
+      uid:user.uid,
+      playerName:getBoardPlayerName(),
+      genre,
+      question:question.slice(0,1000),
+      answer:answer.slice(0,1000),
+      answerCount:0,
+      likes:0,
+      bestAnswerId:"",
+      createdAtMs:Date.now(),
+      createdAt:serverTimestamp()
+    });
+    await setDoc(limitRef,{uid:user.uid,date:todayBoardKey(),count:count+1,updatedAt:serverTimestamp()},{merge:true});
+    alert("投稿しました");
+    showBoardPage();
+  }catch(e){
+    console.error(e);
+    alert("投稿に失敗しました：" + (e.code || e.message || e));
+  }
 };
 
 window.postReviewToBoard = function(i){
-  if(!getLoginUser()){
-    alert("復習リストから投稿するにはログインが必要です");
-    if(window.showSettings) window.showSettings();
-    return;
-  }
-  const bundle=window.getLocalGameData ? window.getLocalGameData() : null;
-  const list=bundle && bundle.playerData ? (bundle.playerData.reviewList||[]) : [];
-  const r=list[i];
-  if(!r){ alert("投稿する問題が見つかりません"); return; }
-  window.showBoardPostForm({
-    genre:"復習リスト",
-    question:r.q || "",
-    answer:(r.a ? "正解：" + r.a + "\n" : "") + (r.explanation ? "解説：" + r.explanation : "")
-  });
+  alert("掲示板機能は現在準備中です");
+  showBoardPage();
 };
 
 window.showBoardDetail = async function(postId){

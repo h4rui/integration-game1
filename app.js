@@ -68,7 +68,7 @@ function cleanQuestionObject(q){
 }
 
 
-const VERSION = "3.0.0";
+const VERSION = "3.0.2";
 
 let enemyHP = 10;
 let playerHP = 5;
@@ -178,9 +178,6 @@ function addExp(n){
 }
 
 function titleHTML(t){
-  if(t==="⚡️創設者")return `<span class="founderTitle">⚡️創設者⚡️</span>`;
-  if(t==="MENERU")return `<span class="meneruTitle">👾MENERU👾</span>`;
-  if(t==="なかなか")return `<span class="nakanakaTitle">🧊なかなか🧊</span>`;
   if(t==="🌈虹の数学神🌈")return `<span class="rainbowTitle">🌈虹の数学神🌈</span>`;
   if(t==="❄️絶対零度❄️")return `<span class="urTitle" style="color:#00ccff;">❄️絶対零度❄️</span>`;
   if(t==="🌌宇宙の支配者🌌")return `<span class="rainbowTitle">🌌宇宙の支配者🌌</span>`;
@@ -439,7 +436,7 @@ function achievementList(){
     "15分プレイ","1時間プレイ","10時間プレイ","50時間プレイ","100時間プレイ","数学廃人",
     "3日連続","7日連続","30日連続","100日連続","毎日数学生活",
     "初復習","復習10問","復習50問","復習100問","反省王",
-    "創設者","MENERU発見者","なかなか発見者","初ガチャ","UR獲得",
+    "初ガチャ","UR獲得",
     "古参勢","神速","完璧主義者","数学神","伝説の数学神",
     "1問目で即死","惜しい！","深夜の数学者","朝活勢","寝るな！"
   ];
@@ -472,9 +469,6 @@ function checkAchievements(){
   if(playerData.consecutiveDays>=365)unlockAchievement("毎日数学生活");
   if((playerData.reviewList||[]).length>=1)unlockAchievement("初復習");
   if((playerData.reviewList||[]).length>=10)unlockAchievement("復習10問");
-  if(playerData.equippedTitle==="⚡️創設者")unlockAchievement("創設者");
-  if(playerData.equippedTitle==="MENERU")unlockAchievement("MENERU発見者");
-  if(playerData.equippedTitle==="なかなか")unlockAchievement("なかなか発見者");
   if(getLevel()>=300)unlockAchievement("数学神");
   if(getLevel()>=1000)unlockAchievement("伝説の数学神");
   saveAllData();
@@ -483,7 +477,6 @@ function checkAchievements(){
 
 function allTitles(){
   return [
-    "⚡️創設者","MENERU","なかなか",
     "理系","数学初心者","数学中級者","数学上級者",
     "数学の鬼👹","数学の申し子🪽","数学王👑",
     "伝説","神話","創世神🌌",
@@ -1248,16 +1241,6 @@ async function addFriend(){
   let id=document.getElementById("friendIdInput").value.trim().replace(/-/g,"").toUpperCase();
   if(!id){alert("IDを入力して");return;}
 
-  if(id==="adminadminadmin9671"){
-    unlockTitle("⚡️創設者");
-    unlockAchievement("創設者");
-    playerData.equippedTitle="⚡️創設者";
-    saveAllData();
-    updateHomeStatus();
-    showFriendMenu();
-    alert("⚡️創設者⚡️ を解放しました！");
-    return;
-  }
   if(playerData.friends.some(f=>(typeof f==="string"?f:f.id)===id)){alert("追加済み");return;}
 
   let data=null;
@@ -1940,44 +1923,6 @@ async function submit(){
 
   if(u===""){
     alert("答えを入力して");
-    return;
-  }
-
-  if(u.toUpperCase()==="MENERU" && mode==="derivative"){
-    unlockTitle("MENERU");
-    unlockAchievement("MENERU発見者");
-    playerData.equippedTitle="MENERU";
-    saveAllData();
-    updateHomeStatus();
-    alert("👾MENERU👾 を解放しました！");
-    return;
-  }
-
-  if(u==="なかなか0601" && mode==="arithmetic"){
-    unlockTitle("なかなか");
-    unlockAchievement("なかなか発見者");
-    playerData.equippedTitle="なかなか";
-    saveAllData();
-    updateHomeStatus();
-    alert("🧊なかなか🧊 を解放しました！");
-    return;
-  }
-
-  if(u==="adminadmin9671" && mode==="prime"){
-    playerData.coins=(playerData.coins||0)+1000000000;
-    saveAllData();
-    updateHomeStatus();
-    alert("💰 1000000000コイン獲得！");
-    return;
-  }
-
-  if(u==="adminadminadmin9671" && mode==="integral"){
-    unlockTitle("⚡️創設者");
-    unlockAchievement("創設者");
-    playerData.equippedTitle="⚡️創設者";
-    saveAllData();
-    updateHomeStatus();
-    alert("⚡️創設者を解放しました！");
     return;
   }
 
@@ -3242,6 +3187,16 @@ document.addEventListener("dblclick", function(e){
 // Ver2.7.3 auto update news system
 // Ver2.8.7+ private fixes are intentionally hidden from public update history
 const UPDATE_NOTES = {
+  "3.0.2": [
+    "画面上部のバージョン表示を更新",
+    "掲示板を準備中表示へ変更",
+    "一部の非公開コマンド称号を整理"
+  ],
+  "3.0.1": [
+    "フレンドコード未発行時に自動で8桁コードを再発行するように修正",
+    "掲示板の投稿処理を修正",
+    "投稿失敗時に原因が分かりやすい表示へ改善"
+  ],
   "3.0.0": [
     "数学掲示板βを追加",
     "復習リストから掲示板へ投稿できるように変更",
@@ -3457,8 +3412,6 @@ function showAchievements(){
     const pr=getAchievementProgress(a);
 
     let label=a;
-    if(a==="MENERU発見者"&&got)label=`<span class="meneruTitle">👾MENERU発見者👾</span>`;
-    if(a==="なかなか発見者"&&got)label=`<span class="nakanakaTitle">🧊なかなか発見者🧊</span>`;
 
     html+=`
       <div class="achievementItem">
