@@ -1,5 +1,5 @@
 
-// Ver2.8.3 expression cleanup
+// Ver2.8.7 expression cleanup
 function cleanMathExpression(expr){
   if(expr===undefined || expr===null) return expr;
   let s = String(expr);
@@ -68,7 +68,7 @@ function cleanQuestionObject(q){
 }
 
 
-const VERSION = "2.8.5";
+const VERSION = "2.8.8";
 
 let enemyHP = 10;
 let playerHP = 5;
@@ -220,7 +220,7 @@ function saveAllData(){
   localStorage.setItem("playerProfile",JSON.stringify(playerProfile));
   localStorage.setItem("playerData",JSON.stringify(playerData));
   localStorage.setItem("settings",JSON.stringify(settings));
-  if(window.queueCloudSave) window.queueCloudSave();
+  if(window.queueCloudSave && !window.__cloudLoginJustSignedIn) window.queueCloudSave();
 }
 window.saveAllData = saveAllData;
 window.getLevel = getLevel;
@@ -406,14 +406,13 @@ function refreshLoginStatus(){
     user=window.currentUser;
   }
 
-  let savedName=localStorage.getItem("googleLoginName");
   let uid=localStorage.getItem("googleLoginUid");
-  let name=user ? (user.displayName || "Googleユーザー") : savedName;
+  let linked=localStorage.getItem("googleLoginLinked");
 
-  if(user || uid || name){
-    if(el)el.innerText="ログイン中：" + (name || "Googleユーザー");
+  if(user || uid || linked){
+    if(el)el.innerText="アカウント連携済み";
     if(home){
-      home.innerHTML="🟢 ログイン中：" + (name || "Googleユーザー");
+      home.innerHTML="🟢 アカウント連携済み";
       home.className="loginOk";
     }
   }else{
@@ -2591,11 +2590,11 @@ function checkGoogleLoginStatus(){
   if(window.getGoogleLoginInfo)user=window.getGoogleLoginInfo();
   else if(window.currentUser)user=window.currentUser;
 
-  const savedName=localStorage.getItem("googleLoginName");
   const uid=localStorage.getItem("googleLoginUid");
 
-  if(user || uid || savedName){
-    alert("ログイン中\n名前：" + ((user&&user.displayName)||savedName||"Googleユーザー") + "\nUID保存：" + (uid ? "あり" : "なし"));
+  if(user || uid){
+    alert("アカウント連携済みです
+本名はゲーム画面には表示されません");
   }else{
     alert("未ログインです");
   }
@@ -3218,11 +3217,17 @@ document.addEventListener("dblclick", function(e){
 
 // Ver2.7.3 auto update news system
 const UPDATE_NOTES = {
-  "2.8.5": [
-    "ログイン処理の安定性を向上",
-    "アカウント連携時の不具合を修正",
-    "セーブ機能の安定性を向上",
-    "ランキングと対戦機能の動作を改善"
+  "2.8.8": [
+    "ログイン時に使うデータを選べるように変更",
+    "クラウドデータとこの端末のデータを確認して選択可能に改善",
+    "プレイヤー名方式をさらに安定化",
+    "ログイン状態確認で本名が表示されないように調整"
+  ],
+  "2.8.7": [
+    "プレイヤー名方式に変更",
+    "ログイン後も本名が表示されないように調整",
+    "アカウント連携時の保存処理を改善",
+    "ランキング・プロフィール表示をニックネーム中心に改善"
   ],
   "2.7.3": [
     "壊れていたpanelAreaのHTMLを修正",
@@ -3467,7 +3472,7 @@ function playEnemyDefeat(){
 }
 
 
-// Ver2.8.3 profile icon preview/save
+// Ver2.8.7 profile icon preview/save
 function previewProfileIcon(){
   const input=document.getElementById("iconInputEdit");
   const preview=document.getElementById("iconPreview");
