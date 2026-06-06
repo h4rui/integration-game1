@@ -978,7 +978,7 @@ h4rui.github.io
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import { getFirestore, collection, doc, setDoc, getDoc, getDocs, query, where, limit, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDVXwXTGeft41ajd0KDwNPG-dH8pmsMIt8",
@@ -1019,6 +1019,61 @@ window.loginGoogle = async function(){
   }catch(e){
     console.error(e);
     alert("Googleログイン開始に失敗：" + (e.code || e.message || e));
+  }
+};
+
+
+function getEmailPasswordInputs(){
+  const email = (document.getElementById("emailLoginInput")?.value || "").trim();
+  const password = document.getElementById("passwordLoginInput")?.value || "";
+  return {email,password};
+}
+
+window.loginEmailPassword = async function(){
+  try{
+    const {email,password} = getEmailPasswordInputs();
+    if(!email || !password){
+      alert("メールアドレスとパスワードを入力してください");
+      return;
+    }
+    if(password.length < 6){
+      alert("パスワードは6文字以上にしてください");
+      return;
+    }
+    localStorage.setItem("loginTrying","1");
+    await setPersistence(auth,browserLocalPersistence);
+    const result = await signInWithEmailAndPassword(auth,email,password);
+    if(result && result.user){
+      applyGoogleLoginState(result.user);
+      alert("メールログインに成功しました");
+    }
+  }catch(e){
+    console.error(e);
+    alert("メールログインに失敗：" + (e.code || e.message || e));
+  }
+};
+
+window.registerEmailPassword = async function(){
+  try{
+    const {email,password} = getEmailPasswordInputs();
+    if(!email || !password){
+      alert("メールアドレスとパスワードを入力してください");
+      return;
+    }
+    if(password.length < 6){
+      alert("パスワードは6文字以上にしてください");
+      return;
+    }
+    localStorage.setItem("loginTrying","1");
+    await setPersistence(auth,browserLocalPersistence);
+    const result = await createUserWithEmailAndPassword(auth,email,password);
+    if(result && result.user){
+      applyGoogleLoginState(result.user);
+      alert("メールアカウントを作成しました");
+    }
+  }catch(e){
+    console.error(e);
+    alert("メールアカウント作成に失敗：" + (e.code || e.message || e));
   }
 };
 

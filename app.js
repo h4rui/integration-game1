@@ -1000,9 +1000,19 @@ function showSettings(){
       <button onclick="toggleSE()">🔊 効果音 ${settings.se?"ON":"OFF"}</button>
     </div>
     <div class="settingsItem">
+      <h3>アカウント連携</h3>
       <button class="googleLoginBtn" onclick="loginGoogle()">Googleログイン</button>
-      <button onclick="logoutGoogle()">ログアウト</button><button onclick="checkGoogleLoginStatus()">ログイン状態確認</button><button onclick="forceCloudSave()">Googleセーブ</button><button onclick="forceCloudLoad()">Google読込</button>
+      <button onclick="logoutGoogle()">ログアウト</button>
+      <button onclick="forceCloudSave()">Googleセーブ</button>
       <p id="loginStatus">確認中...</p>
+    </div>
+    <div class="settingsItem">
+      <h3>メールアドレスでログイン</h3>
+      <input id="emailLoginInput" type="email" placeholder="メールアドレス" autocomplete="email">
+      <input id="passwordLoginInput" type="password" placeholder="パスワード（6文字以上）" autocomplete="current-password">
+      <button onclick="loginEmailPassword()">メールでログイン</button>
+      <button onclick="registerEmailPassword()">新規登録</button>
+      <p>※メールログインを使うには、管理画面でメール/パスワード認証を有効にしてください。</p>
     </div>
 ${themeButtonsHTML()}
   `;
@@ -3215,19 +3225,8 @@ document.addEventListener("dblclick", function(e){
 
 
 // Ver2.7.3 auto update news system
+// Ver2.8.7+ private fixes are intentionally hidden from public update history
 const UPDATE_NOTES = {
-  "2.8.8": [
-    "ログイン時に使うデータを選べるように変更",
-    "クラウドデータとこの端末のデータを確認して選択可能に改善",
-    "プレイヤー名方式をさらに安定化",
-    "ログイン状態確認で本名が表示されないように調整"
-  ],
-  "2.8.7": [
-    "プレイヤー名方式に変更",
-    "ログイン後も本名が表示されないように調整",
-    "アカウント連携時の保存処理を改善",
-    "ランキング・プロフィール表示をニックネーム中心に改善"
-  ],
   "2.7.3": [
     "壊れていたpanelAreaのHTMLを修正",
     "強すぎるタップ制御を削除",
@@ -3269,8 +3268,20 @@ const UPDATE_NOTES = {
   ]
 };
 
+function getLatestUpdateNoteVersion(){
+  const versions = Object.keys(UPDATE_NOTES).sort((a,b)=>{
+    const pa=a.split(".").map(Number);
+    const pb=b.split(".").map(Number);
+    for(let i=0;i<3;i++){
+      if(pb[i]!==pa[i])return pb[i]-pa[i];
+    }
+    return 0;
+  });
+  return versions[0] || "2.7.3";
+}
+
 function updateNotesHTML(){
-  const v = (typeof VERSION !== "undefined") ? VERSION : "2.7.3";
+  const v = getLatestUpdateNoteVersion();
   let html = `
     <h2>📢 お知らせ</h2>
     <div class="newsCard">
@@ -3451,19 +3462,8 @@ function getEnemyInfo(){
 function renderEnemyMob(){
   const area=document.getElementById("enemyMobArea");
   if(!area)return;
-  if(mode==="random" || mode==="review" || (matchState && matchState.active)){
-    area.innerHTML="";
-    return;
-  }
-  const e=getEnemyInfo();
-  area.innerHTML=`
-    <div id="enemyMobCard" class="enemyMobWrap enemy-${e.key}">
-      <div class="enemyMobName">${e.label}　${e.name}</div>
-      <img class="enemyMobImg ${e.key==='easy'?'slime':''}" src="${e.img}" alt="${e.name}"
-        onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<div style=&quot;font-size:82px&quot;>👾</div>')">
-      <div>HP 10 / 10</div>
-    </div>
-  `;
+  // 敵キャラ名・画像スペースは一時的に非表示
+  area.innerHTML="";
 }
 function playEnemyDefeat(){
   const card=document.getElementById("enemyMobCard");
