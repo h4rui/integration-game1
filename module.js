@@ -412,6 +412,7 @@ const roomId = Math.random().toString(36).slice(2,8).toUpperCase();
 await setDoc(doc(db,"matches",roomId),{
 roomId:roomId,
 type:data.type || "online",
+betaVote: !!data.betaVote,
 status:"waiting",
 hostId:getPlayerId(),
 hostName:data.name || "名無し",
