@@ -4,8 +4,9 @@
 <meta charset="UTF-8">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5681066295421790"
 crossorigin="anonymous"></script>
-<title>数学マスター Ver 2.8.9</title>
+<title>数学マスター Ver 2.8.8</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <style>
 body{
   margin:0;
@@ -296,7 +297,7 @@ a{color:#00ffcc}
   padding:9px 14px;
 }
 
-/* Ver 2.8.9 Space UI */
+/* Ver 2.8.8 Space UI */
 body{
   margin:0;
   color:white;
@@ -349,7 +350,7 @@ body{
   text-shadow:0 0 8px #60a5fa,0 0 18px #7c3aed,0 0 32px #38bdf8;
 }
 #homeScreen h1::after{
-  content:"Ver 2.8.9";display:block;font-size:18px;color:#67e8f9;margin-top:6px;text-shadow:0 0 10px #22d3ee;
+  content:"Ver 2.8.8";display:block;font-size:18px;color:#67e8f9;margin-top:6px;text-shadow:0 0 10px #22d3ee;
 }
 #homePlayerCard{
   width:88%;max-width:780px;margin:18px auto 22px;padding:18px;
@@ -409,7 +410,7 @@ body{
 }
 
 
-/* Ver 2.8.9 additions */
+/* Ver 2.8.8 additions */
 #homePlayerName{
   font-size:26px;
   font-weight:900;
@@ -489,7 +490,7 @@ body{
 }
 
 
-/* Ver 2.8.9 Profile Card UI */
+/* Ver 2.8.8 Profile Card UI */
 .profileHero{
   width:92%;
   max-width:900px;
@@ -976,30 +977,8 @@ h4rui.github.io
 <script src="https://cdn.jsdelivr.net/npm/mathjs@11.11.0/lib/browser/math.js"></script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-import {
-  getFirestore,
-  collection,
-  doc,
-  setDoc,
-  getDoc,
-  getDocs,
-  query,
-  where,
-  limit,
-  serverTimestamp,
-  updateDoc,
-  deleteDoc
-} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-import {
-  getAuth,
-  GoogleAuthProvider,
-  signInWithRedirect,
-  getRedirectResult,
-  signOut,
-  onAuthStateChanged,
-  setPersistence,
-  browserLocalPersistence
-} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import { getFirestore, collection, doc, setDoc, getDoc, getDocs, query, where, limit, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDVXwXTGeft41ajd0KDwNPG-dH8pmsMIt8",
@@ -1014,145 +993,110 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
-
 window.firebaseApp = app;
+window.db = db;
 window.firebaseDb = db;
 window.firebaseAuth = auth;
-window.currentUser = null;
-
-await setPersistence(auth, browserLocalPersistence).catch((e) => {
-  console.error("Firebase persistence error:", e);
-});
-
+setPersistence(auth,browserLocalPersistence).catch((e)=>console.error(e));
 const provider = new GoogleAuthProvider();
-provider.setCustomParameters({ prompt: "select_account" });
+provider.setCustomParameters({ prompt:"select_account" });
 
-function getLocalBundleForCloud(){
-  return window.getLocalGameData ? window.getLocalGameData() : null;
-}
-
-function getLocalPlayerName(){
-  const bundle = getLocalBundleForCloud();
-  return (bundle && bundle.playerProfile && bundle.playerProfile.name) ? bundle.playerProfile.name : "名無し";
-}
-
-function makeFriendCode(){
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let code = "";
-  for(let i=0;i<8;i++) code += chars[Math.floor(Math.random()*chars.length)];
-  return code;
-}
-
-async function ensureFriendCode(user){
-  if(!user) return "";
-  let code = localStorage.getItem("friendCode");
-  if(code && code.length===8) return code;
-
-  for(let i=0;i<20;i++){
-    code = makeFriendCode();
-    const ref = doc(db,"friendCodes",code);
-    const snap = await getDoc(ref);
-    if(!snap.exists()){
-      await setDoc(ref,{
-        uid:user.uid,
-        friendCode:code,
-        createdAt:serverTimestamp()
-      });
-      localStorage.setItem("friendCode",code);
-      return code;
-    }
-  }
-  code = "M" + Math.random().toString(36).slice(2,9).toUpperCase().replace(/[^A-Z0-9]/g,"0").slice(0,7);
-  localStorage.setItem("friendCode",code);
-  return code;
-}
-
-async function ensurePlayerNameAfterLogin(user){
-  if(!user) return;
-  let name = getLocalPlayerName();
-  if(!name || name === "名無し" || name === "Googleユーザー"){
-    const entered = prompt("プレイヤー名を決めてください（本名ではなくニックネーム推奨）", "");
-    if(entered && entered.trim()){
-      const bundle = getLocalBundleForCloud() || {playerProfile:{}, playerData:{}, settings:{}};
-      bundle.playerProfile = bundle.playerProfile || {};
-      bundle.playerProfile.name = entered.trim().slice(0,16);
-      if(window.applyCloudGameData) window.applyCloudGameData(bundle);
-    }
-  }
-}
-
-async function saveUserMeta(user){
-  if(!user) return;
-  const friendCode = await ensureFriendCode(user);
-  const playerName = getLocalPlayerName();
-  await setDoc(doc(db,"userProfiles",user.uid),{
-    uid:user.uid,
-    friendCode,
-    email:user.email || "",
-    displayName:user.displayName || "",
-    playerName,
-    photoURL:user.photoURL || "",
-    updatedAt:serverTimestamp()
-  },{merge:true});
-}
-
-function setLoginState(user){
-  window.currentUser = user || null;
-
-  if(user){
-    localStorage.setItem("googleLoginLinked","1");
-    localStorage.setItem("googleLoginUid", user.uid);
-    localStorage.removeItem("googleLoginName");
-    localStorage.removeItem("loginTrying");
-
-    if(window.unlockAchievement){
-      window.unlockAchievement("初ログイン");
-    }
-  }else{
-    localStorage.removeItem("googleLoginLinked");
-    localStorage.removeItem("googleLoginUid");
-    localStorage.removeItem("googleLoginName");
-  }
-
-  if(window.refreshLoginStatus) window.refreshLoginStatus();
-  if(window.updateHomeStatus) window.updateHomeStatus();
-}
-
-async function afterLoginReady(user, fromRedirect=false){
-  if(!user) return;
-  try{
-    await ensurePlayerNameAfterLogin(user);
-    await saveUserMeta(user);
-    if(!window.__cloudAutoChecked){
-      window.__cloudAutoChecked = true;
-      await window.loadCloudPlayerDataAndApply();
-    }
-    if(fromRedirect) alert("アカウント連携に成功しました");
-  }catch(e){
-    console.warn("after login setup failed", e);
-  }
-}
 
 window.loginGoogle = async function(){
   try{
     localStorage.setItem("loginTrying","1");
     await setPersistence(auth,browserLocalPersistence);
-    await signInWithRedirect(auth,provider);
+    try{
+      const result = await signInWithPopup(auth,provider);
+      if(result && result.user){
+        applyGoogleLoginState(result.user);
+        alert("アカウント連携に成功しました");
+      }
+    }catch(popupError){
+      console.warn("Popup login failed, fallback to redirect:", popupError);
+      await signInWithRedirect(auth,provider);
+    }
   }catch(e){
-    console.error("Google login start error:", e);
+    console.error(e);
     alert("Googleログイン開始に失敗：" + (e.code || e.message || e));
   }
 };
 
+
+function applyGoogleLoginState(user){
+  window.currentUser = user || null;
+
+  if(user){
+    window.__cloudLoginJustSignedIn = true;
+    localStorage.setItem("googleLoginLinked","1");
+    localStorage.setItem("googleLoginUid", user.uid);
+    localStorage.setItem("googleDisplayNameHidden", user.displayName || "");
+    localStorage.removeItem("loginTrying");
+    console.log("アカウント連携中:", user.uid);
+
+    if(window.unlockAchievement){
+      window.unlockAchievement("初ログイン");
+      if(window.saveAllData) window.saveAllData();
+    }
+  }else{
+    localStorage.removeItem("googleLoginLinked");
+    localStorage.removeItem("googleDisplayNameHidden");
+    localStorage.removeItem("googleLoginUid");
+    console.log("未ログイン");
+  }
+
+  if(window.refreshLoginStatus) window.refreshLoginStatus();
+  if(window.updateHomeStatus) window.updateHomeStatus();
+
+  if(user){
+    ensurePlayerNameAfterLogin(user);
+    setTimeout(()=>{
+      if(window.loadCloudPlayerDataAndApply){
+        window.loadCloudPlayerDataAndApply().catch(e=>console.warn("cloud load failed",e));
+      }
+    },1200);
+  }
+}
+
+getRedirectResult(auth)
+  .then((result)=>{
+    if(result && result.user){
+      applyGoogleLoginState(result.user);
+      alert("アカウント連携に成功しました");
+    }
+  })
+  .catch((e)=>{
+    console.error(e);
+    localStorage.removeItem("loginTrying");
+    alert("Googleログイン確認エラー：" + (e.code || e.message || e));
+  });
+
+onAuthStateChanged(auth,user=>{
+  applyGoogleLoginState(user);
+
+  if(!user && localStorage.getItem("loginTrying")==="1"){
+    setTimeout(()=>{
+      if(!auth.currentUser){
+        alert("Googleログイン後に認証状態を取得できませんでした。Safariの設定でサイト越えトラッキング防止が強い場合があります。もう一度ログインを押してください。");
+        localStorage.removeItem("loginTrying");
+      }
+    },2500);
+  }
+});
+
 window.logoutGoogle = async function(){
   try{
     await signOut(auth);
-    setLoginState(null);
-    window.__cloudAutoChecked=false;
+  }finally{
+    window.currentUser=null;
+    window.__cloudLoginJustSignedIn = false;
+    localStorage.removeItem("googleLoginLinked");
+    localStorage.removeItem("googleDisplayNameHidden");
+    localStorage.removeItem("googleLoginUid");
+    localStorage.removeItem("loginTrying");
+    if(window.refreshLoginStatus) window.refreshLoginStatus();
+    if(window.updateHomeStatus) window.updateHomeStatus();
     alert("ログアウトしました");
-  }catch(e){
-    console.error("Logout error:", e);
-    alert("ログアウト失敗：" + (e.code || e.message || e));
   }
 };
 
@@ -1160,125 +1104,41 @@ window.getGoogleLoginInfo = function(){
   return auth.currentUser || window.currentUser || null;
 };
 
-window.saveCloudPlayerDataNow = async function(){
-  const user = auth.currentUser;
-  if(!user) return false;
-  await ensurePlayerNameAfterLogin(user);
-  const friendCode = await ensureFriendCode(user);
-  const bundle = getLocalBundleForCloud();
-  if(!bundle) return false;
-  const playerName = (bundle.playerProfile && bundle.playerProfile.name) || "名無し";
-  await setDoc(doc(db,"userSaves",user.uid),{
-    uid:user.uid,
-    friendCode,
-    email:user.email || "",
-    displayName:user.displayName || "",
-    playerName,
-    photoURL:user.photoURL || "",
-    playerProfile:bundle.playerProfile || {},
-    playerData:bundle.playerData || {},
-    settings:bundle.settings || {},
-    updatedAt:serverTimestamp()
-  },{merge:true});
-  await saveUserMeta(user);
-  return true;
-};
+window.currentUser = null;
 
-let cloudSaveTimer=null;
-window.queueCloudSave = function(){
-  if(!auth.currentUser) return;
-  if(cloudSaveTimer) clearTimeout(cloudSaveTimer);
-  cloudSaveTimer=setTimeout(()=>{
-    window.saveCloudPlayerDataNow().catch(e=>console.warn("cloud save failed",e));
-  },900);
-};
 
-window.loadCloudPlayerDataAndApply = async function(){
-  const user = auth.currentUser;
-  if(!user) return false;
-  const ref = doc(db,"userSaves",user.uid);
-  const snap = await getDoc(ref);
-  if(!snap.exists()){
-    await window.saveCloudPlayerDataNow();
-    return false;
-  }
 
-  const cloud = snap.data();
-  const local = getLocalBundleForCloud();
-  const cloudName = (cloud.playerProfile && cloud.playerProfile.name) || cloud.playerName || "名無し";
-  const localName = (local && local.playerProfile && local.playerProfile.name) || "名無し";
-  const cloudExp = (cloud.playerData && cloud.playerData.exp) || 0;
-  const localExp = (local && local.playerData && local.playerData.exp) || 0;
-  const cloudLv = Math.floor(cloudExp/100)+1;
-  const localLv = Math.floor(localExp/100)+1;
-  const cloudCorrect = cloud.playerData ? (cloud.playerData.totalCorrect||0) : 0;
-  const localCorrect = local && local.playerData ? (local.playerData.totalCorrect||0) : 0;
-
-  const useCloud = confirm(`保存データが見つかりました。どちらを使いますか？\n\nOK：クラウドデータを読み込む\nキャンセル：この端末のデータで上書きする\n\nクラウド：${cloudName} / Lv${cloudLv} / 正解${cloudCorrect}問\nこの端末：${localName} / Lv${localLv} / 正解${localCorrect}問`);
-
-  if(useCloud){
-    if(window.applyCloudGameData){
-      window.applyCloudGameData({
-        playerProfile:cloud.playerProfile || {},
-        playerData:cloud.playerData || {},
-        settings:cloud.settings || {}
-      });
-    }
-    if(cloud.friendCode) localStorage.setItem("friendCode",cloud.friendCode);
-    return true;
-  }
-
-  await window.saveCloudPlayerDataNow();
-  return false;
-};
-
-window.forceCloudSave = async function(){
+// Ver2.8.8 プレイヤー名方式（Google名は画面に出さない）
+async function ensurePlayerNameAfterLogin(user){
   try{
-    const ok = await window.saveCloudPlayerDataNow();
-    alert(ok ? "クラウド保存完了" : "Googleログインしていません");
-  }catch(e){
-    console.error(e);
-    alert("クラウド保存失敗：" + (e.code || e.message || e));
-  }
-};
-
-window.forceCloudLoad = async function(){
-  try{
-    const ok = await window.loadCloudPlayerDataAndApply();
-    alert(ok ? "クラウドデータを読み込みました" : "クラウドデータがないのでこの端末データを保存しました");
-  }catch(e){
-    console.error(e);
-    alert("クラウド読込失敗：" + (e.code || e.message || e));
-  }
-};
-
-getRedirectResult(auth)
-  .then(async (result)=>{
-    if(result && result.user){
-      setLoginState(result.user);
-      await afterLoginReady(result.user,true);
-    }
-  })
-  .catch((e)=>{
-    console.error("Google redirect result error:", e);
-    localStorage.removeItem("loginTrying");
-    alert("Googleログイン確認エラー：" + (e.code || e.message || e));
-  });
-
-onAuthStateChanged(auth,async (user)=>{
-  setLoginState(user);
-  if(user){
-    await afterLoginReady(user,false);
-  }
-  if(!user && localStorage.getItem("loginTrying")==="1"){
-    setTimeout(()=>{
-      if(!auth.currentUser){
-        localStorage.removeItem("loginTrying");
-        alert("ログイン状態を取得できませんでした。Safariの場合はページを更新してからもう一度ログインしてください。");
+    if(!user) return;
+    let bundle = window.getLocalGameData ? window.getLocalGameData() : null;
+    let currentName = bundle && bundle.playerProfile ? (bundle.playerProfile.name || "") : "";
+    if(!currentName || currentName === "名無し" || currentName === "Googleユーザー"){
+      let inputName = prompt("プレイヤー名を決めてください（本名ではなくニックネーム推奨）", "");
+      if(inputName){
+        inputName = inputName.trim().slice(0,16);
+        if(inputName){
+          let newBundle = window.getLocalGameData ? window.getLocalGameData() : {playerProfile:{},playerData:{},settings:{}};
+          newBundle.playerProfile = newBundle.playerProfile || {};
+          newBundle.playerProfile.name = inputName;
+          if(window.applyCloudGameData) window.applyCloudGameData(newBundle);
+        }
       }
-    },2500);
+    }
+    bundle = window.getLocalGameData ? window.getLocalGameData() : null;
+    const playerName = bundle && bundle.playerProfile ? (bundle.playerProfile.name || "名無し") : "名無し";
+    await setDoc(doc(db,"userProfiles",user.uid),{
+      uid:user.uid,
+      googleDisplayName:user.displayName || "",
+      googleEmail:user.email || "",
+      playerName:playerName,
+      updatedAt:serverTimestamp()
+    },{merge:true});
+  }catch(e){
+    console.warn("player name setup failed", e);
   }
-});
+}
 
 function getWeekKey(){
   const now = new Date();
@@ -1295,7 +1155,7 @@ function getWeekKey(){
 }
 
 function getPlayerId(){
-  if(auth.currentUser) return "google_" + auth.currentUser.uid;
+  if(window.currentUser) return "google_" + window.currentUser.uid;
   let playerId = localStorage.getItem("playerId");
   if(!playerId){
     playerId = crypto.randomUUID();
@@ -1304,21 +1164,7 @@ function getPlayerId(){
   return "local_" + playerId;
 }
 
-window.getMyPlayerId = () => localStorage.getItem("friendCode") || getPlayerId();
-
-window.firebaseTestConnection = async function(){
-  const id = "test_" + Date.now();
-  const ref = doc(db,"connectionTests",id);
-  await setDoc(ref,{
-    ok:true,
-    createdAtText:new Date().toISOString(),
-    updatedAt:serverTimestamp()
-  });
-  const snap = await getDoc(ref);
-  if(!snap.exists()) throw new Error("test-doc-not-found");
-  await deleteDoc(ref);
-  return true;
-};
+window.getMyPlayerId = () => getPlayerId();
 
 window.saveWorldScore = async function(data){
   const week = getWeekKey();
@@ -1333,12 +1179,12 @@ window.saveWorldScore = async function(data){
   }
 
   await setDoc(ref,{
-    name:data.name || "名無し",
-    icon:data.icon || "",
-    score:data.score || 0,
-    title:data.title || "初心者",
-    level:data.level || 1,
-    mode:data.mode || "random",
+    name:data.name,
+    icon:data.icon,
+    score:data.score,
+    title:data.title,
+    level:data.level,
+    mode:data.mode,
     week:week,
     playerId:playerId,
     updatedAt:serverTimestamp()
@@ -1346,153 +1192,41 @@ window.saveWorldScore = async function(data){
 };
 
 window.loadWorldRanking = async function(){
-  const qRank = query(
-    collection(db,"rankings"),
-    where("week","==",getWeekKey()),
-    where("mode","==","random"),
-    limit(100)
-  );
-  const snap = await getDocs(qRank);
+  const q = query(collection(db,"rankings"), where("week","==",getWeekKey()), where("mode","==","random"), limit(100));
+  const snap = await getDocs(q);
   let list = [];
-  snap.forEach(d=>list.push(d.data()));
-  list.sort((a,b)=>(b.score||0)-(a.score||0));
+  snap.forEach(doc=>list.push(doc.data()));
+  list.sort((a,b)=>b.score-a.score);
   return list;
 };
 
 window.savePlayerPublicData = async function(data){
-  const user = auth.currentUser;
-  const uid = user ? user.uid : getPlayerId();
-  const friendCode = user ? await ensureFriendCode(user) : (localStorage.getItem("friendCode") || "");
-  const playerName = data.name || getLocalPlayerName() || "名無し";
-  await setDoc(doc(db,"players",uid),{
-    uid:uid,
-    playerId:uid,
-    friendCode:friendCode,
-    email:user ? (user.email || "") : "",
-    displayName:user ? (user.displayName || "") : "",
-    playerName:playerName,
-    name:playerName,
-    photoURL:user ? (user.photoURL || "") : "",
-    icon:data.icon || "",
-    title:data.title || "初心者",
-    level:data.level || 1,
-    bestRandomScore:data.bestRandomScore || 0,
+  const playerId = getPlayerId();
+  await setDoc(doc(db,"players",playerId),{
+    playerId:playerId,
+    name:data.name,
+    icon:data.icon,
+    title:data.title,
+    level:data.level,
+    bestRandomScore:data.bestRandomScore,
     updatedAt:serverTimestamp()
-  },{merge:true});
-  if(user) await saveUserMeta(user);
+  });
 };
 
 window.loadFriendData = async function(friendId){
-  let code = String(friendId || "").trim().toUpperCase().replace(/-/g,"");
-  if(code.length===8){
-    const codeSnap = await getDoc(doc(db,"friendCodes",code));
-    if(codeSnap.exists()){
-      const uid = codeSnap.data().uid;
-      const playerSnap = await getDoc(doc(db,"players",uid));
-      if(playerSnap.exists()) return playerSnap.data();
-      const profileSnap = await getDoc(doc(db,"userProfiles",uid));
-      if(profileSnap.exists()) return profileSnap.data();
-    }
-  }
   const snap = await getDoc(doc(db,"players",friendId));
   if(!snap.exists()) return null;
   return snap.data();
 };
 
-window.createMatchRoom = async function(data){
-  const roomId = Math.random().toString(36).slice(2,8).toUpperCase();
 
-  await setDoc(doc(db,"matches",roomId),{
-    roomId:roomId,
-    type:data.type || "online",
-    status:"waiting",
-    hostId:getPlayerId(),
-    hostName:data.name || "名無し",
-    hostTitle:data.title || "初心者",
-    hostRate:data.rate || 1000,
-    guestId:"",
-    guestName:"",
-    guestTitle:"",
-    hostPoints:0,
-    guestPoints:0,
-    round:0,
-    currentQuestion:data.questions[0],
-    questions:data.questions,
-    roundWinner:"",
-    winner:"",
-    createdAtText:new Date().toISOString(),
-    updatedAt:serverTimestamp()
-  });
 
-  return roomId;
-};
+
 
 window.loadMatchRoom = async function(roomId){
   const snap = await getDoc(doc(db,"matches",roomId));
   if(!snap.exists()) return null;
   return snap.data();
-};
-
-window.joinMatchRoom = async function(roomId,data){
-  const ref = doc(db,"matches",roomId);
-  const snap = await getDoc(ref);
-
-  if(!snap.exists()) throw new Error("room-not-found");
-
-  const room = snap.data();
-  const myId = getPlayerId();
-
-  if(room.hostId === myId) throw new Error("own-room");
-  if(room.guestId) throw new Error("already-full");
-  if(room.status === "finished" || room.status === "canceled") throw new Error("room-closed");
-
-  await updateDoc(ref,{
-    status:"playing",
-    guestId:myId,
-    guestName:data.name || "名無し",
-    guestTitle:data.title || "初心者",
-    updatedAt:serverTimestamp()
-  });
-
-  const after = await getDoc(ref);
-  return after.data();
-};
-
-window.cancelMatchRoom = async function(roomId){
-  const ref = doc(db,"matches",roomId);
-  const snap = await getDoc(ref);
-  if(!snap.exists()) return;
-
-  const room=snap.data();
-  if(room.hostId !== getPlayerId()) throw new Error("not-host");
-
-  await updateDoc(ref,{
-    status:"canceled",
-    updatedAt:serverTimestamp()
-  });
-};
-
-window.loadOpenMatchRooms = async function(){
-  const qOpen = query(
-    collection(db,"matches"),
-    where("type","==","online"),
-    where("status","==","waiting"),
-    limit(30)
-  );
-
-  const snap = await getDocs(qOpen);
-  let list=[];
-  const myId=getPlayerId();
-
-  snap.forEach(d=>{
-    const data=d.data();
-    if(!data.guestId && data.hostId !== myId){
-      list.push(data);
-    }
-  });
-
-  list.sort((a,b)=>(b.createdAtText||"").localeCompare(a.createdAtText||""));
-  return list;
 };
 
 window.claimMatchPoint = async function(roomId,side,round){
@@ -1542,6 +1276,147 @@ window.claimMatchPoint = async function(roomId,side,round){
   return after.data();
 };
 
+window.saveRateData = async function(result){
+  const playerId = getPlayerId();
+  const ref = doc(db,"ratings",playerId);
+  const snap = await getDoc(ref);
+  let data = snap.exists() ? snap.data() : {};
+  let rating = data.rating || 1000;
+  let wins = data.wins || 0;
+  let losses = data.losses || 0;
+
+  if(result === "win"){
+    rating += 25;
+    wins++;
+  }else if(result === "loss"){
+    rating = Math.max(100, rating - 25);
+    losses++;
+  }
+
+  await setDoc(ref,{
+    playerId,
+    name:((window.getLocalGameData&&window.getLocalGameData().playerProfile&&window.getLocalGameData().playerProfile.name) || "名無し"),
+    icon:((window.getLocalGameData&&window.getLocalGameData().playerProfile&&window.getLocalGameData().playerProfile.icon) || ""),
+    title:((window.getLocalGameData&&window.getLocalGameData().playerData&&window.getLocalGameData().playerData.equippedTitle) || "初心者"),
+    level:(window.getLevel ? window.getLevel() : 1),
+    rating,
+    wins,
+    losses,
+    updatedAt:serverTimestamp()
+  });
+
+  return {rating,wins,losses};
+};
+
+window.loadRateRanking = async function(){
+  const snap = await getDocs(collection(db,"ratings"));
+  let list=[];
+  snap.forEach(d=>list.push(d.data()));
+  list.sort((a,b)=>(b.rating||1000)-(a.rating||1000));
+  return list.slice(0,100);
+};
+
+
+
+
+
+
+
+
+
+
+
+window.loadOpenMatchRooms = async function(){
+  const qOpen = query(
+    collection(db,"matches"),
+    where("type","==","online"),
+    where("status","==","waiting"),
+    limit(30)
+  );
+
+  const snap = await getDocs(qOpen);
+  let list=[];
+  const myId=getPlayerId();
+
+  snap.forEach(d=>{
+    const data=d.data();
+    if(!data.guestId && data.hostId !== myId){
+      list.push(data);
+    }
+  });
+
+  list.sort((a,b)=>(b.createdAtText||"").localeCompare(a.createdAtText||""));
+  return list;
+};
+
+window.createMatchRoom = async function(data){
+  const roomId = Math.random().toString(36).slice(2,8).toUpperCase();
+
+  await setDoc(doc(db,"matches",roomId),{
+    roomId:roomId,
+    type:data.type || "online",
+    status:"waiting",
+    hostId:getPlayerId(),
+    hostName:data.name || "名無し",
+    hostTitle:data.title || "初心者",
+    hostRate:data.rate || 1000,
+    guestId:"",
+    guestName:"",
+    guestTitle:"",
+    hostPoints:0,
+    guestPoints:0,
+    round:0,
+    currentQuestion:data.questions[0],
+    questions:data.questions,
+    roundWinner:"",
+    winner:"",
+    createdAtText:new Date().toISOString(),
+    updatedAt:serverTimestamp()
+  });
+
+  return roomId;
+};
+
+window.joinMatchRoom = async function(roomId,data){
+  const ref = doc(db,"matches",roomId);
+  const snap = await getDoc(ref);
+
+  if(!snap.exists()) throw new Error("room-not-found");
+
+  const room = snap.data();
+  const myId = getPlayerId();
+
+  if(room.hostId === myId) throw new Error("own-room");
+  if(room.guestId) throw new Error("already-full");
+  if(room.status === "finished" || room.status === "canceled") throw new Error("room-closed");
+
+  await updateDoc(ref,{
+    status:"playing",
+    guestId:myId,
+    guestName:data.name || "名無し",
+    guestTitle:data.title || "初心者",
+    updatedAt:serverTimestamp()
+  });
+
+  const after = await getDoc(ref);
+  return after.data();
+};
+
+window.cancelMatchRoom = async function(roomId){
+  const ref = doc(db,"matches",roomId);
+  const snap = await getDoc(ref);
+  if(!snap.exists()) return;
+
+  const room=snap.data();
+  if(room.hostId !== getPlayerId()) throw new Error("not-host");
+
+  await updateDoc(ref,{
+    status:"canceled",
+    updatedAt:serverTimestamp()
+  });
+};
+
+
 window.surrenderMatchRoom = async function(roomId,side){
   const ref = doc(db,"matches",roomId);
   const snap = await getDoc(ref);
@@ -1588,49 +1463,142 @@ window.leaveMatchRoom = async function(roomId,side){
   return after.data();
 };
 
-window.saveRateData = async function(result){
-  const playerId = getPlayerId();
-  const ref = doc(db,"ratings",playerId);
-  const snap = await getDoc(ref);
-  let data = snap.exists() ? snap.data() : {};
-  let rating = data.rating || 1000;
-  let wins = data.wins || 0;
-  let losses = data.losses || 0;
 
-  if(result === "win"){
-    rating += 25;
-    wins++;
-  }else if(result === "loss"){
-    rating = Math.max(100, rating - 25);
-    losses++;
-  }
-
+window.testFirestoreDirect = async function(){
+  const id = "test_" + Date.now();
+  const ref = doc(db,"connectionTests",id);
   await setDoc(ref,{
-    playerId,
-    name:(window.playerProfile && window.playerProfile.name) || localStorage.getItem("googleLoginName") || "名無し",
-    icon:(window.playerProfile && window.playerProfile.icon) || "",
-    title:(window.playerData && window.playerData.equippedTitle) || "初心者",
-    level:(window.getLevel && window.getLevel()) || 1,
-    rating,
-    wins,
-    losses,
+    ok:true,
+    from:location.hostname,
+    createdAt:serverTimestamp()
+  });
+  const snap = await getDoc(ref);
+  if(!snap.exists()) throw new Error("write-read-failed");
+  return {ok:true,id};
+};
+
+
+// Ver2.8.3 Googleログイン連動セーブ
+function getLocalBundleForCloud(){
+  if(window.getLocalGameData){
+    return window.getLocalGameData();
+  }
+  return null;
+}
+
+window.saveCloudPlayerDataNow = async function(){
+  const user = auth.currentUser;
+  if(!user) return false;
+
+  const bundle = getLocalBundleForCloud();
+  if(!bundle) return false;
+
+  await setDoc(doc(db,"userSaves",user.uid),{
+    uid:user.uid,
+    name:(bundle.playerProfile && bundle.playerProfile.name) || "名無し",
+    playerName:(bundle.playerProfile && bundle.playerProfile.name) || "名無し",
+    googleDisplayName:user.displayName || "",
+    googleEmail:user.email || "",
+    playerProfile:bundle.playerProfile || {},
+    playerData:bundle.playerData || {},
+    settings:bundle.settings || {},
     updatedAt:serverTimestamp()
   },{merge:true});
 
-  return {rating,wins,losses};
+  return true;
 };
 
-window.loadRateRanking = async function(){
-  const snap = await getDocs(collection(db,"ratings"));
-  let list=[];
-  snap.forEach(d=>list.push(d.data()));
-  list.sort((a,b)=>(b.rating||1000)-(a.rating||1000));
-  return list.slice(0,100);
+let cloudSaveTimer = null;
+window.queueCloudSave = function(){
+  if(!auth.currentUser) return;
+  if(cloudSaveTimer) clearTimeout(cloudSaveTimer);
+  cloudSaveTimer = setTimeout(()=>{
+    window.saveCloudPlayerDataNow().catch(e=>console.warn("cloud save failed",e));
+  },800);
 };
 
-window.firebaseReady = true;
-console.log("Firebase ready:", firebaseConfig.projectId);
+window.loadCloudPlayerDataAndApply = async function(){
+  const user = auth.currentUser;
+  if(!user) return false;
+
+  const ref = doc(db,"userSaves",user.uid);
+  const snap = await getDoc(ref);
+
+  // 初回ログイン：クラウドにデータがなければ、この端末のデータを保存
+  if(!snap.exists()){
+    await ensurePlayerNameAfterLogin(user);
+    await window.saveCloudPlayerDataNow();
+    window.__cloudLoginJustSignedIn = false;
+    return false;
+  }
+
+  const cloud = snap.data();
+  const local = getLocalBundleForCloud();
+  const cloudName = (cloud.playerProfile && cloud.playerProfile.name) || cloud.playerName || "名無し";
+  const localName = (local && local.playerProfile && local.playerProfile.name) || "名無し";
+  const cloudLevel = cloud.playerData && cloud.playerData.exp ? Math.floor((cloud.playerData.exp||0)/100)+1 : 1;
+  const localLevel = local && local.playerData && local.playerData.exp ? Math.floor((local.playerData.exp||0)/100)+1 : 1;
+  const cloudCorrect = cloud.playerData ? (cloud.playerData.totalCorrect||0) : 0;
+  const localCorrect = local && local.playerData ? (local.playerData.totalCorrect||0) : 0;
+
+  const useCloud = confirm(
+    "保存データが見つかりました。どちらを使いますか？\n\n" +
+    "OK：クラウドデータを読み込む\n" +
+    "キャンセル：この端末のデータで上書きする\n\n" +
+    "クラウド：" + cloudName + " / Lv" + cloudLevel + " / 正解" + cloudCorrect + "問\n" +
+    "この端末：" + localName + " / Lv" + localLevel + " / 正解" + localCorrect + "問"
+  );
+
+  if(useCloud){
+    if(window.applyCloudGameData){
+      window.applyCloudGameData({
+        playerProfile:cloud.playerProfile || {},
+        playerData:cloud.playerData || {},
+        settings:cloud.settings || {}
+      });
+    }
+    window.__cloudLoginJustSignedIn = false;
+    return true;
+  }
+
+  await ensurePlayerNameAfterLogin(user);
+  await window.saveCloudPlayerDataNow();
+  window.__cloudLoginJustSignedIn = false;
+  return false;
+};
+
+window.forceCloudSave = async function(){
+  try{
+    const ok = await window.saveCloudPlayerDataNow();
+    alert(ok ? "Google連動セーブ完了" : "Googleログインしていません");
+  }catch(e){
+    console.error(e);
+    alert("Google連動セーブ失敗：" + (e.code || e.message || e));
+  }
+};
+
+window.forceCloudLoad = async function(){
+  try{
+    const ok = await window.loadCloudPlayerDataAndApply();
+    alert(ok ? "Googleセーブを読み込みました" : "クラウドデータがないのでこの端末データを保存しました");
+  }catch(e){
+    console.error(e);
+    alert("Googleセーブ読み込み失敗：" + (e.code || e.message || e));
+  }
+};
+
+
+window.getFirebaseDebugInfo = function(){
+  return {
+    host: location.hostname,
+    projectId: firebaseConfig.projectId,
+    authDomain: firebaseConfig.authDomain,
+    login: !!auth.currentUser,
+    uid: auth.currentUser ? auth.currentUser.uid : null
+  };
+};
+
 </script>
-<script src="app.js?v=2.8.9"></script>
+<script src="app.js?v=2.8.8"></script>
 </body>
 </html>

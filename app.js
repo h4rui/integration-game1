@@ -1,4 +1,34 @@
 
+// Ver2.8.7 expression cleanup
+function cleanMathExpression(expr){
+  if(expr===undefined || expr===null) return expr;
+  let s = String(expr);
+
+  // 係数0の項を消す: +0x^2, -0x, 0x², +0x^3 など
+  s = s.replace(/(^|[+\-])\s*0\s*x(?:\^\d+|[²³⁴⁵⁶])?/g, "$1");
+  s = s.replace(/(^|[+\-])\s*0\s*x/g, "$1");
+
+  // 係数1を省略: 1x^2 -> x^2, -1x -> -x, +1x -> +x
+  s = s.replace(/(^|[+\-(])\s*1\s*x/g, "$1x");
+  s = s.replace(/(^|[+\-(])\s*-1\s*x/g, "$1-x");
+  s = s.replace(/([+\-])\s*1\s*x/g, "$1x");
+  s = s.replace(/([+\-])\s*-1\s*x/g, m => m.includes("+") ? "-x" : "+x");
+
+  // +0, -0 を見た目から消す
+  s = s.replace(/\+\s*0(?=\)|\s|$)/g, "");
+  s = s.replace(/-\s*0(?=\)|\s|$)/g, "");
+
+  // 符号の整理
+  s = s.replace(/\+\s*-/g,"-").replace(/-\s*\+/g,"-").replace(/\+\s*\+/g,"+").replace(/--/g,"+");
+  s = s.replace(/\(\+/g,"(").replace(/^\+/,"");
+  s = s.replace(/\s+/g," ").trim();
+
+  // 空になったかっこを少しだけ整える
+  s = s.replace(/\(\s*\)/g,"0");
+  return s;
+}
+
+
 // Ver2.6.7 operator color and combo damage
 function colorOperatorsHTML(s){
   if(s===undefined || s===null)return "";
@@ -26,13 +56,7 @@ function showComboDamage(){
 
 // Ver2.6.1 formula display fix
 function fixFormulaSigns(s){
-  if(s===undefined || s===null)return s;
-  return String(s)
-    .replace(/\+\s*-/g,"-")
-    .replace(/-\s*\+/g,"-")
-    .replace(/\+\s*\+/g,"+")
-    .replace(/--/g,"+")
-    .replace(/^\+/,"");
+  return cleanMathExpression(s);
 }
 function cleanQuestionObject(q){
   if(!q)return q;
@@ -44,7 +68,7 @@ function cleanQuestionObject(q){
 }
 
 
-const VERSION = "2.8.9";
+const VERSION = "2.8.8";
 
 let enemyHP = 10;
 let playerHP = 5;
@@ -196,8 +220,27 @@ function saveAllData(){
   localStorage.setItem("playerProfile",JSON.stringify(playerProfile));
   localStorage.setItem("playerData",JSON.stringify(playerData));
   localStorage.setItem("settings",JSON.stringify(settings));
+  if(window.queueCloudSave && !window.__cloudLoginJustSignedIn) window.queueCloudSave();
 }
 window.saveAllData = saveAllData;
+window.getLevel = getLevel;
+window.getLocalGameData = function(){
+  return {
+    playerProfile: playerProfile,
+    playerData: playerData,
+    settings: settings
+  };
+};
+window.applyCloudGameData = function(data){
+  if(data.playerProfile) playerProfile = Object.assign(playerProfile || {}, data.playerProfile);
+  if(data.playerData) playerData = Object.assign(playerData || {}, data.playerData);
+  if(data.settings) settings = Object.assign(settings || {}, data.settings);
+  localStorage.setItem("playerProfile",JSON.stringify(playerProfile));
+  localStorage.setItem("playerData",JSON.stringify(playerData));
+  localStorage.setItem("settings",JSON.stringify(settings));
+  applySettings();
+  updateHomeStatus();
+};
 window.updateHomeStatus = updateHomeStatus;
 window.addEventListener("load",()=>{
   loadAllData();
@@ -299,17 +342,27 @@ function setPanelWithNav(html){
   panel.innerHTML=commonNavHTML()+html;
 }
 
+
 function openPanelPage(fnName){
   const menu=document.getElementById("homeMenu");
   const panel=document.getElementById("panelArea");
   if(menu)menu.classList.add("hidden");
   if(panel)panel.innerHTML="";
   pushPanelHistory(fnName);
-  eval(fnName+"()");
+  try{
+    if(typeof window[fnName]==="function"){
+      window[fnName]();
+    }else{
+      eval(fnName+"()");
+    }
+  }catch(e){
+    console.error(e);
+    if(panel)panel.innerHTML="<p>ページを開けませんでした。</p>";
+  }
   setTimeout(ensureHomeButton,0);
   setTimeout(ensureHomeButton,300);
-  setTimeout(ensureHomeButton,1000);
 }
+
 function closePanelPage(){
   const menu=document.getElementById("homeMenu");
   const panel=document.getElementById("panelArea");
@@ -426,17 +479,7 @@ function checkAchievements(){
   if(getLevel()>=1000)unlockAchievement("伝説の数学神");
   saveAllData();
 }
-function showAchievements(){
-  checkAchievements();
-  let html="<h2>🏆 実績一覧</h2>";
-  for(let a of achievementList()){
-    let got=playerData.achievements.includes(a);
-    if(a==="MENERU発見者"&&got){html+=`<div class="achievementItem">✅ <span class="meneruTitle">👾MENERU発見者👾</span></div>`;continue;}
-    if(a==="なかなか発見者"&&got){html+=`<div class="achievementItem">✅ <span class="nakanakaTitle">🧊なかなか発見者🧊</span></div>`;continue;}
-    html+=`<div class="achievementItem">${got?"✅":"⬜"} ${a}</div>`;
-  }
-  document.getElementById("panelArea").innerHTML=html;
-}
+
 
 function allTitles(){
   return [
@@ -958,7 +1001,7 @@ function showSettings(){
     </div>
     <div class="settingsItem">
       <button class="googleLoginBtn" onclick="loginGoogle()">Googleログイン</button>
-      <button onclick="logoutGoogle()">ログアウト</button><button onclick="checkGoogleLoginStatus()">ログイン状態確認</button><button onclick="testFirestoreConnection()">Firestore接続確認</button>
+      <button onclick="logoutGoogle()">ログアウト</button><button onclick="checkGoogleLoginStatus()">ログイン状態確認</button><button onclick="forceCloudSave()">Googleセーブ</button><button onclick="forceCloudLoad()">Google読込</button>
       <p id="loginStatus">確認中...</p>
     </div>
 ${themeButtonsHTML()}
@@ -1012,6 +1055,7 @@ function getExpPercent(){
   const need=level*100;
   return Math.min(100,Math.round((currentExp%need)/need*100));
 }
+
 function showProfile(){
   const name=playerProfile.name||"名無し";
   const title=playerData.equippedTitle||"初心者";
@@ -1068,7 +1112,13 @@ function showProfile(){
     <div class="profileBgSelector">
       <h3>プロフィール編集</h3>
       <input id="nameInput" placeholder="名前" value="${name}">
-      <button onclick="saveProfileName()">名前を保存</button>
+      <div class="iconPreviewWrap">
+        <img id="iconPreview" class="iconPreview" src="${icon || ""}">
+        <br>
+        <label class="fileInputLabel" for="iconInputEdit">画像を選ぶ</label>
+        <input id="iconInputEdit" type="file" accept="image/*" onchange="previewProfileIcon()">
+      </div>
+      <button onclick="saveProfileFromPanel()">名前・アイコンを保存</button>
       <button onclick="showTitles()">称号を変更</button>
       <button onclick="showMatchHistory()">対戦履歴</button>
       <button onclick="showStatsPage()">成績を見る</button>
@@ -1078,6 +1128,7 @@ function showProfile(){
   document.getElementById("panelArea").innerHTML=html;
   if(typeof ensureHomeButton==="function")ensureHomeButton();
 }
+
 function saveProfileName(){
   const v=document.getElementById("nameInput").value.trim();
   if(!v){alert("名前を入力して");return;}
@@ -1115,31 +1166,7 @@ function showOpponentProfile(data){
   if(typeof ensureHomeButton==="function")ensureHomeButton();
 }
 
-function saveProfileFromPanel(){
-  let nameEl=document.getElementById("playerNameEdit") || document.getElementById("nameInput");
-  let iconEl=document.getElementById("iconInputEdit");
-  let name=nameEl ? nameEl.value.trim() : "";
-  let file=(iconEl && iconEl.files) ? iconEl.files[0] : null;
 
-  if(name)playerProfile.name=name;
-
-  if(file){
-    let reader=new FileReader();
-    reader.onload=function(e){
-      playerProfile.icon=e.target.result;
-      saveAllData();
-      updateHomeStatus();
-      showProfile();
-      alert("保存したよ");
-    };
-    reader.readAsDataURL(file);
-  }else{
-    saveAllData();
-    updateHomeStatus();
-    showProfile();
-    alert("保存したよ");
-  }
-}
 
 function showContact(){
   document.getElementById("panelArea").innerHTML=`
@@ -1354,7 +1381,7 @@ function retryReview(i){
   document.getElementById("modeTitle").innerText="📚 復習モード";
   document.getElementById("result").innerHTML="";
   current=cleanQuestionObject(current);
-  document.getElementById("q").innerHTML=colorOperatorsHTML(current.q);
+  document.getElementById("q").innerText=cleanMathExpression(current.q);
   document.getElementById("ans").value="";
   updateHP();
     showComboDamage();
@@ -1397,6 +1424,7 @@ function selectDifficulty(m){
     <button class="modeBtn" onclick="startMode('easy')">🟢 初級</button>
     <button class="modeBtn" onclick="startMode('normal')">🟡 中級</button>
     <button class="modeBtn" onclick="startMode('hard')">🔴 上級</button>
+    <button class="modeBtn hardBtn" onclick="startMode('veryHard')">🔥 難問</button>
   `;
 }
 function startMode(diff){
@@ -1422,6 +1450,7 @@ function openGame(){
   if(mode==="arithmetic")title="⚔️ 四則演算バトル ⚔️";
   if(mode==="random")title="⚔️ ランキングモード ⚔️";
   document.getElementById("modeTitle").innerText=title;
+  renderEnemyMob();
 }
 function backHome(){
   if(matchState && matchState.active && matchState.roomId){try{leaveMatchRoom(matchState.roomId,matchState.side);}catch(e){}}
@@ -1532,6 +1561,7 @@ function generateArithmetic(){
 }
 
 function generateIntegral(){
+  if(difficulty==="veryHard")return generateHardIntegralQuestion();
   let type=difficulty==="easy"?rand(1,3):difficulty==="normal"?rand(1,8):rand(1,12);
 
   if(type===1){
@@ -1867,7 +1897,7 @@ function nextQ(){
     go.classList.add("goAnim");
 
     setTimeout(()=>{
-      q.innerText=current.q;
+      q.innerText=cleanMathExpression(current.q);
       q.classList.add("questionAnim");
     },300);
   },200);
@@ -1950,6 +1980,7 @@ async function submit(){
   if(ok){
     score++;
     combo++;
+    showComboPop();
 
     playerData.totalCorrect++;
     addExp(10);
@@ -2067,7 +2098,8 @@ function nextTurn(){
 
   if(mode!=="random"){
     if(enemyHP<=0){
-      showEnd("勝利！");
+      playEnemyDefeat();
+      setTimeout(()=>showEnd("勝利！"),450);
       return;
     }
 
@@ -2427,7 +2459,7 @@ function showMatchQuestion(room){
 
   current=room.currentQuestion;
   current=cleanQuestionObject(current);
-  document.getElementById("q").innerHTML=colorOperatorsHTML(current.q);
+  document.getElementById("q").innerText=cleanMathExpression(current.q);
   document.getElementById("ans").value="";
   document.getElementById("result").innerHTML=
     `<p>第${(room.round||0)+1}問　先に正解した方が1ポイント</p>`;
@@ -2559,10 +2591,9 @@ function checkGoogleLoginStatus(){
   else if(window.currentUser)user=window.currentUser;
 
   const uid=localStorage.getItem("googleLoginUid");
-  const linked=localStorage.getItem("googleLoginLinked");
 
-  if(user || uid || linked){
-    alert("アカウント連携済みです。\n本名・メールアドレスはゲーム画面には表示されません。");
+  if(user || uid){
+    alert("アカウント連携済みです\n本名はゲーム画面には表示されません");
   }else{
     alert("未ログインです");
   }
@@ -2852,21 +2883,6 @@ async function showOnlineMatchMenu(){
   }
 }
 
-async function testFirestoreConnection(){
-  try{
-    const roomId=await createMatchRoom({
-      type:"test",
-      name:"接続テスト",
-      title:"テスト",
-      questions:[{q:"1+1",a:"2",display:"2",explanation:"テスト"}]
-    });
-    await cancelMatchRoom(roomId);
-    alert("Firestore接続OK");
-  }catch(e){
-    alert("Firestore接続NG：" + (e.code || e.message || e));
-    console.error(e);
-  }
-}
 
 setInterval(ensureHomeButton,1500);
 
@@ -3024,91 +3040,6 @@ const MESSAGE_COLLECTION = [
 
 
 
-let __lastTouchEnd = 0;
-document.addEventListener("touchend", function(e){
-  const now = Date.now();
-  if(now - __lastTouchEnd <= 300){
-    const t = e.target;
-    if(t && (t.tagName === "BUTTON" || t.classList.contains("keyBtn") || t.closest("#customKeyboard"))){
-      e.preventDefault();
-    }
-  }
-  __lastTouchEnd = now;
-}, {passive:false});
-
-document.addEventListener("dblclick", function(e){
-  const t = e.target;
-  if(t && (t.tagName === "BUTTON" || t.classList.contains("keyBtn") || t.closest("#customKeyboard"))){
-    e.preventDefault();
-  }
-}, {passive:false});
-
-
-
-let __lastTouchStart = 0;
-document.addEventListener("touchstart", function(e){
-  if(e.touches && e.touches.length > 1){
-    e.preventDefault();
-    return;
-  }
-
-  const now = Date.now();
-  const t = e.target;
-
-  if(now - __lastTouchStart < 300){
-    if(t && (t.tagName === "BUTTON" || t.classList.contains("keyBtn") || t.closest("#customKeyboard"))){
-      e.preventDefault();
-    }
-  }
-
-  __lastTouchStart = now;
-}, {passive:false});
-
-document.addEventListener("touchend", function(e){
-  const t = e.target;
-  if(t && (t.classList && t.classList.contains("googleLoginBtn"))){
-    return;
-  }
-  if(t && (t.tagName === "BUTTON" || t.classList.contains("keyBtn") || t.closest("#customKeyboard"))){
-    e.preventDefault();
-    if(t.click) t.click();
-  }
-}, {passive:false});
-
-
-
-let __safeLastTouchEnd = 0;
-document.addEventListener("touchend", function(e){
-  const now = Date.now();
-  const t = e.target;
-
-  // Googleログインは絶対に邪魔しない
-  if(t && t.closest && t.closest(".googleLoginBtn")) return;
-
-  // テンキーだけダブルタップ拡大を止める。クリックの再実行はしない。
-  if(t && t.closest && t.closest("#customKeyboard")){
-    if(now - __safeLastTouchEnd <= 320){
-      e.preventDefault();
-    }
-  }
-
-  __safeLastTouchEnd = now;
-}, {passive:false});
-
-document.addEventListener("dblclick", function(e){
-  const t = e.target;
-  if(t && t.closest && t.closest("#customKeyboard")){
-    e.preventDefault();
-  }
-}, {passive:false});
-
-document.addEventListener("gesturestart", function(e){
-  if(e.target && e.target.closest && e.target.closest("#customKeyboard")){
-    e.preventDefault();
-  }
-}, {passive:false});
-
-
 // Ver2.6.6 偏差値55くらいの積分難問
 const HARD_INTEGRAL_QUESTIONS = [
   {
@@ -3213,29 +3144,6 @@ function difficultyLabel(d){
 }
 
 
-function addHardDifficultyButtonIfNeeded(){
-  const panel=document.getElementById("panelArea");
-  if(!panel || panel.innerHTML.includes("veryHard"))return;
-  if(panel.innerHTML.includes("上級") && panel.innerHTML.includes("startStudyMode")){
-    panel.innerHTML = panel.innerHTML.replace(/(<button[^>]*上級<\/button>)/, "$1<button class=\"hardBtn\" onclick=\"startMode('veryHard')\">難問</button>");
-  }
-}
-setInterval(addHardDifficultyButtonIfNeeded,800);
-
-
-
-let __mmLastKeyTouch = 0;
-document.addEventListener("touchend", function(e){
-  const t = e.target;
-  if(!(t && t.closest && t.closest("#customKeyboard"))) return;
-  const now = Date.now();
-  if(now - __mmLastKeyTouch < 300){
-    e.preventDefault();
-  }
-  __mmLastKeyTouch = now;
-}, {passive:false});
-
-
 // Ver2.7.1 stable pages
 
 
@@ -3286,39 +3194,50 @@ window.showNewsPage=showNewsPage;
 window.showStatsPage=showStatsPage;
 
 
-// Ver2.7.2 keypad operator orange only
-function colorKeypadOperators(){
-  const keys = document.querySelectorAll("#customKeyboard button, #customKeyboard .keyBtn");
-  keys.forEach(btn=>{
-    const t=(btn.textContent||"").trim();
-    if(["+","-","−","×","÷"].includes(t)){
-      btn.classList.add("keyOpOrange");
-    }
-  });
-}
-setInterval(colorKeypadOperators,800);
-window.addEventListener("load",()=>setTimeout(colorKeypadOperators,500));
+// Ver2.7.3 keypad-only double tap guard
+let __mmKeyLastTouch = 0;
+document.addEventListener("touchend", function(e){
+  const t = e.target;
+  if(!(t && t.closest && t.closest("#customKeyboard"))) return;
+  const now = Date.now();
+  if(now - __mmKeyLastTouch < 300){
+    e.preventDefault();
+  }
+  __mmKeyLastTouch = now;
+}, {passive:false});
+
+document.addEventListener("dblclick", function(e){
+  const t=e.target;
+  if(t && t.closest && t.closest("#customKeyboard")){
+    e.preventDefault();
+  }
+}, {passive:false});
 
 
-// Ver2.7.2 auto update news system
+// Ver2.7.3 auto update news system
 const UPDATE_NOTES = {
-  "2.8.9": [
-    "ホームカードが開かない不具合を修正",
-    "クラウドデータの読込処理を改善",
-    "プレイヤー名・フレンドコードの保存処理を調整",
-    "ログイン情報の表示を安全な形に変更"
+  "2.8.8": [
+    "ログイン時に使うデータを選べるように変更",
+    "クラウドデータとこの端末のデータを確認して選択可能に改善",
+    "プレイヤー名方式をさらに安定化",
+    "ログイン状態確認で本名が表示されないように調整"
+  ],
+  "2.8.7": [
+    "プレイヤー名方式に変更",
+    "ログイン後も本名が表示されないように調整",
+    "アカウント連携時の保存処理を改善",
+    "ランキング・プロフィール表示をニックネーム中心に改善"
+  ],
+  "2.7.3": [
+    "壊れていたpanelAreaのHTMLを修正",
+    "強すぎるタップ制御を削除",
+    "テンキーの + × ÷ - をオレンジ色に変更",
+    "お知らせをVERSION連動の自動表示に変更",
+    "成績・お知らせページを開けるように修正"
   ],
   "2.7.2": [
     "テンキーの + × ÷ - をオレンジ色に変更",
-    "お知らせをVERSION連動の自動表示に変更",
-    "通常ボタンの反応を邪魔しない方式に調整"
-  ],
-  "2.7.1": [
-    "反応しない問題が出たため安定版から作り直し",
-    "お知らせ・成績ページを安全な方式に修正"
-  ],
-  "2.6.9": [
-    "お知らせ自動表示の仕組みを追加"
+    "お知らせをVERSION連動の自動表示に変更"
   ],
   "2.6.8": [
     "3連続正解からダメージ増加に変更",
@@ -3332,15 +3251,10 @@ const UPDATE_NOTES = {
     "難易度「難問」を追加",
     "積分に部分積分・置換積分の問題を追加"
   ],
-  "2.6.5": [
-    "Googleログインボタンの反応を修正",
-    "モード選択の誤タップ対策を調整"
-  ],
   "2.6.1": [
     "問題表示の +- を - に修正"
   ],
   "2.5.0": [
-    "モンスト風プロフィールカードを追加",
     "プロフィール背景変更を追加"
   ],
   "2.4.0": [
@@ -3356,7 +3270,7 @@ const UPDATE_NOTES = {
 };
 
 function updateNotesHTML(){
-  const v = (typeof VERSION !== "undefined") ? VERSION : "2.7.2";
+  const v = (typeof VERSION !== "undefined") ? VERSION : "2.7.3";
   let html = `
     <h2>📢 お知らせ</h2>
     <div class="newsCard">
@@ -3398,14 +3312,223 @@ function showNewsPage(){
 window.showNewsPage=showNewsPage;
 
 
-// Ver2.8.9 safety exports
-window.openPanelPage=openPanelPage;
+// Ver2.7.3 keypad operator orange only
+function colorKeypadOperators(){
+  const keys = document.querySelectorAll("#customKeyboard button, #customKeyboard .keyBtn");
+  keys.forEach(btn=>{
+    const t=(btn.textContent||"").trim();
+    if(["+","-","−","×","÷"].includes(t)){
+      btn.classList.add("keyOpOrange");
+    }
+  });
+}
+setInterval(colorKeypadOperators,800);
+window.addEventListener("load",()=>setTimeout(colorKeypadOperators,500));
+
 window.showStudyMenu=showStudyMenu;
+
 window.showRankingMenu=showRankingMenu;
+
 window.showMatchMenu=showMatchMenu;
+
 window.showGacha=showGacha;
+
 window.showProfileMenu=showProfileMenu;
+
 window.showOtherMenu=showOtherMenu;
-window.showStatsPage=showStatsPage;
-window.showNewsPage=showNewsPage;
-window.refreshLoginStatus=refreshLoginStatus;
+
+
+// Ver2.7.5 combo animation
+function showComboPop(){
+  if((combo||0) < 2)return;
+  const old=document.getElementById("comboPop");
+  if(old)old.remove();
+
+  const dmg = (typeof comboDamageValue==="function") ? comboDamageValue(combo) : 1;
+  const div=document.createElement("div");
+  div.id="comboPop";
+  div.className="comboPop";
+  div.innerHTML=`🔥 ${combo} COMBO<br><span style="font-size:28px">⚔️ ${dmg} DAMAGE</span>`;
+  document.body.appendChild(div);
+  setTimeout(()=>div.remove(),950);
+}
+
+
+// Ver2.7.5 achievement progress
+function getAchievementProgress(a){
+  const correct=playerData.totalCorrect||0;
+  const best=playerData.bestRandomScore||0;
+  const maxCombo=playerData.maxCombo||0;
+  const play=playerData.playTime||0;
+  const days=playerData.consecutiveDays||0;
+  const review=(playerData.reviewList||[]).length;
+  const level=(typeof getLevel==="function")?getLevel():1;
+
+  const map={
+    "初正解":[correct,1],
+    "10問正解":[correct,10],
+    "100問正解":[correct,100],
+    "1000問正解":[correct,1000],
+    "初ランキング登録":[best,1],
+    "週間ランキング参加":[best,1],
+    "プロフィール設定完了":[(playerProfile.name!=="名無し"||playerProfile.icon)?1:0,1],
+    "3連勝":[maxCombo,3],
+    "5連勝":[maxCombo,5],
+    "10連勝":[maxCombo,10],
+    "25連勝":[maxCombo,25],
+    "50連勝":[maxCombo,50],
+    "100連勝":[maxCombo,100],
+    "無双":[maxCombo,200],
+    "15分プレイ":[play,15*60],
+    "1時間プレイ":[play,60*60],
+    "10時間プレイ":[play,10*60*60],
+    "50時間プレイ":[play,50*60*60],
+    "100時間プレイ":[play,100*60*60],
+    "数学廃人":[play,500*60*60],
+    "3日連続":[days,3],
+    "7日連続":[days,7],
+    "30日連続":[days,30],
+    "100日連続":[days,100],
+    "毎日数学生活":[days,365],
+    "初復習":[review,1],
+    "復習10問":[review,10],
+    "復習50問":[review,50],
+    "復習100問":[review,100],
+    "数学神":[level,300],
+    "伝説の数学神":[level,1000]
+  };
+
+  const v=map[a] || [(playerData.achievements||[]).includes(a)?1:0,1];
+  const now=Math.min(v[0],v[1]);
+  const need=v[1] || 1;
+  const pct=Math.min(100,Math.round(now/need*100));
+  return {now,need,pct};
+}
+
+function showAchievements(){
+  checkAchievements();
+  let gotCount=(playerData.achievements||[]).length;
+  let totalCount=achievementList().length;
+  let totalPct=Math.round(gotCount/totalCount*100);
+
+  let html=`
+    <h2>🏆 実績一覧</h2>
+    <div class="achievementItem">
+      <h3>達成率 <span class="achievementPct">${totalPct}%</span></h3>
+      <p>${gotCount}/${totalCount}</p>
+      <div class="achievementProgress"><div class="achievementProgressFill" style="width:${totalPct}%"></div></div>
+    </div>
+  `;
+
+  for(let a of achievementList()){
+    let got=playerData.achievements.includes(a);
+    const pr=getAchievementProgress(a);
+
+    let label=a;
+    if(a==="MENERU発見者"&&got)label=`<span class="meneruTitle">👾MENERU発見者👾</span>`;
+    if(a==="なかなか発見者"&&got)label=`<span class="nakanakaTitle">🧊なかなか発見者🧊</span>`;
+
+    html+=`
+      <div class="achievementItem">
+        ${got?"✅":"⬜"} ${label}
+        <div class="achievementProgress"><div class="achievementProgressFill" style="width:${pr.pct}%"></div></div>
+        <div class="achievementPct">${pr.pct}%</div>
+        <small>${pr.now}/${pr.need}</small>
+      </div>
+    `;
+  }
+  document.getElementById("panelArea").innerHTML=html;
+}
+
+
+// Ver2.7.6 enemy mob system
+function getEnemyInfo(){
+  if(difficulty==="normal")return {key:"normal", name:"ゴブリン", img:"enemy_goblin.png", label:"中級"};
+  if(difficulty==="hard")return {key:"hard", name:"オーガ", img:"enemy_ogre.png", label:"上級"};
+  if(difficulty==="veryHard")return {key:"veryHard", name:"ドラゴン", img:"enemy_dragon.png", label:"難問"};
+  return {key:"easy", name:"スライム", img:"enemy_slime.png", label:"初級"};
+}
+function renderEnemyMob(){
+  const area=document.getElementById("enemyMobArea");
+  if(!area)return;
+  if(mode==="random" || mode==="review" || (matchState && matchState.active)){
+    area.innerHTML="";
+    return;
+  }
+  const e=getEnemyInfo();
+  area.innerHTML=`
+    <div id="enemyMobCard" class="enemyMobWrap enemy-${e.key}">
+      <div class="enemyMobName">${e.label}　${e.name}</div>
+      <img class="enemyMobImg ${e.key==='easy'?'slime':''}" src="${e.img}" alt="${e.name}"
+        onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<div style=&quot;font-size:82px&quot;>👾</div>')">
+      <div>HP 10 / 10</div>
+    </div>
+  `;
+}
+function playEnemyDefeat(){
+  const card=document.getElementById("enemyMobCard");
+  if(card)card.classList.add("enemyMobDefeated");
+}
+
+
+// Ver2.8.7 profile icon preview/save
+function previewProfileIcon(){
+  const input=document.getElementById("iconInputEdit");
+  const preview=document.getElementById("iconPreview");
+  if(!input || !input.files || !input.files[0])return;
+  const file=input.files[0];
+  const reader=new FileReader();
+  reader.onload=function(e){
+    if(preview)preview.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function resizeImageDataUrl(file, maxSize=360){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=function(e){
+      const img=new Image();
+      img.onload=function(){
+        let w=img.width, h=img.height;
+        if(w>h && w>maxSize){h=Math.round(h*maxSize/w);w=maxSize;}
+        else if(h>=w && h>maxSize){w=Math.round(w*maxSize/h);h=maxSize;}
+        const canvas=document.createElement("canvas");
+        canvas.width=w; canvas.height=h;
+        const ctx=canvas.getContext("2d");
+        ctx.drawImage(img,0,0,w,h);
+        resolve(canvas.toDataURL("image/png"));
+      };
+      img.onerror=reject;
+      img.src=e.target.result;
+    };
+    reader.onerror=reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function saveProfileFromPanel(){
+  let nameInput=document.getElementById("nameInput") || document.getElementById("playerNameEdit");
+  let name=nameInput ? nameInput.value.trim() : "";
+  let input=document.getElementById("iconInputEdit");
+
+  if(name)playerProfile.name=name;
+
+  if(input && input.files && input.files[0]){
+    try{
+      playerProfile.icon=await resizeImageDataUrl(input.files[0],360);
+    }catch(e){
+      alert("画像の保存に失敗しました");
+      console.error(e);
+      return;
+    }
+  }
+
+  saveAllData();
+  updateHomeStatus();
+  if(typeof savePublicProfile==="function")savePublicProfile();
+  showProfile();
+  alert("保存したよ");
+}
+window.previewProfileIcon=previewProfileIcon;
+window.saveProfileFromPanel=saveProfileFromPanel;
