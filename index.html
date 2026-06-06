@@ -899,7 +899,7 @@ button,.modeBtn{
 
 
 
-/* Ver3.0.3 match found / VS animation */
+/* Ver3.0.4 match found / VS animation */
 .matchSearchBox,.matchFoundOverlay{
   width:92%;max-width:820px;margin:18px auto;padding:20px;border-radius:22px;
   background:linear-gradient(135deg,rgba(15,23,42,.88),rgba(30,27,75,.8));
@@ -1282,7 +1282,6 @@ async function ensurePlayerNameAfterLogin(user){
       uid:user.uid,
       friendCode:friendCode,
       googleDisplayName:user.displayName || "",
-      googleEmail:user.email || "",
       playerName:playerName,
       updatedAt:serverTimestamp()
     },{merge:true});
@@ -1376,24 +1375,8 @@ window.loadFriendData = async function(friendId){
   if(code && code.length === 8){
     const codeSnap = await getDoc(doc(db,"friendCodes",code));
     if(codeSnap.exists()){
-      const data = codeSnap.data();
-      const uid = data.uid;
-      const profileSnap = uid ? await getDoc(doc(db,"userProfiles",uid)) : null;
       const publicSnap = await getDoc(doc(db,"players",code));
       if(publicSnap.exists()) return publicSnap.data();
-      if(profileSnap && profileSnap.exists()){
-        const p = profileSnap.data();
-        return {
-          playerId:"google_"+uid,
-          friendCode:code,
-          name:p.playerName || "名無し",
-          playerName:p.playerName || "名無し",
-          icon:p.icon || "",
-          title:p.title || "初心者",
-          level:p.level || 1,
-          bestRandomScore:p.bestRandomScore || 0
-        };
-      }
     }
   }
   const snap = await getDoc(doc(db,"players",friendId));
@@ -1696,7 +1679,6 @@ window.saveCloudPlayerDataNow = async function(){
     name:(bundle.playerProfile && bundle.playerProfile.name) || "名無し",
     playerName:(bundle.playerProfile && bundle.playerProfile.name) || "名無し",
     googleDisplayName:user.displayName || "",
-    googleEmail:user.email || "",
     playerProfile:bundle.playerProfile || {},
     playerData:bundle.playerData || {},
     settings:bundle.settings || {},
@@ -1984,6 +1966,6 @@ window.getFirebaseDebugInfo = function(){
 };
 
 </script>
-<script src="app.js?v=3.0.3"></script>
+<script src="app.js?v=3.0.4"></script>
 </body>
 </html>
