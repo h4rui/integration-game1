@@ -1,6 +1,6 @@
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-import { getFirestore, collection, doc, setDoc, getDoc, getDocs, query, where, limit, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+import { getFirestore, collection, doc, setDoc, getDoc, getDocs, query, where, limit, serverTimestamp, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
 const firebaseConfig = {
@@ -42,18 +42,39 @@ function makeFriendCode(){
 }
 async function ensureFriendCode(user){
   if(!user) return "";
-  const saved = normalizeFriendCode(localStorage.getItem("friendCode"));
-  if(saved && saved.length === 8) return saved;
 
   const profileRef = doc(db,"userProfiles",user.uid);
-  const profileSnap = await getDoc(profileRef);
-  const existing = profileSnap.exists() ? normalizeFriendCode(profileSnap.data().friendCode) : "";
+  const profileSnap = await getDoc(profileRef).catch(()=>null);
+  const existing = profileSnap && profileSnap.exists() ? normalizeFriendCode(profileSnap.data().friendCode) : "";
+
   if(existing && existing.length === 8){
     localStorage.setItem("friendCode", existing);
+    await setDoc(doc(db,"friendCodes",existing),{
+      code: existing,
+      uid: user.uid,
+      playerId: "google_" + user.uid,
+      updatedAt: serverTimestamp()
+    },{merge:true}).catch(()=>{});
     return existing;
   }
 
-  for(let i=0;i<20;i++){
+  const saved = normalizeFriendCode(localStorage.getItem("friendCode"));
+  if(saved && saved.length === 8){
+    await setDoc(doc(db,"friendCodes",saved),{
+      code: saved,
+      uid: user.uid,
+      playerId: "google_" + user.uid,
+      updatedAt: serverTimestamp()
+    },{merge:true});
+    await setDoc(profileRef,{
+      uid:user.uid,
+      friendCode:saved,
+      updatedAt:serverTimestamp()
+    },{merge:true});
+    return saved;
+  }
+
+  for(let i=0;i<30;i++){
     const code = makeFriendCode();
     const codeRef = doc(db,"friendCodes",code);
     const codeSnap = await getDoc(codeRef);
@@ -62,7 +83,8 @@ async function ensureFriendCode(user){
         code,
         uid:user.uid,
         playerId:"google_" + user.uid,
-        createdAt:serverTimestamp()
+        createdAt:serverTimestamp(),
+        updatedAt:serverTimestamp()
       });
       await setDoc(profileRef,{
         uid:user.uid,
@@ -70,6 +92,7 @@ async function ensureFriendCode(user){
         updatedAt:serverTimestamp()
       },{merge:true});
       localStorage.setItem("friendCode", code);
+      if(window.updateHomeStatus) window.updateHomeStatus();
       return code;
     }
   }
@@ -342,6 +365,15 @@ window.loadMatchRoom = async function(roomId){
   return snap.data();
 };
 
+window.subscribeMatchRoom = function(roomId, callback){
+  const ref = doc(db,"matches",roomId);
+  return onSnapshot(ref,(snap)=>{
+    callback(snap.exists() ? snap.data() : null);
+  },(e)=>{
+    console.error("match realtime failed", e);
+  });
+};
+
 window.claimMatchPoint = async function(roomId,side,round){
   const ref = doc(db,"matches",roomId);
   const snap = await getDoc(ref);
@@ -473,9 +505,12 @@ window.createMatchRoom = async function(data){
     hostName:data.name || "名無し",
     hostTitle:data.title || "初心者",
     hostRate:data.rate || 1000,
+    hostLevel:data.level || 1,
     guestId:"",
     guestName:"",
     guestTitle:"",
+    guestRate:1000,
+    guestLevel:1,
     hostPoints:0,
     guestPoints:0,
     round:0,
@@ -508,6 +543,8 @@ window.joinMatchRoom = async function(roomId,data){
     guestId:myId,
     guestName:data.name || "名無し",
     guestTitle:data.title || "初心者",
+    guestRate:data.rate || 1000,
+    guestLevel:data.level || 1,
     updatedAt:serverTimestamp()
   });
 
@@ -683,36 +720,7 @@ window.forceCloudLoad = async function(){
 
 
 
-window.overwriteCloudWithThisDevice = async function(){
-  if(!auth.currentUser){
-    alert("ログインしていません");
-    return;
-  }
-  if(!confirm("この端末のデータでクラウドを上書きしますか？")) return;
-  await ensurePlayerNameAfterLogin(auth.currentUser);
-  await window.saveCloudPlayerDataNow();
-  alert("この端末データでクラウドを上書きしました");
-};
 
-function escapeHTML(str){
-  return String(str ?? "")
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#39;");
-}
-function getLoginUser(){ return auth.currentUser || window.currentUser || null; }
-function getBoardPlayerName(){
-  const bundle = window.getLocalGameData ? window.getLocalGameData() : null;
-  return (bundle && bundle.playerProfile && bundle.playerProfile.name) || "名無し";
-}
-function todayBoardKey(){
-  return new Date().toLocaleDateString("ja-JP",{timeZone:"Asia/Tokyo"}).replaceAll("/","-");
-}
-function boardPostId(){
-  return "post_" + Date.now() + "_" + Math.random().toString(36).slice(2,8);
-}
 
 window.showBoardPage = async function(){
   const menu=document.getElementById("homeMenu");
@@ -779,36 +787,43 @@ window.showBoardPostForm = function(prefill={}){
 };
 
 window.submitBoardPost = async function(){
-  const user=getLoginUser();
-  if(!user){ alert("投稿するにはログインが必要です"); return; }
-  const question=(document.getElementById("boardQuestionInput")?.value||"").trim();
-  const answer=(document.getElementById("boardAnswerInput")?.value||"").trim();
-  const genre=(document.getElementById("boardGenreInput")?.value||"質問").trim().slice(0,20) || "質問";
-  if(!question){ alert("質問内容を入力してください"); return; }
+  try{
+    const user=getLoginUser();
+    if(!user){ alert("投稿するにはログインが必要です"); return; }
+    const question=(document.getElementById("boardQuestionInput")?.value||"").trim();
+    const answer=(document.getElementById("boardAnswerInput")?.value||"").trim();
+    const genre=(document.getElementById("boardGenreInput")?.value||"質問").trim().slice(0,20) || "質問";
+    if(!question){ alert("質問内容を入力してください"); return; }
 
-  const limitId=user.uid + "_" + todayBoardKey();
-  const limitRef=doc(db,"boardDailyLimit",limitId);
-  const limitSnap=await getDoc(limitRef);
-  const count=limitSnap.exists() ? (limitSnap.data().count||0) : 0;
-  if(count>=5){ alert("今日の投稿上限は5件です"); return; }
+    await ensureFriendCode(user).catch(()=>{});
 
-  const id=boardPostId();
-  await setDoc(doc(db,"boardPosts",id),{
-    postId:id,
-    uid:user.uid,
-    playerName:getBoardPlayerName(),
-    genre,
-    question:question.slice(0,1000),
-    answer:answer.slice(0,1000),
-    answerCount:0,
-    likes:0,
-    bestAnswerId:"",
-    createdAtMs:Date.now(),
-    createdAt:serverTimestamp()
-  });
-  await setDoc(limitRef,{uid:user.uid,date:todayBoardKey(),count:count+1,updatedAt:serverTimestamp()},{merge:true});
-  alert("投稿しました");
-  showBoardPage();
+    const limitId=user.uid + "_" + todayBoardKey();
+    const limitRef=doc(db,"boardDailyLimit",limitId);
+    const limitSnap=await getDoc(limitRef);
+    const count=limitSnap.exists() ? (limitSnap.data().count||0) : 0;
+    if(count>=5){ alert("今日の投稿上限は5件です"); return; }
+
+    const id=boardPostId();
+    await setDoc(doc(db,"boardPosts",id),{
+      postId:id,
+      uid:user.uid,
+      playerName:getBoardPlayerName(),
+      genre,
+      question:question.slice(0,1000),
+      answer:answer.slice(0,1000),
+      answerCount:0,
+      likes:0,
+      bestAnswerId:"",
+      createdAtMs:Date.now(),
+      createdAt:serverTimestamp()
+    });
+    await setDoc(limitRef,{uid:user.uid,date:todayBoardKey(),count:count+1,updatedAt:serverTimestamp()},{merge:true});
+    alert("投稿しました");
+    showBoardPage();
+  }catch(e){
+    console.error(e);
+    alert("投稿に失敗しました：" + (e.code || e.message || e));
+  }
 };
 
 window.postReviewToBoard = function(i){

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5681066295421790"
 crossorigin="anonymous"></script>
-<title>数学マスター Ver 3.0.2</title>
+<title>数学マスター Ver 3.0.1</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <style>
@@ -297,7 +297,7 @@ a{color:#00ffcc}
   padding:9px 14px;
 }
 
-/* Ver 3.0.2 Space UI */
+/* Ver 3.0.1 Space UI */
 body{
   margin:0;
   color:white;
@@ -350,7 +350,7 @@ body{
   text-shadow:0 0 8px #60a5fa,0 0 18px #7c3aed,0 0 32px #38bdf8;
 }
 #homeScreen h1::after{
-  content:"Ver 3.0.2";display:block;font-size:18px;color:#67e8f9;margin-top:6px;text-shadow:0 0 10px #22d3ee;
+  content:"Ver 3.0.1";display:block;font-size:18px;color:#67e8f9;margin-top:6px;text-shadow:0 0 10px #22d3ee;
 }
 #homePlayerCard{
   width:88%;max-width:780px;margin:18px auto 22px;padding:18px;
@@ -490,7 +490,7 @@ body{
 }
 
 
-/* Ver 3.0.2 Profile Card UI */
+/* Ver 3.0.1 Profile Card UI */
 .profileHero{
   width:92%;
   max-width:900px;
@@ -897,6 +897,34 @@ button,.modeBtn{
 .boardAnswer{background:rgba(15,23,42,.72);border:1px solid rgba(255,255,255,.13)}
 .boardSmallBtn{font-size:16px;padding:8px 12px;border-radius:10px;margin:5px}
 
+
+
+/* Ver3.0.3 match found / VS animation */
+.matchSearchBox,.matchFoundOverlay{
+  width:92%;max-width:820px;margin:18px auto;padding:20px;border-radius:22px;
+  background:linear-gradient(135deg,rgba(15,23,42,.88),rgba(30,27,75,.8));
+  border:1px solid rgba(56,189,248,.6);
+  box-shadow:0 0 24px rgba(56,189,248,.26), inset 0 0 30px rgba(255,255,255,.06);
+}
+.matchSpinner{
+  width:58px;height:58px;margin:8px auto 14px;border-radius:50%;
+  border:5px solid rgba(255,255,255,.18);border-top-color:#22d3ee;
+  animation:matchSpin .85s linear infinite;
+}
+@keyframes matchSpin{to{transform:rotate(360deg)}}
+.matchFoundTitle{font-size:34px;font-weight:900;color:#fde68a;text-shadow:0 0 18px #f59e0b;animation:matchFoundPop .55s ease-out both}
+@keyframes matchFoundPop{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
+.matchVsWrap{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;margin-top:18px}
+.matchVsPlayer{padding:14px;border-radius:18px;background:rgba(0,0,0,.32);border:1px solid rgba(255,255,255,.18);font-size:18px;line-height:1.55;animation:matchCardIn .45s ease-out both}
+.matchVsName{font-size:26px;font-weight:900;color:#fff;text-shadow:0 0 10px #38bdf8}
+.matchVsText{font-size:34px;font-weight:900;color:#fb7185;text-shadow:0 0 15px #ef4444}
+.matchThreat{margin-top:8px;font-size:22px;font-weight:900;color:#fde68a;text-shadow:0 0 10px rgba(250,204,21,.55)}
+.matchCountdown{font-size:64px;font-weight:900;margin-top:16px;color:#22d3ee;text-shadow:0 0 22px #22d3ee;animation:matchCountPulse .65s ease-in-out infinite}
+@keyframes matchCountPulse{0%{transform:scale(.92)}50%{transform:scale(1.12)}100%{transform:scale(.92)}}
+@keyframes matchCardIn{from{opacity:0;transform:translateY(12px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+.matchScoreV303{align-items:center;font-size:18px;gap:12px}.matchScoreV303>div{min-width:110px}.matchCenterSmall{font-size:20px;font-weight:900;color:#fde68a}.matchCenterSmall span{font-size:17px;color:#fff}
+@media(max-width:560px){.matchVsWrap{grid-template-columns:1fr}.matchVsText{font-size:28px}.matchFoundTitle{font-size:26px}.matchVsName{font-size:22px}.matchScoreV303{font-size:14px;gap:6px}.matchScoreV303>div{min-width:82px}.matchCenterSmall{font-size:16px}}
+
 </style>
 <!--
 Googleログイン用メモ:
@@ -1018,7 +1046,7 @@ h4rui.github.io
 <script src="https://cdn.jsdelivr.net/npm/mathjs@11.11.0/lib/browser/math.js"></script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-import { getFirestore, collection, doc, setDoc, getDoc, getDocs, query, where, limit, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+import { getFirestore, collection, doc, setDoc, getDoc, getDocs, query, where, limit, serverTimestamp, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
 const firebaseConfig = {
@@ -1383,6 +1411,15 @@ window.loadMatchRoom = async function(roomId){
   return snap.data();
 };
 
+window.subscribeMatchRoom = function(roomId, callback){
+  const ref = doc(db,"matches",roomId);
+  return onSnapshot(ref,(snap)=>{
+    callback(snap.exists() ? snap.data() : null);
+  },(e)=>{
+    console.error("match realtime failed", e);
+  });
+};
+
 window.claimMatchPoint = async function(roomId,side,round){
   const ref = doc(db,"matches",roomId);
   const snap = await getDoc(ref);
@@ -1514,9 +1551,12 @@ window.createMatchRoom = async function(data){
     hostName:data.name || "名無し",
     hostTitle:data.title || "初心者",
     hostRate:data.rate || 1000,
+    hostLevel:data.level || 1,
     guestId:"",
     guestName:"",
     guestTitle:"",
+    guestRate:1000,
+    guestLevel:1,
     hostPoints:0,
     guestPoints:0,
     round:0,
@@ -1549,6 +1589,8 @@ window.joinMatchRoom = async function(roomId,data){
     guestId:myId,
     guestName:data.name || "名無し",
     guestTitle:data.title || "初心者",
+    guestRate:data.rate || 1000,
+    guestLevel:data.level || 1,
     updatedAt:serverTimestamp()
   });
 
@@ -1731,15 +1773,16 @@ window.showBoardPage = async function(){
   const panel=document.getElementById("panelArea");
   if(menu) menu.classList.add("hidden");
   if(!panel) return;
-  panel.innerHTML = `
-    <h2>💬 数学掲示板</h2>
+  panel.innerHTML = `<h2>💬 数学掲示板 β</h2>
     <div class="boardPost">
-      <h3>準備中</h3>
-      <p>掲示板機能は現在準備中です。</p>
-      <p>公開までしばらくお待ちください。</p>
+      <p>わからない問題を投稿して、みんなで教え合えます。</p>
+      <p>投稿・回答・いいねはログイン必須。投稿は1日5件まで。</p>
+      <button class="boardSmallBtn" onclick="showBoardPostForm()">質問を投稿する</button>
+      <button class="boardSmallBtn" onclick="showBoardPage()">更新</button>
     </div>
-  `;
+    <div id="boardList">読み込み中...</div>`;
   if(typeof ensureHomeButton==="function") setTimeout(ensureHomeButton,0);
+  await loadBoardPosts();
 };
 
 window.loadBoardPosts = async function(){
@@ -1830,8 +1873,20 @@ window.submitBoardPost = async function(){
 };
 
 window.postReviewToBoard = function(i){
-  alert("掲示板機能は現在準備中です");
-  showBoardPage();
+  if(!getLoginUser()){
+    alert("復習リストから投稿するにはログインが必要です");
+    if(window.showSettings) window.showSettings();
+    return;
+  }
+  const bundle=window.getLocalGameData ? window.getLocalGameData() : null;
+  const list=bundle && bundle.playerData ? (bundle.playerData.reviewList||[]) : [];
+  const r=list[i];
+  if(!r){ alert("投稿する問題が見つかりません"); return; }
+  window.showBoardPostForm({
+    genre:"復習リスト",
+    question:r.q || "",
+    answer:(r.a ? "正解：" + r.a + "\n" : "") + (r.explanation ? "解説：" + r.explanation : "")
+  });
 };
 
 window.showBoardDetail = async function(postId){
@@ -1929,6 +1984,6 @@ window.getFirebaseDebugInfo = function(){
 };
 
 </script>
-<script src="app.js?v=3.0.0"></script>
+<script src="app.js?v=3.0.3"></script>
 </body>
 </html>
