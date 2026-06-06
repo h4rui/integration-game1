@@ -321,7 +321,6 @@ if(!snap.exists()) return null;
 const room = snap.data();
 if(room.status !== "playing") return room;
 if(room.round !== round) return room;
-if(room.roundWinner) return room;
 let hostPoints = room.hostPoints || 0;
 let guestPoints = room.guestPoints || 0;
 if(side === "host") hostPoints++;
@@ -344,6 +343,7 @@ await updateDoc(ref,{
 hostPoints,
 guestPoints,
 roundWinner:side,
+roundWinnerRound:round,
 round:nextRound,
 currentQuestion:nextQuestion,
 winner,
@@ -413,6 +413,10 @@ await setDoc(doc(db,"matches",roomId),{
 roomId:roomId,
 type:data.type || "online",
 betaVote: !!data.betaVote,
+hostVote:[],
+guestVote:[],
+finalGenre:"",
+finalGenreLabel:"",
 status:"waiting",
 hostId:getPlayerId(),
 hostName:data.name || "名無し",
@@ -796,28 +800,39 @@ uid: auth.currentUser ? auth.currentUser.uid : null
 };
 
 
-// Ver3.0.5 beta match voting helpers
+// Ver3.0.8 robust match vote helpers
 window.setMatchVote = async function(roomId, side, genres){
-  const ref = doc(db,"matches",roomId);
+  if(!roomId) throw new Error("room-id-missing");
+  const ref = doc(db,"matches",String(roomId).toUpperCase());
   const field = side === "host" ? "hostVote" : "guestVote";
-  await updateDoc(ref,{[field]: genres || ["random"], updatedAt: serverTimestamp()});
+  const safeGenres = Array.isArray(genres) && genres.length ? genres : ["random"];
+  const snap = await getDoc(ref);
+  if(!snap.exists()) throw new Error("room-not-found");
+  await setDoc(ref,{
+    [field]: safeGenres,
+    voteUpdatedAtText: new Date().toISOString(),
+    updatedAt: serverTimestamp()
+  },{merge:true});
 };
 window.finalizeMatchVote = async function(roomId, finalGenre, questions){
-  const ref = doc(db,"matches",roomId);
+  if(!roomId) throw new Error("room-id-missing");
+  const ref = doc(db,"matches",String(roomId).toUpperCase());
   const snap = await getDoc(ref);
   if(!snap.exists()) return null;
   const room = snap.data();
   if(room.finalGenre) return room;
   const labels={arithmetic:"四則演算",prime:"素因数分解",factor:"因数分解",expand:"展開",derivative:"微分",integral:"積分",random:"ランダム"};
-  await updateDoc(ref,{
+  const qs = Array.isArray(questions) && questions.length ? questions : (room.questions || []);
+  await setDoc(ref,{
     finalGenre: finalGenre || "random",
     finalGenreLabel: labels[finalGenre] || finalGenre || "ランダム",
-    questions: questions || room.questions || [],
-    currentQuestion: (questions && questions[0]) || room.currentQuestion,
+    questions: qs,
+    currentQuestion: qs[0] || room.currentQuestion || null,
     round: 0,
     roundWinner: "",
+    finalizingGenre: false,
     updatedAt: serverTimestamp()
-  });
+  },{merge:true});
   const after = await getDoc(ref);
   return after.exists() ? after.data() : null;
 };

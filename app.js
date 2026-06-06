@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.0.6";
+const VERSION = "3.0.8";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -2124,15 +2124,43 @@ if(!ok)ok=expressionsEqual(u,current.a);
 if(!ok)ok=normalize(u)===normalize(current.display);
 if(!ok){
 combo=0;
-document.getElementById("result").innerHTML="× 不正解。もう一度！";
+const ans=document.getElementById("ans");
+if(ans) ans.value="";
+matchState.localLocked=true;
+let remain=5;
+const resultEl=document.getElementById("result");
+const showPenalty=()=>{ if(resultEl) resultEl.innerHTML=`× 不正解。<br>${remain}秒ペナルティ`; };
+showPenalty();
+const penaltyTimer=setInterval(()=>{
+remain--;
+if(remain>0){
+showPenalty();
+}else{
+clearInterval(penaltyTimer);
+matchState.localLocked=false;
+if(resultEl) resultEl.innerHTML="もう一度入力できます";
+if(ans) ans.focus();
+}
+},1000);
 return true;
 }
 matchState.localLocked=true;
-document.getElementById("result").innerHTML="○ 正解！ポイント判定中...";
+document.getElementById("result").innerHTML="○ 正解！次の問題へ進みます...";
 let room=await claimMatchPoint(matchState.roomId,matchState.side,matchState.currentRound);
 if(room){
 matchState.room=room;
+if(room.status==="finished" || room.status==="canceled"){
+finishMatch(room);
+return true;
+}
+if(room.round!==matchState.currentRound){
+matchState.currentRound=room.round;
+matchState.currentQuestion=room.currentQuestion;
+matchState.localLocked=false;
+showMatchQuestion(room,false);
+}else{
 updateMatchHeader(room);
+}
 }
 return true;
 }
@@ -2717,6 +2745,12 @@ e.preventDefault();
 }
 }, {passive:false});
 const UPDATE_NOTES = {
+"3.0.8": [
+"フレンド対戦の反応速度を改善",
+"どちらかが正解した時点で次の問題へ進むように調整",
+"ミス時に5秒ペナルティを追加",
+"ミス時に解答欄を自動で空にするように変更"
+],
 "3.0.4": [
 "セキュリティを強化",
 "メールアドレスを保存しない方式に変更",

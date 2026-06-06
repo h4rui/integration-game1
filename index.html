@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5681066295421790"
 crossorigin="anonymous"></script>
-<title>数学マスター Ver 3.0.6</title>
+<title>数学マスター Ver 3.0.8</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <style>
@@ -350,7 +350,7 @@ body{
   text-shadow:0 0 8px #60a5fa,0 0 18px #7c3aed,0 0 32px #38bdf8;
 }
 #homeScreen h1::after{
-  content:"Ver 3.0.6";display:block;font-size:18px;color:#67e8f9;margin-top:6px;text-shadow:0 0 10px #22d3ee;
+  content:"Ver 3.0.8";display:block;font-size:18px;color:#67e8f9;margin-top:6px;text-shadow:0 0 10px #22d3ee;
 }
 #homePlayerCard{
   width:88%;max-width:780px;margin:18px auto 22px;padding:18px;
@@ -1974,33 +1974,44 @@ window.getFirebaseDebugInfo = function(){
 };
 
 
-// Ver3.0.6 match vote helpers
+// Ver3.0.8 robust match vote helpers
 window.setMatchVote = async function(roomId, side, genres){
-  const ref = doc(db,"matches",roomId);
+  if(!roomId) throw new Error("room-id-missing");
+  const ref = doc(db,"matches",String(roomId).toUpperCase());
   const field = side === "host" ? "hostVote" : "guestVote";
-  await updateDoc(ref,{[field]: genres || ["random"], updatedAt: serverTimestamp()});
+  const safeGenres = Array.isArray(genres) && genres.length ? genres : ["random"];
+  const snap = await getDoc(ref);
+  if(!snap.exists()) throw new Error("room-not-found");
+  await setDoc(ref,{
+    [field]: safeGenres,
+    voteUpdatedAtText: new Date().toISOString(),
+    updatedAt: serverTimestamp()
+  },{merge:true});
 };
 window.finalizeMatchVote = async function(roomId, finalGenre, questions){
-  const ref = doc(db,"matches",roomId);
+  if(!roomId) throw new Error("room-id-missing");
+  const ref = doc(db,"matches",String(roomId).toUpperCase());
   const snap = await getDoc(ref);
   if(!snap.exists()) return null;
   const room = snap.data();
   if(room.finalGenre) return room;
   const labels={arithmetic:"四則演算",prime:"素因数分解",factor:"因数分解",expand:"展開",derivative:"微分",integral:"積分",random:"ランダム"};
-  await updateDoc(ref,{
+  const qs = Array.isArray(questions) && questions.length ? questions : (room.questions || []);
+  await setDoc(ref,{
     finalGenre: finalGenre || "random",
     finalGenreLabel: labels[finalGenre] || finalGenre || "ランダム",
-    questions: questions || room.questions || [],
-    currentQuestion: (questions && questions[0]) || room.currentQuestion,
+    questions: qs,
+    currentQuestion: qs[0] || room.currentQuestion || null,
     round: 0,
     roundWinner: "",
+    finalizingGenre: false,
     updatedAt: serverTimestamp()
-  });
+  },{merge:true});
   const after = await getDoc(ref);
   return after.exists() ? after.data() : null;
 };
 
 </script>
-<script src="app.js?v=3.0.6"></script>
+<script src="app.js?v=3.0.8"></script>
 </body>
 </html>
