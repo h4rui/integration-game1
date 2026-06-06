@@ -1,14 +1,30 @@
 
-// Ver2.7.9 expression cleanup
+// Ver2.8.2 expression cleanup
 function cleanMathExpression(expr){
   if(expr===undefined || expr===null) return expr;
   let s = String(expr);
+
+  // 係数0の項を消す: +0x^2, -0x, 0x², +0x^3 など
+  s = s.replace(/(^|[+\-])\s*0\s*x(?:\^\d+|[²³⁴⁵⁶])?/g, "$1");
+  s = s.replace(/(^|[+\-])\s*0\s*x/g, "$1");
+
+  // 係数1を省略: 1x^2 -> x^2, -1x -> -x, +1x -> +x
+  s = s.replace(/(^|[+\-(])\s*1\s*x/g, "$1x");
+  s = s.replace(/(^|[+\-(])\s*-1\s*x/g, "$1-x");
+  s = s.replace(/([+\-])\s*1\s*x/g, "$1x");
+  s = s.replace(/([+\-])\s*-1\s*x/g, m => m.includes("+") ? "-x" : "+x");
+
+  // +0, -0 を見た目から消す
+  s = s.replace(/\+\s*0(?=\)|\s|$)/g, "");
+  s = s.replace(/-\s*0(?=\)|\s|$)/g, "");
+
+  // 符号の整理
   s = s.replace(/\+\s*-/g,"-").replace(/-\s*\+/g,"-").replace(/\+\s*\+/g,"+").replace(/--/g,"+");
-  s = s.replace(/(^|[+\-(])1x/g, "$1x");
-  s = s.replace(/(^|[+\-(])-1x/g, "$1-x");
-  s = s.replace(/(^|[+\-])0x(\^?\d*)?/g, "");
   s = s.replace(/\(\+/g,"(").replace(/^\+/,"");
   s = s.replace(/\s+/g," ").trim();
+
+  // 空になったかっこを少しだけ整える
+  s = s.replace(/\(\s*\)/g,"0");
   return s;
 }
 
@@ -40,13 +56,7 @@ function showComboDamage(){
 
 // Ver2.6.1 formula display fix
 function fixFormulaSigns(s){
-  if(s===undefined || s===null)return s;
-  return String(s)
-    .replace(/\+\s*-/g,"-")
-    .replace(/-\s*\+/g,"-")
-    .replace(/\+\s*\+/g,"+")
-    .replace(/--/g,"+")
-    .replace(/^\+/,"");
+  return cleanMathExpression(s);
 }
 function cleanQuestionObject(q){
   if(!q)return q;
@@ -973,7 +983,7 @@ function showSettings(){
     </div>
     <div class="settingsItem">
       <button class="googleLoginBtn" onclick="loginGoogle()">Googleログイン</button>
-      <button onclick="logoutGoogle()">ログアウト</button><button onclick="checkGoogleLoginStatus()">ログイン状態確認</button><button onclick="testFirestoreConnection()">Firestore接続確認</button><button onclick="showFirebaseDebug()">Firebase情報</button>
+      <button onclick="logoutGoogle()">ログアウト</button><button onclick="checkGoogleLoginStatus()">ログイン状態確認</button>
       <p id="loginStatus">確認中...</p>
     </div>
 ${themeButtonsHTML()}
@@ -2856,38 +2866,6 @@ async function showOnlineMatchMenu(){
   }
 }
 
-async function testFirestoreConnection(){
-  try{
-    if(window.testFirestoreDirect){
-      const r = await window.testFirestoreDirect();
-      alert("Firestore接続OK\nconnectionTests に書き込み成功：" + r.id);
-      return;
-    }
-
-    const roomId=await createMatchRoom({
-      type:"test",
-      name:"接続テスト",
-      title:"テスト",
-      questions:[{q:"1+1",a:"2",display:"2",explanation:"テスト"}]
-    });
-    await cancelMatchRoom(roomId);
-    alert("Firestore接続OK");
-  }catch(e){
-    const msg = e && (e.code || e.message) ? (e.code || e.message) : String(e);
-    alert("Firestore接続NG：" + msg + "\n\nFirebaseのFirestoreルール、またはプロジェクトIDを確認して。詳しくはPCのConsoleを見て。");
-    console.error(e);
-  }
-}
-
-function showFirebaseDebug(){
-  try{
-    const info = window.getFirebaseDebugInfo ? window.getFirebaseDebugInfo() : {error:"Firebase module not ready"};
-    alert(JSON.stringify(info,null,2));
-  }catch(e){
-    alert("Firebase情報取得失敗：" + (e.code || e.message || e));
-  }
-}
-window.showFirebaseDebug=showFirebaseDebug;
 
 setInterval(ensureHomeButton,1500);
 
@@ -3464,7 +3442,7 @@ function playEnemyDefeat(){
 }
 
 
-// Ver2.7.9 profile icon preview/save
+// Ver2.8.2 profile icon preview/save
 function previewProfileIcon(){
   const input=document.getElementById("iconInputEdit");
   const preview=document.getElementById("iconPreview");
