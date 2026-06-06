@@ -1,5 +1,5 @@
 
-// Ver2.8.4 expression cleanup
+// Ver2.8.3 expression cleanup
 function cleanMathExpression(expr){
   if(expr===undefined || expr===null) return expr;
   let s = String(expr);
@@ -68,7 +68,7 @@ function cleanQuestionObject(q){
 }
 
 
-const VERSION = "2.8.4";
+const VERSION = "2.8.5";
 
 let enemyHP = 10;
 let playerHP = 5;
@@ -3218,18 +3218,11 @@ document.addEventListener("dblclick", function(e){
 
 // Ver2.7.3 auto update news system
 const UPDATE_NOTES = {
-  "2.8.4": [
+  "2.8.5": [
     "ログイン処理の安定性を向上",
     "アカウント連携時の不具合を修正",
-    "データ保存・読み込み処理を改善",
-    "ランキングと対戦機能の安定性を向上",
-    "全体的な動作を安定化"
-  ],
-  "2.8.3": [
-    "ログイン機能を改善",
-    "セーブ機能を改善",
-    "ランキング機能を改善",
-    "数式表示を調整"
+    "セーブ機能の安定性を向上",
+    "ランキングと対戦機能の動作を改善"
   ],
   "2.7.3": [
     "壊れていたpanelAreaのHTMLを修正",
@@ -3474,7 +3467,7 @@ function playEnemyDefeat(){
 }
 
 
-// Ver2.8.4 profile icon preview/save
+// Ver2.8.3 profile icon preview/save
 function previewProfileIcon(){
   const input=document.getElementById("iconInputEdit");
   const preview=document.getElementById("iconPreview");
