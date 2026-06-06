@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.0.4";
+const VERSION = "3.0.5";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -3245,3 +3245,266 @@ console.error(e);
 document.getElementById("openRoomList").innerHTML=`<p>募集中一覧の取得に失敗しました。<br>${e.code || e.message || e}</p>`;
 }
 }
+
+
+// Ver3.0.5 beta match voting / terms / expression cleanup patch
+(function(){
+  const GENRES = [
+    {id:"arithmetic", label:"四則演算"},
+    {id:"prime", label:"素因数分解"},
+    {id:"factor", label:"因数分解"},
+    {id:"expand", label:"展開"},
+    {id:"derivative", label:"微分"},
+    {id:"integral", label:"積分"},
+    {id:"random", label:"ランダム"}
+  ];
+  window.BETA_MATCH_GENRES = GENRES;
+
+  window.cleanMathExpression = function(expr){
+    if(expr===undefined || expr===null) return expr;
+    let s = String(expr);
+    s = s.replace(/\s+/g, "");
+    // 0係数の項を消す
+    s = s.replace(/(^|[+\-])0x(?:\^?\d+|[²³⁴⁵⁶])?/g, "$1");
+    s = s.replace(/(^|[+\-])0(?:sin|cos|tan|log|sqrt|√|e\^)/g, "$1");
+    // 1係数を省略
+    s = s.replace(/(^|[+\-(])1(?=x|sin|cos|tan|log|sqrt|√|e\^|\()/g, "$1");
+    s = s.replace(/(^|[+\-(])-1(?=x|sin|cos|tan|log|sqrt|√|e\^|\()/g, "$1-");
+    // x^1 を x に
+    s = s.replace(/x\^1(?!\d)/g,"x");
+    s = s.replace(/x¹/g,"x");
+    // +0 / -0 を消す
+    s = s.replace(/([+\-])0(?=([+\-) ]|$))/g, "");
+    s = s.replace(/\+\-/g,"-").replace(/-\+/g,"-").replace(/\+\+/g,"+").replace(/--/g,"+");
+    s = s.replace(/^\+/g,"").replace(/\(\+/g,"(");
+    s = s.replace(/\(\)/g,"0");
+    return s || "0";
+  };
+  window.fixFormulaSigns = window.cleanMathExpression;
+
+  const oldNormalize = (typeof normalize === "function") ? normalize : (x=>String(x));
+  window.normalize = normalize = function(str){
+    let s = String(str)
+      .replace(/\s/g,"")
+      .replace(/×/g,"*")
+      .replace(/÷/g,"/")
+      .replace(/π/g,"pi")
+      .replace(/²/g,"^2").replace(/³/g,"^3").replace(/⁴/g,"^4").replace(/⁵/g,"^5").replace(/⁶/g,"^6")
+      .replace(/¹/g,"^1")
+      .replace(/\+C/g,"").replace(/C/g,"");
+    s = s.replace(/(^|[+\-\(])1(?=x|sin|cos|tan|log|sqrt|exp|e\^|\()/g,"$1");
+    s = s.replace(/(^|[+\-\(])-1(?=x|sin|cos|tan|log|sqrt|exp|e\^|\()/g,"$1-");
+    s = s.replace(/x\^1(?!\d)/g,"x");
+    s = s.replace(/([+\-])0(?=([+\-\)]|$))/g,"");
+    return s;
+  };
+
+  function genreLabel(id){ return (GENRES.find(g=>g.id===id)||{}).label || id; }
+  function expandedGenres(list){
+    let a=(list&&list.length?list:["random"]);
+    if(a.includes("random")) return ["arithmetic","prime","factor","expand","derivative","integral"];
+    return a.filter(x=>x && x!=="random");
+  }
+  function decideGenres(a,b){
+    const A=expandedGenres(a), B=expandedGenres(b);
+    const common=A.filter(x=>B.includes(x));
+    const pool=common.length ? common : [...new Set([...A,...B])];
+    return pool[Math.floor(Math.random()*pool.length)] || "arithmetic";
+  }
+  function makeQuestionsForGenreList(genres){
+    const oldMode=mode, oldDiff=difficulty;
+    let list=[];
+    const pool=expandedGenres(genres);
+    for(let i=0;i<9;i++){
+      mode=pool[Math.floor(Math.random()*pool.length)] || "arithmetic";
+      difficulty="normal";
+      list.push(cleanQuestionObject(generateQuestion()));
+    }
+    mode=oldMode; difficulty=oldDiff;
+    return list;
+  }
+  window.makeMatchQuestionsForGenre = function(finalGenre){ return makeQuestionsForGenreList([finalGenre]); };
+
+  window.showMatchMenu = function(){
+    document.getElementById("panelArea").innerHTML=`
+      <h2>⚔️ 対戦</h2>
+      <button class="modeBtn" onclick="selectRankingMode()">🏆 週間ランキングモード</button>
+      <button class="modeBtn" onclick="showOnlineMatchMenu()">🧪 β版対戦</button>
+      <button class="modeBtn" onclick="showFriendMatchMenu()">🤝 フレンドマッチ</button>
+      <button class="modeBtn" onclick="showMatchHistory()">📜 対戦履歴</button>
+      <button class="modeBtn" onclick="showGenreStats()">📊 ジャンル別正答率</button>
+      <div class="matchBox">
+        <p>β版対戦：マッチ成立後に、両者が出題分野を複数選択できます。</p>
+        <p>共通する分野があれば共通分野から、なければ両者の選択全体からランダムで決まります。</p>
+      </div>`;
+    if(typeof ensureHomeButton==="function")ensureHomeButton();
+  };
+
+  window.showOnlineMatchMenu = async function(){
+    const box=document.getElementById("panelArea");
+    box.innerHTML=`
+      <h2>🧪 β版対戦</h2>
+      <div class="matchBox">
+        <p>募集中の部屋から参加できます。</p>
+        <p>マッチ成立後、出題分野を複数選択して投票します。</p>
+        <button onclick="createOnlineMatch()">新しく募集する</button>
+        <button onclick="showOnlineMatchMenu()">更新</button>
+      </div>
+      <h3>募集中一覧</h3>
+      <div id="openRoomList">読み込み中...</div>`;
+    try{
+      const rooms=await loadOpenMatchRooms();
+      let html="";
+      if(!rooms.length)html="<p>現在募集中の部屋はありません。</p>";
+      for(const r of rooms){
+        const myRate=(playerData&&playerData.rating)||1000;
+        const label=(typeof matchThreatLabel==="function")?matchThreatLabel(myRate,r.hostRate||1000):"";
+        html+=`<div class="openRoomItem"><b>${r.hostName||"名無し"}</b><br>Lv ${r.hostLevel||1}<br>${titleHTML(r.hostTitle||"初心者")}<br>レート：${r.hostRate||1000}<br><b>${label}</b><br><button onclick="joinOpenOnlineMatch('${r.roomId}')">参加する</button></div>`;
+      }
+      document.getElementById("openRoomList").innerHTML=html;
+    }catch(e){
+      console.error(e);
+      document.getElementById("openRoomList").innerHTML=`<p>募集中一覧の取得に失敗しました。<br>${e.code || e.message || e}</p>`;
+    }
+  };
+
+  const oldCreateMatch = window.createMatch || createMatch;
+  window.createMatch = createMatch = async function(type){
+    try{
+      let questions=makeQuestionsForGenreList(["random"]);
+      const p=(typeof getMyMatchProfileForV303==="function")?getMyMatchProfileForV303():{name:playerProfile.name||"名無し",title:playerData.equippedTitle||"初心者",level:getLevel(),rate:playerData.rating||1000};
+      let roomId=await createMatchRoom({type:type,name:p.name,title:p.title,level:p.level,rate:p.rate,questions:questions,betaVote:true});
+      matchState.active=true; matchState.roomId=roomId; matchState.type=type; matchState.side="host";
+      matchState.currentRound=-1; matchState.currentQuestion=null; matchState.localLocked=false; matchState.introShown=false; matchState.voteSubmitted=false;
+      if(typeof showMatchSearching==="function")showMatchSearching(type,roomId); else showMatchWaiting(roomId,type);
+      startMatchPolling();
+    }catch(e){ alert("ルーム作成に失敗しました：" + (e.code || e.message || e)); console.error(e); }
+  };
+
+  window.joinMatch = joinMatch = async function(roomId,type){
+    if(!roomId){ alert("ルームIDを入力して"); return; }
+    try{
+      const p=(typeof getMyMatchProfileForV303==="function")?getMyMatchProfileForV303():{name:playerProfile.name||"名無し",title:playerData.equippedTitle||"初心者",level:getLevel(),rate:playerData.rating||1000};
+      await joinMatchRoom(roomId,{name:p.name,title:p.title,level:p.level,rate:p.rate});
+      matchState.active=true; matchState.roomId=roomId; matchState.type=type; matchState.side="guest";
+      matchState.currentRound=-1; matchState.currentQuestion=null; matchState.localLocked=false; matchState.introShown=false; matchState.voteSubmitted=false;
+      if(typeof showMatchSearching==="function")showMatchSearching(type,roomId); else showMatchWaiting(roomId,type);
+      startMatchPolling();
+    }catch(e){ alert(typeof getJoinErrorMessage==="function" ? getJoinErrorMessage(e) : "参加できませんでした"); console.log(e); }
+  };
+
+  function selectedVoteGenres(){
+    const checked=[...document.querySelectorAll(".matchGenreCheck:checked")].map(x=>x.value);
+    return checked.length ? checked : ["random"];
+  }
+  window.submitMatchGenreVote = async function(){
+    if(!matchState || !matchState.roomId)return;
+    const genres=selectedVoteGenres();
+    matchState.voteSubmitted=true;
+    const area=document.getElementById("panelArea");
+    if(area)area.innerHTML=`<div class="matchBox"><h2>投票完了</h2><p>選択：${genres.map(genreLabel).join("、")}</p><p>相手の投票を待っています...</p></div>`;
+    try{ await window.setMatchVote(matchState.roomId, matchState.side, genres); }
+    catch(e){ console.error(e); alert("投票に失敗しました："+(e.code||e.message||e)); }
+  };
+
+  function showVoteScreen(room){
+    document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+    document.getElementById("homeScreen").classList.add("active");
+    const panel=document.getElementById("panelArea");
+    const myVote=matchState.side==="host"?room.hostVote:room.guestVote;
+    const otherVote=matchState.side==="host"?room.guestVote:room.hostVote;
+    if(myVote && myVote.length){
+      panel.innerHTML=`<div class="matchBox"><h2>投票完了</h2><p>選択：${myVote.map(genreLabel).join("、")}</p><p>${otherVote&&otherVote.length?"分野を決定中...":"相手の投票を待っています..."}</p></div>`;
+      return;
+    }
+    panel.innerHTML=`
+      <h2>🧪 出題分野を投票</h2>
+      <div class="matchBox matchVoteBox">
+        <p>出したい分野を複数選択できます。</p>
+        <div class="genreGrid">
+          ${GENRES.map(g=>`<label class="genreChoice"><input class="matchGenreCheck" type="checkbox" value="${g.id}" ${g.id==="random"?"checked":""}> ${g.label}</label>`).join("")}
+        </div>
+        <button onclick="submitMatchGenreVote()">この分野で投票</button>
+        <p>共通分野がある場合は共通分野が優先されます。</p>
+      </div>`;
+  }
+
+  const oldHandle = (typeof handleMatchRoomRealtime==="function") ? handleMatchRoomRealtime : null;
+  window.handleMatchRoomRealtime = handleMatchRoomRealtime = function(room){
+    if(!matchState.active || !room)return;
+    matchState.room=room;
+    if(room.status==="waiting"){ if(typeof showMatchWaiting==="function")showMatchWaiting(room.roomId,room.type); return; }
+    if(room.status==="finished" || room.status==="canceled"){ finishMatch(room); return; }
+    if(room.status==="playing" && !room.finalGenre){
+      const hostVote=room.hostVote||[];
+      const guestVote=room.guestVote||[];
+      if(hostVote.length && guestVote.length && matchState.side==="host" && !room.finalizingGenre){
+        const finalGenre=decideGenres(hostVote,guestVote);
+        const questions=makeQuestionsForGenreList([finalGenre]);
+        window.finalizeMatchVote(room.roomId, finalGenre, questions).catch(e=>console.error("finalize vote failed",e));
+      }
+      showVoteScreen(room);
+      return;
+    }
+    if(!matchState.introShown){
+      matchState.introShown=true;
+      if(typeof showMatchFoundIntro==="function")showMatchFoundIntro(room,()=>showMatchQuestion(room,true));
+      else showMatchQuestion(room,true);
+      return;
+    }
+    if(room.round!==matchState.currentRound){
+      matchState.currentRound=room.round;
+      matchState.currentQuestion=room.currentQuestion;
+      matchState.localLocked=false;
+      showMatchQuestion(room,false);
+    }else{ updateMatchHeader(room); }
+  };
+
+  const oldShowMatchQuestion = window.showMatchQuestion || showMatchQuestion;
+  window.showMatchQuestion = showMatchQuestion = function(room,fromIntro=false){
+    oldShowMatchQuestion(room,fromIntro);
+    const result=document.getElementById("result");
+    if(result && room && room.finalGenreLabel){
+      result.innerHTML = `<p>出題分野：${room.finalGenreLabel}</p>` + result.innerHTML;
+    }
+  };
+
+  window.showTermsPage = function(){
+    const html=`<h2>📜 利用規約</h2>
+      <div class="guideItem"><h3>第1条 本サービスについて</h3><p>数学マスターは、数学学習を目的としたWebゲームです。</p></div>
+      <div class="guideItem"><h3>第2条 禁止事項</h3><p>チート、不正アクセス、ランキング改ざん、荒らし、他ユーザーへの迷惑行為を禁止します。</p></div>
+      <div class="guideItem"><h3>第3条 データの扱い</h3><p>不正または不適切と判断したデータは、運営側で削除・制限する場合があります。</p></div>
+      <div class="guideItem"><h3>第4条 サービス変更</h3><p>本サービスの内容は、予告なく変更・停止する場合があります。</p></div>
+      <div class="guideItem"><h3>第5条 免責</h3><p>本サービスの利用により生じた損害について、運営者は法令上必要な範囲を除き責任を負いません。</p></div>`;
+    openSimplePage(html);
+  };
+  window.showPrivacyPage = function(){
+    const html=`<h2>🔒 プライバシーポリシー</h2>
+      <div class="guideItem"><h3>取得する情報</h3><p>ユーザー識別ID、Google表示名、プレイヤー名、フレンドコード、ゲーム進行データを取得する場合があります。</p></div>
+      <div class="guideItem"><h3>取得しない情報</h3><p>メールアドレス、パスワード、住所、クレジットカード情報は保存しません。</p></div>
+      <div class="guideItem"><h3>利用目的</h3><p>ログイン、セーブデータ保存、ランキング、フレンド機能、不正利用対策、サービス改善のために利用します。</p></div>
+      <div class="guideItem"><h3>公開される情報</h3><p>プレイヤー名、称号、レベル、フレンドコードなど、ゲーム内表示に必要な情報が公開される場合があります。</p></div>
+      <div class="guideItem"><h3>第三者提供</h3><p>法令に基づく場合を除き、個人を特定できる非公開情報を第三者へ提供しません。</p></div>`;
+    openSimplePage(html);
+  };
+  window.showOtherMenu = function(){
+    document.getElementById("panelArea").innerHTML=`
+      <h2>⚙️ その他</h2>
+      <button class="modeBtn" onclick="showGuide()">📖 遊び方</button>
+      <button class="modeBtn" onclick="showDailyMission()">🎯 デイリーミッション</button>
+      <button class="modeBtn" onclick="showLoginCalendar()">📅 ログボカレンダー</button>
+      <button class="modeBtn" onclick="showSettings()">⚙️ 設定</button>
+      <button class="modeBtn" onclick="showContact()">📩 お問い合わせ</button>
+      <button class="modeBtn" onclick="showTermsPage()">📜 利用規約</button>
+      <button class="modeBtn" onclick="showPrivacyPage()">🔒 プライバシーポリシー</button>`;
+  };
+
+  if(typeof UPDATE_NOTES !== "undefined"){
+    UPDATE_NOTES["3.0.5"]=[
+      "β版対戦に出題分野の複数選択投票を追加",
+      "共通分野を優先して出題範囲を決定するように改善",
+      "利用規約とプライバシーポリシーを追加",
+      "0と1の省略に関する表示・入力判定を改善"
+    ];
+  }
+})();

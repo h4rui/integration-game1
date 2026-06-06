@@ -793,3 +793,30 @@ login: !!auth.currentUser,
 uid: auth.currentUser ? auth.currentUser.uid : null
 };
 };
+
+
+// Ver3.0.5 beta match voting helpers
+window.setMatchVote = async function(roomId, side, genres){
+  const ref = doc(db,"matches",roomId);
+  const field = side === "host" ? "hostVote" : "guestVote";
+  await updateDoc(ref,{[field]: genres || ["random"], updatedAt: serverTimestamp()});
+};
+window.finalizeMatchVote = async function(roomId, finalGenre, questions){
+  const ref = doc(db,"matches",roomId);
+  const snap = await getDoc(ref);
+  if(!snap.exists()) return null;
+  const room = snap.data();
+  if(room.finalGenre) return room;
+  const labels={arithmetic:"四則演算",prime:"素因数分解",factor:"因数分解",expand:"展開",derivative:"微分",integral:"積分",random:"ランダム"};
+  await updateDoc(ref,{
+    finalGenre: finalGenre || "random",
+    finalGenreLabel: labels[finalGenre] || finalGenre || "ランダム",
+    questions: questions || room.questions || [],
+    currentQuestion: (questions && questions[0]) || room.currentQuestion,
+    round: 0,
+    roundWinner: "",
+    updatedAt: serverTimestamp()
+  });
+  const after = await getDoc(ref);
+  return after.exists() ? after.data() : null;
+};

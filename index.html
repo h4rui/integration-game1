@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5681066295421790"
 crossorigin="anonymous"></script>
-<title>数学マスター Ver 3.0.1</title>
+<title>数学マスター Ver 3.0.5</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <style>
@@ -350,7 +350,7 @@ body{
   text-shadow:0 0 8px #60a5fa,0 0 18px #7c3aed,0 0 32px #38bdf8;
 }
 #homeScreen h1::after{
-  content:"Ver 3.0.1";display:block;font-size:18px;color:#67e8f9;margin-top:6px;text-shadow:0 0 10px #22d3ee;
+  content:"Ver 3.0.5";display:block;font-size:18px;color:#67e8f9;margin-top:6px;text-shadow:0 0 10px #22d3ee;
 }
 #homePlayerCard{
   width:88%;max-width:780px;margin:18px auto 22px;padding:18px;
@@ -924,6 +924,14 @@ button,.modeBtn{
 @keyframes matchCardIn{from{opacity:0;transform:translateY(12px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
 .matchScoreV303{align-items:center;font-size:18px;gap:12px}.matchScoreV303>div{min-width:110px}.matchCenterSmall{font-size:20px;font-weight:900;color:#fde68a}.matchCenterSmall span{font-size:17px;color:#fff}
 @media(max-width:560px){.matchVsWrap{grid-template-columns:1fr}.matchVsText{font-size:28px}.matchFoundTitle{font-size:26px}.matchVsName{font-size:22px}.matchScoreV303{font-size:14px;gap:6px}.matchScoreV303>div{min-width:82px}.matchCenterSmall{font-size:16px}}
+
+
+/* Ver3.0.5 beta voting */
+.genreGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:14px auto;max-width:560px}
+.genreChoice{display:block;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:12px;padding:12px;font-size:18px;text-align:left}
+.genreChoice input{width:auto;margin-right:8px;transform:scale(1.25)}
+.matchVoteBox{text-align:center}
+@media(max-width:520px){.genreGrid{grid-template-columns:1fr}.genreChoice{font-size:17px}}
 
 </style>
 <!--
@@ -1966,6 +1974,6 @@ window.getFirebaseDebugInfo = function(){
 };
 
 </script>
-<script src="app.js?v=3.0.4"></script>
+<script src="app.js?v=3.0.5"></script>
 </body>
 </html>
