@@ -993,29 +993,30 @@ function showGuide(){
 }
 
 function showSettings(){
+  const linked = !!(window.getGoogleLoginInfo && window.getGoogleLoginInfo()) || !!localStorage.getItem("googleLoginUid") || !!localStorage.getItem("googleLoginLinked");
+  const accountHTML = linked ? `
+    <div class="settingsItem">
+      <h3>アカウント連携</h3>
+      <p id="loginStatus">アカウント連携済み</p>
+      <p>データは自動でクラウド保存されます。</p>
+      <button onclick="logoutGoogle()">ログアウト</button>
+    </div>
+  ` : `
+    <div class="settingsItem">
+      <h3>アカウント連携</h3>
+      <p>ログインするとデータが自動保存されます。</p>
+      <button class="googleLoginBtn" onclick="loginGoogle()">Googleログイン</button>
+      <p id="loginStatus">未ログイン</p>
+    </div>
+  `;
+
   document.getElementById("panelArea").innerHTML=`
     <h2>⚙️ 設定</h2>
     <div class="settingsItem">
       <button onclick="toggleBGM()">🎵 BGM ${settings.bgm?"ON":"OFF"}</button>
       <button onclick="toggleSE()">🔊 効果音 ${settings.se?"ON":"OFF"}</button>
     </div>
-    <div class="settingsItem">
-      <h3>アカウント連携</h3>
-      <button class="googleLoginBtn" onclick="loginGoogle()">Googleログイン</button>
-      <button onclick="logoutGoogle()">ログアウト</button>
-      <button onclick="forceCloudSave()">Googleセーブ</button>
-      <button onclick="overwriteCloudWithThisDevice()">この端末でクラウド上書き</button>
-      <p id="loginStatus">確認中...</p>
-    </div>
-    <div class="settingsItem">
-      <h3>メールアドレスでログイン</h3>
-      <input id="emailLoginInput" type="email" placeholder="メールアドレス" autocomplete="email">
-      <input id="passwordLoginInput" type="password" placeholder="パスワード（6文字以上）" autocomplete="current-password">
-      <button onclick="loginEmailPassword()">メールでログイン</button>
-      <button onclick="registerEmailPassword()">新規登録</button>
-      <p>※メールログインを使うには、管理画面でメール/パスワード認証を有効にしてください。</p>
-    </div>
-${themeButtonsHTML()}
+    ${accountHTML}
   `;
   refreshLoginStatus();
 }
@@ -1104,7 +1105,6 @@ function showProfile(){
         <div class="profileStat">🏆 レート <b>${rate}</b></div>
         <div class="profileStat">🪙 コイン <b>${coin}</b></div>
         <div class="profileStat">🏅 実績 <b>${achievements}個</b></div>
-        <div class="profileStat">🎨 背景 <b>${profileBgName(getProfileBg())}</b></div>
       </div>
     </div>
 
@@ -1118,7 +1118,6 @@ function showProfile(){
       </div>
     </div>
 
-    ${profileBgButtonsHTML()}
 
     <div class="profileBgSelector">
       <h3>プロフィール編集</h3>
@@ -1215,14 +1214,17 @@ async function savePublicProfile(){
 }
 
 function showFriendMenu(){
+  const friendCode = window.getMyFriendCode ? window.getMyFriendCode() : (window.getMyPlayerId?window.getMyPlayerId():"未取得");
   let html=`
     <h2>🤝 フレンド</h2>
     <div class="friendItem">
-      <p>あなたのID</p>
-      <input value="${window.getMyPlayerId?window.getMyPlayerId():"未取得"}" readonly>
+      <p>あなたのフレンドコード</p>
+      <input id="myFriendCodeInput" value="${friendCode}" readonly onclick="copyMyFriendCode()">
+      <button onclick="copyMyFriendCode()">コピー</button>
+      <p style="font-size:14px;opacity:.85;">タップするとコピーできます。</p>
     </div>
     <div class="friendItem">
-      <input id="friendIdInput" placeholder="フレンドID">
+      <input id="friendIdInput" placeholder="フレンドコード 例：A7K4-P2X9">
       <button onclick="addFriend()">追加</button>
     </div>
     <div id="friendListArea"></div>
@@ -1231,8 +1233,19 @@ function showFriendMenu(){
   document.getElementById("panelArea").innerHTML=html;
   renderFriendList();
 }
+function copyMyFriendCode(){
+  const code = window.getMyFriendCode ? window.getMyFriendCode() : "";
+  if(!code || code==="未取得"){alert("ログインするとフレンドコードが発行されます");return;}
+  const plain = code.replace(/-/g,"");
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(plain).then(()=>alert("フレンドコードをコピーしました："+code)).catch(()=>alert("コピーできませんでした。長押しでコピーしてください。"));
+  }else{
+    const input=document.getElementById("myFriendCodeInput");
+    if(input){input.select();document.execCommand("copy");alert("フレンドコードをコピーしました："+code);}
+  }
+}
 async function addFriend(){
-  let id=document.getElementById("friendIdInput").value.trim();
+  let id=document.getElementById("friendIdInput").value.trim().replace(/-/g,"").toUpperCase();
   if(!id){alert("IDを入力して");return;}
 
   if(id==="adminadminadmin9671"){

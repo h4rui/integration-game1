@@ -861,8 +861,8 @@ button,.modeBtn{
 /* Ver3.0.0 board/news layout */
 #homeNewsMini{
   position:fixed;
-  top:10px;
-  right:10px;
+  top:calc(10px + env(safe-area-inset-top));
+  right:calc(10px + env(safe-area-inset-right));
   z-index:200;
   font-size:14px;
   padding:7px 10px;
@@ -1019,7 +1019,7 @@ h4rui.github.io
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import { getFirestore, collection, doc, setDoc, getDoc, getDocs, query, where, limit, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDVXwXTGeft41ajd0KDwNPG-dH8pmsMIt8",
@@ -1042,6 +1042,63 @@ setPersistence(auth,browserLocalPersistence).catch((e)=>console.error(e));
 const provider = new GoogleAuthProvider();
 provider.setCustomParameters({ prompt:"select_account" });
 
+const FRIEND_CODE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+function normalizeFriendCode(code){
+  return String(code || "").replace(/-/g,"").trim().toUpperCase();
+}
+function formatFriendCode(code){
+  const c = normalizeFriendCode(code);
+  if(c.length === 8) return c.slice(0,4) + "-" + c.slice(4);
+  return c || "未取得";
+}
+function makeFriendCode(){
+  let code = "";
+  for(let i=0;i<8;i++){
+    code += FRIEND_CODE_CHARS[Math.floor(Math.random()*FRIEND_CODE_CHARS.length)];
+  }
+  return code;
+}
+async function ensureFriendCode(user){
+  if(!user) return "";
+  const saved = normalizeFriendCode(localStorage.getItem("friendCode"));
+  if(saved && saved.length === 8) return saved;
+
+  const profileRef = doc(db,"userProfiles",user.uid);
+  const profileSnap = await getDoc(profileRef);
+  const existing = profileSnap.exists() ? normalizeFriendCode(profileSnap.data().friendCode) : "";
+  if(existing && existing.length === 8){
+    localStorage.setItem("friendCode", existing);
+    return existing;
+  }
+
+  for(let i=0;i<20;i++){
+    const code = makeFriendCode();
+    const codeRef = doc(db,"friendCodes",code);
+    const codeSnap = await getDoc(codeRef);
+    if(!codeSnap.exists()){
+      await setDoc(codeRef,{
+        code,
+        uid:user.uid,
+        playerId:"google_" + user.uid,
+        createdAt:serverTimestamp()
+      });
+      await setDoc(profileRef,{
+        uid:user.uid,
+        friendCode:code,
+        updatedAt:serverTimestamp()
+      },{merge:true});
+      localStorage.setItem("friendCode", code);
+      return code;
+    }
+  }
+  throw new Error("friend-code-generate-failed");
+}
+window.getMyFriendCode = function(){
+  const c = normalizeFriendCode(localStorage.getItem("friendCode"));
+  return c ? formatFriendCode(c) : "未取得";
+};
+
+
 
 window.loginGoogle = async function(){
   try{
@@ -1060,61 +1117,6 @@ window.loginGoogle = async function(){
   }catch(e){
     console.error(e);
     alert("Googleログイン開始に失敗：" + (e.code || e.message || e));
-  }
-};
-
-
-function getEmailPasswordInputs(){
-  const email = (document.getElementById("emailLoginInput")?.value || "").trim();
-  const password = document.getElementById("passwordLoginInput")?.value || "";
-  return {email,password};
-}
-
-window.loginEmailPassword = async function(){
-  try{
-    const {email,password} = getEmailPasswordInputs();
-    if(!email || !password){
-      alert("メールアドレスとパスワードを入力してください");
-      return;
-    }
-    if(password.length < 6){
-      alert("パスワードは6文字以上にしてください");
-      return;
-    }
-    localStorage.setItem("loginTrying","1");
-    await setPersistence(auth,browserLocalPersistence);
-    const result = await signInWithEmailAndPassword(auth,email,password);
-    if(result && result.user){
-      applyGoogleLoginState(result.user);
-      alert("メールログインに成功しました");
-    }
-  }catch(e){
-    console.error(e);
-    alert("メールログインに失敗：" + (e.code || e.message || e));
-  }
-};
-
-window.registerEmailPassword = async function(){
-  try{
-    const {email,password} = getEmailPasswordInputs();
-    if(!email || !password){
-      alert("メールアドレスとパスワードを入力してください");
-      return;
-    }
-    if(password.length < 6){
-      alert("パスワードは6文字以上にしてください");
-      return;
-    }
-    localStorage.setItem("loginTrying","1");
-    await setPersistence(auth,browserLocalPersistence);
-    const result = await createUserWithEmailAndPassword(auth,email,password);
-    if(result && result.user){
-      applyGoogleLoginState(result.user);
-      alert("メールアカウントを作成しました");
-    }
-  }catch(e){
-    console.error(e);
-    alert("メールアカウント作成に失敗：" + (e.code || e.message || e));
   }
 };
 
@@ -1224,8 +1226,10 @@ async function ensurePlayerNameAfterLogin(user){
     }
     bundle = window.getLocalGameData ? window.getLocalGameData() : null;
     const playerName = bundle && bundle.playerProfile ? (bundle.playerProfile.name || "名無し") : "名無し";
+    const friendCode = await ensureFriendCode(user);
     await setDoc(doc(db,"userProfiles",user.uid),{
       uid:user.uid,
+      friendCode:friendCode,
       googleDisplayName:user.displayName || "",
       googleEmail:user.email || "",
       playerName:playerName,
@@ -1260,7 +1264,7 @@ function getPlayerId(){
   return "local_" + playerId;
 }
 
-window.getMyPlayerId = () => getPlayerId();
+window.getMyPlayerId = () => (window.getMyFriendCode ? window.getMyFriendCode() : getPlayerId());
 
 window.saveWorldScore = async function(data){
   const week = getWeekKey();
@@ -1298,18 +1302,49 @@ window.loadWorldRanking = async function(){
 
 window.savePlayerPublicData = async function(data){
   const playerId = getPlayerId();
-  await setDoc(doc(db,"players",playerId),{
+  const friendCode = auth.currentUser ? await ensureFriendCode(auth.currentUser).catch(()=>normalizeFriendCode(localStorage.getItem("friendCode"))) : "";
+  const publicData = {
     playerId:playerId,
+    friendCode:friendCode || "",
     name:data.name,
+    playerName:data.name,
     icon:data.icon,
     title:data.title,
     level:data.level,
     bestRandomScore:data.bestRandomScore,
     updatedAt:serverTimestamp()
-  });
+  };
+  await setDoc(doc(db,"players",playerId),publicData,{merge:true});
+  if(friendCode){
+    await setDoc(doc(db,"players",friendCode),publicData,{merge:true});
+  }
 };
 
 window.loadFriendData = async function(friendId){
+  const code = normalizeFriendCode(friendId);
+  if(code && code.length === 8){
+    const codeSnap = await getDoc(doc(db,"friendCodes",code));
+    if(codeSnap.exists()){
+      const data = codeSnap.data();
+      const uid = data.uid;
+      const profileSnap = uid ? await getDoc(doc(db,"userProfiles",uid)) : null;
+      const publicSnap = await getDoc(doc(db,"players",code));
+      if(publicSnap.exists()) return publicSnap.data();
+      if(profileSnap && profileSnap.exists()){
+        const p = profileSnap.data();
+        return {
+          playerId:"google_"+uid,
+          friendCode:code,
+          name:p.playerName || "名無し",
+          playerName:p.playerName || "名無し",
+          icon:p.icon || "",
+          title:p.title || "初心者",
+          level:p.level || 1,
+          bestRandomScore:p.bestRandomScore || 0
+        };
+      }
+    }
+  }
   const snap = await getDoc(doc(db,"players",friendId));
   if(!snap.exists()) return null;
   return snap.data();
@@ -1589,8 +1624,10 @@ window.saveCloudPlayerDataNow = async function(){
   const bundle = getLocalBundleForCloud();
   if(!bundle) return false;
 
+  const friendCode = await ensureFriendCode(user).catch(()=>normalizeFriendCode(localStorage.getItem("friendCode")));
   await setDoc(doc(db,"userSaves",user.uid),{
     uid:user.uid,
+    friendCode:friendCode || "",
     name:(bundle.playerProfile && bundle.playerProfile.name) || "名無し",
     playerName:(bundle.playerProfile && bundle.playerProfile.name) || "名無し",
     googleDisplayName:user.displayName || "",
@@ -1664,36 +1701,7 @@ window.forceCloudLoad = async function(){
 
 
 
-window.overwriteCloudWithThisDevice = async function(){
-  if(!auth.currentUser){
-    alert("ログインしていません");
-    return;
-  }
-  if(!confirm("この端末のデータでクラウドを上書きしますか？")) return;
-  await ensurePlayerNameAfterLogin(auth.currentUser);
-  await window.saveCloudPlayerDataNow();
-  alert("この端末データでクラウドを上書きしました");
-};
 
-function escapeHTML(str){
-  return String(str ?? "")
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#39;");
-}
-function getLoginUser(){ return auth.currentUser || window.currentUser || null; }
-function getBoardPlayerName(){
-  const bundle = window.getLocalGameData ? window.getLocalGameData() : null;
-  return (bundle && bundle.playerProfile && bundle.playerProfile.name) || "名無し";
-}
-function todayBoardKey(){
-  return new Date().toLocaleDateString("ja-JP",{timeZone:"Asia/Tokyo"}).replaceAll("/","-");
-}
-function boardPostId(){
-  return "post_" + Date.now() + "_" + Math.random().toString(36).slice(2,8);
-}
 
 window.showBoardPage = async function(){
   const menu=document.getElementById("homeMenu");
