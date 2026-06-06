@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5681066295421790"
 crossorigin="anonymous"></script>
-<title>数学マスター Ver 2.8.3</title>
+<title>数学マスター Ver 2.8.4</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <style>
@@ -297,7 +297,7 @@ a{color:#00ffcc}
   padding:9px 14px;
 }
 
-/* Ver 2.8.3 Space UI */
+/* Ver 2.8.4 Space UI */
 body{
   margin:0;
   color:white;
@@ -350,7 +350,7 @@ body{
   text-shadow:0 0 8px #60a5fa,0 0 18px #7c3aed,0 0 32px #38bdf8;
 }
 #homeScreen h1::after{
-  content:"Ver 2.8.3";display:block;font-size:18px;color:#67e8f9;margin-top:6px;text-shadow:0 0 10px #22d3ee;
+  content:"Ver 2.8.4";display:block;font-size:18px;color:#67e8f9;margin-top:6px;text-shadow:0 0 10px #22d3ee;
 }
 #homePlayerCard{
   width:88%;max-width:780px;margin:18px auto 22px;padding:18px;
@@ -410,7 +410,7 @@ body{
 }
 
 
-/* Ver 2.8.3 additions */
+/* Ver 2.8.4 additions */
 #homePlayerName{
   font-size:26px;
   font-weight:900;
@@ -490,7 +490,7 @@ body{
 }
 
 
-/* Ver 2.8.3 Profile Card UI */
+/* Ver 2.8.4 Profile Card UI */
 .profileHero{
   width:92%;
   max-width:900px;
@@ -975,11 +975,11 @@ h4rui.github.io
 <audio id="se_wrong" src="wrong.mp3"></audio>
 
 <script src="https://cdn.jsdelivr.net/npm/mathjs@11.11.0/lib/browser/math.js"></script>
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-import { getFirestore, collection, doc, setDoc, getDoc, getDocs, query, where, limit, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script>
+// Ver2.8.4 Firebase/Google login stable compat build
 const firebaseConfig = {
   apiKey: "AIzaSyDVXwXTGeft41ajd0KDwNPG-dH8pmsMIt8",
   authDomain: "math-master-3c4df.firebaseapp.com",
@@ -990,38 +990,21 @@ const firebaseConfig = {
   measurementId: "G-4YFNNNT6CK"
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
-window.firebaseApp = app;
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const auth = firebase.auth();
+const provider = new firebase.auth.GoogleAuthProvider();
+provider.setCustomParameters({ prompt:"select_account" });
+
+window.firebaseApp = firebase.app();
 window.db = db;
 window.firebaseDb = db;
 window.firebaseAuth = auth;
-setPersistence(auth,browserLocalPersistence).catch((e)=>console.error(e));
-const provider = new GoogleAuthProvider();
-provider.setCustomParameters({ prompt:"select_account" });
+window.currentUser = null;
 
-
-window.loginGoogle = async function(){
-  try{
-    localStorage.setItem("loginTrying","1");
-    await setPersistence(auth,browserLocalPersistence);
-    try{
-      const result = await signInWithPopup(auth,provider);
-      if(result && result.user){
-        applyGoogleLoginState(result.user);
-        alert("Googleログイン成功：" + (result.user.displayName || "Googleユーザー"));
-      }
-    }catch(popupError){
-      console.warn("Popup login failed, fallback to redirect:", popupError);
-      await signInWithRedirect(auth,provider);
-    }
-  }catch(e){
-    console.error(e);
-    alert("Googleログイン開始に失敗：" + (e.code || e.message || e));
-  }
-};
-
+function serverTimestamp(){
+  return firebase.firestore.FieldValue.serverTimestamp();
+}
 
 function applyGoogleLoginState(user){
   window.currentUser = user || null;
@@ -1036,6 +1019,12 @@ function applyGoogleLoginState(user){
       window.unlockAchievement("初ログイン");
       if(window.saveAllData) window.saveAllData();
     }
+
+    setTimeout(()=>{
+      if(window.loadCloudPlayerDataAndApply){
+        window.loadCloudPlayerDataAndApply().catch(e=>console.warn("cloud load failed",e));
+      }
+    },1200);
   }else{
     localStorage.removeItem("googleLoginName");
     localStorage.removeItem("googleLoginUid");
@@ -1044,17 +1033,34 @@ function applyGoogleLoginState(user){
 
   if(window.refreshLoginStatus) window.refreshLoginStatus();
   if(window.updateHomeStatus) window.updateHomeStatus();
-
-  if(user){
-    setTimeout(()=>{
-      if(window.loadCloudPlayerDataAndApply){
-        window.loadCloudPlayerDataAndApply().catch(e=>console.warn("cloud load failed",e));
-      }
-    },1200);
-  }
 }
 
-getRedirectResult(auth)
+window.loginGoogle = async function(){
+  try{
+    localStorage.setItem("loginTrying","1");
+    await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+    try{
+      const result = await auth.signInWithPopup(provider);
+      if(result && result.user){
+        applyGoogleLoginState(result.user);
+        alert("Googleログイン成功：" + (result.user.displayName || "Googleユーザー"));
+      }
+    }catch(popupError){
+      console.warn("Popup login failed, fallback to redirect:", popupError);
+      if(popupError && popupError.code === "auth/popup-closed-by-user"){
+        localStorage.removeItem("loginTrying");
+        return;
+      }
+      await auth.signInWithRedirect(provider);
+    }
+  }catch(e){
+    console.error(e);
+    localStorage.removeItem("loginTrying");
+    alert("Googleログイン開始に失敗：" + (e.code || e.message || e));
+  }
+};
+
+auth.getRedirectResult()
   .then((result)=>{
     if(result && result.user){
       applyGoogleLoginState(result.user);
@@ -1067,13 +1073,13 @@ getRedirectResult(auth)
     alert("Googleログイン確認エラー：" + (e.code || e.message || e));
   });
 
-onAuthStateChanged(auth,user=>{
+auth.onAuthStateChanged(user=>{
   applyGoogleLoginState(user);
 
   if(!user && localStorage.getItem("loginTrying")==="1"){
     setTimeout(()=>{
       if(!auth.currentUser){
-        alert("Googleログイン後に認証状態を取得できませんでした。Safariの設定でサイト越えトラッキング防止が強い場合があります。もう一度ログインを押してください。");
+        alert("ログイン後に認証状態を取得できませんでした。もう一度ログインを押してください。");
         localStorage.removeItem("loginTrying");
       }
     },2500);
@@ -1082,7 +1088,7 @@ onAuthStateChanged(auth,user=>{
 
 window.logoutGoogle = async function(){
   try{
-    await signOut(auth);
+    await auth.signOut();
   }finally{
     window.currentUser=null;
     localStorage.removeItem("googleLoginName");
@@ -1097,53 +1103,6 @@ window.logoutGoogle = async function(){
 window.getGoogleLoginInfo = function(){
   return auth.currentUser || window.currentUser || null;
 };
-
-window.currentUser = null;
-
-
-
-function applyGoogleLoginState(user){
-  window.currentUser = user || null;
-
-  if(user){
-    localStorage.setItem("googleLoginName", user.displayName || "Googleユーザー");
-    localStorage.setItem("googleLoginUid", user.uid);
-    localStorage.removeItem("loginTrying");
-    console.log("Googleログイン中:", user.displayName, user.uid);
-
-    if(window.unlockAchievement){
-      window.unlockAchievement("初ログイン");
-      if(window.saveAllData) window.saveAllData();
-    }
-  }else{
-    localStorage.removeItem("googleLoginName");
-    localStorage.removeItem("googleLoginUid");
-    console.log("未ログイン");
-  }
-
-  if(window.refreshLoginStatus) window.refreshLoginStatus();
-  if(window.updateHomeStatus) window.updateHomeStatus();
-
-  if(user){
-    setTimeout(()=>{
-      if(window.loadCloudPlayerDataAndApply){
-        window.loadCloudPlayerDataAndApply().catch(e=>console.warn("cloud load failed",e));
-      }
-    },1200);
-  }
-}
-
-
-
-
-
-
-
-
-
-
-
-
 
 function getWeekKey(){
   const now = new Date();
@@ -1175,15 +1134,15 @@ window.saveWorldScore = async function(data){
   const week = getWeekKey();
   const playerId = getPlayerId();
   const docId = week + "_" + data.mode + "_" + playerId;
-  const ref = doc(db,"rankings",docId);
-  const old = await getDoc(ref);
+  const ref = db.collection("rankings").doc(docId);
+  const old = await ref.get();
 
-  if(old.exists()){
+  if(old.exists){
     const oldScore = old.data().score || 0;
     if(oldScore >= data.score) return;
   }
 
-  await setDoc(ref,{
+  await ref.set({
     name:data.name,
     icon:data.icon,
     score:data.score,
@@ -1197,8 +1156,11 @@ window.saveWorldScore = async function(data){
 };
 
 window.loadWorldRanking = async function(){
-  const q = query(collection(db,"rankings"), where("week","==",getWeekKey()), where("mode","==","random"), limit(100));
-  const snap = await getDocs(q);
+  const snap = await db.collection("rankings")
+    .where("week","==",getWeekKey())
+    .where("mode","==","random")
+    .limit(100)
+    .get();
   let list = [];
   snap.forEach(doc=>list.push(doc.data()));
   list.sort((a,b)=>b.score-a.score);
@@ -1207,7 +1169,7 @@ window.loadWorldRanking = async function(){
 
 window.savePlayerPublicData = async function(data){
   const playerId = getPlayerId();
-  await setDoc(doc(db,"players",playerId),{
+  await db.collection("players").doc(playerId).set({
     playerId:playerId,
     name:data.name,
     icon:data.icon,
@@ -1215,29 +1177,25 @@ window.savePlayerPublicData = async function(data){
     level:data.level,
     bestRandomScore:data.bestRandomScore,
     updatedAt:serverTimestamp()
-  });
+  },{merge:true});
 };
 
 window.loadFriendData = async function(friendId){
-  const snap = await getDoc(doc(db,"players",friendId));
-  if(!snap.exists()) return null;
+  const snap = await db.collection("players").doc(friendId).get();
+  if(!snap.exists) return null;
   return snap.data();
 };
 
-
-
-
-
 window.loadMatchRoom = async function(roomId){
-  const snap = await getDoc(doc(db,"matches",roomId));
-  if(!snap.exists()) return null;
+  const snap = await db.collection("matches").doc(roomId).get();
+  if(!snap.exists) return null;
   return snap.data();
 };
 
 window.claimMatchPoint = async function(roomId,side,round){
-  const ref = doc(db,"matches",roomId);
-  const snap = await getDoc(ref);
-  if(!snap.exists()) return null;
+  const ref = db.collection("matches").doc(roomId);
+  const snap = await ref.get();
+  if(!snap.exists) return null;
   const room = snap.data();
 
   if(room.status !== "playing") return room;
@@ -1266,7 +1224,7 @@ window.claimMatchPoint = async function(roomId,side,round){
     status = "finished";
   }
 
-  await updateDoc(ref,{
+  await ref.update({
     hostPoints,
     guestPoints,
     roundWinner:side,
@@ -1277,15 +1235,15 @@ window.claimMatchPoint = async function(roomId,side,round){
     updatedAt:serverTimestamp()
   });
 
-  const after = await getDoc(ref);
+  const after = await ref.get();
   return after.data();
 };
 
 window.saveRateData = async function(result){
   const playerId = getPlayerId();
-  const ref = doc(db,"ratings",playerId);
-  const snap = await getDoc(ref);
-  let data = snap.exists() ? snap.data() : {};
+  const ref = db.collection("ratings").doc(playerId);
+  const snap = await ref.get();
+  let data = snap.exists ? snap.data() : {};
   let rating = data.rating || 1000;
   let wins = data.wins || 0;
   let losses = data.losses || 0;
@@ -1298,48 +1256,39 @@ window.saveRateData = async function(result){
     losses++;
   }
 
-  await setDoc(ref,{
+  const bundle = window.getLocalGameData ? window.getLocalGameData() : {};
+  const profile = bundle.playerProfile || {};
+  const pdata = bundle.playerData || {};
+
+  await ref.set({
     playerId,
-    name:((window.getLocalGameData&&window.getLocalGameData().playerProfile&&window.getLocalGameData().playerProfile.name) || "名無し"),
-    icon:((window.getLocalGameData&&window.getLocalGameData().playerProfile&&window.getLocalGameData().playerProfile.icon) || ""),
-    title:((window.getLocalGameData&&window.getLocalGameData().playerData&&window.getLocalGameData().playerData.equippedTitle) || "初心者"),
+    name:profile.name || "名無し",
+    icon:profile.icon || "",
+    title:pdata.equippedTitle || "初心者",
     level:(window.getLevel ? window.getLevel() : 1),
     rating,
     wins,
     losses,
     updatedAt:serverTimestamp()
-  });
+  },{merge:true});
 
   return {rating,wins,losses};
 };
 
 window.loadRateRanking = async function(){
-  const snap = await getDocs(collection(db,"ratings"));
+  const snap = await db.collection("ratings").get();
   let list=[];
   snap.forEach(d=>list.push(d.data()));
   list.sort((a,b)=>(b.rating||1000)-(a.rating||1000));
   return list.slice(0,100);
 };
 
-
-
-
-
-
-
-
-
-
-
 window.loadOpenMatchRooms = async function(){
-  const qOpen = query(
-    collection(db,"matches"),
-    where("type","==","online"),
-    where("status","==","waiting"),
-    limit(30)
-  );
-
-  const snap = await getDocs(qOpen);
+  const snap = await db.collection("matches")
+    .where("type","==","online")
+    .where("status","==","waiting")
+    .limit(30)
+    .get();
   let list=[];
   const myId=getPlayerId();
 
@@ -1357,7 +1306,7 @@ window.loadOpenMatchRooms = async function(){
 window.createMatchRoom = async function(data){
   const roomId = Math.random().toString(36).slice(2,8).toUpperCase();
 
-  await setDoc(doc(db,"matches",roomId),{
+  await db.collection("matches").doc(roomId).set({
     roomId:roomId,
     type:data.type || "online",
     status:"waiting",
@@ -1383,10 +1332,10 @@ window.createMatchRoom = async function(data){
 };
 
 window.joinMatchRoom = async function(roomId,data){
-  const ref = doc(db,"matches",roomId);
-  const snap = await getDoc(ref);
+  const ref = db.collection("matches").doc(roomId);
+  const snap = await ref.get();
 
-  if(!snap.exists()) throw new Error("room-not-found");
+  if(!snap.exists) throw new Error("room-not-found");
 
   const room = snap.data();
   const myId = getPlayerId();
@@ -1395,7 +1344,7 @@ window.joinMatchRoom = async function(roomId,data){
   if(room.guestId) throw new Error("already-full");
   if(room.status === "finished" || room.status === "canceled") throw new Error("room-closed");
 
-  await updateDoc(ref,{
+  await ref.update({
     status:"playing",
     guestId:myId,
     guestName:data.name || "名無し",
@@ -1403,60 +1352,59 @@ window.joinMatchRoom = async function(roomId,data){
     updatedAt:serverTimestamp()
   });
 
-  const after = await getDoc(ref);
+  const after = await ref.get();
   return after.data();
 };
 
 window.cancelMatchRoom = async function(roomId){
-  const ref = doc(db,"matches",roomId);
-  const snap = await getDoc(ref);
-  if(!snap.exists()) return;
+  const ref = db.collection("matches").doc(roomId);
+  const snap = await ref.get();
+  if(!snap.exists) return;
 
   const room=snap.data();
   if(room.hostId !== getPlayerId()) throw new Error("not-host");
 
-  await updateDoc(ref,{
+  await ref.update({
     status:"canceled",
     updatedAt:serverTimestamp()
   });
 };
 
-
 window.surrenderMatchRoom = async function(roomId,side){
-  const ref = doc(db,"matches",roomId);
-  const snap = await getDoc(ref);
-  if(!snap.exists()) return null;
+  const ref = db.collection("matches").doc(roomId);
+  const snap = await ref.get();
+  if(!snap.exists) return null;
   const room=snap.data();
   if(room.status!=="playing" && room.status!=="waiting") return room;
 
   const winner = side==="host" ? "guest" : "host";
 
-  await updateDoc(ref,{
+  await ref.update({
     status:"finished",
     winner:winner,
     surrenderedBy:side,
     updatedAt:serverTimestamp()
   });
 
-  const after=await getDoc(ref);
+  const after=await ref.get();
   return after.data();
 };
 
 window.leaveMatchRoom = async function(roomId,side){
-  const ref = doc(db,"matches",roomId);
-  const snap = await getDoc(ref);
-  if(!snap.exists()) return null;
+  const ref = db.collection("matches").doc(roomId);
+  const snap = await ref.get();
+  if(!snap.exists) return null;
   const room=snap.data();
 
   if(room.status==="waiting"){
-    await updateDoc(ref,{
+    await ref.update({
       status:"canceled",
       leftBy:side,
       updatedAt:serverTimestamp()
     });
   }else if(room.status==="playing"){
     const winner = side==="host" ? "guest" : "host";
-    await updateDoc(ref,{
+    await ref.update({
       status:"finished",
       winner:winner,
       leftBy:side,
@@ -1464,26 +1412,23 @@ window.leaveMatchRoom = async function(roomId,side){
     });
   }
 
-  const after=await getDoc(ref);
+  const after=await ref.get();
   return after.data();
 };
 
-
 window.testFirestoreDirect = async function(){
   const id = "test_" + Date.now();
-  const ref = doc(db,"connectionTests",id);
-  await setDoc(ref,{
+  const ref = db.collection("connectionTests").doc(id);
+  await ref.set({
     ok:true,
     from:location.hostname,
     createdAt:serverTimestamp()
   });
-  const snap = await getDoc(ref);
-  if(!snap.exists()) throw new Error("write-read-failed");
+  const snap = await ref.get();
+  if(!snap.exists) throw new Error("write-read-failed");
   return {ok:true,id};
 };
 
-
-// Ver2.8.3 Googleログイン連動セーブ
 function getLocalBundleForCloud(){
   if(window.getLocalGameData){
     return window.getLocalGameData();
@@ -1498,7 +1443,7 @@ window.saveCloudPlayerDataNow = async function(){
   const bundle = getLocalBundleForCloud();
   if(!bundle) return false;
 
-  await setDoc(doc(db,"userSaves",user.uid),{
+  await db.collection("userSaves").doc(user.uid).set({
     uid:user.uid,
     name:(bundle.playerProfile && bundle.playerProfile.name) || user.displayName || "名無し",
     playerProfile:bundle.playerProfile || {},
@@ -1523,10 +1468,10 @@ window.loadCloudPlayerDataAndApply = async function(){
   const user = auth.currentUser;
   if(!user) return false;
 
-  const ref = doc(db,"userSaves",user.uid);
-  const snap = await getDoc(ref);
+  const ref = db.collection("userSaves").doc(user.uid);
+  const snap = await ref.get();
 
-  if(!snap.exists()){
+  if(!snap.exists){
     await window.saveCloudPlayerDataNow();
     return false;
   }
@@ -1562,7 +1507,6 @@ window.forceCloudLoad = async function(){
   }
 };
 
-
 window.getFirebaseDebugInfo = function(){
   return {
     host: location.hostname,
@@ -1572,8 +1516,7 @@ window.getFirebaseDebugInfo = function(){
     uid: auth.currentUser ? auth.currentUser.uid : null
   };
 };
-
 </script>
-<script src="app.js?v=2.8.3"></script>
+<script src="app.js?v=2.8.4"></script>
 </body>
 </html>
