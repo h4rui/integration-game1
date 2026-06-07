@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.1.4";
+const VERSION = "3.1.5";
 let enemyHP = 10;
 let playerHP = 5;
 let current;

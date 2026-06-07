@@ -559,21 +559,52 @@ window.saveCloudPlayerDataNow().catch(e=>console.warn("cloud save failed",e));
 window.loadCloudPlayerDataAndApply = async function(){
 const user = auth.currentUser;
 if(!user) return false;
-const ref = doc(db,"userSaves",user.uid);
-const snap = await getDoc(ref);
-if(!snap.exists()){
-await ensurePlayerNameAfterLogin(user);
-await window.saveCloudPlayerDataNow();
-window.__cloudLoginJustSignedIn = false;
-return false;
+const refs = [
+  doc(db,"userSaves",user.uid),
+  doc(db,"userSaves","google_" + user.uid)
+];
+let snap = null;
+let usedLegacy = false;
+try{
+  snap = await getDoc(refs[0]);
+}catch(e){
+  console.warn("cloud primary load failed", e);
+}
+if(!snap || !snap.exists()){
+  try{
+    snap = await getDoc(refs[1]);
+    usedLegacy = !!(snap && snap.exists());
+  }catch(e){
+    console.warn("cloud legacy load failed", e);
+  }
+}
+if(!snap || !snap.exists()){
+  await ensurePlayerNameAfterLogin(user);
+  await window.saveCloudPlayerDataNow();
+  window.__cloudLoginJustSignedIn = false;
+  return false;
 }
 const cloud = snap.data();
 if(window.applyCloudGameData){
-window.applyCloudGameData({
-playerProfile:cloud.playerProfile || {},
-playerData:cloud.playerData || {},
-settings:cloud.settings || {}
-});
+  window.applyCloudGameData({
+    playerProfile:cloud.playerProfile || {},
+    playerData:cloud.playerData || {},
+    settings:cloud.settings || {}
+  });
+}
+// 旧形式 google_UID から読み込めた場合は、今後用に通常UIDへコピーしておく
+if(usedLegacy){
+  try{
+    await setDoc(doc(db,"userSaves",user.uid),{
+      ...cloud,
+      uid:user.uid,
+      migratedFrom:"google_" + user.uid,
+      migratedAt:serverTimestamp(),
+      updatedAt:serverTimestamp()
+    },{merge:true});
+  }catch(e){
+    console.warn("cloud migration failed", e);
+  }
 }
 window.__cloudLoginJustSignedIn = false;
 return true;

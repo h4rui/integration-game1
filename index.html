@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5681066295421790"
 crossorigin="anonymous"></script>
-<title>数学マスター Ver 3.1.4</title>
+<title>数学マスター Ver 3.1.5</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <style>
@@ -350,7 +350,7 @@ body{
   text-shadow:0 0 8px #60a5fa,0 0 18px #7c3aed,0 0 32px #38bdf8;
 }
 #homeScreen h1::after{
-  content:"Ver 3.1.4";display:block;font-size:18px;color:#67e8f9;margin-top:6px;text-shadow:0 0 10px #22d3ee;
+  content:"Ver 3.1.5";display:block;font-size:18px;color:#67e8f9;margin-top:6px;text-shadow:0 0 10px #22d3ee;
 }
 #homePlayerCard{
   width:88%;max-width:780px;margin:18px auto 22px;padding:18px;
@@ -1734,18 +1734,36 @@ window.loadCloudPlayerDataAndApply = async function(){
   const user = auth.currentUser;
   if(!user) return false;
 
-  const ref = doc(db,"userSaves",user.uid);
-  const snap = await getDoc(ref);
+  const refs = [
+    doc(db,"userSaves",user.uid),
+    doc(db,"userSaves","google_" + user.uid)
+  ];
 
-  // 初回ログイン：クラウドにデータがなければ、この端末のデータを自動保存
-  if(!snap.exists()){
+  let snap = null;
+  let usedLegacy = false;
+
+  try{
+    snap = await getDoc(refs[0]);
+  }catch(e){
+    console.warn("cloud primary load failed", e);
+  }
+
+  if(!snap || !snap.exists()){
+    try{
+      snap = await getDoc(refs[1]);
+      usedLegacy = !!(snap && snap.exists());
+    }catch(e){
+      console.warn("cloud legacy load failed", e);
+    }
+  }
+
+  if(!snap || !snap.exists()){
     await ensurePlayerNameAfterLogin(user);
     await window.saveCloudPlayerDataNow();
     window.__cloudLoginJustSignedIn = false;
     return false;
   }
 
-  // 2回目以降：確認を出さずにクラウドデータを自動読込
   const cloud = snap.data();
   if(window.applyCloudGameData){
     window.applyCloudGameData({
@@ -1754,6 +1772,21 @@ window.loadCloudPlayerDataAndApply = async function(){
       settings:cloud.settings || {}
     });
   }
+
+  if(usedLegacy){
+    try{
+      await setDoc(doc(db,"userSaves",user.uid),{
+        ...cloud,
+        uid:user.uid,
+        migratedFrom:"google_" + user.uid,
+        migratedAt:serverTimestamp(),
+        updatedAt:serverTimestamp()
+      },{merge:true});
+    }catch(e){
+      console.warn("cloud migration failed", e);
+    }
+  }
+
   window.__cloudLoginJustSignedIn = false;
   return true;
 };
