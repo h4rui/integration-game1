@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5681066295421790"
 crossorigin="anonymous"></script>
-<title>数学マスター Ver 3.1.6</title>
+<title>数学マスター Ver 3.1.7</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -352,7 +352,7 @@ body{
   text-shadow:0 0 8px #60a5fa,0 0 18px #7c3aed,0 0 32px #38bdf8;
 }
 #homeScreen h1::after{
-  content:"Ver 3.1.6";display:block;font-size:18px;color:#67e8f9;margin-top:6px;text-shadow:0 0 10px #22d3ee;
+  content:"Ver 3.1.7";display:block;font-size:18px;color:#67e8f9;margin-top:6px;text-shadow:0 0 10px #22d3ee;
 }
 #homePlayerCard{
   width:88%;max-width:780px;margin:18px auto 22px;padding:18px;
@@ -960,6 +960,21 @@ button,.modeBtn{
 .serialLoginBox:active{transform:scale(.98);}
 .serialInputBox input{text-transform:uppercase;}
 
+
+/* Ver3.1.7 keypad log / tap fix */
+#ans{
+  scroll-margin-top:120px;
+  -webkit-user-select:text;
+  user-select:text;
+}
+#customKeyboard .keyBtn{
+  touch-action:manipulation!important;
+  -webkit-tap-highlight-color:transparent!important;
+}
+#customKeyboard{
+  touch-action:manipulation!important;
+}
+
 </style>
 <!--
 Googleログイン用メモ:
@@ -1053,6 +1068,7 @@ h4rui.github.io
     <button class="keyBtn" onclick="addKey('.')">.</button>
     <button class="keyBtn" onclick="addKey('e')">e</button>
     <button class="keyBtn" onclick="addKey('pi')">π</button>
+    <button class="keyBtn" onclick="addKey('log(')">log</button>
     <button class="keyBtn" onclick="addKey('C')">C</button>
     <button class="keyBtn danger wide" onclick="backspaceInput()">⌫</button>
 
@@ -2041,8 +2057,8 @@ window.finalizeMatchVote = async function(roomId, finalGenre, questions){
 </script>
 
 <script>
-console.log("数学マスター Ver 3.1.6 cachefix loaded", new Date().toISOString());
+console.log("数学マスター Ver 3.1.7 cachefix loaded", new Date().toISOString());
 </script>
-<script src="app.js?v=3.1.6-cachefix"></script>
+<script src="app.js?v=3.1.7-keypad-log-fix"></script>
 </body>
 </html>

@@ -868,4 +868,4 @@ window.finalizeMatchVote = async function(roomId, finalGenre, questions){
   return after.exists() ? after.data() : null;
 };
 
-console.log("module.js Ver 3.1.6 cachefix loaded");
+console.log("module.js Ver 3.1.7 cachefix loaded");
