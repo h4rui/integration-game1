@@ -578,37 +578,36 @@ if(!snap || !snap.exists()){
     console.warn("cloud legacy load failed", e);
   }
 }
-if(snap && snap.exists()){
-  const cloud = snap.data();
-  if(window.applyCloudGameData){
-    window.applyCloudGameData({
-      playerProfile:cloud.playerProfile || {},
-      playerData:cloud.playerData || {},
-      settings:cloud.settings || {}
-    });
-  }
-  if(usedLegacy){
-    try{
-      await setDoc(doc(db,"userSaves",user.uid),{
-        ...cloud,
-        uid:user.uid,
-        migratedFrom:"google_" + user.uid,
-        migratedAt:serverTimestamp(),
-        updatedAt:serverTimestamp()
-      },{merge:true});
-    }catch(e){
-      console.warn("cloud migration failed", e);
-    }
-  }
+if(!snap || !snap.exists()){
+  await ensurePlayerNameAfterLogin(user);
+  await window.saveCloudPlayerDataNow();
   window.__cloudLoginJustSignedIn = false;
-  console.log("Googleデータを読み込みました");
-  return true;
+  return false;
 }
-await ensurePlayerNameAfterLogin(user);
-await window.saveCloudPlayerDataNow();
+const cloud = snap.data();
+if(window.applyCloudGameData){
+  window.applyCloudGameData({
+    playerProfile:cloud.playerProfile || {},
+    playerData:cloud.playerData || {},
+    settings:cloud.settings || {}
+  });
+}
+// 旧形式 google_UID から読み込めた場合は、今後用に通常UIDへコピーしておく
+if(usedLegacy){
+  try{
+    await setDoc(doc(db,"userSaves",user.uid),{
+      ...cloud,
+      uid:user.uid,
+      migratedFrom:"google_" + user.uid,
+      migratedAt:serverTimestamp(),
+      updatedAt:serverTimestamp()
+    },{merge:true});
+  }catch(e){
+    console.warn("cloud migration failed", e);
+  }
+}
 window.__cloudLoginJustSignedIn = false;
-console.log("クラウドデータがなかったため、この端末データをGoogleへ保存しました");
-return false;
+return true;
 };
 window.forceCloudSave = async function(){
 try{
@@ -868,3 +867,5 @@ window.finalizeMatchVote = async function(roomId, finalGenre, questions){
   const after = await getDoc(ref);
   return after.exists() ? after.data() : null;
 };
+
+console.log("module.js Ver 3.1.6 cachefix loaded");
