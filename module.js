@@ -868,4 +868,122 @@ window.finalizeMatchVote = async function(roomId, finalGenre, questions){
   return after.exists() ? after.data() : null;
 };
 
-console.log("module.js Ver 3.1.7 cachefix loaded");
+console.log("module.js Ver 3.1.9 rank mission fix loaded");
+
+
+// Ver3.1.9 ranking / mission / mutual friend helpers
+function getDailyKey319(){
+  const now=new Date();
+  const jp=new Date(now.toLocaleString("en-US",{timeZone:"Asia/Tokyo"}));
+  const y=jp.getFullYear();
+  const m=String(jp.getMonth()+1).padStart(2,"0");
+  const d=String(jp.getDate()).padStart(2,"0");
+  return `${y}-${m}-${d}`;
+}
+function requireLogin319(){
+  if(!auth.currentUser) throw new Error("login-required");
+  return auth.currentUser;
+}
+window.saveDailyQuestionCount = async function(delta=1){
+  const user=requireLogin319();
+  const playerId=getPlayerId();
+  const day=getDailyKey319();
+  const ref=doc(db,"dailyQuestionRankings",day+"_"+playerId);
+  const snap=await getDoc(ref);
+  const old=snap.exists()?snap.data():{};
+  const bundle=window.getLocalGameData?window.getLocalGameData():{};
+  const pp=bundle.playerProfile||{};
+  const pd=bundle.playerData||{};
+  await setDoc(ref,{
+    day, playerId, uid:user.uid,
+    name:pp.name||"名無し",
+    icon:pp.icon||"",
+    title:pd.equippedTitle||"初心者",
+    count:(old.count||0)+delta,
+    updatedAt:serverTimestamp()
+  },{merge:true});
+};
+window.loadDailyQuestionRanking = async function(){
+  requireLogin319();
+  const day=getDailyKey319();
+  const snap=await getDocs(query(collection(db,"dailyQuestionRankings"), where("day","==",day), limit(100)));
+  let list=[]; snap.forEach(d=>list.push(d.data()));
+  list.sort((a,b)=>(b.count||0)-(a.count||0));
+  return list.slice(0,100);
+};
+window.loadLevelRanking = async function(){
+  requireLogin319();
+  const snap=await getDocs(collection(db,"players"));
+  let list=[]; snap.forEach(d=>list.push(d.data()));
+  const seen=new Set();
+  list=list.filter(p=>{ const k=p.playerId||p.friendCode||p.name; if(seen.has(k))return false; seen.add(k); return true; });
+  list.sort((a,b)=>((b.level||1)-(a.level||1)) || ((b.exp||0)-(a.exp||0)));
+  return list.slice(0,100);
+};
+const oldSavePlayerPublicData319 = window.savePlayerPublicData;
+window.savePlayerPublicData = async function(data){
+  if(oldSavePlayerPublicData319) await oldSavePlayerPublicData319(data);
+  const playerId=getPlayerId();
+  const bundle=window.getLocalGameData?window.getLocalGameData():{};
+  const pd=bundle.playerData||{};
+  await setDoc(doc(db,"players",playerId),{exp:pd.exp||0,totalQuestions:pd.totalQuestions||0,updatedAt:serverTimestamp()},{merge:true});
+  const fc=normalizeFriendCode(localStorage.getItem("friendCode"));
+  if(fc) await setDoc(doc(db,"players",fc),{exp:pd.exp||0,totalQuestions:pd.totalQuestions||0,updatedAt:serverTimestamp()},{merge:true});
+};
+window.contributeGlobalMission = async function(delta=1){
+  requireLogin319();
+  const day=getDailyKey319();
+  const ref=doc(db,"globalMissions",day);
+  const snap=await getDoc(ref);
+  const old=snap.exists()?snap.data():{};
+  await setDoc(ref,{day,correct:(old.correct||0)+delta,updatedAt:serverTimestamp()},{merge:true});
+};
+window.loadGlobalMission = async function(){
+  const day=getDailyKey319();
+  const ref=doc(db,"globalMissions",day);
+  const snap=await getDoc(ref);
+  let data=snap.exists()?snap.data():{day,correct:0};
+  if(auth.currentUser){
+    const cr=await getDoc(doc(db,"globalMissionClaims",day+"_"+auth.currentUser.uid));
+    data.claimed=cr.exists()?(cr.data().claimed||[]):[];
+  }else data.claimed=[];
+  return data;
+};
+window.claimGlobalMissionReward = async function(need){
+  const user=requireLogin319();
+  const day=getDailyKey319();
+  const ref=doc(db,"globalMissionClaims",day+"_"+user.uid);
+  const snap=await getDoc(ref);
+  const old=snap.exists()?snap.data():{claimed:[]};
+  const claimed=old.claimed||[];
+  if(claimed.includes(String(need))) return false;
+  claimed.push(String(need));
+  await setDoc(ref,{uid:user.uid,day,claimed,updatedAt:serverTimestamp()},{merge:true});
+  return true;
+};
+window.addMutualFriendCode = async function(friendCode){
+  const user=requireLogin319();
+  const myCode=await ensureFriendCode(user).catch(()=>normalizeFriendCode(localStorage.getItem("friendCode")));
+  const code=normalizeFriendCode(friendCode);
+  if(!code || code===myCode) return false;
+  const codeSnap=await getDoc(doc(db,"friendCodes",code));
+  if(!codeSnap.exists()) return false;
+  const targetUid=codeSnap.data().uid;
+  const myRef=doc(db,"userProfiles",user.uid);
+  const tgRef=doc(db,"userProfiles",targetUid);
+  const mySnap=await getDoc(myRef); const tgSnap=await getDoc(tgRef);
+  const myFriends=(mySnap.exists()&&Array.isArray(mySnap.data().friends))?mySnap.data().friends:[];
+  const tgFriends=(tgSnap.exists()&&Array.isArray(tgSnap.data().friends))?tgSnap.data().friends:[];
+  if(!myFriends.some(f=>(typeof f==="string"?f:f.id)===code)) myFriends.push({id:code});
+  if(myCode && !tgFriends.some(f=>(typeof f==="string"?f:f.id)===myCode)) tgFriends.push({id:myCode});
+  await setDoc(myRef,{friends:myFriends,updatedAt:serverTimestamp()},{merge:true});
+  await setDoc(tgRef,{friends:tgFriends,updatedAt:serverTimestamp()},{merge:true});
+  return true;
+};
+window.syncMyCloudFriends = async function(){
+  const user=auth.currentUser;
+  if(!user) return [];
+  const snap=await getDoc(doc(db,"userProfiles",user.uid));
+  if(!snap.exists()) return [];
+  return Array.isArray(snap.data().friends)?snap.data().friends:[];
+};
