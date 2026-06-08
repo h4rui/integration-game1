@@ -4527,3 +4527,168 @@ console.log("app.js Ver 3.1.9 base loaded");
 
   console.log("app.js Ver 3.1.9 rank mission fix loaded");
 })();
+
+
+// Ver3.1.9 final safe rebuild patch
+// 目的：既存機能を消さず、その他メニューだけ整理。設定を一番上、シリアルコードを一番下、ミッション枠に統合。
+(function(){
+  const V_SAFE = "3.1.9";
+
+  try{
+    if(typeof UPDATE_NOTES !== "undefined"){
+      delete UPDATE_NOTES["3.1.8"];
+      UPDATE_NOTES[V_SAFE] = [
+        "ランキングをレベルランキング・日間問題数ランキングへ整理",
+        "週間ランキングを学習のランダム問題へ移動",
+        "デイリーミッションと全体ミッションをミッション枠へ統合",
+        "その他メニューを整理",
+        "Firebaseルール復旧用に対応"
+      ];
+    }
+  }catch(e){ console.warn("update notes safe patch failed", e); }
+
+  function safePanel(){ return document.getElementById("panelArea"); }
+  function safeHome(){ if(typeof ensureHomeButton === "function") setTimeout(ensureHomeButton,0); }
+
+  // プライバシーポリシー関数名の互換性確保
+  if(typeof window.showPrivacyPolicyPage !== "function" && typeof window.showPrivacyPage === "function"){
+    window.showPrivacyPolicyPage = window.showPrivacyPage;
+  }
+  if(typeof window.showPrivacyPage !== "function" && typeof window.showPrivacyPolicyPage === "function"){
+    window.showPrivacyPage = window.showPrivacyPolicyPage;
+  }
+
+  // ミッション枠：デイリーと全体をこの中に入れる
+  window.showMissionMenu = function(){
+    const panel=safePanel();
+    if(!panel) return;
+    panel.innerHTML = `
+      <h2>🎯 ミッション</h2>
+      <div class="missionItem">
+        <h3>今日のミッション</h3>
+        <p>個人ミッションと全体ミッションをここから確認できます。</p>
+      </div>
+      <button class="modeBtn" onclick="showDailyMission()">🎯 デイリーミッション</button>
+      <button class="modeBtn" onclick="showGlobalMission319()">🌍 全体ミッション</button>
+    `;
+    safeHome();
+  };
+
+  // その他：設定を一番上、シリアルコードを一番下。お知らせ・成績はその他から削除。
+  window.showOtherMenu = showOtherMenu = function(){
+    const panel=safePanel();
+    const menu=document.getElementById("homeMenu");
+    if(menu) menu.classList.add("hidden");
+    if(!panel) return;
+    panel.innerHTML = `
+      <h2>⚙️ その他</h2>
+      <button class="modeBtn" onclick="showSettings()">⚙️ 設定</button>
+      <button class="modeBtn" onclick="showGuide()">📖 遊び方</button>
+      <button class="modeBtn" onclick="showMissionMenu()">🎯 ミッション</button>
+      <button class="modeBtn" onclick="showLoginCalendar()">📅 ログボカレンダー</button>
+      <button class="modeBtn" onclick="showContact()">📩 お問い合わせ</button>
+      <button class="modeBtn" onclick="showTermsPage()">📜 利用規約</button>
+      <button class="modeBtn" onclick="showPrivacyPolicyPage()">🔒 プライバシーポリシー</button>
+      <button class="modeBtn" onclick="showSerialCodePage()">🎁 シリアルコード</button>
+    `;
+    safeHome();
+  };
+
+  // 学習メニューにランダム問題がない場合の最終保証
+  if(typeof window.startRandomStudyMode !== "function"){
+    window.startRandomStudyMode = function(){
+      mode="studyRandom";
+      difficulty="hard";
+      openGame();
+      start();
+    };
+  }
+  const baseGenerateQuestionSafe = (typeof generateQuestion === "function") ? generateQuestion : null;
+  if(baseGenerateQuestionSafe && !window.__safeStudyRandomPatched){
+    window.__safeStudyRandomPatched = true;
+    generateQuestion = function(){
+      if(mode === "studyRandom"){
+        const oldMode = mode;
+        const oldDiff = difficulty;
+        const modes = ["integral","derivative","factor","prime","expand","arithmetic"];
+        mode = modes[rand(0,modes.length-1)];
+        difficulty = oldDiff || "hard";
+        const q = baseGenerateQuestionSafe();
+        mode = oldMode;
+        difficulty = oldDiff;
+        return q;
+      }
+      return baseGenerateQuestionSafe.apply(this,arguments);
+    };
+  }
+  window.showStudyMenu = showStudyMenu = function(){
+    const panel=safePanel();
+    if(!panel) return;
+    panel.innerHTML = `
+      <h2>📚 学習モード</h2>
+      <button class="modeBtn" onclick="selectDifficulty('integral')">積分</button>
+      <button class="modeBtn" onclick="selectDifficulty('derivative')">微分</button>
+      <button class="modeBtn" onclick="selectDifficulty('factor')">因数分解</button>
+      <button class="modeBtn" onclick="selectDifficulty('prime')">素因数分解</button>
+      <button class="modeBtn" onclick="selectDifficulty('expand')">展開</button>
+      <button class="modeBtn" onclick="selectDifficulty('arithmetic')">四則演算</button>
+      <button class="modeBtn" onclick="startRandomStudyMode()">🎲 ランダム問題</button>
+    `;
+    safeHome();
+  };
+
+  // ランキングはログイン必須。週間ランキングは表示しない。
+  function isLoginSafe319(){
+    return !!((window.getGoogleLoginInfo && window.getGoogleLoginInfo()) || localStorage.getItem("googleLoginUid") || localStorage.getItem("googleLoginLinked"));
+  }
+  function loginRequiredSafeHTML(title){
+    return `<h2>${title}</h2><div class="profileItem"><p>ランキング機能はログインが必要です。</p><button class="googleLoginBtn" onclick="loginGoogle()">Googleログイン</button></div>`;
+  }
+  window.showRankingMenu = showRankingMenu = function(){
+    const panel=safePanel();
+    if(!panel) return;
+    if(!isLoginSafe319()){
+      panel.innerHTML = loginRequiredSafeHTML("🏆 ランキング");
+      safeHome();
+      return;
+    }
+    panel.innerHTML = `
+      <h2>🏆 ランキング</h2>
+      <button class="modeBtn" onclick="showLevelRanking319()">⭐ レベルランキング</button>
+      <button class="modeBtn" onclick="showDailyQuestionRanking319()">📚 日間問題数ランキング</button>
+      <button class="modeBtn" onclick="showFriendRanking()">🤝 フレンドランキング</button>
+      <button class="modeBtn" onclick="showRateRanking()">🏅 レートランキング</button>
+    `;
+    safeHome();
+  };
+  window.showWorldRanking = showWorldRanking = function(){
+    if(typeof showDailyQuestionRanking319 === "function") return showDailyQuestionRanking319();
+  };
+  window.selectRankingMode = selectRankingMode = function(){
+    startRandomStudyMode();
+  };
+
+  // 古参勢以外のシリアルコード無効化の最終保証
+  window.redeemSerialCode310 = function(){
+    const input=document.getElementById("serialCodeInput");
+    const result=document.getElementById("serialCodeResult");
+    const code=(input && input.value ? input.value : "").trim().toUpperCase().replace(/\s|-/g,"");
+    if(!code){ alert("コードを入力してください"); return; }
+    if(!isLoginSafe319()){ alert("シリアルコードの使用にはログインが必要です"); return; }
+    if(code !== "KOSAN2026"){
+      alert("このシリアルコードは使用期限が終了しました");
+      return;
+    }
+    if(!playerData.serialRedeemedCodes) playerData.serialRedeemedCodes=[];
+    if(playerData.serialRedeemedCodes.includes(code)){ alert("このコードはすでに使用済みです"); return; }
+    unlockTitle("古参勢");
+    playerData.serialRedeemedCodes.push(code);
+    saveAllData();
+    updateHomeStatus();
+    const msg=`🎉 シリアルコード認証成功！<br><br>${titleHTML("古参勢")}<br><br>古参勢を獲得しました！`;
+    if(result) result.innerHTML=`<div class="profileItem serialResultBox">${msg}</div>`;
+    alert("古参勢を獲得しました！");
+  };
+
+  console.log("app.js Ver 3.1.9 final safe rebuild loaded");
+})();
