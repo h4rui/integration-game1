@@ -1117,7 +1117,6 @@ let html=`
 <button onclick="addFriend()">追加</button>
 </div>
 <div id="friendListArea"></div>
-<button onclick="showFriendRanking()">🏆 フレンドランキング</button>
 `;
 document.getElementById("panelArea").innerHTML=html;
 renderFriendList();
@@ -1901,7 +1900,6 @@ document.getElementById("panelArea").innerHTML=`
 <h2>🏆 ランキング</h2>
 <button class="modeBtn" onclick="showWorldRanking()">🌍 週間ランキング</button>
 <button class="modeBtn" onclick="selectRankingMode()">🏆 週間ランキングモードで遊ぶ</button>
-<button class="modeBtn" onclick="showFriendRanking()">🤝 フレンドランキング</button>
 <button class="modeBtn" onclick="showRateRanking()">🏅 レートランキング</button>
 `;
 }
@@ -4346,8 +4344,7 @@ console.log("app.js Ver 3.1.9 base loaded");
       <h2>🏆 ランキング</h2>
       <button class="modeBtn" onclick="showLevelRanking319()">⭐ レベルランキング</button>
       <button class="modeBtn" onclick="showDailyQuestionRanking319()">📚 日間問題数ランキング</button>
-      <button class="modeBtn" onclick="showFriendRanking()">🤝 フレンドランキング</button>
-      <button class="modeBtn" onclick="showRateRanking()">🏅 レートランキング</button>
+            <button class="modeBtn" onclick="showRateRanking()">🏅 レートランキング</button>
     `;
   };
 
@@ -4656,8 +4653,7 @@ console.log("app.js Ver 3.1.9 base loaded");
       <h2>🏆 ランキング</h2>
       <button class="modeBtn" onclick="showLevelRanking319()">⭐ レベルランキング</button>
       <button class="modeBtn" onclick="showDailyQuestionRanking319()">📚 日間問題数ランキング</button>
-      <button class="modeBtn" onclick="showFriendRanking()">🤝 フレンドランキング</button>
-      <button class="modeBtn" onclick="showRateRanking()">🏅 レートランキング</button>
+            <button class="modeBtn" onclick="showRateRanking()">🏅 レートランキング</button>
     `;
     safeHome();
   };
@@ -4691,4 +4687,75 @@ console.log("app.js Ver 3.1.9 base loaded");
   };
 
   console.log("app.js Ver 3.1.9 final safe rebuild loaded");
+})();
+
+
+// Ver3.1.9 daily/global/friend-ranking final fix
+// ・全体ミッションはログイン不要で反映
+// ・日間問題数ランキングはローカル日別カウントを正として上書き保存
+// ・フレンドランキングは表示しない
+(function(){
+  function todayKeyLocal319Fix(){
+    return new Date().toLocaleDateString("ja-JP",{timeZone:"Asia/Tokyo"});
+  }
+  function isLogin319Fix(){
+    return !!((window.getGoogleLoginInfo && window.getGoogleLoginInfo()) || localStorage.getItem("googleLoginUid") || localStorage.getItem("googleLoginLinked"));
+  }
+  function panel319Fix(){ return document.getElementById("panelArea"); }
+  function saveDailyLocalQuestionCount319Fix(add){
+    const today=todayKeyLocal319Fix();
+    if(playerData.dailyQuestionRankDate!==today){
+      playerData.dailyQuestionRankDate=today;
+      playerData.dailyQuestionRankCount=0;
+    }
+    playerData.dailyQuestionRankCount=(playerData.dailyQuestionRankCount||0)+Number(add||0);
+    saveAllData();
+    if(isLogin319Fix() && window.saveDailyQuestionTotal){
+      window.saveDailyQuestionTotal(playerData.dailyQuestionRankCount).catch(e=>console.warn("daily total save failed",e));
+    }
+  }
+  const prevSubmit319Fix = window.submit || submit;
+  window.submit = submit = async function(){
+    const beforeQ=playerData.totalQuestions||0;
+    const beforeC=playerData.totalCorrect||0;
+    const ret=await prevSubmit319Fix.apply(this,arguments);
+    const afterQ=playerData.totalQuestions||0;
+    const afterC=playerData.totalCorrect||0;
+    if(afterQ>beforeQ) saveDailyLocalQuestionCount319Fix(afterQ-beforeQ);
+    if(afterC>beforeC && window.contributeGlobalMission){
+      window.contributeGlobalMission(afterC-beforeC).catch(e=>console.warn("global mission public failed",e));
+    }
+    return ret;
+  };
+  window.showFriendRanking = function(){
+    const p=panel319Fix();
+    if(p){
+      p.innerHTML=`<h2>🤝 フレンドランキング</h2><div class="profileItem"><p>フレンドランキングは削除しました。</p></div>`;
+      if(typeof ensureHomeButton==="function") ensureHomeButton();
+    }
+  };
+  const rankingHTML319Fix = function(){
+    return `
+      <h2>🏆 ランキング</h2>
+      <button class="modeBtn" onclick="showLevelRanking319()">⭐ レベルランキング</button>
+      <button class="modeBtn" onclick="showDailyQuestionRanking319()">📚 日間問題数ランキング</button>
+      <button class="modeBtn" onclick="showRateRanking()">🏅 レートランキング</button>
+    `;
+  };
+  const loginRequired319Fix = function(){
+    return `<h2>🏆 ランキング</h2><div class="profileItem"><p>ランキング機能はログインが必要です。</p><button class="googleLoginBtn" onclick="loginGoogle()">Googleログイン</button></div>`;
+  };
+  window.showRankingMenu = showRankingMenu = function(){
+    const p=panel319Fix(); if(!p)return;
+    p.innerHTML = isLogin319Fix() ? rankingHTML319Fix() : loginRequired319Fix();
+    if(typeof ensureHomeButton==="function") ensureHomeButton();
+  };
+  const oldFriendMenu319Fix = window.showFriendMenu || showFriendMenu;
+  window.showFriendMenu = showFriendMenu = function(){
+    oldFriendMenu319Fix();
+    setTimeout(()=>{
+      const p=panel319Fix();
+      if(p) p.innerHTML=p.innerHTML.replace(/<button[^>]*onclick="showFriendRanking\(\)"[^>]*>.*?フレンドランキング.*?<\/button>/g,"");
+    },0);
+  };
 })();

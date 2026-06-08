@@ -931,12 +931,30 @@ window.savePlayerPublicData = async function(data){
   if(fc) await setDoc(doc(db,"players",fc),{exp:pd.exp||0,totalQuestions:pd.totalQuestions||0,updatedAt:serverTimestamp()},{merge:true});
 };
 window.contributeGlobalMission = async function(delta=1){
-  requireLogin319();
+  // Ver3.1.9 fix: 全体ミッションはログイン不要で反映
   const day=getDailyKey319();
   const ref=doc(db,"globalMissions",day);
   const snap=await getDoc(ref);
   const old=snap.exists()?snap.data():{};
-  await setDoc(ref,{day,correct:(old.correct||0)+delta,updatedAt:serverTimestamp()},{merge:true});
+  await setDoc(ref,{day,correct:(old.correct||0)+Number(delta||1),updatedAt:serverTimestamp()},{merge:true});
+};
+window.saveDailyQuestionTotal = async function(totalCount=0){
+  const user=requireLogin319();
+  const playerId=getPlayerId();
+  const day=getDailyKey319();
+  const ref=doc(db,"dailyQuestionRankings",day+"_"+playerId);
+  const bundle=window.getLocalGameData?window.getLocalGameData():{};
+  const pp=bundle.playerProfile||{};
+  const pd=bundle.playerData||{};
+  await setDoc(ref,{
+    day, playerId, uid:user.uid,
+    name:pp.name||"名無し",
+    icon:pp.icon||"",
+    title:pd.equippedTitle||"初心者",
+    level:(window.getLevel?window.getLevel():1),
+    count:Number(totalCount||0),
+    updatedAt:serverTimestamp()
+  },{merge:true});
 };
 window.loadGlobalMission = async function(){
   const day=getDailyKey319();
