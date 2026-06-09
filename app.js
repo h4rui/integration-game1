@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.2.1";
+const VERSION = "3.2.5";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -5124,4 +5124,478 @@ ${ultra}
 
   document.addEventListener("input",function(e){ if(e && e.target && e.target.id==="ans") updatePreview321(); });
   console.log("Ver3.2.1 stable recovery loaded");
+})();
+
+// Ver3.2.3 custom patch: duplicate gacha refund + 文系微積 + XP倍率
+(function(){
+  if(window.__v323BunkeiGachaPatchLoaded) return;
+  window.__v323BunkeiGachaPatchLoaded = true;
+
+  const BASE_XP_323 = {
+    arithmetic: 3,
+    expand: 5,
+    factor: 7,
+    prime: 8,
+    primeFactor: 8,
+    derivative: 12,
+    integral: 14
+  };
+  const DIFF_RATE_323 = {
+    bunkei: 0.8,
+    easy: 1.0,
+    normal: 1.3,
+    hard: 1.5,
+    veryHard: 2.0,
+    ultraHard: 2.5,
+    difficult: 2.0,
+    super: 2.5
+  };
+  window.calculateQuestionXP323 = function(m,d){
+    if(m === "random" || m === "studyRandom") return 20;
+    const base = BASE_XP_323[m] || 10;
+    const rate = DIFF_RATE_323[d] == null ? 1 : DIFF_RATE_323[d];
+    return Math.floor(base * rate);
+  };
+
+  const BUNKEI_DERIVATIVE_323 = [
+    {q:"文系：d/dx x²", a:"2*x", display:"2x", explanation:"数IIの基本。x^nの微分はnx^(n-1)。"},
+    {q:"文系：d/dx 3x²+2x-5", a:"6*x+2", display:"6x+2", explanation:"項ごとに微分します。"},
+    {q:"文系：d/dx x³-4x²+7x", a:"3*x^2-8*x+7", display:"3x²-8x+7", explanation:"多項式の微分です。"},
+    {q:"文系：d/dx (x+2)(x-3)", a:"2*x-1", display:"2x-1", explanation:"展開してx²-x-6にしてから微分します。"},
+    {q:"文系：d/dx (2x-1)²", a:"8*x-4", display:"8x-4", explanation:"展開して4x²-4x+1にしてから微分します。"},
+    {q:"文系：y=x³-3x² の導関数", a:"3*x^2-6*x", display:"3x²-6x", explanation:"導関数を求めます。"}
+  ];
+  const BUNKEI_INTEGRAL_323 = [
+    {q:"文系：∫ 2x dx", a:"x^2", display:"x²+C", explanation:"x²を微分すると2xです。"},
+    {q:"文系：∫ (3x²+2x) dx", a:"x^3+x^2", display:"x³+x²+C", explanation:"項ごとに積分します。"},
+    {q:"文系：∫ (6x-4) dx", a:"3*x^2-4*x", display:"3x²-4x+C", explanation:"多項式の積分です。"},
+    {q:"文系：∫₀² x dx", a:"2", display:"2", explanation:"x²/2 に0と2を代入します。"},
+    {q:"文系：∫₀¹ (3x²+1) dx", a:"2", display:"2", explanation:"x³+x に0と1を代入します。"},
+    {q:"文系：∫ (x+1)² dx", a:"x^3/3+x^2+x", display:"x³/3+x²+x+C", explanation:"展開してx²+2x+1にしてから積分します。"}
+  ];
+  window.generateBunkeiQuestion323 = function(){
+    const arr = mode === "integral" ? BUNKEI_INTEGRAL_323 : BUNKEI_DERIVATIVE_323;
+    const q = arr[rand(0, arr.length-1)];
+    return (typeof cleanQuestionObject === "function") ? cleanQuestionObject(Object.assign({}, q)) : Object.assign({}, q);
+  };
+
+  const baseGenerateQuestion323 = (typeof generateQuestion === "function") ? generateQuestion : null;
+  if(baseGenerateQuestion323){
+    window.generateQuestion = generateQuestion = function(){
+      if((mode === "integral" || mode === "derivative") && difficulty === "bunkei") return window.generateBunkeiQuestion323();
+      return baseGenerateQuestion323.apply(this, arguments);
+    };
+  }
+
+  // 学習モードにランダムを入れる
+  window.startRandomStudyMode = function(){
+    mode = "studyRandom";
+    difficulty = "veryHard";
+    openGame();
+    start();
+  };
+  window.showStudyMenu = showStudyMenu = function(){
+    const panel = document.getElementById("panelArea");
+    if(!panel) return;
+    panel.innerHTML = `
+      <h2>📚 学習モード</h2>
+      <button class="modeBtn" onclick="selectDifficulty('integral')">積分</button>
+      <button class="modeBtn" onclick="selectDifficulty('derivative')">微分</button>
+      <button class="modeBtn" onclick="selectDifficulty('factor')">因数分解</button>
+      <button class="modeBtn" onclick="selectDifficulty('prime')">素因数分解</button>
+      <button class="modeBtn" onclick="selectDifficulty('expand')">展開</button>
+      <button class="modeBtn" onclick="selectDifficulty('arithmetic')">四則演算</button>
+      <button class="modeBtn hardBtn" onclick="startRandomStudyMode()">🎲 ランダム</button>
+    `;
+    if(typeof ensureHomeButton === "function") ensureHomeButton();
+  };
+
+  // 微分・積分だけ「文系」を初級の上に置く
+  window.selectDifficulty = selectDifficulty = function(m){
+    mode = m;
+    const panel = document.getElementById("panelArea");
+    if(!panel) return;
+    const bunkei = (m === "integral" || m === "derivative") ? `<button class="modeBtn" onclick="startMode('bunkei')">📘 文系</button>` : "";
+    const ultra = (m === "integral") ? `<button class="modeBtn hardBtn" onclick="startMode('ultraHard')">💀 超難問</button>` : "";
+    panel.innerHTML = `
+      <h2>難易度選択</h2>
+      ${bunkei}
+      <button class="modeBtn" onclick="startMode('easy')">🟢 初級</button>
+      <button class="modeBtn" onclick="startMode('normal')">🟡 中級</button>
+      <button class="modeBtn" onclick="startMode('hard')">🔴 上級</button>
+      <button class="modeBtn hardBtn" onclick="startMode('veryHard')">🔥 難問</button>
+      ${ultra}
+    `;
+    if(typeof ensureHomeButton === "function") ensureHomeButton();
+  };
+
+  const baseOpenGame323 = (typeof openGame === "function") ? openGame : null;
+  if(baseOpenGame323){
+    window.openGame = openGame = function(){
+      baseOpenGame323.apply(this, arguments);
+      const mt = document.getElementById("modeTitle");
+      if(!mt) return;
+      if(mode === "studyRandom") mt.innerText = "🎲 ランダム問題 🎲";
+      if(mode === "derivative" && difficulty === "bunkei") mt.innerText = "📘 文系 微分 📘";
+      if(mode === "integral" && difficulty === "bunkei") mt.innerText = "📘 文系 積分 📘";
+    };
+  }
+
+  // 正解時XPを分野×難易度倍率に変更。ランダムは20XP固定。
+  window.submit = submit = async function(){
+    if(!current) return;
+    let input = document.getElementById("ans");
+    let u = input ? input.value.trim() : "";
+    if(typeof matchState !== "undefined" && matchState && matchState.active){
+      await submitMatchAnswer(u);
+      return;
+    }
+    if(u === ""){
+      alert("答えを入力して");
+      return;
+    }
+    if(u === "admin9671") u = current.display;
+    let ok = false;
+    if(mode === "prime"){
+      ok = checkPrimeAnswer(u, current.number);
+    }else{
+      if(!ok) ok = expressionsEqual(u, current.a);
+      if(!ok) ok = normalize(u) === normalize(current.display);
+    }
+    playerData.totalQuestions++;
+    recordGenreResult(mode, ok);
+    history.push({question:current.q, your:u, answer:current.display, explanation:current.explanation, ok:ok});
+    if(ok){
+      score++;
+      combo++;
+      if(typeof showComboPop === "function") showComboPop();
+      playerData.totalCorrect++;
+      const xpGain = window.calculateQuestionXP323(mode, difficulty);
+      addExp(xpGain);
+      playerData.coins = (playerData.coins || 0) + 1;
+      if(combo > playerData.maxCombo) playerData.maxCombo = combo;
+      updateMission("correct");
+      if(mode === "integral") updateMission("integral");
+      if(mode !== "random" && mode !== "studyRandom" && mode !== "review") enemyHP -= comboDamageValue(combo);
+      if(enemyHP < 0) enemyHP = 0;
+      if(settings.se) document.getElementById("se_correct").play();
+      document.getElementById("result").innerHTML = `○ 正解！<br>正解：${current.display}<br>+${xpGain}EXP / +1コイン`;
+    }else{
+      combo = 0;
+      addReviewItem(current);
+      if(mode === "random" || mode === "studyRandom"){
+        finishRandom();
+        return;
+      }
+      if(mode !== "review") playerHP--;
+      if(settings.se) document.getElementById("se_wrong").play();
+      document.getElementById("result").innerHTML = `
+× 不正解<br>
+正解：${current.display}
+<br><br>
+📖 ${current.explanation}
+<br><br>
+🤖 ${aiExplain(current.q)}
+`;
+    }
+    checkTitles();
+    checkAchievements();
+    saveAllData();
+    updateHP();
+    updateHomeStatus();
+    nextTurn();
+  };
+
+  // ガチャは被りあり。被った称号は3コイン返金。
+  window.getGachaResultNoDuplicate = getGachaResultNoDuplicate = function(){
+    return getGachaResult();
+  };
+  function applyGachaItem323(item){
+    if(!playerData.gachaTitles) playerData.gachaTitles = [];
+    const duplicate = playerData.gachaTitles.includes(item.title);
+    if(duplicate){
+      playerData.coins = (playerData.coins || 0) + 3;
+    }else{
+      unlockTitle(item.title);
+      playerData.gachaTitles.push(item.title);
+    }
+    if(item.rarity === "UR"){
+      unlockAchievement("UR獲得");
+    }
+    return duplicate;
+  }
+  window.drawGacha = drawGacha = function(){
+    if((playerData.coins || 0) < 10){ alert("コインが足りません"); return; }
+    playerData.coins -= 10;
+    const item = getGachaResult();
+    const duplicate = applyGachaItem323(item);
+    unlockAchievement("初ガチャ");
+    if(item.rarity === "UR"){
+      document.body.classList.add("urFlash");
+      setTimeout(()=>document.body.classList.remove("urFlash"),1000);
+    }
+    saveAllData();
+    updateHomeStatus();
+    const box = document.getElementById("panelArea");
+    if(box){
+      box.innerHTML = `
+        <h2>🎰 ガチャ結果</h2>
+        <div class="profileItem">
+          <h2>${item.rarity}</h2>
+          <h1>${titleHTML(item.title)}</h1>
+          <p>${duplicate ? "被り！3コイン返金" : "新しい称号を獲得！"}</p>
+          <p>所持コイン：${playerData.coins || 0}</p>
+          <button onclick="drawGacha()">もう一回引く</button>
+          <button onclick="showGacha()">ガチャ画面へ</button>
+        </div>`;
+    }
+  };
+  window.drawGacha10 = drawGacha10 = function(){
+    if((playerData.coins || 0) < 100){ alert("コインが足りません"); return; }
+    playerData.coins -= 100;
+    const results = [];
+    let refund = 0;
+    let hasUR = false;
+    for(let i=0;i<10;i++){
+      const item = getGachaResult();
+      const duplicate = applyGachaItem323(item);
+      if(duplicate) refund += 3;
+      if(item.rarity === "UR") hasUR = true;
+      results.push({item, duplicate});
+    }
+    unlockAchievement("初ガチャ");
+    if(hasUR){
+      document.body.classList.add("urFlash");
+      setTimeout(()=>document.body.classList.remove("urFlash"),1000);
+    }
+    saveAllData();
+    updateHomeStatus();
+    let html = `<h2>🎰 10連ガチャ結果</h2>
+      <div class="profileItem">
+        <p>被り返金：${refund}コイン</p>
+        <p>所持コイン：${playerData.coins || 0}</p>
+        <button onclick="drawGacha10()">もう一度10連</button>
+        <button onclick="showGacha()">ガチャ画面へ</button>
+      </div>`;
+    for(const r of results){
+      html += `<div class="titleItem"><b>${r.item.rarity}</b><br>${titleHTML(r.item.title)}<br>${r.duplicate ? "被り：+3コイン" : "NEW"}</div>`;
+    }
+    const box = document.getElementById("panelArea");
+    if(box) box.innerHTML = html;
+  };
+  window.showGacha = showGacha = function(){
+    const box = document.getElementById("panelArea");
+    if(!box) return;
+    box.innerHTML = `
+      <h2>🎰 ガチャ</h2>
+      <div class="profileItem">
+        <p>所持コイン：${playerData.coins || 0}</p>
+        <p>1回：10コイン / 10連：100コイン</p>
+        <p>称号は被りあり。被ったら3コイン返金。</p>
+        <button onclick="drawGacha()">10コインで引く</button>
+        <button onclick="drawGacha10()">100コインで10連</button>
+        <button onclick="showGachaBook()">ガチャ図鑑を見る</button>
+      </div>
+      <div class="profileItem">
+        <h3>排出率</h3>
+        <p>R 70% / SR 20% / SSR 8% / UR 2%</p>
+        <p>URのみ色付き。コマンド称号はガチャから出ません。</p>
+      </div>`;
+  };
+
+  try{
+    if(typeof UPDATE_NOTES !== "undefined"){
+      UPDATE_NOTES["3.2.3"] = [
+        "ガチャ称号を被りありに変更",
+        "ガチャで被った称号は3コイン返金に変更",
+        "微分と積分に文系難易度を追加",
+        "文系は数IIまでの微積、XP倍率0.8倍に設定",
+        "正解時XPを分野別基礎XP×難易度倍率に変更"
+      ];
+    }
+  }catch(e){}
+  console.log("Ver3.2.3 custom patch loaded");
+})();
+
+
+// Ver3.2.5 final patch: click/keypad/question stability + final UI labels
+(function(){
+  if(window.__v325FinalPatchLoaded) return;
+  window.__v325FinalPatchLoaded = true;
+
+  const BASE_XP_325 = { arithmetic:3, expand:5, factor:7, prime:8, primeFactor:8, derivative:12, integral:14 };
+  const RATE_XP_325 = { bunkei:0.8, easy:1, normal:1.3, hard:1.5, veryHard:2, ultraHard:2.5, superHard:2.5, difficult:2, super:2.5 };
+  window.calculateQuestionXP325 = function(m,d){
+    if(m === "random" || m === "studyRandom") return 20;
+    return Math.floor((BASE_XP_325[m] || 10) * (RATE_XP_325[d] == null ? 1 : RATE_XP_325[d]));
+  };
+  window.calculateQuestionXP323 = window.calculateQuestionXP325;
+  window.calculateQuestionXP = function(){ return window.calculateQuestionXP325(mode,difficulty); };
+
+  function fireInput325(el){
+    try{ el.dispatchEvent(new Event("input", {bubbles:true})); }catch(e){}
+  }
+
+  window.addKey = addKey = function(text){
+    const input = document.getElementById("ans");
+    if(!input) return;
+    input.value = (input.value || "") + String(text || "");
+    try{ input.setSelectionRange(input.value.length,input.value.length); }catch(e){}
+    fireInput325(input);
+  };
+  window.clearInput = clearInput = function(){
+    const input = document.getElementById("ans");
+    if(input){ input.value=""; fireInput325(input); }
+  };
+  window.backspaceInput = backspaceInput = function(){
+    const input = document.getElementById("ans");
+    if(!input) return;
+    input.value = String(input.value || "").slice(0,-1);
+    fireInput325(input);
+  };
+
+  // Inline onclick が環境によって不安定な時の予備クリック処理
+  document.addEventListener("click", function(e){
+    const btn = e.target && e.target.closest ? e.target.closest("button") : null;
+    if(!btn || !btn.classList || !btn.classList.contains("keyBtn")) return;
+    const raw = btn.getAttribute("onclick") || "";
+    if(raw.includes("addKey")){
+      const m = raw.match(/addKey\('([^']*)'\)/);
+      if(m){ e.preventDefault(); e.stopPropagation(); window.addKey(m[1]); }
+    }else if(raw.includes("backspaceInput")){
+      e.preventDefault(); e.stopPropagation(); window.backspaceInput();
+    }else if(raw.includes("submit")){
+      e.preventDefault(); e.stopPropagation(); if(typeof window.submit === "function") window.submit();
+    }
+  }, true);
+
+  window.startRandomStudyMode = function(){
+    mode = "studyRandom";
+    difficulty = "veryHard";
+    openGame();
+    start();
+  };
+
+  window.showStudyMenu = showStudyMenu = function(){
+    const panel = document.getElementById("panelArea");
+    if(!panel) return;
+    panel.innerHTML = `
+      <h2>📚 学習モード</h2>
+      <button class="modeBtn" onclick="selectDifficulty('integral')">積分</button>
+      <button class="modeBtn" onclick="selectDifficulty('derivative')">微分</button>
+      <button class="modeBtn" onclick="selectDifficulty('factor')">因数分解</button>
+      <button class="modeBtn" onclick="selectDifficulty('prime')">素因数分解</button>
+      <button class="modeBtn" onclick="selectDifficulty('expand')">展開</button>
+      <button class="modeBtn" onclick="selectDifficulty('arithmetic')">四則演算</button>
+      <button class="modeBtn hardBtn" onclick="startRandomStudyMode()">🎲 ランダム</button>
+    `;
+    if(typeof ensureHomeButton === "function") ensureHomeButton();
+  };
+
+  window.selectDifficulty = selectDifficulty = function(m){
+    mode = m;
+    const panel = document.getElementById("panelArea");
+    if(!panel) return;
+    const bunkei = (m === "integral" || m === "derivative") ? `<button class="modeBtn" onclick="startMode('bunkei')">📘 文系</button>` : "";
+    const ultra = (m === "integral") ? `<button class="modeBtn hardBtn" onclick="startMode('ultraHard')">💀 超難問</button>` : "";
+    panel.innerHTML = `
+      <h2>難易度選択</h2>
+      ${bunkei}
+      <button class="modeBtn" onclick="startMode('easy')">🟢 初級</button>
+      <button class="modeBtn" onclick="startMode('normal')">🟡 中級</button>
+      <button class="modeBtn" onclick="startMode('hard')">🔴 上級</button>
+      <button class="modeBtn hardBtn" onclick="startMode('veryHard')">🔥 難問</button>
+      ${ultra}
+    `;
+    if(typeof ensureHomeButton === "function") ensureHomeButton();
+  };
+
+  const oldOpenGame325 = (typeof openGame === "function") ? openGame : null;
+  if(oldOpenGame325){
+    window.openGame = openGame = function(){
+      oldOpenGame325.apply(this, arguments);
+      const mt = document.getElementById("modeTitle");
+      if(!mt) return;
+      if(mode === "studyRandom") mt.innerText = "🎲 ランダム問題";
+      if(mode === "derivative" && difficulty === "bunkei") mt.innerText = "📘 文系 微分";
+      if(mode === "integral" && difficulty === "bunkei") mt.innerText = "📘 文系 積分";
+      if(mode === "integral" && (difficulty === "ultraHard" || difficulty === "superHard")) mt.innerText = "💀 積分 超難問";
+    };
+  }
+
+  const baseGenerateQuestion325 = (typeof generateQuestion === "function") ? generateQuestion : null;
+  if(baseGenerateQuestion325){
+    window.generateQuestion = generateQuestion = function(){
+      if(mode === "studyRandom"){
+        const oldMode = mode, oldDiff = difficulty;
+        const modes = ["integral","derivative","factor","prime","expand"];
+        mode = modes[Math.floor(Math.random()*modes.length)];
+        difficulty = "veryHard";
+        let q = baseGenerateQuestion325.apply(this, arguments);
+        mode = oldMode; difficulty = oldDiff;
+        return q;
+      }
+      return baseGenerateQuestion325.apply(this, arguments);
+    };
+  }
+
+  window.nextQ = nextQ = function(){
+    if(typeof clearHint === "function") clearHint();
+    let qObj = null;
+    let count = 0;
+    do{
+      qObj = generateQuestion();
+      if(typeof cleanQuestionObject === "function") qObj = cleanQuestionObject(qObj);
+      count++;
+    }while(qObj && usedQuestions && usedQuestions.includes(qObj.q) && count < 100);
+    current = qObj || {q:"1+1", a:"2", display:"2", explanation:"予備問題です。"};
+    if(usedQuestions && current.q) usedQuestions.push(current.q);
+    const q = document.getElementById("q");
+    const ans = document.getElementById("ans");
+    const go = document.getElementById("goText");
+    if(ans){ ans.value=""; fireInput325(ans); }
+    if(q){
+      q.classList.remove("questionAnim");
+      q.textContent = (typeof cleanMathExpression === "function") ? cleanMathExpression(current.q) : String(current.q || "");
+      void q.offsetWidth;
+      q.classList.add("questionAnim");
+      if(typeof window.prettyMathHTML === "function"){
+        try{ q.innerHTML = window.prettyMathHTML(q.textContent); }catch(e){}
+      }
+    }
+    if(go){ go.classList.remove("goAnim"); void go.offsetWidth; go.classList.add("goAnim"); }
+  };
+
+  window.showMatchMenu = showMatchMenu = function(){
+    const p = document.getElementById("panelArea");
+    if(!p) return;
+    p.innerHTML = `
+      <h2>⚔️ 対戦</h2>
+      <button class="modeBtn" onclick="showOnlineMatchMenu()">⚔️ ランダムマッチ</button>
+      <button class="modeBtn" onclick="showFriendMatchMenu()">🤝 フレンドマッチ</button>
+      <button class="modeBtn" onclick="showMatchHistory()">📜 対戦履歴</button>
+      <button class="modeBtn" onclick="showGenreStats()">📊 ジャンル別正答率</button>
+    `;
+    if(typeof ensureHomeButton === "function") ensureHomeButton();
+  };
+
+  // 表示テキストから古いLv表記・XP固定表記を残さない
+  function cleanOldLabels325(root){
+    const el = root || document.getElementById("panelArea") || document.body;
+    if(!el) return;
+    el.querySelectorAll("button").forEach(b=>{
+      b.innerHTML = b.innerHTML
+        .replace(/\s*Lv\s*\d+\s*[〜~]\s*\d+/g,"")
+        .replace(/\s*Lv\s*10/g,"")
+        .replace(/（20XP固定）/g,"");
+    });
+  }
+  const moTarget = document.getElementById("panelArea");
+  if(moTarget && window.MutationObserver){
+    new MutationObserver(()=>cleanOldLabels325(moTarget)).observe(moTarget,{childList:true,subtree:true});
+  }
+  document.addEventListener("DOMContentLoaded",()=>cleanOldLabels325());
+  cleanOldLabels325();
+
+  console.log("Ver3.2.5 final patch loaded");
 })();

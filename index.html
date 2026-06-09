@@ -995,6 +995,14 @@ sugakumaster.com
 www.sugakumaster.com
 h4rui.github.io
 -->
+
+<style>
+/* Ver3.2.5 click safety */
+button,.modeBtn,.keyBtn{pointer-events:auto !important;touch-action:manipulation;}
+#spaceBg,#goText,.levelUp,.comboPop{pointer-events:none !important;}
+#customKeyboard{position:relative;z-index:20;}
+#panelArea{position:relative;z-index:10;}
+</style>
 </head>
 <body>
 
@@ -2072,7 +2080,7 @@ window.finalizeMatchVote = async function(roomId, finalGenre, questions){
 <script>
 console.log("数学マスター Ver 3.1.9 cachefix loaded", new Date().toISOString());
 </script>
-<script src="app.js?v=3.2.1-stable-input-ultra"></script>
+<script src="app.js?v=3.2.5-final"></script>
 
 <!-- Ver3.1.9 realtime rank mission FINAL FIX -->
 <script type="module">
@@ -2534,210 +2542,7 @@ import { doc, setDoc, getDoc, collection, query, where, limit, onSnapshot, serve
 </script>
 
 <script>
-// Ver3.2.2 custom final patch: XP, study random, super integral, pretty fractions, match menu cleanup
-(function(){
-  if(window.__v322CustomPatchLoaded) return;
-  window.__v322CustomPatchLoaded = true;
-
-  const BASE_XP_V322 = { arithmetic:3, expand:5, factor:7, prime:8, derivative:12, integral:14 };
-  const MULTI_XP_V322 = { easy:1, normal:1.3, hard:1.5, veryHard:2, superHard:2.5 };
-  function calcXPV322(){
-    if(mode === "studyRandom" || mode === "random") return 20;
-    const base = BASE_XP_V322[mode] || 10;
-    const multi = MULTI_XP_V322[difficulty] || 1;
-    return Math.floor(base * multi);
-  }
-  window.calculateQuestionXP = calcXPV322;
-
-  function escV322(s){
-    return String(s == null ? "" : s).replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));
-  }
-  function fracHTMLV322(top,bottom){
-    return `<span class="frac"><span class="top">${top}</span><span class="bottom">${bottom}</span></span>`;
-  }
-  function prettyMathHTMLV322(raw){
-    let t = escV322(raw);
-    t = t.replace(/\^\(([^)]+)\)/g,"<sup>$1</sup>");
-    t = t.replace(/\^(\-?\d+)/g,"<sup>$1</sup>");
-    // 1/(x²+1), (x+1)/(x²+1), 7/3 などを縦分数に統一
-    t = t.replace(/\(([^()<>]+)\)\/\(([^()<>]+)\)/g, (_,a,b)=>fracHTMLV322(a,b));
-    t = t.replace(/([\-]?\d+)\/\(([^()<>]+)\)/g, (_,a,b)=>fracHTMLV322(a,b));
-    t = t.replace(/\(([^()<>]+)\)\/([A-Za-z0-9π]+(?:<sup>\-?\d+<\/sup>|[²³⁴⁵⁶])?)/g, (_,a,b)=>fracHTMLV322(a,b));
-    t = t.replace(/(^|[^\w<\/])([\-]?(?:\d+|x|π|e|log\d*|sin\d*|cos\d*|tan\d*|arctan\d*))\/([A-Za-z0-9π]+(?:<sup>\-?\d+<\/sup>|[²³⁴⁵⁶])?)/g, (m,pre,a,b)=>pre+fracHTMLV322(a,b));
-    return t;
-  }
-  window.prettyMathHTML = prettyMathHTMLV322;
-
-  function prettyElementV322(el){
-    if(!el || el.dataset.prettyLock === "1") return;
-    const raw = el.textContent || "";
-    if(!raw || raw === "START" || raw === "GO!") return;
-    el.dataset.prettyLock = "1";
-    el.innerHTML = prettyMathHTMLV322(raw);
-    el.dataset.prettyLock = "0";
-  }
-  function installPrettyObserverV322(){
-    const q = document.getElementById("q");
-    if(q && window.MutationObserver && !q.__prettyV322){
-      q.__prettyV322 = true;
-      new MutationObserver(()=>prettyElementV322(q)).observe(q,{childList:true,characterData:true,subtree:true});
-    }
-    const prev = document.getElementById("answerPreview");
-    const ans = document.getElementById("ans");
-    if(ans && prev && !ans.__prettyInputV322){
-      ans.__prettyInputV322 = true;
-      ans.addEventListener("input",()=>{ prev.innerHTML = ans.value ? prettyMathHTMLV322(ans.value) : ""; });
-    }
-  }
-  installPrettyObserverV322();
-  window.addEventListener("load",installPrettyObserverV322);
-
-  const SUPER_INTEGRAL_V322 = [
-    {q:"超難問：∫x²sinx dx", a:"-x^2*cos(x)+2*x*sin(x)+2*cos(x)", display:"-x^2cosx+2xsinx+2cosx+C", explanation:"部分積分を2回使います。"},
-    {q:"超難問：∫x²cosx dx", a:"x^2*sin(x)+2*x*cos(x)-2*sin(x)", display:"x^2sinx+2xcosx-2sinx+C", explanation:"部分積分を2回使います。"},
-    {q:"超難問：∫e^x cosx dx", a:"exp(x)*(sin(x)+cos(x))/2", display:"e^x(sinx+cosx)/2+C", explanation:"部分積分を2回使い、元の積分を移項します。"},
-    {q:"超難問：∫e^x sinx dx", a:"exp(x)*(sin(x)-cos(x))/2", display:"e^x(sinx-cosx)/2+C", explanation:"部分積分を2回使い、元の積分を移項します。"},
-    {q:"超難問：∫1/(x²+4x+8) dx", a:"atan((x+2)/2)/2", display:"1/2arctan((x+2)/2)+C", explanation:"平方完成して (x+2)^2+4 にします。"},
-    {q:"超難問：∫x/(x²+1)^2 dx", a:"-1/(2*(x^2+1))", display:"-1/(2(x^2+1))+C", explanation:"t=x²+1 と置換します。"},
-    {q:"超難問：∫logx dx", a:"x*log(x)-x", display:"xlogx-x+C", explanation:"部分積分で logx を微分する側にします。"},
-    {q:"超難問：∫x/(x²+2x+2) dx", a:"log(x^2+2*x+2)/2-atan(x+1)", display:"1/2log(x^2+2x+2)-arctan(x+1)+C", explanation:"x=(x+1)-1 に分けて処理します。"}
-  ];
-  function generateSuperIntegralV322(){
-    const q = SUPER_INTEGRAL_V322[Math.floor(Math.random()*SUPER_INTEGRAL_V322.length)];
-    return (typeof cleanQuestionObject === "function") ? cleanQuestionObject(Object.assign({},q)) : Object.assign({},q);
-  }
-
-  const oldGenerateQuestionV322 = window.generateQuestion || (typeof generateQuestion === "function" ? generateQuestion : null);
-  if(oldGenerateQuestionV322){
-    window.generateQuestion = generateQuestion = function(){
-      if(mode === "studyRandom"){
-        const oldMode = mode, oldDiff = difficulty;
-        const modes = ["integral","derivative","factor","prime","expand"];
-        mode = modes[Math.floor(Math.random()*modes.length)];
-        difficulty = "veryHard";
-        const q = oldGenerateQuestionV322.apply(this,arguments);
-        mode = oldMode; difficulty = oldDiff;
-        return q;
-      }
-      if(mode === "integral" && difficulty === "superHard") return generateSuperIntegralV322();
-      return oldGenerateQuestionV322.apply(this,arguments);
-    };
-  }
-
-  window.startRandomStudyMode = function(){
-    mode = "studyRandom";
-    difficulty = "veryHard";
-    openGame();
-    start();
-  };
-
-  window.showStudyMenu = showStudyMenu = function(){
-    const p = document.getElementById("panelArea");
-    if(!p) return;
-    p.innerHTML = `
-      <h2>📚 学習モード</h2>
-      <button class="modeBtn" onclick="selectDifficulty('integral')">積分</button>
-      <button class="modeBtn" onclick="selectDifficulty('derivative')">微分</button>
-      <button class="modeBtn" onclick="selectDifficulty('factor')">因数分解</button>
-      <button class="modeBtn" onclick="selectDifficulty('prime')">素因数分解</button>
-      <button class="modeBtn" onclick="selectDifficulty('expand')">展開</button>
-      <button class="modeBtn" onclick="selectDifficulty('arithmetic')">四則演算</button>
-      <button class="modeBtn hardBtn" onclick="startRandomStudyMode()">🎲 ランダム（20XP固定）</button>
-    `;
-    if(typeof ensureHomeButton === "function") ensureHomeButton();
-  };
-
-  window.selectDifficulty = selectDifficulty = function(m){
-    mode = m;
-    const superBtn = m === "integral" ? `<button class="modeBtn hardBtn" onclick="startMode('superHard')">👑 超難問 Lv10</button>` : "";
-    document.getElementById("panelArea").innerHTML = `
-      <h2>難易度選択</h2>
-      <button class="modeBtn" onclick="startMode('easy')">🟢 初級 Lv1〜3</button>
-      <button class="modeBtn" onclick="startMode('normal')">🟡 中級 Lv2〜5</button>
-      <button class="modeBtn" onclick="startMode('hard')">🔴 上級 Lv4〜7</button>
-      <button class="modeBtn hardBtn" onclick="startMode('veryHard')">🔥 難問 Lv6〜9</button>
-      ${superBtn}
-    `;
-    if(typeof ensureHomeButton === "function") ensureHomeButton();
-  };
-
-  const oldOpenGameV322 = window.openGame || (typeof openGame === "function" ? openGame : null);
-  if(oldOpenGameV322){
-    window.openGame = openGame = function(){
-      oldOpenGameV322.apply(this,arguments);
-      const title = document.getElementById("modeTitle");
-      if(title && mode === "studyRandom") title.innerText = "🎲 ランダム問題";
-      if(title && mode === "integral" && difficulty === "superHard") title.innerText = "👑 積分 超難問";
-    };
-  }
-
-  // 対戦欄から「🏆ランダム問題」を削除
-  window.showMatchMenu = showMatchMenu = function(){
-    const p = document.getElementById("panelArea");
-    if(!p) return;
-    p.innerHTML = `
-      <h2>⚔️ 対戦</h2>
-      <button class="modeBtn" onclick="showOnlineMatchMenu()">⚔️ ランダムマッチ</button>
-      <button class="modeBtn" onclick="showFriendMatchMenu()">🤝 フレンドマッチ</button>
-      <button class="modeBtn" onclick="showMatchHistory()">📜 対戦履歴</button>
-      <button class="modeBtn" onclick="showGenreStats()">📊 ジャンル別正答率</button>
-      <div class="matchBox"><p>対戦メニューからランダム問題を削除しました。</p></div>
-    `;
-    if(typeof ensureHomeButton === "function") ensureHomeButton();
-  };
-
-  // 対戦問題は難問寄りにする（四則演算なし）
-  if(typeof makeMatchQuestions === "function"){
-    window.makeMatchQuestions = makeMatchQuestions = function(){
-      const oldMode = mode, oldDiff = difficulty;
-      const modes = ["integral","derivative","factor","prime","expand"];
-      const list = [];
-      for(let i=0;i<9;i++){
-        mode = modes[Math.floor(Math.random()*modes.length)];
-        difficulty = "veryHard";
-        list.push(cleanQuestionObject(generateQuestion()));
-      }
-      mode = oldMode; difficulty = oldDiff;
-      return list;
-    };
-  }
-
-  const oldSubmitV322 = window.submit || (typeof submit === "function" ? submit : null);
-  if(oldSubmitV322 && !window.__v322SubmitWrapped){
-    window.__v322SubmitWrapped = true;
-    window.submit = submit = async function(){
-      const beforeC = playerData.totalCorrect || 0;
-      const beforeExp = playerData.exp || 0;
-      const xp = calcXPV322();
-      const ret = await oldSubmitV322.apply(this,arguments);
-      const afterC = playerData.totalCorrect || 0;
-      if(afterC > beforeC){
-        const expected = beforeExp + xp;
-        const delta = expected - (playerData.exp || 0);
-        if(delta !== 0 && typeof addExp === "function") addExp(delta);
-        const res = document.getElementById("result");
-        if(res){
-          res.innerHTML = res.innerHTML.replace(/\+\d+EXP/g, `+${xp}EXP`);
-          res.innerHTML = res.innerHTML.replace(/正解：([^<]+)/, (m,a)=>`正解：${prettyMathHTMLV322(a)}`);
-        }
-        if(typeof saveAllData === "function") saveAllData();
-        if(window.saveLevelRankingNow && window.getGoogleLoginInfo && window.getGoogleLoginInfo()) window.saveLevelRankingNow().catch(()=>{});
-      }
-      return ret;
-    };
-  }
-
-  const oldShowGuideV322 = window.showGuide || (typeof showGuide === "function" ? showGuide : null);
-  if(oldShowGuideV322){
-    window.showGuide = showGuide = function(){
-      oldShowGuideV322.apply(this,arguments);
-      setTimeout(()=>{
-        const p=document.getElementById("panelArea");
-        if(p) p.innerHTML = p.innerHTML.replace("1問正解ごとに +10EXP。", "正解時のEXPは分野別XP×難易度倍率（小数切り捨て）。ランダムは20EXP固定。");
-      },0);
-    };
-  }
-})();
+// Ver3.2.2 custom final patch removed in Ver3.2.5 to prevent old overrides.
 </script>
 
 </body>
