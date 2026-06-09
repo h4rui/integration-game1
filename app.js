@@ -6284,3 +6284,133 @@ ${ultra}
   setTimeout(function(){ window.updateAnswerPreviewV329(); },300);
   console.log("Ver3.2.11 advanced preview patch loaded");
 })();
+
+// Ver3.2.12 photo ultra integral + question position fix
+// 目的：写真の476・477系の超難問積分を追加し、超難問の問題表示位置ズレを修正。
+(function(){
+  if(window.__v3212PhotoUltraPatchLoaded) return;
+  window.__v3212PhotoUltraPatchLoaded = true;
+  try{ window.VERSION = "3.2.12"; }catch(e){}
+
+  function injectStyle(){
+    if(document.getElementById('v3212-question-position-style')) return;
+    const st=document.createElement('style');
+    st.id='v3212-question-position-style';
+    st.textContent = `
+      /* Ver3.2.12: 超難問の問題位置ズレ修正 */
+      #q{
+        min-height:170px!important;
+        box-sizing:border-box!important;
+        display:flex!important;
+        align-items:center!important;
+        justify-content:center!important;
+        flex-wrap:wrap!important;
+        gap:2px 4px!important;
+        padding:14px 12px!important;
+        margin:12px auto 12px!important;
+        width:94%!important;
+        max-width:760px!important;
+        line-height:1.45!important;
+        overflow-x:auto!important;
+        overflow-y:visible!important;
+        word-break:normal!important;
+        overflow-wrap:anywhere!important;
+      }
+      #q .frac{font-size:.86em!important; margin:0 3px!important;}
+      #q .frac .top{padding:0 4px 3px!important;}
+      #q .frac .bottom{padding:3px 4px 0!important;}
+      #q .sqrtBox{display:inline-flex!important;align-items:flex-start!important;vertical-align:middle!important;line-height:1!important;margin:0 3px!important;}
+      #q .sqrtRadicand{border-top:2px solid currentColor!important;padding:2px 4px 0!important;margin-left:1px!important;}
+      @media(max-width:520px){
+        #q{font-size:28px!important;min-height:185px!important;padding:12px 8px!important;}
+        #q .frac{font-size:.78em!important;}
+      }
+    `;
+    document.head.appendChild(st);
+  }
+  injectStyle();
+
+  const PHOTO_ULTRA_3212 = [
+    // 476・477の写真で読める問題＋同レベル類題。文字が潰れているものは近い形に補完。
+    {q:"超難問：∫ e^x/(e^x+e^(-x)) dx", a:"log(exp(2*x)+1)/2", display:"1/2log(e^(2x)+1)+C", explanation:"分子分母にe^xをかけて、e^(2x)/(e^(2x)+1) と見ます。"},
+    {q:"超難問：∫ (e^x-e^(-x))^2 dx", a:"exp(2*x)/2-2*x-exp(-2*x)/2", display:"e^(2x)/2-2x-e^(-2x)/2+C", explanation:"展開してから積分します。"},
+    {q:"超難問：∫ (e^(x/2)-e^(-x/2)) dx", a:"2*exp(x/2)+2*exp(-x/2)", display:"2e^(x/2)+2e^(-x/2)+C", explanation:"指数の係数に注意して積分します。"},
+    {q:"超難問：∫ (2x-3)/(x^2-3x+4) dx", a:"log(x^2-3*x+4)", display:"log(x^2-3x+4)+C", explanation:"分子が分母の微分です。"},
+    {q:"超難問：∫ (2x+1)/(x^2+x-4) dx", a:"log(x^2+x-4)", display:"log(x^2+x-4)+C", explanation:"分子が分母の微分です。"},
+    {q:"超難問：∫ (x^2-x)/(x^3+1) dx", a:"log(x+1)-log(x^2-x+1)/2-sqrt(3)*atan((2*x-1)/sqrt(3))/6", display:"log(x+1)-1/2log(x^2-x+1)-√3/6 tan^-1((2x-1)/√3)+C", explanation:"x^3+1=(x+1)(x^2-x+1) として部分分数分解します。"},
+    {q:"超難問：∫ dx/(1+sin(x))", a:"tan(x)-1/cos(x)", display:"tan(x)-1/cos(x)+C", explanation:"分子分母に1-sinxをかけます。"},
+    {q:"超難問：∫ sin(x)/(1+cos(x)) dx", a:"-log(1+cos(x))", display:"-log(1+cos(x))+C", explanation:"t=1+cosx と置換します。"},
+    {q:"超難問：∫ cos(x)/(1-sin(x)) dx", a:"-log(1-sin(x))", display:"-log(1-sin(x))+C", explanation:"t=1-sinx と置換します。"},
+    {q:"超難問：∫ 1/(1+cos(x)) dx", a:"tan(x/2)", display:"tan(x/2)+C", explanation:"1+cosx=2cos^2(x/2) を使います。"},
+    {q:"超難問：∫ x e^(x^2) dx", a:"exp(x^2)/2", display:"e^(x^2)/2+C", explanation:"t=x^2 と置換します。"},
+    {q:"超難問：∫ x e^(-x^2) dx", a:"-exp(-x^2)/2", display:"-e^(-x^2)/2+C", explanation:"t=-x^2 と置換します。"},
+    {q:"超難問：∫ 2x e^(-x^2) dx", a:"-exp(-x^2)", display:"-e^(-x^2)+C", explanation:"t=-x^2 と置換します。"},
+    {q:"超難問：∫ sin(log(x)) dx", a:"x*(sin(log(x))-cos(log(x)))/2", display:"x(sin(logx)-cos(logx))/2+C", explanation:"t=logx と置換して ∫e^t sint dt にします。"},
+    {q:"超難問：∫ cos(log(x)) dx", a:"x*(sin(log(x))+cos(log(x)))/2", display:"x(sin(logx)+cos(logx))/2+C", explanation:"t=logx と置換して ∫e^t cost dt にします。"},
+    {q:"超難問：∫ x/(sqrt(x)+1) dx", a:"2*x^(3/2)/3-x+2*sqrt(x)-2*log(sqrt(x)+1)", display:"2x^(3/2)/3-x+2√x-2log(√x+1)+C", explanation:"t=√x と置換します。"},
+    {q:"超難問：∫ dx/(sqrt(x)+1)", a:"2*sqrt(x)-2*log(sqrt(x)+1)", display:"2√x-2log(√x+1)+C", explanation:"t=√x と置換します。"},
+    {q:"超難問：∫ log(x^2) dx", a:"x*log(x^2)-2*x", display:"xlog(x^2)-2x+C", explanation:"log(x^2)を部分積分します。"},
+    {q:"超難問：∫ log(x+1)/x^2 dx", a:"log(x+1)-log(x)-log(x+1)/x", display:"log(x+1)-logx-log(x+1)/x+C", explanation:"部分積分後に部分分数分解します。"},
+    {q:"超難問：∫ log(x+1)/x^3 dx", a:"-log(x+1)/(2*x^2)+log(x)/(2)-log(x+1)/2+1/(2*x)", display:"-log(x+1)/(2x^2)+1/2logx-1/2log(x+1)+1/(2x)+C", explanation:"部分積分後に有理式を分解します。"},
+    {q:"超難問：∫ dx/(sqrt(x-1)*sqrt(x+1))", a:"log(x+sqrt(x^2-1))", display:"log(x+√(x^2-1))+C", explanation:"双曲線型の標準形です。"},
+    {q:"超難問：∫ (x-1)/sqrt(x^2-2*x) dx", a:"sqrt(x^2-2*x)", display:"√(x^2-2x)+C", explanation:"t=x^2-2x と置換します。"},
+    {q:"超難問：∫ log(x+sqrt(x^2+1)) dx", a:"x*log(x+sqrt(x^2+1))-sqrt(x^2+1)", display:"xlog(x+√(x^2+1))-√(x^2+1)+C", explanation:"部分積分を使います。"},
+    {q:"超難問：∫ x*2^x dx", a:"2^x*(x/log(2)-1/(log(2)^2))", display:"2^x(x/log2-1/(log2)^2)+C", explanation:"部分積分で2^xを積分します。"},
+    {q:"超難問：∫ x*log(x^2) dx", a:"x^2*log(x^2)/2-x^2/2", display:"x^2log(x^2)/2-x^2/2+C", explanation:"部分積分です。"},
+    {q:"超難問：∫ x^2*2^x dx", a:"2^x*(x^2/log(2)-2*x/(log(2)^2)+2/(log(2)^3))", display:"2^x(x^2/log2-2x/(log2)^2+2/(log2)^3)+C", explanation:"部分積分をくり返します。"},
+    {q:"超難問：∫ dx/(1-2x)^3", a:"1/(4*(1-2*x)^2)", display:"1/(4(1-2x)^2)+C", explanation:"t=1-2x と置換します。"},
+    {q:"超難問：∫ log(x^2+1)/x^2 dx", a:"2*atan(x)-log(x^2+1)/x", display:"2tan^-1(x)-log(x^2+1)/x+C", explanation:"部分積分を使います。"},
+    {q:"超難問：∫ (log(x))^2/x dx", a:"(log(x))^3/3", display:"(logx)^3/3+C", explanation:"t=logx と置換します。"},
+    {q:"超難問：∫ cos^3(x)sin(2x) dx", a:"-2*cos(x)^5/5", display:"-2cos^5(x)/5+C", explanation:"sin2x=2sinxcosx として t=cosx。"},
+    {q:"超難問：∫ dx/cos^3(x)", a:"tan(x)/cos(x)/2+log((1+sin(x))/cos(x))/2", display:"1/2 tanx/cosx + 1/2log((1+sinx)/cosx)+C", explanation:"sec^3x の標準積分です。"},
+    {q:"超難問：∫₀^(π/2) sin^2(x) dx", a:"pi/4", display:"π/4", explanation:"半角公式を使います。"},
+    {q:"超難問：∫₀^(π/2) cos^2(x) dx", a:"pi/4", display:"π/4", explanation:"半角公式を使います。"},
+    {q:"超難問：∫₀^(π/2) sin^4(x) dx", a:"3*pi/16", display:"3π/16", explanation:"半角公式を2回使います。"},
+    {q:"超難問：∫₀^(π/2) cos^4(x) dx", a:"3*pi/16", display:"3π/16", explanation:"半角公式を2回使います。"},
+    {q:"超難問：∫₀^(π/2) sin(x)cos(x) dx", a:"1/2", display:"1/2", explanation:"t=sinx と置換します。"},
+    {q:"超難問：∫₀^(π/2) sin^2(x)cos(x) dx", a:"1/3", display:"1/3", explanation:"t=sinx と置換します。"},
+    {q:"超難問：∫₀^(π/2) sin(x)cos^2(x) dx", a:"1/3", display:"1/3", explanation:"t=cosx と置換します。"},
+    {q:"超難問：∫₁^e (log(x))/x dx", a:"1/2", display:"1/2", explanation:"t=logx と置換します。"},
+    {q:"超難問：∫₁^e (log(x))^2/x dx", a:"1/3", display:"1/3", explanation:"t=logx と置換します。"},
+    {q:"超難問：∫₀^1 dx/(x^2+1)", a:"pi/4", display:"π/4", explanation:"tan^-1x に代入します。"},
+    {q:"超難問：∫₀^1 dx/(x^2+4)", a:"atan(1/2)/2", display:"1/2tan^-1(1/2)", explanation:"∫dx/(x^2+a^2)=1/a tan^-1(x/a) です。"},
+    {q:"超難問：∫₀^1 dx/(x^2+x+1)", a:"2*atan((2*x+1)/sqrt(3))/sqrt(3)", display:"2/√3[tan^-1((2x+1)/√3)]_0^1", explanation:"平方完成します。定積分の形で表示しています。"}
+  ];
+
+  const oldUltra3212 = window.generateUltraHardIntegralQuestion;
+  window.generateUltraHardIntegralQuestion = function(){
+    let q;
+    if(Math.random() < 0.75 || typeof oldUltra3212 !== 'function'){
+      q = PHOTO_ULTRA_3212[Math.floor(Math.random()*PHOTO_ULTRA_3212.length)];
+      q = Object.assign({}, q);
+    }else{
+      q = oldUltra3212();
+    }
+    return (typeof cleanQuestionObject === "function") ? cleanQuestionObject(q) : q;
+  };
+
+  const oldNext3212 = window.nextQ;
+  if(typeof oldNext3212 === 'function'){
+    window.nextQ = nextQ = function(){
+      oldNext3212.apply(this, arguments);
+      setTimeout(function(){
+        injectStyle();
+        const qEl=document.getElementById('q');
+        if(qEl && typeof current !== 'undefined' && current && current.q){
+          try{ qEl.innerHTML = (window.prettyMathHTML || window.readableMathHTML3211)(current.q); }catch(e){}
+        }
+      },0);
+    };
+  }
+
+  try{
+    if(typeof UPDATE_NOTES !== "undefined"){
+      UPDATE_NOTES["3.2.12"] = [
+        "写真の476・477系の積分超難問を追加",
+        "読みにくい問題は同レベルの類題で補完",
+        "超難問の問題表示位置ズレを修正"
+      ];
+    }
+  }catch(e){}
+  console.log("Ver3.2.12 photo ultra integral / question position patch loaded");
+})();
