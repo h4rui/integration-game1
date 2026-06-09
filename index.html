@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5681066295421790"
 crossorigin="anonymous"></script>
-<title>数学マスター Ver 3.2.8</title>
+<title>数学マスター Ver 3.2.9</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -352,7 +352,7 @@ body{
   text-shadow:0 0 8px #60a5fa,0 0 18px #7c3aed,0 0 32px #38bdf8;
 }
 #homeScreen h1::after{
-  content:"Ver 3.2.8";display:block;font-size:18px;color:#67e8f9;margin-top:6px;text-shadow:0 0 10px #22d3ee;
+  content:"Ver 3.2.9";display:block;font-size:18px;color:#67e8f9;margin-top:6px;text-shadow:0 0 10px #22d3ee;
 }
 #homePlayerCard{
   width:88%;max-width:780px;margin:18px auto 22px;padding:18px;
@@ -986,6 +986,35 @@ button,.modeBtn{
 .frac .bottom{display:block;padding:2px 3px 0;}
 #q .frac,.mathPreview .frac{font-size:.9em;}
 #q sup,.mathPreview sup{font-size:.65em;vertical-align:super;}
+
+
+/* Ver3.2.9 stable answer preview space */
+#answerPreview.mathPreview{
+  min-height:150px!important;
+  height:150px!important;
+  box-sizing:border-box!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:8px!important;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+  white-space:nowrap!important;
+  padding:12px 14px!important;
+  margin:8px auto 10px!important;
+}
+#answerPreview .previewLabel{font-size:13px;opacity:.72;line-height:1;}
+#answerPreview .previewPlaceholder{font-size:15px;opacity:.45;}
+#answerPreview .previewMath{font-size:30px;line-height:1.35;max-width:100%;}
+.mathPreview .sqrtBox{display:inline-flex;align-items:flex-start;vertical-align:middle;line-height:1;margin:0 2px;}
+.mathPreview .sqrtSymbol{font-size:1.05em;line-height:1.05;margin-right:1px;}
+.mathPreview .sqrtRadicand{display:inline-block;border-top:2px solid currentColor;padding:2px 4px 0 3px;min-width:18px;line-height:1.05;}
+.mathPreview sup{font-size:.62em;vertical-align:super;}
+@media(max-width:520px){
+  #answerPreview.mathPreview{min-height:165px!important;height:165px!important;width:92%!important;}
+  #answerPreview .previewMath{font-size:27px;}
+}
 
 </style>
 <!--
@@ -2072,7 +2101,7 @@ window.finalizeMatchVote = async function(roomId, finalGenre, questions){
 <script>
 console.log("数学マスター Ver 3.1.9 cachefix loaded", new Date().toISOString());
 </script>
-<script src="app.js?v=3.2.8-final"></script>
+<script src="app.js?v=3.2.9-preview"></script>
 
 <!-- Ver3.1.9 realtime rank mission FINAL FIX -->
 <script type="module">

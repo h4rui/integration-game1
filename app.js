@@ -5773,3 +5773,119 @@ ${ultra}
   document.addEventListener("input", function(e){ if(e && e.target && e.target.id === "ans") updatePreview328(); });
   console.log("Ver3.2.8 final consolidation patch loaded");
 })();
+
+// Ver3.2.9 input preview layout / readable math patch
+// 目的：分数・√・π・逆三角関数の入力プレビューを見やすくし、テンキー位置を動かさない。
+(function(){
+  if(window.__v329PreviewPatchLoaded) return;
+  window.__v329PreviewPatchLoaded = true;
+  try{ window.VERSION = "3.2.9"; }catch(e){}
+
+  function byId(id){ return document.getElementById(id); }
+  function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(m){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m];}); }
+  function frac(a,b){ return '<span class="frac"><span class="top">'+a+'</span><span class="bottom">'+b+'</span></span>'; }
+  function sqrtBox(v){ return '<span class="sqrtBox"><span class="sqrtSymbol">√</span><span class="sqrtRadicand">'+v+'</span></span>'; }
+  function readableInverseTrig(t){
+    return t
+      .replace(/arctan\s*\(([^()]*)\)/g, 'tan<sup>-1</sup>($1)')
+      .replace(/atan\s*\(([^()]*)\)/g, 'tan<sup>-1</sup>($1)')
+      .replace(/arcsin\s*\(([^()]*)\)/g, 'sin<sup>-1</sup>($1)')
+      .replace(/asin\s*\(([^()]*)\)/g, 'sin<sup>-1</sup>($1)')
+      .replace(/arccos\s*\(([^()]*)\)/g, 'cos<sup>-1</sup>($1)')
+      .replace(/acos\s*\(([^()]*)\)/g, 'cos<sup>-1</sup>($1)');
+  }
+  function prettyMath329(raw){
+    let t = esc(raw || "");
+    t = t.replace(/pi/g, "π");
+    t = t.replace(/\*/g, "");
+    t = readableInverseTrig(t);
+    t = t.replace(/sqrt\(([^()]+)\)/g, function(_,v){ return sqrtBox(v); });
+    t = t.replace(/√\(([^()]+)\)/g, function(_,v){ return sqrtBox(v); });
+    t = t.replace(/√([A-Za-z0-9π]+(?:\^[\-]?\d+)?)/g, function(_,v){ return sqrtBox(v); });
+    t = t.replace(/\^\(([^)]+)\)/g,"<sup>$1</sup>");
+    t = t.replace(/\^(\-?\d+)/g,"<sup>$1</sup>");
+    t = t.replace(/\(([^()<>]+)\)\/\(([^()<>]+)\)/g, function(_,a,b){return frac(a,b);});
+    t = t.replace(/([\-]?\d+)\/\(([^()<>]+)\)/g, function(_,a,b){return frac(a,b);});
+    t = t.replace(/\(([^()<>]+)\)\/([A-Za-z0-9π]+(?:<sup>\-?\d+<\/sup>|[²³⁴⁵⁶])?)/g, function(_,a,b){return frac(a,b);});
+    t = t.replace(/(^|[^\w<\/])([\-]?(?:\d+|x|π|e|log\d*|sin\d*|cos\d*|tan(?:<sup>\-1<\/sup>)?|tan\d*))\/([A-Za-z0-9π]+(?:<sup>\-?\d+<\/sup>|[²³⁴⁵⁶])?)/g, function(m,pre,a,b){return pre+frac(a,b);});
+    return t;
+  }
+  window.prettyMathHTML = prettyMath329;
+
+  window.updateAnswerPreviewV329 = function(){
+    const input = byId("ans");
+    let prev = byId("answerPreview");
+    if(!input || !prev) return;
+    prev.style.display = "flex";
+    const val = input.value || "";
+    if(val.trim()){
+      prev.innerHTML = '<div class="previewLabel">入力プレビュー</div><div class="previewMath">'+prettyMath329(val)+'</div>';
+    }else{
+      prev.innerHTML = '<div class="previewLabel">入力プレビュー</div><div class="previewPlaceholder">分数・√・指数が入るスペース</div>';
+    }
+  };
+
+  const oldAdd = window.addKey;
+  window.addKey = addKey = function(text){
+    const input = byId("ans");
+    if(!input) return;
+    input.value += text;
+    try{ input.dispatchEvent(new Event("input", {bubbles:true})); }catch(e){}
+    try{ input.focus({preventScroll:true}); input.setSelectionRange(input.value.length,input.value.length); }catch(e){}
+    window.updateAnswerPreviewV329();
+  };
+  window.backspaceInput = backspaceInput = function(){
+    const input = byId("ans");
+    if(!input) return;
+    input.value = input.value.slice(0,-1);
+    try{ input.dispatchEvent(new Event("input", {bubbles:true})); }catch(e){}
+    window.updateAnswerPreviewV329();
+  };
+  window.clearInput = clearInput = function(){
+    const input = byId("ans");
+    if(!input) return;
+    input.value = "";
+    try{ input.dispatchEvent(new Event("input", {bubbles:true})); }catch(e){}
+    window.updateAnswerPreviewV329();
+  };
+
+  const oldNext = window.nextQ;
+  if(typeof oldNext === "function"){
+    window.nextQ = nextQ = function(){
+      oldNext.apply(this, arguments);
+      setTimeout(function(){ window.updateAnswerPreviewV329(); }, 0);
+    };
+  }
+
+  // 既存問題の表示だけを分かりやすく。内部答えは atan のままで判定は壊さない。
+  const oldClean = window.cleanQuestionObject;
+  if(typeof oldClean === "function"){
+    window.cleanQuestionObject = cleanQuestionObject = function(q){
+      q = oldClean(q);
+      if(q && q.display){
+        q.display = String(q.display)
+          .replace(/arctan\s*\(([^()]*)\)/g, "tan^-1($1)")
+          .replace(/atan\s*\(([^()]*)\)/g, "tan^-1($1)")
+          .replace(/pi/g, "π");
+      }
+      if(q && q.q){ q.q = String(q.q).replace(/pi/g,"π"); }
+      return q;
+    };
+  }
+
+  try{
+    if(typeof UPDATE_NOTES !== "undefined"){
+      UPDATE_NOTES["3.2.9"] = [
+        "入力プレビュー枠を最初から大きめに固定",
+        "分数や長い式を入力してもテンキー位置がズレにくいように調整",
+        "入力プレビューの pi を π と表示",
+        "√ の入力プレビューを根号の上線付き表示に変更",
+        "arctan/atan 表示を tan^-1 表記にして見やすく変更"
+      ];
+    }
+  }catch(e){}
+
+  document.addEventListener("input", function(e){ if(e && e.target && e.target.id === "ans") window.updateAnswerPreviewV329(); });
+  setTimeout(function(){ window.updateAnswerPreviewV329(); }, 300);
+  console.log("Ver3.2.9 preview patch loaded");
+})();
