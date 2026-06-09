@@ -2062,6 +2062,287 @@ window.finalizeMatchVote = async function(roomId, finalGenre, questions){
 <script>
 console.log("数学マスター Ver 3.1.9 cachefix loaded", new Date().toISOString());
 </script>
-<script src="app.js?v=3.1.9-safe-rebuild"></script>
+<script src="app.js?v=3.1.9-realtime-final"></script>
+
+<!-- Ver3.1.9 realtime rank mission FINAL FIX -->
+<script type="module">
+import { doc, setDoc, getDoc, collection, query, where, limit, onSnapshot, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+(function(){
+  const db = window.firebaseDb || window.db;
+  const auth = window.firebaseAuth;
+  if(!db){ console.warn("realtime rank mission fix: db not found"); return; }
+
+  let unsubDaily319Final = null;
+  let unsubLevel319Final = null;
+  let unsubGlobal319Final = null;
+
+  function getDayKey319Final(){
+    const now = new Date();
+    const jp = new Date(now.toLocaleString("en-US",{timeZone:"Asia/Tokyo"}));
+    const y = jp.getFullYear();
+    const m = String(jp.getMonth()+1).padStart(2,"0");
+    const d = String(jp.getDate()).padStart(2,"0");
+    return `${y}-${m}-${d}`;
+  }
+  function getStoredPlayerId319Final(){
+    let id = localStorage.getItem("playerId");
+    if(!id){
+      id = (crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(36).slice(2);
+      localStorage.setItem("playerId",id);
+    }
+    return "local_" + id;
+  }
+  function getPlayerId319Final(){
+    const user = auth && auth.currentUser;
+    return user ? "google_" + user.uid : getStoredPlayerId319Final();
+  }
+  function getBundle319Final(){
+    if(window.getLocalGameData) return window.getLocalGameData() || {};
+    return {
+      playerProfile: window.playerProfile || {},
+      playerData: window.playerData || {}
+    };
+  }
+  function getName319Final(){
+    const b=getBundle319Final();
+    return (b.playerProfile && b.playerProfile.name) || "名無し";
+  }
+  function getIcon319Final(){
+    const b=getBundle319Final();
+    return (b.playerProfile && b.playerProfile.icon) || "";
+  }
+  function getTitle319Final(){
+    const b=getBundle319Final();
+    return (b.playerData && b.playerData.equippedTitle) || "初心者";
+  }
+  function getExp319Final(){
+    const b=getBundle319Final();
+    return (b.playerData && Number(b.playerData.exp || 0)) || 0;
+  }
+  function getTotalQuestions319Final(){
+    const b=getBundle319Final();
+    return (b.playerData && Number(b.playerData.totalQuestions || 0)) || 0;
+  }
+  function getLevel319Final(){
+    if(window.getLevel) return window.getLevel();
+    const exp=getExp319Final();
+    let level=1, used=0;
+    while(true){
+      const need = level<=10 ? 100 : level<=30 ? 150 : level<=50 ? 200 : level<=100 ? 300 : level<=200 ? 500 : 1000;
+      if(exp < used + need) return level;
+      used += need; level++;
+      if(level>9999) return level;
+    }
+  }
+  function titleHTML319Final(t){
+    return window.titleHTML ? window.titleHTML(t||"初心者") : ("🏅 " + (t||"初心者"));
+  }
+  function stopRealtime319Final(){
+    try{ if(unsubDaily319Final) unsubDaily319Final(); }catch(e){}
+    try{ if(unsubLevel319Final) unsubLevel319Final(); }catch(e){}
+    try{ if(unsubGlobal319Final) unsubGlobal319Final(); }catch(e){}
+    unsubDaily319Final = unsubLevel319Final = unsubGlobal319Final = null;
+  }
+  function loginRequiredHTML319Final(title){
+    return `<h2>${title}</h2><div class="profileItem"><p>ランキング機能はGoogleログインが必要です。</p><button class="googleLoginBtn" onclick="loginGoogle()">Googleログイン</button></div>`;
+  }
+  function renderRankList319Final(box,title,list,type){
+    let html=`<h2>${title}</h2>`;
+    if(!list.length) html += `<p>まだ記録がありません</p>`;
+    list.forEach((p,i)=>{
+      const icon=p.icon?`<img class="rankIcon" src="${p.icon}">`:"";
+      const name=p.name || p.playerName || "名無し";
+      if(type==="daily"){
+        html += `<div class="rankItem">${i+1}位 ${icon}${name}<br>${titleHTML319Final(p.title)}<br>本日：${p.count||0}問</div>`;
+      }else{
+        html += `<div class="rankItem">${i+1}位 ${icon}${name}<br>${titleHTML319Final(p.title)}<br>Lv${p.level||1}<br>EXP：${p.exp||0}</div>`;
+      }
+    });
+    box.innerHTML=html;
+    if(typeof window.ensureHomeButton==="function") window.ensureHomeButton();
+  }
+
+  async function savePlayerPublic319Final(){
+    const user = auth && auth.currentUser;
+    if(!user) return;
+    const playerId = getPlayerId319Final();
+    const data = {
+      playerId,
+      uid:user.uid,
+      name:getName319Final(),
+      playerName:getName319Final(),
+      icon:getIcon319Final(),
+      title:getTitle319Final(),
+      level:getLevel319Final(),
+      exp:getExp319Final(),
+      totalQuestions:getTotalQuestions319Final(),
+      updatedAt:serverTimestamp()
+    };
+    await setDoc(doc(db,"players",playerId),data,{merge:true});
+    const fc = String(localStorage.getItem("friendCode")||"").replace(/-/g,"").trim().toUpperCase();
+    if(fc) await setDoc(doc(db,"players",fc),{...data, friendCode:fc},{merge:true});
+  }
+
+  async function recordRankMission319Final(correctDelta){
+    const d = Number(correctDelta||0);
+    if(d<=0) return;
+    const day=getDayKey319Final();
+
+    // 全体ミッションはログイン不要
+    await setDoc(doc(db,"globalMissions",day),{
+      day,
+      correct: increment(d),
+      updatedAt: serverTimestamp()
+    },{merge:true}).catch(e=>console.warn("global mission write failed", e));
+
+    // ランキングはログイン必須
+    const user = auth && auth.currentUser;
+    if(user){
+      const playerId=getPlayerId319Final();
+      await setDoc(doc(db,"dailyQuestionRankings",day+"_"+playerId),{
+        day,
+        playerId,
+        uid:user.uid,
+        name:getName319Final(),
+        icon:getIcon319Final(),
+        title:getTitle319Final(),
+        level:getLevel319Final(),
+        count: increment(d),
+        updatedAt: serverTimestamp()
+      },{merge:true}).catch(e=>console.warn("daily ranking write failed", e));
+      await savePlayerPublic319Final().catch(e=>console.warn("level ranking write failed", e));
+    }
+  }
+
+  const previousSubmit319Final = window.submit;
+  if(typeof previousSubmit319Final === "function" && !window.__rankMissionSubmitFinalPatched319){
+    window.__rankMissionSubmitFinalPatched319 = true;
+    window.submit = async function(){
+      const before = (window.getLocalGameData && window.getLocalGameData().playerData && Number(window.getLocalGameData().playerData.totalCorrect || 0)) || 0;
+      const ret = await previousSubmit319Final.apply(this, arguments);
+      const after = (window.getLocalGameData && window.getLocalGameData().playerData && Number(window.getLocalGameData().playerData.totalCorrect || 0)) || before;
+      const diff = after - before;
+      if(diff>0) recordRankMission319Final(diff);
+      return ret;
+    };
+    // onclick="submit()" が古い関数を参照しないように念押し
+    try{ eval("submit = window.submit"); }catch(e){}
+  }
+
+  window.showRankingMenu = function(){
+    stopRealtime319Final();
+    const box=document.getElementById("panelArea"); if(!box) return;
+    if(!auth || !auth.currentUser){ box.innerHTML=loginRequiredHTML319Final("🏆 ランキング"); return; }
+    box.innerHTML=`
+      <h2>🏆 ランキング</h2>
+      <button class="modeBtn" onclick="showLevelRanking319()">⭐ レベルランキング</button>
+      <button class="modeBtn" onclick="showDailyQuestionRanking319()">📚 日間問題数ランキング</button>
+      <button class="modeBtn" onclick="showRateRanking()">🏅 レートランキング</button>
+    `;
+    if(typeof window.ensureHomeButton==="function") window.ensureHomeButton();
+  };
+
+  window.showDailyQuestionRanking319 = function(){
+    stopRealtime319Final();
+    const box=document.getElementById("panelArea"); if(!box) return;
+    if(!auth || !auth.currentUser){ box.innerHTML=loginRequiredHTML319Final("📚 日間問題数ランキング"); return; }
+    box.innerHTML="<h2>読み込み中...</h2>";
+    const day=getDayKey319Final();
+    const qRef=query(collection(db,"dailyQuestionRankings"),where("day","==",day),limit(100));
+    unsubDaily319Final=onSnapshot(qRef,(snap)=>{
+      let list=[]; snap.forEach(d=>list.push(d.data()));
+      list.sort((a,b)=>(b.count||0)-(a.count||0));
+      renderRankList319Final(box,"📚 日間問題数ランキング",list.slice(0,100),"daily");
+    },(e)=>{ console.error(e); box.innerHTML="<p>日間ランキング取得失敗</p>"; });
+  };
+
+  window.showLevelRanking319 = async function(){
+    stopRealtime319Final();
+    const box=document.getElementById("panelArea"); if(!box) return;
+    if(!auth || !auth.currentUser){ box.innerHTML=loginRequiredHTML319Final("⭐ レベルランキング"); return; }
+    box.innerHTML="<h2>読み込み中...</h2>";
+    await savePlayerPublic319Final().catch(()=>{});
+    unsubLevel319Final=onSnapshot(collection(db,"players"),(snap)=>{
+      let list=[]; snap.forEach(d=>list.push(d.data()));
+      const seen=new Set();
+      list=list.filter(p=>{
+        const k=p.playerId || p.friendCode || p.uid || p.name;
+        if(!k || seen.has(k)) return false;
+        seen.add(k); return true;
+      });
+      list.sort((a,b)=>((b.level||1)-(a.level||1)) || ((b.exp||0)-(a.exp||0)) || ((b.totalQuestions||0)-(a.totalQuestions||0)));
+      renderRankList319Final(box,"⭐ レベルランキング",list.slice(0,100),"level");
+    },(e)=>{ console.error(e); box.innerHTML="<p>レベルランキング取得失敗</p>"; });
+  };
+
+  window.showGlobalMission319 = function(){
+    stopRealtime319Final();
+    const box=document.getElementById("panelArea"); if(!box) return;
+    box.innerHTML="<h2>読み込み中...</h2>";
+    const day=getDayKey319Final();
+    unsubGlobal319Final=onSnapshot(doc(db,"globalMissions",day),async (snap)=>{
+      const data=snap.exists()?snap.data():{correct:0};
+      let claimed=[];
+      const user=auth && auth.currentUser;
+      if(user){
+        try{
+          const cr=await getDoc(doc(db,"globalMissionClaims",day+"_"+user.uid));
+          claimed=cr.exists()?(cr.data().claimed||[]):[];
+        }catch(e){}
+      }
+      const correct=Number(data.correct||0);
+      const rewards=[{need:1000,coin:50},{need:5000,coin:100},{need:10000,coin:200}];
+      let html=`<h2>🌍 全体ミッション</h2><div class="missionItem"><h3>今日のみんなの正解数</h3><p>${correct}問</p></div>`;
+      for(const r of rewards){
+        const done=correct>=r.need;
+        const got=claimed.includes(String(r.need));
+        html += `<div class="missionItem">${done?"✅":"⬜"} 全員で${r.need}問正解<br>${Math.min(correct,r.need)} / ${r.need}<br>報酬：${r.coin}コイン<br>${done?`<button onclick="claimGlobalMissionReward319(${r.need},${r.coin})">${got?"受け取り済み":"受け取る"}</button>`:""}</div>`;
+      }
+      box.innerHTML=html;
+      if(typeof window.ensureHomeButton==="function") window.ensureHomeButton();
+    },(e)=>{ console.error(e); box.innerHTML="<p>全体ミッション取得失敗</p>"; });
+  };
+
+  window.claimGlobalMissionReward319 = async function(need,coin){
+    const user=auth && auth.currentUser;
+    if(!user){ alert("報酬の受け取りにはログインが必要です"); return; }
+    const day=getDayKey319Final();
+    const ref=doc(db,"globalMissionClaims",day+"_"+user.uid);
+    const snap=await getDoc(ref);
+    const old=snap.exists()?snap.data():{claimed:[]};
+    const claimed=old.claimed||[];
+    if(claimed.includes(String(need))){ alert("すでに受け取り済みです"); return; }
+    claimed.push(String(need));
+    await setDoc(ref,{uid:user.uid,day,claimed,updatedAt:serverTimestamp()},{merge:true});
+    const b=window.getLocalGameData ? window.getLocalGameData() : null;
+    if(b && b.playerData){ b.playerData.coins=(b.playerData.coins||0)+Number(coin||0); if(window.applyCloudGameData) window.applyCloudGameData(b); }
+    else if(window.playerData){ window.playerData.coins=(window.playerData.coins||0)+Number(coin||0); }
+    if(window.saveAllData) window.saveAllData();
+    if(window.updateHomeStatus) window.updateHomeStatus();
+    alert(`${coin}コインを受け取りました！`);
+  };
+
+  window.showWorldRanking = function(){ return window.showDailyQuestionRanking319(); };
+  window.showFriendRanking = function(){
+    const box=document.getElementById("panelArea");
+    if(box) box.innerHTML=`<h2>🤝 フレンドランキング</h2><div class="profileItem"><p>フレンドランキングは削除しました。</p></div>`;
+  };
+
+  const oldFriendMenu = window.showFriendMenu;
+  if(typeof oldFriendMenu==="function"){
+    window.showFriendMenu=function(){
+      oldFriendMenu.apply(this,arguments);
+      setTimeout(()=>{
+        const box=document.getElementById("panelArea");
+        if(box) box.innerHTML = box.innerHTML.replace(/<button[^>]*onclick=["']showFriendRanking\(\)["'][^>]*>[\s\S]*?<\/button>/g,"");
+      },0);
+    };
+  }
+
+  console.log("Ver3.1.9 realtime rank/global mission final fix loaded");
+})();
+</script>
+
 </body>
 </html>
