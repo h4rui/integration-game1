@@ -5889,3 +5889,398 @@ ${ultra}
   setTimeout(function(){ window.updateAnswerPreviewV329(); }, 300);
   console.log("Ver3.2.9 preview patch loaded");
 })();
+
+// Ver3.2.10 ultra integral expansion / readable answer & your-answer patch
+// 目的：積分の超難問を大量追加し、正解表示・自分の回答表示を見やすくする。
+(function(){
+  if(window.__v3210UltraReadablePatchLoaded) return;
+  window.__v3210UltraReadablePatchLoaded = true;
+  try{ window.VERSION = "3.2.11"; }catch(e){}
+
+  function byId(id){ return document.getElementById(id); }
+  function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(m){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m];}); }
+  function frac(a,b){ return '<span class="frac"><span class="top">'+a+'</span><span class="bottom">'+b+'</span></span>'; }
+  function sqrtBox(v){ return '<span class="sqrtBox"><span class="sqrtSymbol">√</span><span class="sqrtRadicand">'+v+'</span></span>'; }
+  function invTrig(t){
+    return t
+      .replace(/arctan\s*\(([^()]*)\)/g, 'tan<sup>-1</sup>($1)')
+      .replace(/atan\s*\(([^()]*)\)/g, 'tan<sup>-1</sup>($1)')
+      .replace(/arcsin\s*\(([^()]*)\)/g, 'sin<sup>-1</sup>($1)')
+      .replace(/asin\s*\(([^()]*)\)/g, 'sin<sup>-1</sup>($1)')
+      .replace(/arccos\s*\(([^()]*)\)/g, 'cos<sup>-1</sup>($1)')
+      .replace(/acos\s*\(([^()]*)\)/g, 'cos<sup>-1</sup>($1)');
+  }
+  function readableMath3210(raw){
+    let t = esc(raw || "");
+    t = t.replace(/\bpi\b/g,"π").replace(/\*/g,"");
+    t = invTrig(t);
+    t = t.replace(/sqrt\(([^()]+)\)/g, function(_,v){return sqrtBox(v);});
+    t = t.replace(/√\(([^()]+)\)/g, function(_,v){return sqrtBox(v);});
+    t = t.replace(/√([A-Za-z0-9π]+(?:\^[\-]?\d+)?)/g, function(_,v){return sqrtBox(v);});
+    t = t.replace(/\^\(([^)]+)\)/g,"<sup>$1</sup>");
+    t = t.replace(/\^(\-?\d+)/g,"<sup>$1</sup>");
+    t = t.replace(/\b(sin|cos|tan|log)\s*\(([^()]*)\)/g,"$1($2)");
+    // カッコ付きの分数を優先して縦表示
+    t = t.replace(/\(([^()<>]+)\)\/\(([^()<>]+)\)/g, function(_,a,b){return frac(a,b);});
+    t = t.replace(/([\-]?\d+)\/\(([^()<>]+)\)/g, function(_,a,b){return frac(a,b);});
+    t = t.replace(/\(([^()<>]+)\)\/([A-Za-z0-9π]+(?:<sup>\-?\d+<\/sup>|[²³⁴⁵⁶])?)/g, function(_,a,b){return frac(a,b);});
+    t = t.replace(/(^|[^\w<\/])([\-]?(?:\d+|x|π|e|log\d*|sin\d*|cos\d*|tan(?:<sup>\-1<\/sup>)?|tan\d*))\/([A-Za-z0-9π]+(?:<sup>\-?\d+<\/sup>|[²³⁴⁵⁶])?)/g, function(m,pre,a,b){return pre+frac(a,b);});
+    return t;
+  }
+  window.prettyMathHTML = readableMath3210;
+  window.readableMathHTML3210 = readableMath3210;
+
+  const ULTRA_3210 = [
+    {q:"超難問：∫ x²e^x dx", a:"exp(x)*(x^2-2*x+2)", display:"e^x(x^2-2x+2)+C", explanation:"部分積分を2回使います。"},
+    {q:"超難問：∫ x³e^x dx", a:"exp(x)*(x^3-3*x^2+6*x-6)", display:"e^x(x^3-3x^2+6x-6)+C", explanation:"部分積分を3回使います。"},
+    {q:"超難問：∫ x²sin(x) dx", a:"-x^2*cos(x)+2*x*sin(x)+2*cos(x)", display:"-x^2cos(x)+2xsin(x)+2cos(x)+C", explanation:"部分積分を2回使います。"},
+    {q:"超難問：∫ x²cos(x) dx", a:"x^2*sin(x)+2*x*cos(x)-2*sin(x)", display:"x^2sin(x)+2xcos(x)-2sin(x)+C", explanation:"部分積分を2回使います。"},
+    {q:"超難問：∫ x³sin(x) dx", a:"-x^3*cos(x)+3*x^2*sin(x)+6*x*cos(x)-6*sin(x)", display:"-x^3cos(x)+3x^2sin(x)+6xcos(x)-6sin(x)+C", explanation:"部分積分をくり返します。"},
+    {q:"超難問：∫ x³cos(x) dx", a:"x^3*sin(x)+3*x^2*cos(x)-6*x*sin(x)-6*cos(x)", display:"x^3sin(x)+3x^2cos(x)-6xsin(x)-6cos(x)+C", explanation:"部分積分をくり返します。"},
+    {q:"超難問：∫ e^xcos(x) dx", a:"exp(x)*(sin(x)+cos(x))/2", display:"(e^x(sin(x)+cos(x)))/2+C", explanation:"部分積分を2回使い、元の積分を移項します。"},
+    {q:"超難問：∫ e^xsin(x) dx", a:"exp(x)*(sin(x)-cos(x))/2", display:"(e^x(sin(x)-cos(x)))/2+C", explanation:"部分積分を2回使い、元の積分を移項します。"},
+    {q:"超難問：∫ e^(2x)cos(3x) dx", a:"exp(2*x)*(2*cos(3*x)+3*sin(3*x))/13", display:"(e^(2x)(2cos(3x)+3sin(3x)))/13+C", explanation:"∫e^(ax)cos(bx)dx の型です。"},
+    {q:"超難問：∫ e^(2x)sin(3x) dx", a:"exp(2*x)*(2*sin(3*x)-3*cos(3*x))/13", display:"(e^(2x)(2sin(3x)-3cos(3x)))/13+C", explanation:"∫e^(ax)sin(bx)dx の型です。"},
+    {q:"超難問：∫ xlog(x) dx", a:"(x^2*log(x))/2-x^2/4", display:"(x^2log(x))/2-(x^2)/4+C", explanation:"log(x)を微分する側にして部分積分。"},
+    {q:"超難問：∫ x²log(x) dx", a:"(x^3*log(x))/3-x^3/9", display:"(x^3log(x))/3-(x^3)/9+C", explanation:"log(x)を微分する側にして部分積分。"},
+    {q:"超難問：∫ log(x)/x² dx", a:"-(log(x)+1)/x", display:"-(log(x)+1)/x+C", explanation:"部分積分。1/x² を積分する側にします。"},
+    {q:"超難問：∫ (log(x))² dx", a:"x*(log(x))^2-2*x*log(x)+2*x", display:"x(log(x))^2-2xlog(x)+2x+C", explanation:"部分積分を使います。"},
+    {q:"超難問：∫ 1/(x²+4x+8) dx", a:"atan((x+2)/2)/2", display:"tan^-1((x+2)/2)/2+C", explanation:"平方完成して (x+2)^2+4 にします。"},
+    {q:"超難問：∫ 1/(x²+6x+13) dx", a:"atan((x+3)/2)/2", display:"tan^-1((x+3)/2)/2+C", explanation:"平方完成して (x+3)^2+4 にします。"},
+    {q:"超難問：∫ x/(x²+1)² dx", a:"-1/(2*(x^2+1))", display:"-1/(2(x^2+1))+C", explanation:"t=x²+1 と置換します。"},
+    {q:"超難問：∫ x/(x²+4)² dx", a:"-1/(2*(x^2+4))", display:"-1/(2(x^2+4))+C", explanation:"t=x²+4 と置換します。"},
+    {q:"超難問：∫ x²/(x²+1) dx", a:"x-atan(x)", display:"x-tan^-1(x)+C", explanation:"x²/(x²+1)=1-1/(x²+1) にします。"},
+    {q:"超難問：∫ x²/(x²+4) dx", a:"x-2*atan(x/2)", display:"x-2tan^-1(x/2)+C", explanation:"x²/(x²+4)=1-4/(x²+4) にします。"},
+    {q:"超難問：∫ (2x+3)/(x²+3x+2) dx", a:"log(x^2+3*x+2)", display:"log(x^2+3x+2)+C", explanation:"分子が分母の微分です。"},
+    {q:"超難問：∫ (3x²+2)/(x³+2x+1) dx", a:"log(x^3+2*x+1)", display:"log(x^3+2x+1)+C", explanation:"分子が分母の微分です。"},
+    {q:"超難問：∫ 1/(x²-1) dx", a:"log((x-1)/(x+1))/2", display:"log((x-1)/(x+1))/2+C", explanation:"部分分数分解を使います。"},
+    {q:"超難問：∫ 1/(x²-4) dx", a:"log((x-2)/(x+2))/4", display:"log((x-2)/(x+2))/4+C", explanation:"部分分数分解を使います。"},
+    {q:"超難問：∫ 1/(x²+3x+2) dx", a:"log((x+1)/(x+2))", display:"log((x+1)/(x+2))+C", explanation:"(x+1)(x+2) に因数分解します。"},
+    {q:"超難問：∫ (x+1)/(x²+2x+2) dx", a:"log(x^2+2*x+2)/2", display:"log(x^2+2x+2)/2+C", explanation:"分母の微分の半分です。"},
+    {q:"超難問：∫ x/(x²+2x+2) dx", a:"log(x^2+2*x+2)/2-atan(x+1)", display:"log(x^2+2x+2)/2-tan^-1(x+1)+C", explanation:"x=(x+1)-1 と分けます。"},
+    {q:"超難問：∫ sin(x)cos(x) dx", a:"sin(x)^2/2", display:"(sin(x)^2)/2+C", explanation:"t=sin(x) と置換します。"},
+    {q:"超難問：∫ sin²(x)cos(x) dx", a:"sin(x)^3/3", display:"(sin(x)^3)/3+C", explanation:"t=sin(x) と置換します。"},
+    {q:"超難問：∫ cos²(x)sin(x) dx", a:"-cos(x)^3/3", display:"-(cos(x)^3)/3+C", explanation:"t=cos(x) と置換します。"},
+    {q:"超難問：∫ sin³(x) dx", a:"-cos(x)+cos(x)^3/3", display:"-cos(x)+(cos(x)^3)/3+C", explanation:"sin³x=sinx(1-cos²x) とします。"},
+    {q:"超難問：∫ cos³(x) dx", a:"sin(x)-sin(x)^3/3", display:"sin(x)-(sin(x)^3)/3+C", explanation:"cos³x=cosx(1-sin²x) とします。"},
+    {q:"超難問：∫ sin²(x) dx", a:"x/2-sin(2*x)/4", display:"x/2-sin(2x)/4+C", explanation:"半角公式を使います。"},
+    {q:"超難問：∫ cos²(x) dx", a:"x/2+sin(2*x)/4", display:"x/2+sin(2x)/4+C", explanation:"半角公式を使います。"},
+    {q:"超難問：∫ tan(x) dx", a:"-log(cos(x))", display:"-log(cos(x))+C", explanation:"tanx=sinx/cosx とします。"},
+    {q:"超難問：∫ 1/cos²(x) dx", a:"tan(x)", display:"tan(x)+C", explanation:"1/cos²x=sec²x です。"},
+    {q:"超難問：∫ 1/sin²(x) dx", a:"-1/tan(x)", display:"-1/tan(x)+C", explanation:"csc²x の積分です。"},
+    {q:"超難問：∫ 1/(1+e^x) dx", a:"x-log(1+exp(x))", display:"x-log(1+e^x)+C", explanation:"分子分母に e^(-x) をかけても考えられます。"},
+    {q:"超難問：∫ e^x/(1+e^x) dx", a:"log(1+exp(x))", display:"log(1+e^x)+C", explanation:"t=1+e^x と置換します。"},
+    {q:"超難問：∫ e^x/(1+e^x)² dx", a:"-1/(1+exp(x))", display:"-1/(1+e^x)+C", explanation:"t=1+e^x と置換します。"},
+    {q:"超難問：∫ x/(√(x²+1)) dx", a:"sqrt(x^2+1)", display:"√(x^2+1)+C", explanation:"t=x²+1 と置換します。"},
+    {q:"超難問：∫ 1/(√x(1+√x)) dx", a:"2*log(1+sqrt(x))", display:"2log(1+√x)+C", explanation:"t=√x と置換します。"},
+    {q:"超難問：∫ 1/(√x+1) dx", a:"2*sqrt(x)-2*log(sqrt(x)+1)", display:"2√x-2log(√x+1)+C", explanation:"t=√x と置換します。"},
+    {q:"超難問：∫ 1/(x√x) dx", a:"-2/sqrt(x)", display:"-2/√x+C", explanation:"x^(-3/2) と見ます。"},
+    {q:"超難問：∫ x√(x+1) dx", a:"2*(x+1)^(5/2)/5-2*(x+1)^(3/2)/3", display:"(2(x+1)^(5/2))/5-(2(x+1)^(3/2))/3+C", explanation:"t=x+1 と置換します。"},
+    {q:"超難問：∫ (x+1)√(x²+2x) dx", a:"(x^2+2*x)^(3/2)/3", display:"((x^2+2x)^(3/2))/3+C", explanation:"t=x²+2x と置換します。"},
+    {q:"超難問：∫₀¹ x/(x²+1) dx", a:"log(2)/2", display:"log(2)/2", explanation:"t=x²+1 と置換します。"},
+    {q:"超難問：∫₀¹ x² dx", a:"1/3", display:"1/3", explanation:"定積分の基本です。"},
+    {q:"超難問：∫₀^π sin(x) dx", a:"2", display:"2", explanation:"[-cosx]₀^π を計算します。"},
+    {q:"超難問：∫₀^(π/2) cos(x) dx", a:"1", display:"1", explanation:"[sinx]₀^(π/2) を計算します。"},
+    {q:"超難問：∫₀^(π/2) sin²(x) dx", a:"pi/4", display:"π/4", explanation:"半角公式を使います。"},
+    {q:"超難問：∫₀^(π/2) cos²(x) dx", a:"pi/4", display:"π/4", explanation:"半角公式を使います。"},
+    {q:"超難問：∫₀^1 1/(x²+1) dx", a:"pi/4", display:"π/4", explanation:"tan^-1(1)-tan^-1(0) です。"},
+    {q:"超難問：∫₀^1 1/(x+1) dx", a:"log(2)", display:"log(2)", explanation:"log(x+1) に代入します。"},
+    {q:"超難問：∫₁^e log(x) dx", a:"1", display:"1", explanation:"xlogx-x に 1 と e を代入します。"},
+    {q:"超難問：∫₀^1 xe^x dx", a:"1", display:"1", explanation:"部分積分で xe^x を積分します。"},
+    {q:"超難問：∫₀^π xsin(x) dx", a:"pi", display:"π", explanation:"部分積分を使います。"},
+    {q:"超難問：∫₀^(π/2) xcos(x) dx", a:"pi/2-1", display:"π/2-1", explanation:"部分積分を使います。"},
+    {q:"超難問：∫₀^(π/2) xsin(x) dx", a:"1", display:"1", explanation:"部分積分を使います。"}
+  ];
+
+  window.generateUltraHardIntegralQuestion = function(){
+    const q = ULTRA_3210[Math.floor(Math.random()*ULTRA_3210.length)];
+    return (typeof cleanQuestionObject === "function") ? cleanQuestionObject(Object.assign({},q)) : Object.assign({},q);
+  };
+
+  // 問題文も innerHTML で見やすく表示。入力欄は常にプレビュー枠を表示。
+  const oldNext3210 = window.nextQ;
+  window.nextQ = nextQ = function(){
+    if(typeof oldNext3210 === "function") oldNext3210.apply(this, arguments);
+    setTimeout(function(){
+      const qEl = byId("q");
+      if(qEl && current && current.q){ qEl.innerHTML = readableMath3210(current.q); }
+      if(typeof window.updateAnswerPreviewV329 === "function") window.updateAnswerPreviewV329();
+    }, 0);
+  };
+
+  // 正解/不正解欄で、正解と自分の回答を両方見やすく表示。
+  const baseSubmit3210 = window.submit;
+  if(typeof baseSubmit3210 === "function"){
+    window.submit = submit = async function(){
+      const ansEl = byId("ans");
+      const before = ansEl ? ansEl.value.trim() : "";
+      await baseSubmit3210.apply(this, arguments);
+      const result = byId("result");
+      if(result && current){
+        const isCorrectText = result.innerHTML.indexOf("○ 正解") >= 0;
+        const isWrongText = result.innerHTML.indexOf("× 不正解") >= 0;
+        if(isCorrectText || isWrongText){
+          const correct = current.display || current.a || "";
+          const expMatch = result.innerHTML.match(/\+(\d+)EXP/);
+          const xp = expMatch ? expMatch[1] : "";
+          if(isCorrectText){
+            result.innerHTML = `○ 正解！<br><div class="readableAnswerBox"><div>あなたの回答：</div><div class="previewMath">${readableMath3210(before)}</div><div>正解：</div><div class="previewMath">${readableMath3210(correct)}</div></div>${xp?`+${xp}EXP / +1コイン`:""}`;
+          }else{
+            result.innerHTML = `× 不正解<br><div class="readableAnswerBox"><div>あなたの回答：</div><div class="previewMath">${readableMath3210(before)}</div><div>正解：</div><div class="previewMath">${readableMath3210(correct)}</div></div><br>📖 ${current.explanation||""}<br><br>🤖 ${typeof aiExplain === "function" ? aiExplain(current.q) : ""}`;
+          }
+        }
+      }
+      // 直近履歴にも見やすい回答を保存
+      try{
+        if(Array.isArray(history) && history.length){ history[history.length-1].yourPretty = before; }
+      }catch(e){}
+    };
+  }
+
+  // 結果画面の「あなた」「正解」も見やすく表示。
+  window.showResultPage = showResultPage = function(text){
+    if(typeof setInputVisible === "function") setInputVisible(false);
+    byId("gameScreen") && byId("gameScreen").classList.remove("active");
+    byId("homeScreen") && byId("homeScreen").classList.remove("active");
+    byId("resultScreen") && byId("resultScreen").classList.add("active");
+    setTimeout(function(){ if(typeof ensureHomeButton === "function") ensureHomeButton(); },0);
+    const sum = byId("resultSummary");
+    if(sum) sum.innerHTML = `<div class="profileItem"><h2>${esc(text)}</h2><p>スコア：${score}</p><p>正解数：${history.filter(h=>h.ok).length}</p><p>問題数：${history.length}</p><button class="resultBtn" onclick="restartFromResult()">もう一回</button><button class="resultBtn" onclick="backHomeFromResult()">ホームへ</button></div>`;
+    let html = "<h2>解いた問題一覧</h2>";
+    for(let h of history){
+      html += `<div class="rankItem">${h.ok?"○":"×"}<br>問題：<div class="previewMath">${readableMath3210(h.question)}</div>あなた：<div class="previewMath">${readableMath3210(h.yourPretty || h.your || "")}</div>正解：<div class="previewMath">${readableMath3210(h.answer || "")}</div></div>`;
+    }
+    const list = byId("resultList");
+    if(list) list.innerHTML = html;
+  };
+
+  try{
+    if(typeof UPDATE_NOTES !== "undefined"){
+      UPDATE_NOTES["3.2.10"] = [
+        "積分の超難問を大幅追加",
+        "正解表示を見やすい数式表示に変更",
+        "自分の回答も見やすい数式表示で表示",
+        "結果画面の問題・あなたの回答・正解を見やすく表示"
+      ];
+    }
+  }catch(e){}
+  console.log("Ver3.2.10 ultra integral and readable answer patch loaded");
+})();
+
+// Ver3.2.11 advanced math preview patch
+// 目的：指数の文字・式、文字入り分数、複雑な分子分母をプレビュー/回答/正解表示で見やすくする。
+(function(){
+  if(window.__v3211AdvancedPreviewLoaded) return;
+  window.__v3211AdvancedPreviewLoaded = true;
+  try{ window.VERSION = "3.2.11"; }catch(e){}
+
+  function byId(id){ return document.getElementById(id); }
+  function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(m){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m];}); }
+  function frac(a,b){ return '<span class="frac"><span class="top">'+a+'</span><span class="bottom">'+b+'</span></span>'; }
+  function sqrtBox(v){ return '<span class="sqrtBox"><span class="sqrtSymbol">√</span><span class="sqrtRadicand">'+v+'</span></span>'; }
+  function isBalanced(s){
+    let d=0;
+    for(let i=0;i<s.length;i++){
+      if(s[i]==='(') d++;
+      else if(s[i]===')') { d--; if(d<0) return false; }
+    }
+    return d===0;
+  }
+  function stripOuter(s){
+    s=String(s||"").trim();
+    while(s[0]==='(' && s[s.length-1]===')'){
+      let d=0, ok=true;
+      for(let i=0;i<s.length;i++){
+        if(s[i]==='(') d++;
+        else if(s[i]===')') d--;
+        if(d===0 && i<s.length-1){ ok=false; break; }
+      }
+      if(ok) s=s.slice(1,-1).trim(); else break;
+    }
+    return s;
+  }
+  function splitAddSub(s){
+    let parts=[], d=0, start=0;
+    for(let i=0;i<s.length;i++){
+      const c=s[i];
+      if(c==='(') d++;
+      else if(c===')') d--;
+      else if(d===0 && i>0 && (c==='+' || c==='-')){
+        const prev=s[i-1];
+        if(prev==='^' || prev==='e' || prev==='E') continue;
+        parts.push(s.slice(start,i));
+        start=i;
+      }
+    }
+    if(parts.length){ parts.push(s.slice(start)); return parts; }
+    return null;
+  }
+  function topSlash(s){
+    let d=0;
+    for(let i=0;i<s.length;i++){
+      const c=s[i];
+      if(c==='(') d++;
+      else if(c===')') d--;
+      else if(c==='/' && d===0) return i;
+    }
+    return -1;
+  }
+  function readParens(s, openIndex){
+    let d=0;
+    for(let i=openIndex;i<s.length;i++){
+      if(s[i]==='(') d++;
+      else if(s[i]===')'){
+        d--;
+        if(d===0) return {body:s.slice(openIndex+1,i), end:i};
+      }
+    }
+    return null;
+  }
+  function formatPowerAndRoots(s){
+    let out="";
+    for(let i=0;i<s.length;i++){
+      if(s.startsWith("sqrt(", i)){
+        const r=readParens(s, i+4);
+        if(r){ out += sqrtBox(formatExpr(r.body)); i=r.end; continue; }
+      }
+      if(s[i]==='√'){
+        if(s[i+1]==='('){
+          const r=readParens(s, i+1);
+          if(r){ out += sqrtBox(formatExpr(r.body)); i=r.end; continue; }
+        }else{
+          let j=i+1;
+          while(j<s.length && /[A-Za-z0-9π]/.test(s[j])) j++;
+          if(j>i+1){ out += sqrtBox(formatExpr(s.slice(i+1,j))); i=j-1; continue; }
+        }
+      }
+      if(s[i]==='^'){
+        if(s[i+1]==='('){
+          const r=readParens(s, i+1);
+          if(r){ out += '<sup>'+formatExpr(r.body)+'</sup>'; i=r.end; continue; }
+        }else{
+          let j=i+1;
+          if(s[j]==='-') j++;
+          while(j<s.length && /[A-Za-z0-9π]/.test(s[j])) j++;
+          if(j>i+1){ out += '<sup>'+formatExpr(s.slice(i+1,j))+'</sup>'; i=j-1; continue; }
+        }
+      }
+      out += esc(s[i]);
+    }
+    return out;
+  }
+  function invTrigText(s){
+    return s
+      .replace(/arctan/g,"tan^-1")
+      .replace(/atan/g,"tan^-1")
+      .replace(/arcsin/g,"sin^-1")
+      .replace(/asin/g,"sin^-1")
+      .replace(/arccos/g,"cos^-1")
+      .replace(/acos/g,"cos^-1");
+  }
+  function normalizeText(s){
+    return String(s||"")
+      .replace(/π/g,"pi")
+      .replace(/\bpi\b/g,"π")
+      .replace(/\*/g,"");
+  }
+  function formatExpr(raw){
+    let s = normalizeText(invTrigText(String(raw==null?"":raw))).trim();
+    if(!s) return "";
+    s = stripOuter(s);
+    const parts = splitAddSub(s);
+    if(parts){ return parts.map(function(p){ return formatExpr(p); }).join(""); }
+    const slash = topSlash(s);
+    if(slash>0){
+      const left = stripOuter(s.slice(0,slash));
+      const right = stripOuter(s.slice(slash+1));
+      if(left && right) return frac(formatExpr(left), formatExpr(right));
+    }
+    let html = formatPowerAndRoots(s);
+    html = html.replace(/tan\^-1/g,'tan<sup>-1</sup>')
+               .replace(/sin\^-1/g,'sin<sup>-1</sup>')
+               .replace(/cos\^-1/g,'cos<sup>-1</sup>');
+    return html;
+  }
+
+  window.readableMathHTML3211 = formatExpr;
+  window.prettyMathHTML = formatExpr;
+
+  window.updateAnswerPreviewV329 = function(){
+    const input = byId("ans");
+    let prev = byId("answerPreview");
+    if(!input || !prev) return;
+    prev.style.display = "flex";
+    const val = input.value || "";
+    if(val.trim()){
+      prev.innerHTML = '<div class="previewLabel">入力プレビュー</div><div class="previewMath">'+formatExpr(val)+'</div>';
+    }else{
+      prev.innerHTML = '<div class="previewLabel">入力プレビュー</div><div class="previewPlaceholder">分数・√・指数が入るスペース</div>';
+    }
+  };
+
+  const oldNext3211 = window.nextQ;
+  if(typeof oldNext3211 === "function"){
+    window.nextQ = nextQ = function(){
+      oldNext3211.apply(this, arguments);
+      setTimeout(function(){
+        const qEl = byId("q");
+        if(qEl && typeof current !== "undefined" && current && current.q){ qEl.innerHTML = formatExpr(current.q); }
+        window.updateAnswerPreviewV329();
+      },0);
+    };
+  }
+
+  const oldSubmit3211 = window.submit;
+  if(typeof oldSubmit3211 === "function"){
+    window.submit = submit = async function(){
+      const ansEl = byId("ans");
+      const before = ansEl ? ansEl.value.trim() : "";
+      await oldSubmit3211.apply(this, arguments);
+      const result = byId("result");
+      if(result && typeof current !== "undefined" && current){
+        const ok = result.innerHTML.indexOf("○ 正解") >= 0;
+        const ng = result.innerHTML.indexOf("× 不正解") >= 0;
+        if(ok || ng){
+          const correct = current.display || current.a || "";
+          const expMatch = result.innerHTML.match(/\+(\d+)EXP/);
+          const xp = expMatch ? expMatch[1] : "";
+          const box = '<div class="readableAnswerBox"><div>あなたの回答：</div><div class="previewMath">'+formatExpr(before)+'</div><div>正解：</div><div class="previewMath">'+formatExpr(correct)+'</div></div>';
+          if(ok) result.innerHTML = '○ 正解！<br>'+box+(xp?`+${xp}EXP / +1コイン`:"");
+          else result.innerHTML = '× 不正解<br>'+box+'<br>📖 '+(current.explanation||"")+'<br><br>🤖 '+(typeof aiExplain === "function" ? aiExplain(current.q) : "");
+        }
+      }
+      try{ if(Array.isArray(history) && history.length){ history[history.length-1].yourPretty = before; } }catch(e){}
+    };
+  }
+
+  if(typeof showResultPage === "function"){
+    window.showResultPage = showResultPage = function(text){
+      if(typeof setInputVisible === "function") setInputVisible(false);
+      byId("gameScreen") && byId("gameScreen").classList.remove("active");
+      byId("homeScreen") && byId("homeScreen").classList.remove("active");
+      byId("resultScreen") && byId("resultScreen").classList.add("active");
+      setTimeout(function(){ if(typeof ensureHomeButton === "function") ensureHomeButton(); },0);
+      const sum = byId("resultSummary");
+      if(sum) sum.innerHTML = `<div class="profileItem"><h2>${esc(text)}</h2><p>スコア：${score}</p><p>正解数：${history.filter(h=>h.ok).length}</p><p>問題数：${history.length}</p><button class="resultBtn" onclick="restartFromResult()">もう一回</button><button class="resultBtn" onclick="backHomeFromResult()">ホームへ</button></div>`;
+      let html = "<h2>解いた問題一覧</h2>";
+      for(let h of history){
+        html += `<div class="rankItem">${h.ok?"○":"×"}<br>問題：<div class="previewMath">${formatExpr(h.question)}</div>あなた：<div class="previewMath">${formatExpr(h.yourPretty || h.your || "")}</div>正解：<div class="previewMath">${formatExpr(h.answer || "")}</div></div>`;
+      }
+      const list = byId("resultList");
+      if(list) list.innerHTML = html;
+    };
+  }
+
+  try{
+    if(typeof UPDATE_NOTES !== "undefined"){
+      UPDATE_NOTES["3.2.11"] = [
+        "指数の中が x 以外の文字・式でもプレビュー表示に対応",
+        "分子・分母に文字や式が入る分数を縦分数で表示",
+        "自分の回答・正解・結果画面の数式表示をさらに見やすく調整"
+      ];
+    }
+  }catch(e){}
+  document.addEventListener("input", function(e){ if(e && e.target && e.target.id === "ans") window.updateAnswerPreviewV329(); });
+  setTimeout(function(){ window.updateAnswerPreviewV329(); },300);
+  console.log("Ver3.2.11 advanced preview patch loaded");
+})();

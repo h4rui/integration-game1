@@ -2101,7 +2101,7 @@ window.finalizeMatchVote = async function(roomId, finalGenre, questions){
 <script>
 console.log("数学マスター Ver 3.1.9 cachefix loaded", new Date().toISOString());
 </script>
-<script src="app.js?v=3.2.9-preview"></script>
+<script src="app.js?v=3.2.11-advanced-preview"></script>
 
 <!-- Ver3.1.9 realtime rank mission FINAL FIX -->
 <script type="module">
@@ -2568,3 +2568,29 @@ import { doc, setDoc, getDoc, collection, query, where, limit, onSnapshot, serve
 
 </body>
 </html>
+<style>
+/* Ver3.2.10 readable answer/result UI */
+.readableAnswerBox{
+  margin:10px auto;
+  padding:10px;
+  border-radius:14px;
+  background:rgba(255,255,255,.08);
+  max-width:94%;
+  overflow-x:auto;
+}
+.readableAnswerBox .previewMath,
+.rankItem .previewMath{
+  font-size:24px;
+  line-height:1.35;
+  margin:6px 0 10px;
+  overflow-x:auto;
+  white-space:nowrap;
+}
+#q .frac{font-size:.9em;}
+#q .sqrtBox{display:inline-flex;align-items:flex-start;vertical-align:middle;line-height:1;margin:0 2px;}
+#q .sqrtRadicand{border-top:2px solid currentColor;padding:1px 3px 0;margin-left:1px;}
+@media(max-width:600px){
+  .readableAnswerBox .previewMath,
+  .rankItem .previewMath{font-size:20px;}
+}
+</style>
