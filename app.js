@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.3.0";
+const VERSION = "3.3.1";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -6536,4 +6536,110 @@ ${ultra}
     }
   }catch(e){}
   console.log('Ver3.3.0 range/news patch loaded');
+})();
+
+
+// Ver3.3.1 dx size / ultra label / old news cleanup patch
+// 目的：指数の後ろの dx が指数サイズになる問題を修正し、超難問の問題ラベルと3.2.12のお知らせを消す。
+(function(){
+  if(window.__v331DxUltraNewsPatchLoaded) return;
+  window.__v331DxUltraNewsPatchLoaded = true;
+  try{ window.VERSION = "3.3.1"; }catch(e){}
+
+  function stripUltraLabel331(text){
+    return String(text==null?"":text).replace(/^\s*超難問\s*[：:]\s*/,'');
+  }
+  function protectDx331(text){
+    let s = stripUltraLabel331(text);
+    // ^4dx が ^4dx 全体で指数扱いされるのを防ぐ
+    s = s.replace(/\^(\d+)\s*d\s*x\b/g, '^$1 dx');
+    s = s.replace(/\^\(([^)]*)\)\s*d\s*x\b/g, '^($1) dx');
+    // 積分の後ろの dx を必ず本文側として分離
+    s = s.replace(/([^\s])d\s*x\b/g, '$1 dx');
+    return s;
+  }
+  function fixDxHTML331(html){
+    // HTMLタグの中は触らず、残った dx だけ小さめ本文サイズにする簡易処理
+    return String(html==null?"":html).replace(/(^|[^A-Za-z])d\s*x(?![A-Za-z])/g, function(_,pre){
+      return pre + '<span class="mathDx">dx</span>';
+    });
+  }
+
+  const oldPretty331 = window.prettyMathHTML || window.readableMathHTML330 || window.readableMathHTML3211 || function(x){
+    return String(x==null?"":x).replace(/[&<>"']/g,function(m){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m];});
+  };
+  function pretty331(raw){
+    const html = oldPretty331(protectDx331(raw));
+    return fixDxHTML331(html);
+  }
+  window.prettyMathHTML = pretty331;
+  window.readableMathHTML331 = pretty331;
+
+  const oldClean331 = window.cleanQuestionObject;
+  window.cleanQuestionObject = cleanQuestionObject = function(q){
+    q = (typeof oldClean331 === 'function') ? oldClean331(q) : q;
+    if(q && q.q) q.q = stripUltraLabel331(q.q);
+    return q;
+  };
+
+  function inject331Style(){
+    if(document.getElementById('v331-dx-ultra-style')) return;
+    const st=document.createElement('style');
+    st.id='v331-dx-ultra-style';
+    st.textContent=`
+      .mathDx{
+        display:inline-block!important;
+        font-size:.72em!important;
+        line-height:1!important;
+        vertical-align:baseline!important;
+        margin-left:.10em!important;
+        letter-spacing:.01em!important;
+      }
+      #q .mathDx{font-size:.70em!important;margin-left:.12em!important;}
+      .previewMath .mathDx,.answerPretty .mathDx,.correctPretty .mathDx{font-size:.72em!important;}
+    `;
+    document.head.appendChild(st);
+  }
+  inject331Style();
+
+  function rerenderQuestion331(){
+    const qEl=document.getElementById('q');
+    if(qEl && typeof current !== 'undefined' && current && current.q){
+      try{ qEl.innerHTML = pretty331(current.q); }catch(e){}
+    }
+  }
+  const oldNext331 = window.nextQ;
+  if(typeof oldNext331 === 'function'){
+    window.nextQ = nextQ = function(){
+      oldNext331.apply(this, arguments);
+      setTimeout(function(){ inject331Style(); rerenderQuestion331(); },0);
+    };
+  }
+
+  const oldUpdatePreview331 = window.updateAnswerPreviewV329;
+  window.updateAnswerPreviewV329 = function(){
+    const input=document.getElementById('ans');
+    const prev=document.getElementById('answerPreview');
+    if(!input || !prev) return;
+    prev.style.display='flex';
+    const val=input.value||'';
+    if(val.trim()){
+      prev.innerHTML='<div class="previewLabel">入力プレビュー</div><div class="previewMath">'+pretty331(val)+'</div>';
+    }else{
+      prev.innerHTML='<div class="previewLabel">入力プレビュー</div><div class="previewPlaceholder">分数・√・指数が入るスペース</div>';
+    }
+  };
+
+  try{
+    if(typeof UPDATE_NOTES !== 'undefined'){
+      delete UPDATE_NOTES['3.2.12'];
+      UPDATE_NOTES['3.3.1'] = ['問題追加'];
+    }
+  }catch(e){}
+
+  document.addEventListener('DOMContentLoaded',function(){
+    inject331Style();
+    setTimeout(rerenderQuestion331,0);
+  });
+  console.log('Ver3.3.1 dx/ultra/news patch loaded');
 })();
