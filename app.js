@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.2.8";
+const VERSION = "3.3.0";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -6413,4 +6413,127 @@ ${ultra}
     }
   }catch(e){}
   console.log("Ver3.2.12 photo ultra integral / question position patch loaded");
+})();
+
+
+// Ver3.3.0 range display / simple news patch
+// 目的：定積分の範囲表示をきれいにし、お知らせを簡潔にする。
+(function(){
+  if(window.__v330RangeNewsPatchLoaded) return;
+  window.__v330RangeNewsPatchLoaded = true;
+  try{ window.VERSION = "3.3.0"; }catch(e){}
+
+  function esc330(s){
+    return String(s==null?"":s).replace(/[&<>"']/g,function(m){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m];
+    });
+  }
+  function subToNormal330(s){
+    const map={"₀":"0","₁":"1","₂":"2","₃":"3","₄":"4","₅":"5","₆":"6","₇":"7","₈":"8","₉":"9","₋":"-"};
+    return String(s||"").replace(/[₀₁₂₃₄₅₆₇₈₉₋]/g,function(c){return map[c]||c;});
+  }
+  function integralHTML330(lower, upper){
+    lower = esc330(subToNormal330(lower)).replace(/pi/g,"π");
+    upper = esc330(subToNormal330(upper)).replace(/pi/g,"π");
+    return '<span class="defIntegral"><span class="defUpper">'+upper+'</span><span class="defSymbol">∫</span><span class="defLower">'+lower+'</span></span>';
+  }
+  function prettifyIntegralRanges330(raw){
+    let s = String(raw==null?"":raw);
+    // ∫₀^(π/2), ∫₁^e, ∫_0^(π/2), ∫_0^1 などを上下付きの積分記号にする
+    s = s.replace(/∫([₀₁₂₃₄₅₆₇₈₉₋]+)\^\(([^)]+)\)/g,function(_,lo,up){return integralHTML330(lo,up);});
+    s = s.replace(/∫([₀₁₂₃₄₅₆₇₈₉₋]+)\^([A-Za-z0-9π]+|e)/g,function(_,lo,up){return integralHTML330(lo,up);});
+    s = s.replace(/∫_\{?([^\}\^\s]+)\}?\^\(([^)]+)\)/g,function(_,lo,up){return integralHTML330(lo,up);});
+    s = s.replace(/∫_\{?([^\}\^\s]+)\}?\^\{?([^\}\s]+)\}?/g,function(_,lo,up){return integralHTML330(lo,up);});
+    return s;
+  }
+  const oldPretty330 = window.prettyMathHTML || window.readableMathHTML3211 || function(x){return esc330(x);};
+  function pretty330(raw){
+    let s = String(raw==null?"":raw);
+    // 先に積分範囲だけHTML化して、残りは既存の数式整形へ分割して通す
+    let marked = prettifyIntegralRanges330(s);
+    const tokens = marked.split(/(<span class="defIntegral"[\s\S]*?<\/span><\/span>)/g);
+    return tokens.map(function(tok){
+      if(tok.indexOf('class="defIntegral"')>=0) return tok;
+      return oldPretty330(tok);
+    }).join('');
+  }
+  window.prettyMathHTML = pretty330;
+  window.readableMathHTML330 = pretty330;
+
+  function inject330Style(){
+    if(document.getElementById('v330-range-style')) return;
+    const st=document.createElement('style');
+    st.id='v330-range-style';
+    st.textContent=`
+      .defIntegral{
+        display:inline-grid!important;
+        grid-template-rows:auto auto auto!important;
+        grid-template-columns:auto!important;
+        align-items:center!important;
+        justify-items:center!important;
+        vertical-align:middle!important;
+        line-height:1!important;
+        margin:0 .12em!important;
+        min-width:.75em!important;
+      }
+      .defIntegral .defUpper,
+      .defIntegral .defLower{
+        font-size:.42em!important;
+        line-height:1!important;
+        white-space:nowrap!important;
+        transform:translateX(.22em);
+      }
+      .defIntegral .defSymbol{
+        font-size:1.25em!important;
+        line-height:.92!important;
+      }
+      #q .defIntegral .defUpper,
+      #q .defIntegral .defLower{font-size:.36em!important;}
+      #q .defIntegral .defSymbol{font-size:1.22em!important;}
+      #q{align-items:center!important;}
+      @media(max-width:520px){
+        #q .defIntegral .defUpper,
+        #q .defIntegral .defLower{font-size:.34em!important;}
+        #q .defIntegral .defSymbol{font-size:1.18em!important;}
+      }
+    `;
+    document.head.appendChild(st);
+  }
+  inject330Style();
+
+  const oldNext330 = window.nextQ;
+  if(typeof oldNext330 === 'function'){
+    window.nextQ = nextQ = function(){
+      oldNext330.apply(this, arguments);
+      setTimeout(function(){
+        inject330Style();
+        const qEl=document.getElementById('q');
+        if(qEl && typeof current !== 'undefined' && current && current.q){
+          try{ qEl.innerHTML = pretty330(current.q); }catch(e){}
+        }
+      },0);
+    };
+  }
+
+  const oldUpdatePreview330 = window.updateAnswerPreviewV329;
+  window.updateAnswerPreviewV329 = function(){
+    const input=document.getElementById('ans');
+    const prev=document.getElementById('answerPreview');
+    if(!input || !prev) return;
+    prev.style.display='flex';
+    const val=input.value||'';
+    if(val.trim()){
+      prev.innerHTML='<div class="previewLabel">入力プレビュー</div><div class="previewMath">'+pretty330(val)+'</div>';
+    }else{
+      prev.innerHTML='<div class="previewLabel">入力プレビュー</div><div class="previewPlaceholder">分数・√・指数が入るスペース</div>';
+    }
+  };
+  document.addEventListener('input',function(e){ if(e && e.target && e.target.id==='ans') window.updateAnswerPreviewV329(); });
+
+  try{
+    if(typeof UPDATE_NOTES !== 'undefined'){
+      UPDATE_NOTES['3.3.0'] = ['問題追加'];
+    }
+  }catch(e){}
+  console.log('Ver3.3.0 range/news patch loaded');
 })();
