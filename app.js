@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.2.0";
+const VERSION = "3.2.1";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -4835,7 +4835,7 @@ console.log("app.js Ver 3.1.9 base loaded");
   if(ans) ans.addEventListener("input",updateAnswerPreviewV320);
 
   const qEl=document.getElementById("q");
-  if(qEl && window.MutationObserver){
+  if(false && qEl && window.MutationObserver){
     const obs=new MutationObserver(()=>{
       if(qEl.dataset.prettyLock==="1") return;
       const raw=qEl.textContent||"";
@@ -4966,4 +4966,162 @@ console.log("app.js Ver 3.1.9 base loaded");
       window.loadLevelRanking().then(list=>{ const box=panelV320(); if(box) box.innerHTML=renderLevelV320(list); });
     }
   };
+})();
+
+
+// Ver3.2.1 stable recovery: keypad/question/ultra-hard/news
+(function(){
+  if(window.__v321StableRecoveryLoaded) return;
+  window.__v321StableRecoveryLoaded = true;
+
+  function safeText(v){ return String(v==null?"":v); }
+  function escapeHTML321(s){ return safeText(s).replace(/[&<>"']/g,function(m){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m];}); }
+  function prettyInput321(s){
+    let t=escapeHTML321(s);
+    t=t.replace(/\^\(([^)]+)\)/g,"<sup>$1</sup>");
+    t=t.replace(/\^(\-?\d+)/g,"<sup>$1</sup>");
+    t=t.replace(/([A-Za-z0-9\)]+)\/([A-Za-z0-9\(\)]+)(?![A-Za-z0-9])/g,'<span class="frac"><span class="top">$1</span><span class="bottom">$2</span></span>');
+    return t;
+  }
+  function updatePreview321(){
+    const input=document.getElementById("ans");
+    let prev=document.getElementById("answerPreview");
+    if(!input) return;
+    if(!prev){
+      prev=document.createElement("div");
+      prev.id="answerPreview";
+      prev.className="hintBox";
+      input.insertAdjacentElement("afterend",prev);
+    }
+    if(input.value){
+      prev.style.display="block";
+      prev.innerHTML="入力プレビュー："+prettyInput321(input.value);
+    }else{
+      prev.style.display="none";
+      prev.innerHTML="";
+    }
+  }
+
+  // テンキーを直接操作に戻す。古いwrapperに依存しない。
+  window.addKey = addKey = function(text){
+    const input=document.getElementById("ans");
+    if(!input) return;
+    input.value += text;
+    try{ input.setSelectionRange(input.value.length,input.value.length); }catch(e){}
+    updatePreview321();
+  };
+  window.backspaceInput = backspaceInput = function(){
+    const input=document.getElementById("ans");
+    if(!input) return;
+    input.value=input.value.slice(0,-1);
+    updatePreview321();
+  };
+  window.clearInput = clearInput = function(){
+    const input=document.getElementById("ans");
+    if(!input) return;
+    input.value="";
+    updatePreview321();
+  };
+
+  // 超難問を積分専用で追加
+  const ULTRA_INTEGRAL_QUESTIONS_321 = [
+    {q:"超難問：∫ x²e^x dx", a:"exp(x)*(x^2-2*x+2)", display:"e^x(x^2-2x+2)+C", explanation:"部分積分を2回使います。"},
+    {q:"超難問：∫ xlog(x) dx", a:"(x^2/2)*log(x)-x^2/4", display:"(x^2/2)log(x)-x^2/4+C", explanation:"部分積分。log(x)を微分する側にします。"},
+    {q:"超難問：∫ 1/(x²+4x+5) dx", a:"atan(x+2)", display:"arctan(x+2)+C", explanation:"平方完成して (x+2)^2+1 にします。"},
+    {q:"超難問：∫ (2x+3)/(x²+3x+2) dx", a:"log(x^2+3*x+2)", display:"log(x^2+3x+2)+C", explanation:"分子が分母の微分です。"},
+    {q:"超難問：∫ sin(x)cos(x) dx", a:"sin(x)^2/2", display:"sin(x)^2/2+C", explanation:"t=sin(x) と置換します。"},
+    {q:"超難問：∫₀¹ x/(x²+1) dx", a:"1/2*log(2)", display:"1/2log2", explanation:"t=x²+1 と置換します。"}
+  ];
+  window.generateUltraHardIntegralQuestion = function(){
+    const q=ULTRA_INTEGRAL_QUESTIONS_321[rand(0,ULTRA_INTEGRAL_QUESTIONS_321.length-1)];
+    return (typeof cleanQuestionObject==="function") ? cleanQuestionObject(Object.assign({},q)) : Object.assign({},q);
+  };
+
+  const baseGenerateQuestion321 = (typeof generateQuestion === "function") ? generateQuestion : null;
+  if(baseGenerateQuestion321){
+    window.generateQuestion = generateQuestion = function(){
+      if(mode==="integral" && difficulty==="ultraHard") return window.generateUltraHardIntegralQuestion();
+      return baseGenerateQuestion321();
+    };
+  }
+
+  // 問題表示をプレーンテキストで安定化。問題が出ない事故を防ぐ。
+  window.nextQ = nextQ = function(){
+    if(typeof clearHint==="function") clearHint();
+    let count=0;
+    do{
+      current = (typeof cleanQuestionObject==="function") ? cleanQuestionObject(generateQuestion()) : generateQuestion();
+      count++;
+    }while(usedQuestions && usedQuestions.includes(current.q) && count<100);
+    if(usedQuestions) usedQuestions.push(current.q);
+    const q=document.getElementById("q");
+    const go=document.getElementById("goText");
+    const ans=document.getElementById("ans");
+    if(ans) ans.value="";
+    updatePreview321();
+    if(q){
+      q.innerHTML="";
+      q.textContent="";
+      q.classList.remove("questionAnim");
+    }
+    if(go){ go.classList.remove("goAnim"); void go.offsetWidth; }
+    setTimeout(function(){
+      if(go) go.classList.add("goAnim");
+      setTimeout(function(){
+        if(q){
+          q.textContent = (typeof cleanMathExpression==="function") ? cleanMathExpression(current.q) : current.q;
+          q.classList.add("questionAnim");
+        }
+      },180);
+    },80);
+  };
+
+  // 積分だけ「超難問」ボタンを表示
+  const oldSelectDifficulty321 = (typeof selectDifficulty === "function") ? selectDifficulty : null;
+  if(oldSelectDifficulty321){
+    window.selectDifficulty = selectDifficulty = function(m){
+      mode=m;
+      let ultra = m==="integral" ? `<button class="modeBtn hardBtn" onclick="startMode('ultraHard')">💀 超難問</button>` : "";
+      const p=document.getElementById("panelArea");
+      if(p){
+        p.innerHTML=`
+<h2>難易度選択</h2>
+<button class="modeBtn" onclick="startMode('easy')">🟢 初級</button>
+<button class="modeBtn" onclick="startMode('normal')">🟡 中級</button>
+<button class="modeBtn" onclick="startMode('hard')">🔴 上級</button>
+<button class="modeBtn hardBtn" onclick="startMode('veryHard')">🔥 難問</button>
+${ultra}
+`;
+      }
+    };
+  }
+
+  const oldOpenGame321 = (typeof openGame === "function") ? openGame : null;
+  if(oldOpenGame321){
+    window.openGame = openGame = function(){
+      oldOpenGame321.apply(this,arguments);
+      if(mode==="integral" && difficulty==="ultraHard"){
+        const mt=document.getElementById("modeTitle");
+        if(mt) mt.innerText="💀 積分 超難問 💀";
+      }
+    };
+  }
+
+  // お知らせ：シリアルコード以外の更新内容は毎回載せる
+  try{
+    if(typeof UPDATE_NOTES !== "undefined"){
+      UPDATE_NOTES["3.2.1"] = [
+        "テンキーが反応しない問題を修正",
+        "問題が表示されない問題を修正",
+        "積分に超難問を追加",
+        "素因数分解の判定を最後まで分解した場合のみ正解に修正",
+        "因数分解の順番入れ替え判定を安定化",
+        "ランキング閲覧は未ログイン可能、反映はログイン必須に整理",
+        "全体ミッションは未ログインでも反映する仕様に整理"
+      ];
+    }
+  }catch(e){ console.warn(e); }
+
+  document.addEventListener("input",function(e){ if(e && e.target && e.target.id==="ans") updatePreview321(); });
+  console.log("Ver3.2.1 stable recovery loaded");
 })();
