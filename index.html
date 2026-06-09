@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5681066295421790"
 crossorigin="anonymous"></script>
-<title>数学マスター Ver 3.1.9</title>
+<title>数学マスター Ver 3.2.0</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -352,7 +352,7 @@ body{
   text-shadow:0 0 8px #60a5fa,0 0 18px #7c3aed,0 0 32px #38bdf8;
 }
 #homeScreen h1::after{
-  content:"Ver 3.1.9";display:block;font-size:18px;color:#67e8f9;margin-top:6px;text-shadow:0 0 10px #22d3ee;
+  content:"Ver 3.2.0";display:block;font-size:18px;color:#67e8f9;margin-top:6px;text-shadow:0 0 10px #22d3ee;
 }
 #homePlayerCard{
   width:88%;max-width:780px;margin:18px auto 22px;padding:18px;
@@ -978,6 +978,15 @@ button,.modeBtn{
 
 /* Ver3.1.8 simple nakanaka title */
 .nakanakaSimpleTitle{color:#4FC3F7;font-weight:900;text-shadow:0 0 6px #4FC3F7,0 0 14px #00aaff;}
+
+/* Ver3.2.0 math display */
+.mathPreview{min-height:34px;width:84%;max-width:560px;margin:4px auto 8px;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.10);border:1px solid rgba(0,255,204,.35);font-size:26px;line-height:1.3;word-break:break-word;}
+.frac{display:inline-block;vertical-align:middle;text-align:center;line-height:1;margin:0 2px;}
+.frac .top{display:block;border-bottom:1.5px solid currentColor;padding:0 3px 2px;}
+.frac .bottom{display:block;padding:2px 3px 0;}
+#q .frac,.mathPreview .frac{font-size:.9em;}
+#q sup,.mathPreview sup{font-size:.65em;vertical-align:super;}
+
 </style>
 <!--
 Googleログイン用メモ:
@@ -1041,6 +1050,7 @@ h4rui.github.io
   <div id="q">START</div>
 
   <input id="ans" placeholder="答え" inputmode="none" autocomplete="off">
+  <div id="answerPreview" class="mathPreview"></div>
   <div id="customKeyboard">
     <button class="keyBtn" onclick="addKey('7')">7</button>
     <button class="keyBtn" onclick="addKey('8')">8</button>
@@ -2062,7 +2072,7 @@ window.finalizeMatchVote = async function(roomId, finalGenre, questions){
 <script>
 console.log("数学マスター Ver 3.1.9 cachefix loaded", new Date().toISOString());
 </script>
-<script src="app.js?v=3.1.9-realtime-final"></script>
+<script src="app.js?v=3.2.0-display-rank"></script>
 
 <!-- Ver3.1.9 realtime rank mission FINAL FIX -->
 <script type="module">
@@ -2344,5 +2354,183 @@ import { doc, setDoc, getDoc, collection, query, where, limit, onSnapshot, serve
 })();
 </script>
 
+<script>
+
+// Ver3.2.0 final: strict prime, factor order, display, ranking write/login policy
+(function(){
+  if(window.__v320FinalPatchLoaded) return;
+  window.__v320FinalPatchLoaded = true;
+
+  function loginReal(){
+    return !!(window.getGoogleLoginInfo && window.getGoogleLoginInfo());
+  }
+  function todayKeyV320(){
+    return new Date().toLocaleDateString("ja-JP",{timeZone:"Asia/Tokyo"});
+  }
+  function escapeHTMLV320(s){
+    return String(s==null?"":s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));
+  }
+  function prettyMathHTML(s){
+    let t=escapeHTMLV320(s);
+    t=t.replace(/\^\(([^)]+)\)/g,"<sup>$1</sup>");
+    t=t.replace(/\^(\-?\d+)/g,"<sup>$1</sup>");
+    t=t.replace(/([A-Za-z0-9\)]+)\/([A-Za-z0-9\(\)]+)(?![A-Za-z0-9])/g,'<span class="frac"><span class="top">$1</span><span class="bottom">$2</span></span>');
+    return t;
+  }
+  window.prettyMathHTML = prettyMathHTML;
+  function updateAnswerPreviewV320(){
+    const input=document.getElementById("ans");
+    const prev=document.getElementById("answerPreview");
+    if(prev) prev.innerHTML = input && input.value ? prettyMathHTML(input.value) : "";
+  }
+  const oldAddKeyV320 = window.addKey || (typeof addKey==="function"?addKey:null);
+  if(oldAddKeyV320){
+    window.addKey = addKey = function(text){
+      oldAddKeyV320.apply(this,arguments);
+      updateAnswerPreviewV320();
+    };
+  }
+  const oldBackV320 = window.backspaceInput || (typeof backspaceInput==="function"?backspaceInput:null);
+  if(oldBackV320){ window.backspaceInput = backspaceInput = function(){ oldBackV320.apply(this,arguments); updateAnswerPreviewV320(); }; }
+  const oldClearV320 = window.clearInput || (typeof clearInput==="function"?clearInput:null);
+  if(oldClearV320){ window.clearInput = clearInput = function(){ oldClearV320.apply(this,arguments); updateAnswerPreviewV320(); }; }
+  const ans=document.getElementById("ans");
+  if(ans) ans.addEventListener("input",updateAnswerPreviewV320);
+
+  const qEl=document.getElementById("q");
+  if(qEl && window.MutationObserver){
+    const obs=new MutationObserver(()=>{
+      if(qEl.dataset.prettyLock==="1") return;
+      const raw=qEl.textContent||"";
+      if(!raw || raw==="START") return;
+      qEl.dataset.prettyLock="1";
+      qEl.innerHTML=prettyMathHTML(raw);
+      qEl.dataset.prettyLock="0";
+    });
+    obs.observe(qEl,{childList:true,characterData:true,subtree:true});
+  }
+
+  // strict prime + robust factor order final guard
+  if(typeof checkPrimeAnswer === "function"){
+    const oldPrime=checkPrimeAnswer;
+    checkPrimeAnswer=function(input,number){
+      const s=String(input||"").trim();
+      if(/^\d+$/.test(s) && Number(s)===Number(number) && !isPrime(Number(number))) return false;
+      return oldPrime(input,number);
+    };
+    window.checkPrimeAnswer=checkPrimeAnswer;
+  }
+  if(typeof normalize === "function"){
+    const oldNorm=normalize;
+    normalize=function(str){
+      return oldNorm(str).replace(/\)\(/g,")*(").replace(/(\d|x|pi|e|\))(?=\()/g,"$1*");
+    };
+    window.normalize=normalize;
+  }
+
+  function saveDailyLocalCorrectV320(delta){
+    const today=todayKeyV320();
+    if(playerData.dailyCorrectRankDate!==today){
+      playerData.dailyCorrectRankDate=today;
+      playerData.dailyCorrectRankCount=0;
+    }
+    playerData.dailyCorrectRankCount=(playerData.dailyCorrectRankCount||0)+Number(delta||0);
+    // 互換用
+    playerData.dailyQuestionRankDate=today;
+    playerData.dailyQuestionRankCount=playerData.dailyCorrectRankCount;
+    if(typeof saveAllData==="function") saveAllData();
+    if(loginReal() && window.saveDailyQuestionTotal){
+      window.saveDailyQuestionTotal(playerData.dailyCorrectRankCount).catch(e=>console.warn("daily ranking save failed",e));
+    }
+  }
+
+  const prevSubmitV320 = window.submit || (typeof submit==="function"?submit:null);
+  if(prevSubmitV320 && !window.__v320SubmitWrapped){
+    window.__v320SubmitWrapped=true;
+    window.submit = submit = async function(){
+      const beforeC=playerData.totalCorrect||0;
+      const ret=await prevSubmitV320.apply(this,arguments);
+      const afterC=playerData.totalCorrect||0;
+      const diff=afterC-beforeC;
+      if(diff>0){
+        saveDailyLocalCorrectV320(diff);           // ランキング反映はログイン時だけ
+        if(window.contributeGlobalMission) window.contributeGlobalMission(diff).catch(e=>console.warn("global mission failed",e)); // 全体は未ログインOK
+        if(loginReal() && window.saveLevelRankingNow) window.saveLevelRankingNow().catch(e=>console.warn("level ranking save failed",e));
+      }
+      return ret;
+    };
+  }
+
+  function panel(){return document.getElementById("panelArea");}
+  function homeBtn(){ if(typeof ensureHomeButton==="function") setTimeout(ensureHomeButton,0); }
+
+  window.showRankingMenu = showRankingMenu = function(){
+    const p=panel(); if(!p)return;
+    p.innerHTML=`
+      <h2>🏆 ランキング</h2>
+      <div class="profileItem"><p>ランキングは誰でも見れます。反映はGoogleログイン中のみです。</p></div>
+      <button class="modeBtn" onclick="showLevelRanking319()">⭐ レベルランキング</button>
+      <button class="modeBtn" onclick="showDailyQuestionRanking319()">📚 日間正解数ランキング</button>
+      <button class="modeBtn" onclick="showRateRanking()">🏅 レートランキング</button>
+    `;
+    homeBtn();
+  };
+  window.showFriendRanking = function(){
+    const p=panel(); if(p){ p.innerHTML=`<h2>🤝 フレンドランキング</h2><div class="profileItem"><p>フレンドランキングは削除しました。</p></div>`; homeBtn(); }
+  };
+  const oldFriendMenuV320 = window.showFriendMenu || (typeof showFriendMenu==="function"?showFriendMenu:null);
+  if(oldFriendMenuV320){
+    window.showFriendMenu = showFriendMenu = function(){
+      oldFriendMenuV320.apply(this,arguments);
+      setTimeout(()=>{ const p=panel(); if(p) p.innerHTML=p.innerHTML.replace(/<button[^>]*onclick=["']showFriendRanking\(\)["'][^>]*>[\s\S]*?<\/button>/g,""); },0);
+    };
+  }
+  window.selectRankingMode = selectRankingMode = function(){
+    alert("週間ランキングモードは削除しました。学習モードから通常問題を選んでください。");
+  };
+
+  console.log("Ver3.2.0 final app patch loaded");
+})();
+</script>
+<script>
+
+// Ver3.2.0 realtime ranking display final
+(function(){
+  function rankTitleHTMLV320(t){ return (typeof titleHTML==="function") ? titleHTML(t||"初心者") : (t||"初心者"); }
+  function panelV320(){return document.getElementById("panelArea");}
+  function renderDailyV320(list){
+    let html=`<h2>📚 日間正解数ランキング</h2><div class="profileItem"><p>表示は誰でも可能。ランキング反映はログイン中のみ。</p></div>`;
+    if(!list || !list.length) html += `<p>まだ記録がありません</p>`;
+    (list||[]).forEach((r,i)=>{ html+=`<div class="rankItem">${i+1}位 ${r.icon?`<img class="rankIcon" src="${r.icon}">`:""}${r.name||"名無し"}<br>${rankTitleHTMLV320(r.title)}<br>Lv${r.level||1}<br>${r.count||0}問</div>`; });
+    return html;
+  }
+  function renderLevelV320(list){
+    let html=`<h2>⭐ レベルランキング</h2><div class="profileItem"><p>表示は誰でも可能。ランキング反映はログイン中のみ。</p></div>`;
+    if(!list || !list.length) html += `<p>まだ記録がありません</p>`;
+    (list||[]).forEach((r,i)=>{ html+=`<div class="rankItem">${i+1}位 ${r.icon?`<img class="rankIcon" src="${r.icon}">`:""}${r.name||r.playerName||"名無し"}<br>${rankTitleHTMLV320(r.title)}<br>Lv${r.level||1}<br>EXP：${r.exp||0}</div>`; });
+    return html;
+  }
+  window.showDailyQuestionRanking319 = function(){
+    const p=panelV320(); if(!p)return;
+    p.innerHTML=`<h2>📚 日間正解数ランキング</h2><p>読み込み中...</p>`;
+    if(window.__dailyRankUnsub) try{window.__dailyRankUnsub();}catch(e){}
+    if(window.subscribeDailyQuestionRanking){
+      window.__dailyRankUnsub=window.subscribeDailyQuestionRanking(list=>{ const box=panelV320(); if(box) box.innerHTML=renderDailyV320(list); if(typeof ensureHomeButton==="function") ensureHomeButton(); });
+    }else if(window.loadDailyQuestionRanking){
+      window.loadDailyQuestionRanking().then(list=>{ const box=panelV320(); if(box) box.innerHTML=renderDailyV320(list); });
+    }
+  };
+  window.showLevelRanking319 = function(){
+    const p=panelV320(); if(!p)return;
+    p.innerHTML=`<h2>⭐ レベルランキング</h2><p>読み込み中...</p>`;
+    if(window.__levelRankUnsub) try{window.__levelRankUnsub();}catch(e){}
+    if(window.subscribeLevelRanking){
+      window.__levelRankUnsub=window.subscribeLevelRanking(list=>{ const box=panelV320(); if(box) box.innerHTML=renderLevelV320(list); if(typeof ensureHomeButton==="function") ensureHomeButton(); });
+    }else if(window.loadLevelRanking){
+      window.loadLevelRanking().then(list=>{ const box=panelV320(); if(box) box.innerHTML=renderLevelV320(list); });
+    }
+  };
+})();
+</script>
 </body>
 </html>

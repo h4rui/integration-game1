@@ -868,7 +868,7 @@ window.finalizeMatchVote = async function(roomId, finalGenre, questions){
   return after.exists() ? after.data() : null;
 };
 
-console.log("module.js Ver 3.1.9 rank mission fix loaded");
+console.log("module.js Ver 3.2.0 display/ranking fix loaded");
 
 
 // Ver3.1.9 ranking / mission / mutual friend helpers
@@ -904,7 +904,6 @@ window.saveDailyQuestionCount = async function(delta=1){
   },{merge:true});
 };
 window.loadDailyQuestionRanking = async function(){
-  requireLogin319();
   const day=getDailyKey319();
   const snap=await getDocs(query(collection(db,"dailyQuestionRankings"), where("day","==",day), limit(100)));
   let list=[]; snap.forEach(d=>list.push(d.data()));
@@ -912,7 +911,6 @@ window.loadDailyQuestionRanking = async function(){
   return list.slice(0,100);
 };
 window.loadLevelRanking = async function(){
-  requireLogin319();
   const snap=await getDocs(collection(db,"players"));
   let list=[]; snap.forEach(d=>list.push(d.data()));
   const seen=new Set();
@@ -1005,3 +1003,74 @@ window.syncMyCloudFriends = async function(){
   if(!snap.exists()) return [];
   return Array.isArray(snap.data().friends)?snap.data().friends:[];
 };
+
+
+// Ver3.2.0 final ranking/mission API
+(function(){
+  function dayKeyV320(){
+    const now=new Date();
+    const jp=new Date(now.toLocaleString("en-US",{timeZone:"Asia/Tokyo"}));
+    return `${jp.getFullYear()}-${String(jp.getMonth()+1).padStart(2,"0")}-${String(jp.getDate()).padStart(2,"0")}`;
+  }
+  function loggedUserV320(){ return auth.currentUser || null; }
+  window.saveDailyQuestionTotal = async function(totalCount=0){
+    const user=loggedUserV320();
+    if(!user) return false;
+    const playerId=getPlayerId();
+    const day=dayKeyV320();
+    const ref=doc(db,"dailyQuestionRankings",day+"_"+playerId);
+    const bundle=window.getLocalGameData?window.getLocalGameData():{};
+    const pp=bundle.playerProfile||{};
+    const pd=bundle.playerData||{};
+    await setDoc(ref,{day,playerId,uid:user.uid,name:pp.name||"名無し",icon:pp.icon||"",title:pd.equippedTitle||"初心者",level:(window.getLevel?window.getLevel():1),count:Number(totalCount||0),updatedAt:serverTimestamp()},{merge:true});
+    return true;
+  };
+  window.saveLevelRankingNow = async function(){
+    const user=loggedUserV320();
+    if(!user) return false;
+    const playerId=getPlayerId();
+    const bundle=window.getLocalGameData?window.getLocalGameData():{};
+    const pp=bundle.playerProfile||{};
+    const pd=bundle.playerData||{};
+    const data={playerId,uid:user.uid,name:pp.name||"名無し",playerName:pp.name||"名無し",icon:pp.icon||"",title:pd.equippedTitle||"初心者",level:(window.getLevel?window.getLevel():1),exp:pd.exp||0,totalQuestions:pd.totalQuestions||0,bestRandomScore:pd.bestRandomScore||0,updatedAt:serverTimestamp()};
+    await setDoc(doc(db,"players",playerId),data,{merge:true});
+    const fc=normalizeFriendCode(localStorage.getItem("friendCode"));
+    if(fc) await setDoc(doc(db,"players",fc),{...data,friendCode:fc},{merge:true});
+    return true;
+  };
+  window.loadDailyQuestionRanking = async function(){
+    const day=dayKeyV320();
+    const snap=await getDocs(query(collection(db,"dailyQuestionRankings"), where("day","==",day), limit(100)));
+    let list=[]; snap.forEach(d=>list.push(d.data()));
+    list.sort((a,b)=>(b.count||0)-(a.count||0));
+    return list.slice(0,100);
+  };
+  window.loadLevelRanking = async function(){
+    const snap=await getDocs(collection(db,"players"));
+    let list=[]; snap.forEach(d=>list.push(d.data()));
+    const seen=new Set();
+    list=list.filter(p=>{const k=p.uid||p.playerId||p.friendCode||p.name; if(seen.has(k))return false; seen.add(k); return true;});
+    list.sort((a,b)=>((b.level||1)-(a.level||1))||((b.exp||0)-(a.exp||0)));
+    return list.slice(0,100);
+  };
+  window.subscribeDailyQuestionRanking = function(callback){
+    const day=dayKeyV320();
+    const qRef=query(collection(db,"dailyQuestionRankings"), where("day","==",day), limit(100));
+    return onSnapshot(qRef,(snap)=>{let list=[]; snap.forEach(d=>list.push(d.data())); list.sort((a,b)=>(b.count||0)-(a.count||0)); callback(list.slice(0,100));});
+  };
+  window.subscribeLevelRanking = function(callback){
+    return onSnapshot(collection(db,"players"),(snap)=>{let list=[]; snap.forEach(d=>list.push(d.data())); const seen=new Set(); list=list.filter(p=>{const k=p.uid||p.playerId||p.friendCode||p.name; if(seen.has(k))return false; seen.add(k); return true;}); list.sort((a,b)=>((b.level||1)-(a.level||1))||((b.exp||0)-(a.exp||0))); callback(list.slice(0,100));});
+  };
+  window.contributeGlobalMission = async function(delta=1){
+    const day=dayKeyV320();
+    const ref=doc(db,"globalMissions",day);
+    const snap=await getDoc(ref);
+    const old=snap.exists()?snap.data():{};
+    await setDoc(ref,{day,correct:(old.correct||0)+Number(delta||1),updatedAt:serverTimestamp()},{merge:true});
+    return true;
+  };
+  window.subscribeGlobalMission = function(callback){
+    const day=dayKeyV320();
+    return onSnapshot(doc(db,"globalMissions",day),(snap)=>callback(snap.exists()?snap.data():{day,correct:0}));
+  };
+})();
