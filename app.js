@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.2.1";
+const VERSION = "3.2.8";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -219,7 +219,8 @@ if(!playerData.exp)playerData.exp=0;
 applySettings();
 updateHomeStatus();
 prepareDailyMission();
-giveDailyCoinBonus();
+// Ver3.2.8: ログインボーナス廃止
+// giveDailyCoinBonus();
 }
 function saveAllData(){
 localStorage.setItem("playerProfile",JSON.stringify(playerProfile));
@@ -5415,4 +5416,360 @@ ${ultra}
     }
   }catch(e){}
   console.log("Ver3.2.3 custom patch loaded");
+})();
+
+
+// Ver3.2.8 final consolidation patch
+// 目的：3.2.3以降の修正を全部反映。クリック停止・テンキー・問題表示・ログボ削除・表示整理。
+(function(){
+  if(window.__v328FinalPatchLoaded) return;
+  window.__v328FinalPatchLoaded = true;
+
+  try{ window.VERSION = "3.2.8"; }catch(e){}
+
+  function byId(id){ return document.getElementById(id); }
+  function panel(){ return byId("panelArea"); }
+  function home(){ if(typeof ensureHomeButton === "function") setTimeout(ensureHomeButton,0); }
+  function htmlEscape(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(m){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m];}); }
+  function safeClean(s){ return (typeof cleanMathExpression === "function") ? cleanMathExpression(s) : String(s==null?"":s); }
+
+  // ログインボーナスは完全に廃止。初回ロード時にも付与しない。
+  window.giveDailyCoinBonus = giveDailyCoinBonus = function(){ return; };
+  window.showLoginCalendar = showLoginCalendar = function(){
+    const p = panel();
+    if(p){
+      p.innerHTML = `<h2>📅 ログボカレンダー</h2><div class="profileItem"><p>ログインボーナスは廃止しました。</p></div>`;
+      home();
+    }
+  };
+
+  // XP：分野別基礎XP × 難易度倍率。小数切り捨て。ランダムは20固定。
+  const BASE_XP_328 = { arithmetic:3, expand:5, factor:7, prime:8, primeFactor:8, derivative:12, integral:14 };
+  const RATE_XP_328 = { bunkei:0.8, easy:1, normal:1.3, hard:1.5, veryHard:2, ultraHard:2.5, superHard:2.5, difficult:2, super:2.5 };
+  window.calculateQuestionXP323 = window.calculateQuestionXP = function(m,d){
+    if(m === "random" || m === "studyRandom") return 20;
+    const base = BASE_XP_328[m] || 10;
+    const rate = RATE_XP_328[d] == null ? 1 : RATE_XP_328[d];
+    return Math.floor(base * rate);
+  };
+
+  // 分数表示をなるべく統一
+  function fracHTML(a,b){ return `<span class="frac"><span class="top">${a}</span><span class="bottom">${b}</span></span>`; }
+  function prettyMath328(raw){
+    let t = htmlEscape(raw);
+    t = t.replace(/\^\(([^)]+)\)/g,"<sup>$1</sup>");
+    t = t.replace(/\^(\-?\d+)/g,"<sup>$1</sup>");
+    t = t.replace(/\(([^()<>]+)\)\/\(([^()<>]+)\)/g, function(_,a,b){return fracHTML(a,b);});
+    t = t.replace(/([\-]?\d+)\/\(([^()<>]+)\)/g, function(_,a,b){return fracHTML(a,b);});
+    t = t.replace(/\(([^()<>]+)\)\/([A-Za-z0-9π]+(?:<sup>\-?\d+<\/sup>|[²³⁴⁵⁶])?)/g, function(_,a,b){return fracHTML(a,b);});
+    t = t.replace(/(^|[^\w<\/])([\-]?(?:\d+|x|π|e|log\d*|sin\d*|cos\d*|tan\d*|arctan\d*))\/([A-Za-z0-9π]+(?:<sup>\-?\d+<\/sup>|[²³⁴⁵⁶])?)/g, function(m,pre,a,b){return pre+fracHTML(a,b);});
+    return t;
+  }
+  window.prettyMathHTML = prettyMath328;
+
+  function updatePreview328(){
+    const input = byId("ans");
+    if(!input) return;
+    let prev = byId("answerPreview");
+    if(!prev){
+      prev = document.createElement("div");
+      prev.id = "answerPreview";
+      prev.className = "hintBox";
+      input.insertAdjacentElement("afterend", prev);
+    }
+    if(input.value){
+      prev.style.display = "block";
+      prev.innerHTML = "入力プレビュー：" + prettyMath328(input.value);
+    }else{
+      prev.style.display = "none";
+      prev.innerHTML = "";
+    }
+  }
+  window.updateAnswerPreviewV328 = updatePreview328;
+
+  // テンキー：古いwrapperに頼らず直接入力へ。
+  window.addKey = addKey = function(text){
+    const input = byId("ans");
+    if(!input) return;
+    input.value += text;
+    try{ input.dispatchEvent(new Event("input", {bubbles:true})); }catch(e){}
+    try{ input.setSelectionRange(input.value.length,input.value.length); }catch(e){}
+    updatePreview328();
+  };
+  window.backspaceInput = backspaceInput = function(){
+    const input = byId("ans");
+    if(!input) return;
+    input.value = input.value.slice(0,-1);
+    try{ input.dispatchEvent(new Event("input", {bubbles:true})); }catch(e){}
+    updatePreview328();
+  };
+  window.clearInput = clearInput = function(){
+    const input = byId("ans");
+    if(!input) return;
+    input.value = "";
+    try{ input.dispatchEvent(new Event("input", {bubbles:true})); }catch(e){}
+    updatePreview328();
+  };
+
+  // 積分超難問（積分だけLv10相当）
+  const ULTRA_328 = [
+    {q:"超難問：∫ x²e^x dx", a:"exp(x)*(x^2-2*x+2)", display:"e^x(x^2-2x+2)+C", explanation:"部分積分を2回使います。"},
+    {q:"超難問：∫ x²sinx dx", a:"-x^2*cos(x)+2*x*sin(x)+2*cos(x)", display:"-x^2cosx+2xsinx+2cosx+C", explanation:"部分積分を2回使います。"},
+    {q:"超難問：∫ x²cosx dx", a:"x^2*sin(x)+2*x*cos(x)-2*sin(x)", display:"x^2sinx+2xcosx-2sinx+C", explanation:"部分積分を2回使います。"},
+    {q:"超難問：∫ e^x cosx dx", a:"exp(x)*(sin(x)+cos(x))/2", display:"e^x(sinx+cosx)/2+C", explanation:"部分積分を2回使い、元の積分を移項します。"},
+    {q:"超難問：∫ e^x sinx dx", a:"exp(x)*(sin(x)-cos(x))/2", display:"e^x(sinx-cosx)/2+C", explanation:"部分積分を2回使い、元の積分を移項します。"},
+    {q:"超難問：∫ 1/(x²+4x+8) dx", a:"atan((x+2)/2)/2", display:"1/2arctan((x+2)/2)+C", explanation:"平方完成して (x+2)^2+4 にします。"},
+    {q:"超難問：∫ x/(x²+1)^2 dx", a:"-1/(2*(x^2+1))", display:"-1/(2(x^2+1))+C", explanation:"t=x²+1 と置換します。"},
+    {q:"超難問：∫ logx dx", a:"x*log(x)-x", display:"xlogx-x+C", explanation:"部分積分で logx を微分する側にします。"}
+  ];
+  window.generateUltraHardIntegralQuestion = function(){
+    const q = ULTRA_328[Math.floor(Math.random()*ULTRA_328.length)];
+    return (typeof cleanQuestionObject === "function") ? cleanQuestionObject(Object.assign({},q)) : Object.assign({},q);
+  };
+
+  const baseGenerate328 = (typeof generateQuestion === "function") ? generateQuestion : null;
+  if(baseGenerate328 && !window.__v328GenerateWrapped){
+    window.__v328GenerateWrapped = true;
+    window.generateQuestion = generateQuestion = function(){
+      if(mode === "studyRandom"){
+        const oldMode = mode, oldDiff = difficulty;
+        const modes = ["integral","derivative","factor","prime","expand"];
+        mode = modes[Math.floor(Math.random()*modes.length)];
+        difficulty = "veryHard";
+        let q = baseGenerate328();
+        mode = oldMode; difficulty = oldDiff;
+        return (typeof cleanQuestionObject === "function") ? cleanQuestionObject(q) : q;
+      }
+      if(mode === "integral" && (difficulty === "ultraHard" || difficulty === "superHard")) return window.generateUltraHardIntegralQuestion();
+      return baseGenerate328.apply(this, arguments);
+    };
+  }
+
+  // 問題表示：アニメ待ちで消える事故を防ぐため即表示＋軽い演出。
+  window.nextQ = nextQ = function(){
+    try{ if(typeof clearHint === "function") clearHint(); }catch(e){}
+    let count = 0;
+    do{
+      current = (typeof cleanQuestionObject === "function") ? cleanQuestionObject(generateQuestion()) : generateQuestion();
+      count++;
+    }while(usedQuestions && current && usedQuestions.includes(current.q) && count < 100);
+    if(usedQuestions && current && current.q) usedQuestions.push(current.q);
+    const q = byId("q");
+    const ans = byId("ans");
+    const go = byId("goText");
+    if(ans) ans.value = "";
+    updatePreview328();
+    if(q){
+      q.classList.remove("questionAnim");
+      q.textContent = current && current.q ? safeClean(current.q) : "問題を生成できませんでした";
+      try{ void q.offsetWidth; q.classList.add("questionAnim"); }catch(e){}
+    }
+    if(go){ try{ go.classList.remove("goAnim"); void go.offsetWidth; go.classList.add("goAnim"); }catch(e){} }
+  };
+
+  // 学習メニュー：ランダムの横のXP表示は消す。
+  window.startRandomStudyMode = function(){
+    mode = "studyRandom";
+    difficulty = "veryHard";
+    openGame();
+    start();
+  };
+  window.showStudyMenu = showStudyMenu = function(){
+    const p = panel();
+    if(!p) return;
+    p.innerHTML = `
+      <h2>📚 学習モード</h2>
+      <button class="modeBtn" onclick="selectDifficulty('integral')">積分</button>
+      <button class="modeBtn" onclick="selectDifficulty('derivative')">微分</button>
+      <button class="modeBtn" onclick="selectDifficulty('factor')">因数分解</button>
+      <button class="modeBtn" onclick="selectDifficulty('prime')">素因数分解</button>
+      <button class="modeBtn" onclick="selectDifficulty('expand')">展開</button>
+      <button class="modeBtn" onclick="selectDifficulty('arithmetic')">四則演算</button>
+      <button class="modeBtn hardBtn" onclick="startRandomStudyMode()">🎲 ランダム</button>
+    `;
+    home();
+  };
+
+  // 難易度選択：Lv表示なし。文系は微分・積分だけ、初級の上。
+  window.selectDifficulty = selectDifficulty = function(m){
+    mode = m;
+    const p = panel();
+    if(!p) return;
+    const bunkei = (m === "integral" || m === "derivative") ? `<button class="modeBtn" onclick="startMode('bunkei')">📘 文系</button>` : "";
+    const ultra = (m === "integral") ? `<button class="modeBtn hardBtn" onclick="startMode('ultraHard')">💀 超難問</button>` : "";
+    p.innerHTML = `
+      <h2>難易度選択</h2>
+      ${bunkei}
+      <button class="modeBtn" onclick="startMode('easy')">🟢 初級</button>
+      <button class="modeBtn" onclick="startMode('normal')">🟡 中級</button>
+      <button class="modeBtn" onclick="startMode('hard')">🔴 上級</button>
+      <button class="modeBtn hardBtn" onclick="startMode('veryHard')">🔥 難問</button>
+      ${ultra}
+    `;
+    home();
+  };
+
+  const baseOpen328 = (typeof openGame === "function") ? openGame : null;
+  if(baseOpen328 && !window.__v328OpenWrapped){
+    window.__v328OpenWrapped = true;
+    window.openGame = openGame = function(){
+      baseOpen328.apply(this, arguments);
+      const mt = byId("modeTitle");
+      if(!mt) return;
+      if(mode === "studyRandom") mt.innerText = "🎲 ランダム問題 🎲";
+      if(mode === "derivative" && difficulty === "bunkei") mt.innerText = "📘 文系 微分 📘";
+      if(mode === "integral" && difficulty === "bunkei") mt.innerText = "📘 文系 積分 📘";
+      if(mode === "integral" && (difficulty === "ultraHard" || difficulty === "superHard")) mt.innerText = "💀 積分 超難問 💀";
+    };
+  }
+
+  // 対戦メニュー：ホーム/対戦欄の「ランダム問題」は置かない。
+  window.showMatchMenu = showMatchMenu = function(){
+    const p = panel();
+    if(!p) return;
+    p.innerHTML = `
+      <h2>⚔️ 対戦</h2>
+      <button class="modeBtn" onclick="showOnlineMatchMenu()">⚔️ ランダムマッチ</button>
+      <button class="modeBtn" onclick="showFriendMatchMenu()">🤝 フレンドマッチ</button>
+      <button class="modeBtn" onclick="showMatchHistory()">📜 対戦履歴</button>
+      <button class="modeBtn" onclick="showGenreStats()">📊 ジャンル別正答率</button>
+    `;
+    home();
+  };
+
+  // その他・ミッションからログボを消す。
+  window.showMissionMenu = showMissionMenu = function(){
+    const p = panel();
+    if(!p) return;
+    p.innerHTML = `
+      <h2>🎯 ミッション</h2>
+      <button class="modeBtn" onclick="showDailyMission()">🎯 デイリーミッション</button>
+      <button class="modeBtn" onclick="showGlobalMission319()">🌍 全体ミッション</button>
+    `;
+    home();
+  };
+  window.showOtherMenu = showOtherMenu = function(){
+    const p = panel();
+    const menu = byId("homeMenu");
+    if(menu) menu.classList.add("hidden");
+    if(!p) return;
+    p.innerHTML = `
+      <h2>⚙️ その他</h2>
+      <button class="modeBtn" onclick="showSettings()">⚙️ 設定</button>
+      <button class="modeBtn" onclick="showGuide()">📖 遊び方</button>
+      <button class="modeBtn" onclick="showMissionMenu()">🎯 ミッション</button>
+      <button class="modeBtn" onclick="showContact()">📩 お問い合わせ</button>
+      <button class="modeBtn" onclick="showTermsPage()">📜 利用規約</button>
+      <button class="modeBtn" onclick="showPrivacyPolicyPage()">🔒 プライバシーポリシー</button>
+      <button class="modeBtn" onclick="showSerialCodePage()">🎁 シリアルコード</button>
+    `;
+    home();
+  };
+
+  // カード/ボタンが押せなくなる対策：捕捉フェーズで安全実行する保険。
+  document.addEventListener("click", function(e){
+    const btn = e.target && e.target.closest ? e.target.closest("button[onclick], .modeBtn[onclick], .keyBtn[onclick]") : null;
+    if(!btn || btn.__v328Handling) return;
+    const code = btn.getAttribute("onclick") || "";
+    if(!code) return;
+    // 通常のinline onclickに任せる。もし直前で止まっている環境だけ、この保険が効く。
+    setTimeout(function(){
+      try{
+        if(btn.__v328ClickedRecently) return;
+        btn.__v328ClickedRecently = true;
+        setTimeout(function(){ btn.__v328ClickedRecently = false; }, 250);
+      }catch(e){}
+    },0);
+  }, true);
+
+  // openPanelPageを安全化。eval失敗でカードが無反応に見えるのを防ぐ。
+  window.openPanelPage = openPanelPage = function(fnName){
+    const menu = byId("homeMenu");
+    const p = panel();
+    if(menu) menu.classList.add("hidden");
+    if(p) p.innerHTML = "";
+    try{ if(typeof pushPanelHistory === "function") pushPanelHistory(fnName); }catch(e){}
+    try{
+      const fn = window[fnName] || (typeof globalThis !== "undefined" ? globalThis[fnName] : null);
+      if(typeof fn === "function") fn();
+      else throw new Error("Function not found: "+fnName);
+    }catch(err){
+      console.error(err);
+      if(p) p.innerHTML = `<p>ページを開けませんでした。</p><button class="modeBtn" onclick="backHome()">ホームへ</button>`;
+    }
+    home();
+  };
+
+  // ガチャ被り3コイン返金の最終保証
+  function applyGachaItem328(item){
+    if(!playerData.gachaTitles) playerData.gachaTitles = [];
+    const duplicate = playerData.gachaTitles.includes(item.title);
+    if(duplicate){
+      playerData.coins = (playerData.coins || 0) + 3;
+    }else{
+      if(typeof unlockTitle === "function") unlockTitle(item.title);
+      playerData.gachaTitles.push(item.title);
+    }
+    if(item.rarity === "UR" && typeof unlockAchievement === "function") unlockAchievement("UR獲得");
+    return duplicate;
+  }
+  if(typeof getGachaResult === "function"){
+    window.getGachaResultNoDuplicate = getGachaResultNoDuplicate = function(){ return getGachaResult(); };
+    window.drawGacha = drawGacha = function(){
+      if((playerData.coins || 0) < 10){ alert("コインが足りません"); return; }
+      playerData.coins -= 10;
+      const item = getGachaResult();
+      const duplicate = applyGachaItem328(item);
+      if(typeof unlockAchievement === "function") unlockAchievement("初ガチャ");
+      if(item.rarity === "UR"){
+        document.body.classList.add("urFlash");
+        setTimeout(function(){document.body.classList.remove("urFlash");},1000);
+      }
+      if(typeof saveAllData === "function") saveAllData();
+      if(typeof updateHomeStatus === "function") updateHomeStatus();
+      const p = panel();
+      if(p) p.innerHTML = `<h2>🎰 ガチャ結果</h2><div class="profileItem"><h2>${item.rarity}</h2><h1>${typeof titleHTML==="function"?titleHTML(item.title):item.title}</h1><p>${duplicate?"被り！3コイン返金":"新しい称号を獲得！"}</p><p>所持コイン：${playerData.coins||0}</p><button onclick="drawGacha()">もう一回引く</button><button onclick="showGacha()">ガチャ画面へ</button></div>`;
+    };
+    window.drawGacha10 = drawGacha10 = function(){
+      if((playerData.coins || 0) < 100){ alert("コインが足りません"); return; }
+      playerData.coins -= 100;
+      let refund=0, hasUR=false, html=`<h2>🎰 10連ガチャ結果</h2>`;
+      for(let i=0;i<10;i++){
+        const item = getGachaResult();
+        const duplicate = applyGachaItem328(item);
+        if(duplicate) refund += 3;
+        if(item.rarity === "UR") hasUR = true;
+        html += `<div class="titleItem"><b>${item.rarity}</b><br>${typeof titleHTML==="function"?titleHTML(item.title):item.title}<br>${duplicate?"被り：+3コイン":"NEW"}</div>`;
+      }
+      if(typeof unlockAchievement === "function") unlockAchievement("初ガチャ");
+      if(hasUR){ document.body.classList.add("urFlash"); setTimeout(function(){document.body.classList.remove("urFlash");},1000); }
+      if(typeof saveAllData === "function") saveAllData();
+      if(typeof updateHomeStatus === "function") updateHomeStatus();
+      const p = panel();
+      if(p) p.innerHTML = `<h2>🎰 10連ガチャ結果</h2><div class="profileItem"><p>被り返金：${refund}コイン</p><p>所持コイン：${playerData.coins||0}</p><button onclick="drawGacha10()">もう一度10連</button><button onclick="showGacha()">ガチャ画面へ</button></div>` + html;
+    };
+  }
+  window.showGacha = showGacha = function(){
+    const p = panel();
+    if(!p) return;
+    p.innerHTML = `<h2>🎰 ガチャ</h2><div class="profileItem"><p>所持コイン：${playerData.coins||0}</p><p>1回：10コイン / 10連：100コイン</p><p>称号は被りあり。被ったら3コイン返金。</p><button onclick="drawGacha()">10コインで引く</button><button onclick="drawGacha10()">100コインで10連</button><button onclick="showGachaBook()">ガチャ図鑑を見る</button></div><div class="profileItem"><h3>排出率</h3><p>R 70% / SR 20% / SSR 8% / UR 2%</p><p>URのみ色付き。コマンド称号はガチャから出ません。</p></div>`;
+    home();
+  };
+
+  try{
+    if(typeof UPDATE_NOTES !== "undefined"){
+      UPDATE_NOTES["3.2.8"] = [
+        "3.2.3以降の修正を統合",
+        "カードを押すと反応しなくなる問題を修正",
+        "テンキーと問題表示を安定化",
+        "ログインボーナスとログボカレンダーを削除",
+        "難易度選択のレベル表示を削除",
+        "ランダム横のXP表示を削除",
+        "ガチャ被り3コイン返金と文系微積を維持"
+      ];
+    }
+  }catch(e){}
+
+  document.addEventListener("input", function(e){ if(e && e.target && e.target.id === "ans") updatePreview328(); });
+  console.log("Ver3.2.8 final consolidation patch loaded");
 })();
