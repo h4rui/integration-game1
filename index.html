@@ -2101,7 +2101,7 @@ window.finalizeMatchVote = async function(roomId, finalGenre, questions){
 <script>
 console.log("数学マスター Ver 3.1.9 cachefix loaded", new Date().toISOString());
 </script>
-<script src="app.js?v=3.3.2-full-update"></script>
+<script src="app.js?v=3.3.1-dx-news-label-fix"></script>
 
 <!-- Ver3.1.9 realtime rank mission FINAL FIX -->
 <script type="module">
@@ -2275,7 +2275,7 @@ import { doc, setDoc, getDoc, collection, query, where, limit, onSnapshot, serve
     if(!auth || !auth.currentUser){ box.innerHTML=loginRequiredHTML319Final("🏆 ランキング"); return; }
     box.innerHTML=`
       <h2>🏆 ランキング</h2>
-      <button class="modeBtn" onclick="showLevelRanking319()">⭐ レベルランキング</button>
+      <button class="modeBtn" onclick="showLevelRanking319()">⭐ ランキング停止中</button>
       <button class="modeBtn" onclick="showDailyQuestionRanking319()">📚 日間問題数ランキング</button>
       <button class="modeBtn" onclick="showRateRanking()">🏅 レートランキング</button>
     `;
@@ -2299,7 +2299,7 @@ import { doc, setDoc, getDoc, collection, query, where, limit, onSnapshot, serve
   window.showLevelRanking319 = async function(){
     stopRealtime319Final();
     const box=document.getElementById("panelArea"); if(!box) return;
-    if(!auth || !auth.currentUser){ box.innerHTML=loginRequiredHTML319Final("⭐ レベルランキング"); return; }
+    if(!auth || !auth.currentUser){ box.innerHTML=loginRequiredHTML319Final("⭐ ランキング停止中"); return; }
     box.innerHTML="<h2>読み込み中...</h2>";
     await savePlayerPublic319Final().catch(()=>{});
     unsubLevel319Final=onSnapshot(collection(db,"players"),(snap)=>{
@@ -2311,8 +2311,8 @@ import { doc, setDoc, getDoc, collection, query, where, limit, onSnapshot, serve
         seen.add(k); return true;
       });
       list.sort((a,b)=>((b.level||1)-(a.level||1)) || ((b.exp||0)-(a.exp||0)) || ((b.totalQuestions||0)-(a.totalQuestions||0)));
-      renderRankList319Final(box,"⭐ レベルランキング",list.slice(0,100),"level");
-    },(e)=>{ console.error(e); box.innerHTML="<p>レベルランキング取得失敗</p>"; });
+      renderRankList319Final(box,"⭐ ランキング停止中",list.slice(0,100),"level");
+    },(e)=>{ console.error(e); box.innerHTML="<p>ランキング停止中取得失敗</p>"; });
   };
 
   window.showGlobalMission319 = function(){
@@ -2498,7 +2498,7 @@ import { doc, setDoc, getDoc, collection, query, where, limit, onSnapshot, serve
     p.innerHTML=`
       <h2>🏆 ランキング</h2>
       <div class="profileItem"><p>ランキングは誰でも見れます。反映はGoogleログイン中のみです。</p></div>
-      <button class="modeBtn" onclick="showLevelRanking319()">⭐ レベルランキング</button>
+      <button class="modeBtn" onclick="showLevelRanking319()">⭐ ランキング停止中</button>
       <button class="modeBtn" onclick="showDailyQuestionRanking319()">📚 日間正解数ランキング</button>
       <button class="modeBtn" onclick="showRateRanking()">🏅 レートランキング</button>
     `;
@@ -2515,7 +2515,7 @@ import { doc, setDoc, getDoc, collection, query, where, limit, onSnapshot, serve
     };
   }
   window.selectRankingMode = selectRankingMode = function(){
-    alert("週間ランキングモードは削除しました。学習モードから通常問題を選んでください。");
+    alert("ランキング停止中モードは削除しました。学習モードから通常問題を選んでください。");
   };
 
   console.log("Ver3.2.0 final app patch loaded");
@@ -2534,7 +2534,7 @@ import { doc, setDoc, getDoc, collection, query, where, limit, onSnapshot, serve
     return html;
   }
   function renderLevelV320(list){
-    let html=`<h2>⭐ レベルランキング</h2><div class="profileItem"><p>表示は誰でも可能。ランキング反映はログイン中のみ。</p></div>`;
+    let html=`<h2>⭐ ランキング停止中</h2><div class="profileItem"><p>表示は誰でも可能。ランキング反映はログイン中のみ。</p></div>`;
     if(!list || !list.length) html += `<p>まだ記録がありません</p>`;
     (list||[]).forEach((r,i)=>{ html+=`<div class="rankItem">${i+1}位 ${r.icon?`<img class="rankIcon" src="${r.icon}">`:""}${r.name||r.playerName||"名無し"}<br>${rankTitleHTMLV320(r.title)}<br>Lv${r.level||1}<br>EXP：${r.exp||0}</div>`; });
     return html;
@@ -2551,7 +2551,7 @@ import { doc, setDoc, getDoc, collection, query, where, limit, onSnapshot, serve
   };
   window.showLevelRanking319 = function(){
     const p=panelV320(); if(!p)return;
-    p.innerHTML=`<h2>⭐ レベルランキング</h2><p>読み込み中...</p>`;
+    p.innerHTML=`<h2>⭐ ランキング停止中</h2><p>読み込み中...</p>`;
     if(window.__levelRankUnsub) try{window.__levelRankUnsub();}catch(e){}
     if(window.subscribeLevelRanking){
       window.__levelRankUnsub=window.subscribeLevelRanking(list=>{ const box=panelV320(); if(box) box.innerHTML=renderLevelV320(list); if(typeof ensureHomeButton==="function") ensureHomeButton(); });
@@ -2565,56 +2565,6 @@ import { doc, setDoc, getDoc, collection, query, where, limit, onSnapshot, serve
 
 <!-- Ver3.2.2 inline patch removed in Ver3.2.8: superseded by app.js final patch -->
 
-
-
-<script type="module">
-import { doc, setDoc, collection, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-(function(){
-  const db=window.firebaseDb||window.db;
-  const auth=window.firebaseAuth;
-  if(!db||!auth) return;
-  function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));}
-  function titleHTML(t){ return (window.titleHTML ? window.titleHTML(t||"初心者") : esc(t||"初心者")); }
-  function localPlayerId(){
-    return localStorage.getItem("playerId") || localStorage.getItem("friendCode") || (auth.currentUser && auth.currentUser.uid) || "guest";
-  }
-  function getPD(){ try{return (window.getLocalGameData&&window.getLocalGameData().playerData)||window.playerData||{};}catch(e){return window.playerData||{};} }
-  function calcLevel(exp){
-    exp=Number(exp||0); let lv=1, need=50, used=0;
-    while(exp>=used+need && lv<999){ used+=need; lv++; need=Math.floor(50*lv*1.15); }
-    return lv;
-  }
-  async function ensurePlayer(){
-    const u=auth.currentUser; if(!u) return;
-    const pd=getPD(); const exp=Number(pd.exp||0); const level=Number(pd.level||calcLevel(exp)||1);
-    const id=localPlayerId();
-    await setDoc(doc(db,"players",id),{
-      playerId:id, uid:u.uid, name:(pd.profileName||pd.name||u.displayName||"名無し"), playerName:(pd.profileName||pd.name||u.displayName||"名無し"),
-      icon:(pd.icon||u.photoURL||""), title:(pd.equippedTitle||"初心者"), level:level, exp:exp, totalQuestions:Number(pd.totalQuestions||0), updatedAt:serverTimestamp()
-    },{merge:true});
-  }
-  onAuthStateChanged(auth,u=>{ if(u) ensurePlayer().catch(console.warn); });
-  const oldShow=window.showLevelRanking319;
-  window.showLevelRanking319=function(){
-    const box=document.getElementById("panelArea"); if(!box)return;
-    if(!auth.currentUser){ box.innerHTML='<h2>⭐ レベルランキング</h2><div class="profileItem"><p>ランキング機能はGoogleログインが必要です。</p><button class="googleLoginBtn" onclick="loginGoogle()">Googleログイン</button></div>'; return; }
-    box.innerHTML='<h2>⭐ レベルランキング</h2><p>読み込み中...</p>';
-    ensurePlayer().catch(console.warn);
-    if(window.__levelRankUnsub) try{window.__levelRankUnsub();}catch(e){}
-    window.__levelRankUnsub=onSnapshot(collection(db,"players"),snap=>{
-      const seen=new Set(); let list=[];
-      snap.forEach(d=>{const p=d.data()||{}; const k=p.playerId||p.uid||d.id; if(seen.has(k))return; seen.add(k); list.push(p);});
-      list=list.map(p=>({...p, level:Number(p.level||calcLevel(p.exp)||1), exp:Number(p.exp||0)}));
-      list.sort((a,b)=>(b.level-a.level)||(b.exp-a.exp)||((b.totalQuestions||0)-(a.totalQuestions||0)));
-      let html='<h2>⭐ レベルランキング</h2>';
-      if(!list.length) html+='<p>まだ記録がありません</p>';
-      list.slice(0,100).forEach((p,i)=>{html+='<div class="rankItem">'+(i+1)+'位 '+(p.icon?'<img class="rankIcon" src="'+esc(p.icon)+'">':'')+esc(p.name||p.playerName||'名無し')+'<br>'+titleHTML(p.title)+'<br>Lv'+(p.level||1)+'</div>';});
-      box.innerHTML=html; if(window.ensureHomeButton) window.ensureHomeButton();
-    },e=>{console.error(e); box.innerHTML='<p>レベルランキング取得失敗</p>';});
-  };
-})();
-</script>
 
 </body>
 </html>
