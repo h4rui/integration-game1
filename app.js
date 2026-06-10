@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.3.3";
+const VERSION = "3.3.4";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -6649,7 +6649,7 @@ ${ultra}
 (function(){
   if(window.__v332FullPatchLoaded) return;
   window.__v332FullPatchLoaded = true;
-  try{ window.VERSION = "3.3.3"; }catch(e){}
+  try{ window.VERSION = "3.3.4"; }catch(e){}
 
   function esc332(s){return String(s==null?"":s).replace(/[&<>"']/g,function(m){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m];});}
   function stripLabels332(s){
@@ -6856,3 +6856,313 @@ ${ultra}
 
 
 // Ver3.3.3 note: ranking writes are overridden by index/module safe patch.
+
+
+
+/* =========================================================
+   Ver 3.3.4 判定根本改善 + AI解説鬼強化
+   - ランキング処理は触らない
+   - sinx/cosx/tanx と sin(x)/cos(x)/tan(x) を同一扱い
+   - logx/lnx と log(x)/ln(x) を同一扱い
+   - 2x, 4(1-2x), xsinx などの省略乗算に対応
+   - 積分は「定数差」を許可して、合ってるのに×を減らす
+   - 四則演算は問題文そのまま入力を不正解
+   ========================================================= */
+(function(){
+  if(window.__mm334JudgeAiFixLoaded) return;
+  window.__mm334JudgeAiFixLoaded = true;
+
+  function mm334Str(v){ return String(v == null ? "" : v); }
+
+  function mm334AsciiPowers(s){
+    const map = {"²":"^2","³":"^3","⁴":"^4","⁵":"^5","⁶":"^6","⁷":"^7","⁸":"^8","⁹":"^9","⁰":"^0","⁻":"-"};
+    return mm334Str(s).replace(/[²³⁴⁵⁶⁷⁸⁹⁰⁻]/g, ch => map[ch] || ch);
+  }
+
+  function mm334PrepareExpr(input){
+    let s = mm334AsciiPowers(input);
+    s = s.replace(/\s+/g,"");
+    s = s.replace(/　/g,"");
+    s = s.replace(/π/g,"pi");
+    s = s.replace(/×|·|･/g,"*").replace(/÷/g,"/");
+    s = s.replace(/＋/g,"+").replace(/－/g,"-");
+    s = s.replace(/√/g,"sqrt");
+    s = s.replace(/tan\^-?1|tan⁻¹|arctan|atan/g,"atan");
+    s = s.replace(/\bln/g,"log");
+    // 積分定数は判定から外す
+    s = s.replace(/\+?C\b/g,"").replace(/\+?c\b/g,"");
+
+    // sinx, cos2x, tan(x), logx などを math.js 形式に寄せる
+    s = s.replace(/\b(sin|cos|tan|log|sqrt|atan)([a-zA-Zπ]|\d+(?:\.\d+)?|pi)(?![a-zA-Z0-9_]*\()/g, "$1($2)");
+    s = s.replace(/\b(sin|cos|tan|log|sqrt|atan)([0-9]+)x\b/g, "$1($2*x)");
+    s = s.replace(/\b(sin|cos|tan|log|sqrt|atan)x\b/g, "$1(x)");
+
+    // 省略乗算: 2x, 2pi, 3e, xsin(x), )x, 4( ... )
+    s = s.replace(/(\d)(x|pi|e)/g,"$1*$2");
+    s = s.replace(/(x|pi|e|\))(\d)/g,"$1*$2");
+    s = s.replace(/(\d|x|pi|e|\))(?=\()/g,"$1*");
+    s = s.replace(/(\))(?=(sin|cos|tan|log|sqrt|atan)\()/g,")*");
+    s = s.replace(/(x|pi|e|\d)(?=(sin|cos|tan|log|sqrt|atan)\()/g,"$1*");
+
+    // 連続括弧
+    s = s.replace(/\)\(/g,")*(");
+
+    // 先頭や末尾の + を整える
+    s = s.replace(/^\+/,"").replace(/\+$/,"");
+    return s;
+  }
+
+  window.normalize = function(str){
+    return mm334PrepareExpr(str);
+  };
+
+  function mm334Eval(expr, x){
+    try{
+      if(!window.math || !math.evaluate) return NaN;
+      const prepared = mm334PrepareExpr(expr);
+      const val = math.evaluate(prepared, {x:x, pi:Math.PI, e:Math.E});
+      if(typeof val === "number") return val;
+      if(val && typeof val.valueOf === "function") return Number(val.valueOf());
+      return Number(val);
+    }catch(e){
+      return NaN;
+    }
+  }
+
+  function mm334LooksSameAsQuestion(user){
+    try{
+      if(!window.current || !current.q) return false;
+      if(window.mode !== "arithmetic") return false;
+      const q = String(current.q)
+        .replace(/を.*$/,"")
+        .replace(/[＝=].*$/,"")
+        .trim();
+      return mm334PrepareExpr(user) === mm334PrepareExpr(q);
+    }catch(e){ return false; }
+  }
+
+  function mm334NumericEqual(user, correct){
+    const points = [-3,-2,-1,-0.5,0.5,1,2,3,4];
+    let checked = 0;
+    let diffs = [];
+    for(const x of points){
+      const u = mm334Eval(user,x);
+      const c = mm334Eval(correct,x);
+      if(!isFinite(u) || !isFinite(c)) continue;
+      const diff = u - c;
+      if(Math.abs(diff) > 1e-6 && (!window.current || !String(current.q||"").includes("∫"))) return false;
+      diffs.push(diff);
+      checked++;
+    }
+    if(checked === 0) return false;
+
+    // 積分は +C の違い・定数差を許可
+    if(window.current && String(current.q||"").includes("∫")){
+      const base = diffs[0];
+      return diffs.every(d => Math.abs(d - base) < 1e-5);
+    }
+    return true;
+  }
+
+  // 微分可能なら、積分問題は導関数同士でも確認する
+  function mm334DerivativeEqual(user, correct){
+    try{
+      if(!window.math || !math.derivative) return false;
+      const uq = mm334PrepareExpr(user);
+      const cq = mm334PrepareExpr(correct);
+      const du = math.derivative(uq, "x").toString();
+      const dc = math.derivative(cq, "x").toString();
+      return mm334NumericEqual(du, dc);
+    }catch(e){
+      return false;
+    }
+  }
+
+  window.expressionsEqual = function(user, correct){
+    try{
+      if(mm334LooksSameAsQuestion(user)) return false;
+
+      const u = mm334PrepareExpr(user);
+      const c = mm334PrepareExpr(correct);
+      if(u === c) return true;
+
+      // math.simplify が使えれば簡単な同値を先に見る
+      try{
+        if(window.math && math.simplify){
+          const diff = math.simplify("(" + u + ")-(" + c + ")").toString();
+          if(diff === "0") return true;
+        }
+      }catch(e){}
+
+      if(mm334NumericEqual(u,c)) return true;
+
+      // 積分の答えは見た目違いが多いので導関数も確認
+      if(window.current && String(current.q||"").includes("∫")){
+        if(mm334DerivativeEqual(u,c)) return true;
+      }
+      return false;
+    }catch(e){
+      return false;
+    }
+  };
+
+  function mm334Kind(q){
+    q = String(q || "");
+    if(q.includes("∫")) return "integral";
+    if(q.includes("d/dx") || q.includes("微分")) return "derivative";
+    if(q.includes("因数分解")) return "factor";
+    if(q.includes("展開")) return "expand";
+    if(q.includes("素因数分解")) return "prime";
+    if(/[+\-×÷*/]/.test(q)) return "arithmetic";
+    return "general";
+  }
+
+  function mm334Reason(q){
+    q = String(q || "");
+    if(q.includes("∫")){
+      if(/e\^|exp/.test(q) && /(sin|cos)/.test(q)) return "指数関数と三角関数がかけ算になっているので、部分積分を2回使って元の積分を移項する型です。";
+      if(/log|ln/.test(q)) return "logは微分すると簡単になるので、logを微分する側に置く部分積分を使います。";
+      if(/\^|²|³/.test(q) && /(sin|cos|e\^|exp)/.test(q)) return "多項式×三角関数・指数関数の形なので、次数を下げるために部分積分を使います。";
+      if(/\/|\)\^-/.test(q)) return "分母の形に注目します。中身の微分が近くにあるときは置換、二次式なら平方完成やtan⁻¹型を考えます。";
+      if(/sin|cos|tan/.test(q)) return "三角関数の公式や置換で形を単純にできるかを見る問題です。";
+      return "積分では、まず『べき乗公式でいけるか』『置換か』『部分積分か』を見分けます。この問題は式のまとまりに注目して公式を選びます。";
+    }
+    if(q.includes("d/dx") || q.includes("微分")){
+      if(/sin|cos|tan/.test(q)) return "三角関数は微分公式が決まっているので、まず sin・cos・tan の公式を使います。";
+      if(/log|ln/.test(q)) return "logは中身の微分をかける合成関数の微分になります。";
+      if(/e\^|exp/.test(q)) return "eの指数関数は微分しても形が残るので、指数の中身の微分に注意します。";
+      if(/\(|\)\^/.test(q)) return "かっこの中を1つのかたまりとして見る合成関数の微分を使います。";
+      return "xのべき乗なので、指数を前に出して指数を1下げる公式を使います。";
+    }
+    if(q.includes("因数分解")) return "共通因数、平方差、和と積の組み合わせの順に見ると因数分解しやすいです。";
+    if(q.includes("展開")) return "分配法則を使います。公式が使える形なら公式で一気に展開します。";
+    if(q.includes("素因数分解")) return "小さい素数 2,3,5,7,... で割れるかを順番に確認します。";
+    return "式の形を見て、計算の順序と使える公式を確認します。";
+  }
+
+  window.aiExplain = function(q){
+    const kind = mm334Kind(q);
+    const reason = mm334Reason(q);
+    if(kind === "integral"){
+      return [
+        "【解法の見つけ方】",
+        reason,
+        "",
+        "【進め方】",
+        "① まず式の形を見る。",
+        "② べき乗だけなら ∫x^n dx = x^(n+1)/(n+1)+C を使う。",
+        "③ 中身の微分が外にある形なら置換積分を使う。",
+        "④ x・log・sin・cos・e^x などの積なら部分積分を考える。",
+        "⑤ 最後に微分して元の integrand に戻るか確認する。",
+        "",
+        "【よくあるミス】",
+        "・置換したあと dx を直し忘れる。",
+        "・部分積分で符号を間違える。",
+        "・積分定数 +C を忘れる。",
+        "・分母全体にかかるカッコを外してしまう。"
+      ].join("<br>");
+    }
+    if(kind === "derivative"){
+      return [
+        "【解法の見つけ方】",
+        reason,
+        "",
+        "【進め方】",
+        "① まず外側の関数と内側の関数を分ける。",
+        "② べき乗なら指数を前に出して1下げる。",
+        "③ かっこがあるときは合成関数として、内側の微分をかける。",
+        "④ 積になっているときは積の微分を使う。",
+        "",
+        "【よくあるミス】",
+        "・合成関数で内側の微分を忘れる。",
+        "・sinとcosの符号を間違える。",
+        "・logの微分で分母を忘れる。"
+      ].join("<br>");
+    }
+    if(kind === "factor"){
+      return [
+        "【解法の見つけ方】",
+        reason,
+        "",
+        "【進め方】",
+        "① 共通因数がないか見る。",
+        "② x^2+ax+b 型なら、足して a、かけて b になる2数を探す。",
+        "③ x^2-a^2 なら (x-a)(x+a) を使う。",
+        "④ 展開して元に戻るか確認する。"
+      ].join("<br>");
+    }
+    if(kind === "expand"){
+      return [
+        "【解法の見つけ方】",
+        reason,
+        "",
+        "【進め方】",
+        "① それぞれの項を全部かける。",
+        "② 同類項をまとめる。",
+        "③ (a+b)^2 や (a-b)^2 なら公式を使うと速い。",
+        "④ 符号ミスがないか確認する。"
+      ].join("<br>");
+    }
+    if(kind === "prime"){
+      return [
+        "【解法の見つけ方】",
+        reason,
+        "",
+        "【進め方】",
+        "① 2で割れるか見る。",
+        "② 次に3、5、7…の順に割る。",
+        "③ 最後に全部素数になっているか確認する。",
+        "④ 10 のような合成数を残さず、2×5 のように最後まで分解する。"
+      ].join("<br>");
+    }
+    if(kind === "arithmetic"){
+      return [
+        "【解法の見つけ方】",
+        "四則演算は計算順序が大事です。かっこ、掛け算・割り算、足し算・引き算の順で計算します。",
+        "",
+        "【注意】",
+        "問題文をそのまま入力するのではなく、計算した結果を答えます。",
+        "ただし、計算結果が同じ別の式は正解になる場合があります。"
+      ].join("<br>");
+    }
+    return "【解法の見つけ方】<br>式の形を見て、使える公式を選びます。なぜその公式を使うのかを考えてから計算するとミスが減ります。";
+  };
+
+  // 復習リストの「固定解説」ボタンは消して、AI解説を中心にする
+  if(typeof window.showReviewList === "function"){
+    const oldShowReviewList334 = window.showReviewList;
+    window.showReviewList = showReviewList = function(){
+      try{
+        let html="<h2>📚 復習リスト</h2>";
+        if(!playerData.reviewList || playerData.reviewList.length===0) html+="<p>まだありません</p>";
+        for(let i=0;i<(playerData.reviewList||[]).length;i++){
+          let r=playerData.reviewList[i];
+          let ai = (r.ai && String(r.ai).length>20) ? r.ai : window.aiExplain(r.q);
+          html+=`<div class="reviewItem">
+            <p>${i+1}. ${r.q}</p>
+            <p>正解：${r.a}</p>
+            <button onclick="alert('${String(ai).replace(/'/g,"\\'").replace(/\n/g," ")}')">🤖 AI解説</button>
+            <button onclick="retryReview(${i})">再挑戦</button>
+            <button onclick="postReviewToBoard(${i})">💬 掲示板へ投稿</button>
+          </div>`;
+        }
+        document.getElementById("panelArea").innerHTML=html;
+      }catch(e){
+        oldShowReviewList334();
+      }
+    };
+  }
+
+  // お知らせを短く更新
+  try{
+    const newsCandidates = document.querySelectorAll(".news, #news, .notice, #notice");
+    newsCandidates.forEach(el=>{
+      if(el && /お知らせ|Ver|問題|更新/.test(el.textContent)){
+        el.innerHTML = "<b>お知らせ</b><br>Ver 3.3.4<br>・判定精度改善<br>・AI解説強化<br>・表示調整";
+      }
+    });
+  }catch(e){}
+
+  console.log("Ver 3.3.4 judge + AI explanation fix loaded");
+})();
+
