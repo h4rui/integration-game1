@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.3.1";
+const VERSION = "3.3.2";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -6642,4 +6642,214 @@ ${ultra}
     setTimeout(rerenderQuestion331,0);
   });
   console.log('Ver3.3.1 dx/ultra/news patch loaded');
+})();
+
+// Ver3.3.2 full update patch
+// 数式表示・タイトル統一・ヒント削除・AI解説強化・四則演算判定・問題追加
+(function(){
+  if(window.__v332FullPatchLoaded) return;
+  window.__v332FullPatchLoaded = true;
+  try{ window.VERSION = "3.3.2"; }catch(e){}
+
+  function esc332(s){return String(s==null?"":s).replace(/[&<>"']/g,function(m){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m];});}
+  function stripLabels332(s){
+    return String(s==null?"":s)
+      .replace(/^\s*(文系|初級|中級|上級|難問|超難問)\s*[：:]\s*/,'')
+      .replace(/^\s*[📘⭐🔥⚡👹💀]\s*(文系|初級|中級|上級|難問|超難問)\s*[：:]?\s*/,'');
+  }
+  function categoryLabel332(m){
+    const map={arithmetic:"四則演算",prime:"素因数分解",factor:"因数分解",expand:"展開",derivative:"微分",integral:"積分",review:"復習",studyRandom:"ランダム",random:"ランダム"};
+    return map[m]||m||"問題";
+  }
+  function diffLabel332(d){
+    if(d==="bunkei") return ["📘","文系"];
+    if(d==="easy") return ["⭐","初級"];
+    if(d==="normal") return ["🔥","中級"];
+    if(d==="hard") return ["⚡","上級"];
+    if(d==="veryHard") return ["👹","難問"];
+    if(d==="ultraHard") return ["💀","超難問"];
+    return ["🎲","ランダム"];
+  }
+  function titleText332(){
+    const d=diffLabel332(typeof difficulty!=="undefined"?difficulty:"");
+    const m=categoryLabel332(typeof mode!=="undefined"?mode:"");
+    if((typeof mode!=="undefined") && (mode==="studyRandom"||mode==="random")) return "🎲 ランダム 問題 🎲";
+    if(mode==="review") return "📚 復習 問題 📚";
+    return d[0]+" "+d[1]+" "+m+" "+d[0];
+  }
+  function updateModeTitle332(){ const mt=document.getElementById('modeTitle'); if(mt) mt.textContent=titleText332(); }
+
+  function integralHTML332(lower, upper){
+    lower=esc332(String(lower||"").replace(/pi/g,"π")); upper=esc332(String(upper||"").replace(/pi/g,"π"));
+    return '<span class="defIntegral332"><span class="defSymbol332">∫</span><span class="defLimits332"><span>'+upper+'</span><span>'+lower+'</span></span></span>';
+  }
+  function simplePretty332(raw){
+    let s=stripLabels332(String(raw==null?"":raw));
+    s=s.replace(/\bd\s*x\b/g,' dx');
+    s=s.replace(/pi/g,'π');
+    s=s.replace(/\*\*/g,'^').replace(/\*/g,'×');
+    s=s.replace(/atan|arctan/g,'tan⁻¹');
+    s=s.replace(/∫\[([^\]→]+)→([^\]]+)\]/g,function(_,lo,up){return integralHTML332(lo,up);});
+    s=s.replace(/∫_\{?([^\}\^\s]+)\}?\^\{?([^\}\s]+)\}?/g,function(_,lo,up){return integralHTML332(lo,up);});
+    s=s.replace(/∫([₀₁₂₃₄₅₆₇₈₉₋]+)\^\(([^)]+)\)/g,function(_,lo,up){return integralHTML332(lo,up);});
+    const old = window.readableMathHTML331 || window.readableMathHTML330 || window.readableMathHTML3211 || window.prettyMathHTML;
+    if(typeof old==='function'){
+      const parts=s.split(/(<span class="defIntegral332"[\s\S]*?<\/span><\/span><\/span>)/g);
+      return parts.map(function(p){ return p.indexOf('defIntegral332')>=0 ? p : old(p); }).join('');
+    }
+    return esc332(s)
+      .replace(/\^\(([^)]+)\)/g,'<sup>$1</sup>')
+      .replace(/\^(\d+)/g,'<sup>$1</sup>')
+      .replace(/(^|[^A-Za-z])dx(?![A-Za-z])/g,'$1<span class="mathDx332">dx</span>');
+  }
+  window.prettyMathHTML = simplePretty332;
+  window.readableMathHTML332 = simplePretty332;
+
+  function injectStyle332(){
+    if(document.getElementById('v332-full-style')) return;
+    const st=document.createElement('style'); st.id='v332-full-style';
+    st.textContent=`
+      #hintBtn,#hintArea{display:none!important;}
+      #q{min-height:130px!important;display:flex!important;align-items:center!important;justify-content:center!important;text-align:center!important;line-height:1.35!important;overflow-x:auto!important;padding:10px 8px!important;}
+      #modeTitle{font-size:25px!important;letter-spacing:.02em!important;}
+      .defIntegral332{display:inline-grid!important;grid-template-columns:auto auto!important;grid-template-rows:auto!important;align-items:center!important;justify-items:center!important;vertical-align:middle!important;margin:0 .14em!important;line-height:1!important;}
+      .defSymbol332{font-size:1.55em!important;line-height:.9!important;font-weight:500!important;}
+      .defLimits332{display:grid!important;grid-template-rows:auto auto!important;align-items:center!important;justify-items:start!important;margin-left:.04em!important;line-height:.85!important;transform:translateY(-.03em)!important;}
+      .defLimits332 span{font-size:.42em!important;line-height:.9!important;white-space:nowrap!important;}
+      .mathDx,.mathDx332{font-size:.86em!important;vertical-align:baseline!important;margin-left:.12em!important;}
+      #q .mathDx,#q .mathDx332{font-size:.84em!important;}
+      #q .sqrtBox,.previewMath .sqrtBox{display:inline-flex!important;align-items:flex-start!important;vertical-align:middle!important;}
+      #q .sqrtRadicand,.previewMath .sqrtRadicand{border-top:2px solid currentColor!important;min-width:1.1em!important;padding:2px 5px 0 4px!important;}
+      .reviewItem .aiExplainBox{margin-top:8px;padding:10px;border-radius:12px;background:rgba(0,255,204,.08);text-align:left;line-height:1.65;white-space:pre-wrap;}
+      .rankItem .rankExpLine{display:none!important;}
+      @media(max-width:520px){#modeTitle{font-size:21px!important;}#q{min-height:145px!important;font-size:24px!important}.defSymbol332{font-size:1.45em!important}.defLimits332 span{font-size:.40em!important;}}
+    `;
+    document.head.appendChild(st);
+  }
+  injectStyle332();
+
+  const oldClean332=window.cleanQuestionObject;
+  window.cleanQuestionObject = cleanQuestionObject = function(q){
+    q = (typeof oldClean332==='function') ? oldClean332(q) : q;
+    if(q && q.q) q.q = stripLabels332(q.q);
+    return q;
+  };
+
+  const oldNext332=window.nextQ;
+  if(typeof oldNext332==='function'){
+    window.nextQ = nextQ = function(){
+      const r=oldNext332.apply(this,arguments);
+      setTimeout(function(){
+        injectStyle332(); updateModeTitle332();
+        const qEl=document.getElementById('q');
+        if(qEl && typeof current!=='undefined' && current && current.q){ qEl.innerHTML=simplePretty332(current.q); }
+      },20);
+      return r;
+    };
+  }
+  const oldOpen332=window.openGame;
+  if(typeof oldOpen332==='function'){
+    window.openGame = openGame = function(){ const r=oldOpen332.apply(this,arguments); setTimeout(updateModeTitle332,0); return r; };
+  }
+
+  window.showHint = showHint = function(){};
+  window.clearHint = clearHint = function(){ const h=document.getElementById('hintArea'); if(h) h.innerHTML=''; };
+
+  function normalizeForSameQuestion332(s){
+    return String(s||'').replace(/\s/g,'').replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-').replace(/π/g,'pi').replace(/\*\*/g,'^');
+  }
+  const oldExpressionsEqual332=window.expressionsEqual;
+  if(typeof oldExpressionsEqual332==='function'){
+    window.expressionsEqual = expressionsEqual = function(user,correct){
+      try{
+        if(typeof mode!=='undefined' && mode==='arithmetic' && typeof current!=='undefined' && current && normalizeForSameQuestion332(user)===normalizeForSameQuestion332(current.q)) return false;
+      }catch(e){}
+      return oldExpressionsEqual332.apply(this,arguments);
+    };
+  }
+
+  window.aiExplain = aiExplain = function(q){
+    q=String(q||'');
+    if(q.includes('∫')){
+      if(q.includes('sin')||q.includes('cos')) return '【方針】三角関数の形を見て、基本公式・置換・部分積分のどれを使うか決める。\n\n【なぜこの公式を使う？】sinやcosが単独なら基本公式、合成関数になっているなら中身を置換、xやlogが掛かっているなら部分積分を考える。\n\n【解き方】① まず積分しやすい形に直す。\n② 公式または置換を使う。\n③ 定積分なら最後に上端−下端を計算する。\n\n【注意】三角関数は符号ミスが多いので、微分して元に戻るか確認するとよい。';
+      if(q.includes('e^')||q.includes('log')) return '【方針】指数・対数は、形によって置換積分か部分積分を選ぶ。\n\n【なぜこの公式を使う？】eの指数部分が一次式なら合成関数の積分、logが単独で出るときは微分すると簡単になるので部分積分を使う。\n\n【解き方】① 置換できる中身がないか見る。\n② logがある場合は「logを微分する側」に置く。\n③ 積分後、置換した文字を元に戻す。';
+      return '【方針】式の形を見て、べき乗公式・置換積分・部分積分のどれかを選ぶ。\n\n【なぜこの公式を使う？】xのべきだけならべき乗公式、かっこの中とその微分がセットなら置換積分、異なる種類の関数の積なら部分積分を使う。\n\n【解き方】① まず項ごとに分けられるか確認する。\n② 使う公式を決める。\n③ 計算したら +C を忘れない。\n\n【確認】答えを微分して問題の式に戻れば正解。';
+    }
+    if(q.includes('d/dx')) return '【方針】微分では、外側の関数と内側の関数を分けて考える。\n\n【なぜこの公式を使う？】xのべきならべきの微分、かっこ全体のべきなら合成関数の微分、積なら積の微分を使う。\n\n【解き方】① 何の形か見る。\n② 公式を選ぶ。\n③ 合成関数なら内側の微分を掛ける。';
+    if(q.includes('因数分解')) return '【方針】まず共通因数、次に公式、最後にたすき掛けを見る。\n\n【なぜこの公式を使う？】二乗の差なら a²-b²、平方なら (a±b)²、三次なら和・差の公式が使える。\n\n【解き方】① 共通因数をくくる。\n② 公式に当てはまるか見る。\n③ 展開して元に戻るか確認する。';
+    if(q.includes('素因数分解')) return '【方針】小さい素数から順番に割る。\n\n【なぜこの方法を使う？】素因数分解は「素数だけの積」にする問題なので、2,3,5,7,...で割れるだけ割るのが確実。\n\n【解き方】① 2で割れるか見る。\n② 次に3,5,7で試す。\n③ 最後に全部素数だけになっているか確認する。';
+    return '【方針】まず問題の形を見て、使う公式を決める。\n\n【なぜこの公式を使う？】式の形が公式の形と一致しているから。\n\n【解き方】① 形を見る。\n② 公式に当てはめる。\n③ 計算して答えを確認する。';
+  };
+
+  window.showReviewList = showReviewList = function(){
+    let html='<h2>📚 復習リスト</h2>';
+    if(!playerData.reviewList || playerData.reviewList.length===0) html+='<p>まだありません</p>';
+    for(let i=0;i<(playerData.reviewList||[]).length;i++){
+      const r=playerData.reviewList[i];
+      html += '<div class="reviewItem"><p>'+(i+1)+'. <span class="previewMath">'+simplePretty332(r.q||'')+'</span></p><p>正解：<span class="previewMath">'+simplePretty332(r.a||'')+'</span></p><div class="aiExplainBox">🤖 AI解説\n'+esc332(r.ai || window.aiExplain(r.q||''))+'</div><button onclick="retryReview('+i+')">再挑戦</button><button onclick="postReviewToBoard('+i+')">💬 掲示板へ投稿</button></div>';
+    }
+    const p=document.getElementById('panelArea'); if(p) p.innerHTML=html;
+    if(typeof ensureHomeButton==='function') ensureHomeButton();
+  };
+
+  const extraProblems332={
+    integral:{
+      easy:[
+        ['∫ 7x^6 dx','x^7+C'],['∫ 6x^2 dx','2x^3+C'],['∫ (4x^3-2x) dx','x^4-x^2+C'],['∫ cos(x) dx','sin(x)+C'],['∫ sin(x) dx','-cos(x)+C'],['∫ e^x dx','e^x+C'],['∫ 1/x dx','log(x)+C'],['∫[0→2] 3x^2 dx','8']
+      ],
+      normal:[
+        ['∫ x(x^2+1)^3 dx','(x^2+1)^4/8+C'],['∫ 2x cos(x^2) dx','sin(x^2)+C'],['∫ e^(3x) dx','e^(3x)/3+C'],['∫ sin(2x) dx','-cos(2x)/2+C'],['∫ cos(5x) dx','sin(5x)/5+C'],['∫ 1/(x+2) dx','log(x+2)+C'],['∫[0→π] sin(x) dx','2']
+      ],
+      hard:[
+        ['∫ x e^x dx','e^x*(x-1)+C'],['∫ x sin(x) dx','-x*cos(x)+sin(x)+C'],['∫ x cos(x) dx','x*sin(x)+cos(x)+C'],['∫ log(x) dx','x*log(x)-x+C'],['∫ x/(x^2+1) dx','log(x^2+1)/2+C'],['∫ 1/(x^2+1) dx','atan(x)+C']
+      ],
+      veryHard:[
+        ['∫ x^2 e^x dx','e^x*(x^2-2*x+2)+C'],['∫ e^x sin(x) dx','e^x*(sin(x)-cos(x))/2+C'],['∫ e^x cos(x) dx','e^x*(sin(x)+cos(x))/2+C'],['∫ 1/(x^2+4*x+8) dx','atan((x+2)/2)/2+C'],['∫ x/(x^2+1)^2 dx','-1/(2*(x^2+1))+C'],['∫ sin(x)^3 dx','-cos(x)+cos(x)^3/3+C']
+      ],
+      ultraHard:[
+        ['∫ x^3 e^x dx','e^x*(x^3-3*x^2+6*x-6)+C'],['∫ x^2 sin(x) dx','-x^2*cos(x)+2*x*sin(x)+2*cos(x)+C'],['∫ x^2 cos(x) dx','x^2*sin(x)+2*x*cos(x)-2*sin(x)+C'],['∫ log(x)^2 dx','x*(log(x)^2-2*log(x)+2)+C'],['∫ 1/(1+sin(x)) dx','tan(x)-1/cos(x)+C'],['∫ 1/(1+cos(x)) dx','tan(x/2)+C'],['∫ cos(x)/(1-sin(x)) dx','-log(1-sin(x))+C'],['∫ sin(log(x)) dx','x*(sin(log(x))-cos(log(x)))/2+C'],['∫ cos(log(x)) dx','x*(sin(log(x))+cos(log(x)))/2+C'],['∫ tan(x)*log(cos(x)^2) dx','-log(cos(x)^2)^2/4+C']
+      ]
+    },
+    derivative:{
+      bunkei:[['d/dx (x^3+2x^2-5x+1)','3*x^2+4*x-5'],['d/dx (sin(x)+cos(x))','cos(x)-sin(x)'],['d/dx (e^x+x^2)','e^x+2*x'],['d/dx log(x)','1/x']],
+      easy:[['d/dx x^7','7*x^6'],['d/dx (5x^4)','20*x^3'],['d/dx sin(x)','cos(x)'],['d/dx cos(x)','-sin(x)']],
+      normal:[['d/dx (x^2+1)^3','6*x*(x^2+1)^2'],['d/dx e^(2x)','2*e^(2*x)'],['d/dx log(x^2+1)','2*x/(x^2+1)']],
+      hard:[['d/dx (x sin(x))','sin(x)+x*cos(x)'],['d/dx (x e^x)','e^x*(x+1)'],['d/dx (sin(x)^2)','2*sin(x)*cos(x)']],
+      veryHard:[['d/dx (x^2 log(x))','2*x*log(x)+x'],['d/dx (e^x sin(x))','e^x*(sin(x)+cos(x))'],['d/dx ((x^2+1)/(x-1))','(2*x*(x-1)-(x^2+1))/(x-1)^2']]
+    },
+    factor:{veryHard:[['6x^2-13x+6 を因数分解','(3*x-2)*(2*x-3)'],['x^4-16 を因数分解','(x-2)*(x+2)*(x^2+4)'],['x^3-8 を因数分解','(x-2)*(x^2+2*x+4)']]},
+    expand:{veryHard:[['(x+y+z)^2 を展開','x^2+y^2+z^2+2*x*y+2*y*z+2*z*x'],['(x-2)(x^2+2x+4) を展開','x^3-8'],['(2x-3)^3 を展開','8*x^3-36*x^2+54*x-27']]},
+    prime:{veryHard:[['1260 を素因数分解','2^2*3^2*5*7'],['2310 を素因数分解','2*3*5*7*11'],['756 を素因数分解','2^2*3^3*7']]}
+  };
+  function fromPair332(pair,kind){
+    return {q:pair[0],a:String(pair[1]).replace(/\be\^/g,'exp').replace(/π/g,'pi'),display:pair[1],explanation:window.aiExplain(pair[0])};
+  }
+  const oldGen332=window.generateQuestion;
+  if(typeof oldGen332==='function'){
+    window.generateQuestion = generateQuestion = function(){
+      try{
+        const m=mode, d=difficulty;
+        const bucket = extraProblems332[m] && (extraProblems332[m][d] || extraProblems332[m].veryHard);
+        if(bucket && bucket.length && Math.random()<0.42){ return fromPair332(bucket[Math.floor(Math.random()*bucket.length)],m); }
+      }catch(e){}
+      return oldGen332.apply(this,arguments);
+    };
+  }
+
+  try{
+    if(typeof UPDATE_NOTES!=='undefined'){
+      delete UPDATE_NOTES['3.2.12'];
+      UPDATE_NOTES['3.3.2']=[
+        '数式表示を調整しました',
+        '分野・難易度の表示を統一しました',
+        '問題を追加しました',
+        'ヒントを削除し、AI解説を詳しくしました',
+        'レベルランキングの表示を修正しました'
+      ];
+    }
+  }catch(e){}
+
+  document.addEventListener('DOMContentLoaded',function(){ injectStyle332(); updateModeTitle332(); });
+  setInterval(function(){ try{injectStyle332(); updateModeTitle332();}catch(e){} },1200);
+  console.log('Ver3.3.2 full update patch loaded');
 })();
