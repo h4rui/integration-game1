@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.3.4";
+const VERSION = "3.3.5";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -6544,7 +6544,7 @@ ${ultra}
 (function(){
   if(window.__v331DxUltraNewsPatchLoaded) return;
   window.__v331DxUltraNewsPatchLoaded = true;
-  try{ window.VERSION = "3.3.1"; }catch(e){}
+  try{ window.VERSION = "3.3.5"; }catch(e){}
 
   function stripUltraLabel331(text){
     return String(text==null?"":text).replace(/^\s*超難問\s*[：:]\s*/,'');
@@ -6649,7 +6649,7 @@ ${ultra}
 (function(){
   if(window.__v332FullPatchLoaded) return;
   window.__v332FullPatchLoaded = true;
-  try{ window.VERSION = "3.3.4"; }catch(e){}
+  try{ window.VERSION = "3.3.5"; }catch(e){}
 
   function esc332(s){return String(s==null?"":s).replace(/[&<>"']/g,function(m){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m];});}
   function stripLabels332(s){
@@ -7166,3 +7166,213 @@ ${ultra}
   console.log("Ver 3.3.4 judge + AI explanation fix loaded");
 })();
 
+
+
+
+/* Ver 3.3.5 AI解説強化・判定調整・ランダム修正。ランキング処理は触らない。 */
+(function(){
+  if(window.__mm335PatchLoaded) return;
+  window.__mm335PatchLoaded = true;
+
+  function byId(id){ return document.getElementById(id); }
+  function esc(s){ return String(s ?? "").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+  function stripMath(s){
+    return String(s ?? "")
+      .replace(/\s+/g,"").replace(/　/g,"")
+      .replace(/×/g,"*").replace(/÷/g,"/")
+      .replace(/＋/g,"+").replace(/－/g,"-")
+      .replace(/\+?C\b/gi,"").replace(/π/g,"pi")
+      .replace(/²/g,"^2").replace(/³/g,"^3").replace(/⁴/g,"^4").replace(/⁵/g,"^5").replace(/⁶/g,"^6");
+  }
+  function arithmeticStrict(user, correct){
+    const u = stripMath(user);
+    const c = stripMath(correct);
+    if(/[+\-*/^()]/.test(u)) return false;
+    return u === c;
+  }
+  function qKind(q){
+    q = String(q || "");
+    if(q.includes("∫")) return "integral";
+    if(q.includes("d/dx") || q.includes("微分")) return "derivative";
+    if(q.includes("因数分解")) return "factor";
+    if(q.includes("展開")) return "expand";
+    if(q.includes("素因数分解")) return "prime";
+    if(/[+\-×÷*/]/.test(q)) return "arithmetic";
+    return "general";
+  }
+  function longAI(q){
+    const kind = qKind(q);
+    q = String(q || "");
+    if(kind === "integral"){
+      let reason = "まず積分する式の形を見て、べき乗公式・置換積分・部分積分のどれを使うか判断します。";
+      if(/log|ln/.test(q)) reason = "log は微分すると 1/x の形になって簡単になるので、log を微分する側に置く部分積分を考えます。";
+      else if(/e\^|exp/.test(q) && /(sin|cos)/.test(q)) reason = "e^x と sin・cos の積は、部分積分を2回行うと元の積分がもう一度出てくる型です。そこで移項して解きます。";
+      else if(/\^|²|³/.test(q) && /(sin|cos|e\^|exp)/.test(q)) reason = "多項式と三角関数・指数関数の積なので、多項式の次数を下げるために部分積分を使います。";
+      else if(/\/|\)\^-/.test(q)) reason = "分母のまとまりに注目します。分母の中身の微分が分子に近い形なら置換積分が有効です。二次式なら平方完成して tan⁻¹ 型も考えます。";
+      else if(/sin|cos|tan/.test(q)) reason = "三角関数の積分では、公式で形を変えるか、sin・cos のどちらかを置換するかを見ます。";
+      return [
+        "【解法の見つけ方】", reason, "",
+        "【なぜその解法を使う？】",
+        "積分は『形を簡単にする』のが目的です。中身の微分が外にあるなら置換、積の形なら部分積分、普通のべき乗ならべき乗公式を使います。", "",
+        "【解く手順】",
+        "① 式のまとまりを見る。",
+        "② 置換できる形か確認する。",
+        "③ 積の形なら部分積分を考える。",
+        "④ 計算後、置換した文字を元に戻す。",
+        "⑤ 最後に微分して元の式に戻るか確認する。", "",
+        "【よくあるミス】",
+        "・dx の変換を忘れる。",
+        "・部分積分の符号を間違える。",
+        "・分母全体にカッコを付け忘れる。",
+        "・+C を忘れる。"
+      ].join("<br>");
+    }
+    if(kind === "derivative"){
+      return [
+        "【解法の見つけ方】",
+        "まず外側の関数と内側の関数を分けます。かっこや sin・cos・log・e^x がある場合は、合成関数の微分を疑います。", "",
+        "【なぜその公式を使う？】",
+        "微分は『外側を微分して、内側の微分をかける』のが基本です。積になっている場合は積の微分を使います。", "",
+        "【解く手順】",
+        "① 外側と内側を確認する。",
+        "② 外側を微分する。",
+        "③ 内側の微分をかける。",
+        "④ 同類項を整理する。", "",
+        "【よくあるミス】",
+        "・内側の微分を忘れる。",
+        "・sin と cos の符号ミス。",
+        "・log の微分で分母を忘れる。"
+      ].join("<br>");
+    }
+    if(kind === "factor"){
+      return "【解法の見つけ方】<br>まず共通因数を見る。次に x²+ax+b 型なら、足して a、かけて b になる2数を探します。<br><br>【なぜこの方法？】<br>因数分解は展開の逆なので、かけたら元に戻る形を探します。<br><br>【よくあるミス】<br>・符号を間違える。<br>・最後に展開して確認しない。";
+    }
+    if(kind === "expand"){
+      return "【解法の見つけ方】<br>展開は分配法則で、すべての項をかけます。公式の形なら公式を使うと速いです。<br><br>【なぜこの公式？】<br>(a+b)² や (a-b)² は毎回分配するより公式で処理した方がミスが減ります。<br><br>【よくあるミス】<br>・2ab の項を忘れる。<br>・マイナスの符号ミス。<br>・同類項をまとめ忘れる。";
+    }
+    if(kind === "prime"){
+      return "【解法の見つけ方】<br>小さい素数 2,3,5,7,... で順番に割れるか確認します。<br><br>【なぜこの方法？】<br>素因数分解は、数を素数だけの積に直す作業です。10 や 12 のような合成数を残してはいけません。";
+    }
+    if(kind === "arithmetic"){
+      return "【解法の見つけ方】<br>四則演算は、かっこ → 掛け算・割り算 → 足し算・引き算の順で計算します。<br><br>【注意】<br>四則演算だけは式ではなく、計算後の答え1個を入力してください。<br>例：3+5 の答えは 8。3+5 や 4+4 は不可。";
+    }
+    return "【解法の見つけ方】<br>式の形を見て、使える公式を選びます。なぜその公式を使うのかを確認してから計算するとミスが減ります。";
+  }
+  window.aiExplain = longAI;
+
+  const oldSubmit = window.submit;
+  if(typeof oldSubmit === "function"){
+    window.submit = submit = async function(){
+      const ansEl = byId("ans");
+      const u = ansEl ? ansEl.value.trim() : "";
+      const resultEl = byId("result");
+      const isArithmeticQuestion = window.current && (window.mode === "arithmetic" || (window.mode === "random" && /^[0-9+\-×÷*/().\s]+$/.test(String(current.q||""))));
+      if(isArithmeticQuestion){
+        if(!u){ alert("答えを入力して"); return; }
+        const ok = arithmeticStrict(u, current.a || current.display || "");
+        try{
+          playerData.totalQuestions++;
+          if(typeof recordGenreResult === "function") recordGenreResult(mode, ok);
+          history.push({question:current.q, your:u, answer:current.display, explanation:current.explanation, ok:ok});
+        }catch(e){}
+        if(ok){
+          try{
+            score++; combo++;
+            playerData.totalCorrect++;
+            if(typeof addExp === "function") addExp(10);
+            playerData.coins=(playerData.coins||0)+1;
+            if(typeof saveAllData === "function") saveAllData();
+          }catch(e){}
+          if(resultEl) resultEl.innerHTML = `○ 正解！<br>正解：${esc(current.display||current.a)}<br>+10EXP / +1コイン`;
+          if(typeof nextTurn === "function") nextTurn();
+          return;
+        }else{
+          try{
+            combo=0;
+            if(typeof addReviewItem === "function") addReviewItem(current);
+            if(typeof saveAllData === "function") saveAllData();
+          }catch(e){}
+          if(resultEl) resultEl.innerHTML = `× 不正解<br>正解：${esc(current.display||current.a)}<br><br>🤖 ${longAI(current.q)}`;
+          if(window.mode === "random"){
+            try{
+              if(typeof finishRandom === "function") await finishRandom();
+            }catch(e){
+              console.error(e);
+              if(typeof showEnd === "function") showEnd("終了！");
+            }
+            return;
+          }
+          try{
+            if(mode!=="review") playerHP--;
+            if(typeof updateHP === "function") updateHP();
+            if(typeof nextTurn === "function") nextTurn();
+          }catch(e){}
+          return;
+        }
+      }
+      try{
+        await oldSubmit.apply(this, arguments);
+      }catch(e){
+        console.error("submit error recovered:", e);
+        if(resultEl) resultEl.innerHTML = "エラーが出たため処理を止めました。もう一度入力してください。";
+      }
+    };
+  }
+
+  try{
+    document.querySelectorAll("button, .modeBtn, .resultBtn").forEach(btn=>{
+      if((btn.textContent||"").includes("ヒント")) btn.style.display="none";
+    });
+  }catch(e){}
+
+  if(typeof window.showReviewList === "function"){
+    const oldReview = window.showReviewList;
+    window.showReviewList = showReviewList = function(){
+      try{
+        let html="<h2>📚 復習リスト</h2>";
+        if(!playerData.reviewList || playerData.reviewList.length===0) html+="<p>まだありません</p>";
+        for(let i=0;i<(playerData.reviewList||[]).length;i++){
+          const r=playerData.reviewList[i];
+          const ai=longAI(r.q);
+          html += `<div class="reviewItem">
+            <p>${i+1}. ${esc(r.q)}</p>
+            <p>正解：${esc(r.a)}</p>
+            <button onclick="alert('${String(ai).replace(/'/g,"\\'").replace(/\n/g," ")}')">🤖 AI解説</button>
+            <button onclick="retryReview(${i})">再挑戦</button>
+            <button onclick="postReviewToBoard(${i})">💬 掲示板へ投稿</button>
+          </div>`;
+        }
+        byId("panelArea").innerHTML=html;
+      }catch(e){ oldReview(); }
+    };
+  }
+
+  if(typeof window.selectDifficulty === "function"){
+    const oldSelectDifficulty = window.selectDifficulty;
+    window.selectDifficulty = selectDifficulty = function(m){
+      try{
+        window.mode = mode = m;
+        const names = {integral:"積分", derivative:"微分", factor:"因数分解", expand:"展開", prime:"素因数分解", arithmetic:"四則演算"};
+        const name = names[m] || m;
+        const area = byId("panelArea");
+        if(!area) return oldSelectDifficulty(m);
+        area.innerHTML = `
+          <h2>📚 ${name}</h2>
+          <p style="opacity:.85;margin-top:-6px;">難易度を選んでください</p>
+          <div style="display:grid;gap:10px;margin-top:14px;">
+            ${m==="integral"||m==="derivative" ? `<button class="modeBtn" onclick="startMode('bunkei')">📘 文系 ${name} 📘</button>` : ""}
+            <button class="modeBtn" onclick="startMode('easy')">🟢 初級 ${name}</button>
+            <button class="modeBtn" onclick="startMode('normal')">🟡 中級 ${name}</button>
+            <button class="modeBtn" onclick="startMode('hard')">🔴 上級 ${name}</button>
+            <button class="modeBtn hardBtn" onclick="startMode('veryHard')">🔥 難問 ${name}</button>
+            ${m==="integral" ? `<button class="modeBtn hardBtn" onclick="startMode('superHard')">💀 超難問 ${name} 💀</button>` : ""}
+          </div>
+          <button class="modeBtn" style="margin-top:18px;" onclick="showStudy()">戻る</button>
+        `;
+      }catch(e){ oldSelectDifficulty(m); }
+    };
+  }
+
+  window.MM335_NEWS = "📢 お知らせ\n\nVer 3.3.5\n\n・ランダムモードの不具合を修正\n・判定精度を改善\n・AI解説を大幅強化\n・問題を追加\n・数式表示を改善";
+  console.log("Ver 3.3.5 AI / judge / random fix loaded");
+})();
