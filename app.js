@@ -6853,3 +6853,6 @@ ${ultra}
   setInterval(function(){ try{injectStyle332(); updateModeTitle332();}catch(e){} },1200);
   console.log('Ver3.3.2 full update patch loaded');
 })();
+
+window.openWeeklyRanking=function(){alert('ランキングは現在メンテナンス中です。');return false;};
+window.openLevelRanking=function(){alert('ランキングは現在メンテナンス中です。');return false;};

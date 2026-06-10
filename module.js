@@ -1074,3 +1074,6 @@ window.syncMyCloudFriends = async function(){
     return onSnapshot(doc(db,"globalMissions",day),(snap)=>callback(snap.exists()?snap.data():{day,correct:0}));
   };
 })();
+
+window.openWeeklyRanking=function(){alert('ランキングは現在メンテナンス中です。');return false;};
+window.openLevelRanking=function(){alert('ランキングは現在メンテナンス中です。');return false;};
