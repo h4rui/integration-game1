@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.3.5";
+const VERSION = "3.3.6";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -6544,7 +6544,7 @@ ${ultra}
 (function(){
   if(window.__v331DxUltraNewsPatchLoaded) return;
   window.__v331DxUltraNewsPatchLoaded = true;
-  try{ window.VERSION = "3.3.5"; }catch(e){}
+  try{ window.VERSION = "3.3.6"; }catch(e){}
 
   function stripUltraLabel331(text){
     return String(text==null?"":text).replace(/^\s*超難問\s*[：:]\s*/,'');
@@ -6649,7 +6649,7 @@ ${ultra}
 (function(){
   if(window.__v332FullPatchLoaded) return;
   window.__v332FullPatchLoaded = true;
-  try{ window.VERSION = "3.3.5"; }catch(e){}
+  try{ window.VERSION = "3.3.6"; }catch(e){}
 
   function esc332(s){return String(s==null?"":s).replace(/[&<>"']/g,function(m){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m];});}
   function stripLabels332(s){
@@ -7375,4 +7375,198 @@ ${ultra}
 
   window.MM335_NEWS = "📢 お知らせ\n\nVer 3.3.5\n\n・ランダムモードの不具合を修正\n・判定精度を改善\n・AI解説を大幅強化\n・問題を追加\n・数式表示を改善";
   console.log("Ver 3.3.5 AI / judge / random fix loaded");
+})();
+
+
+
+/* =========================================================
+   Ver 3.3.6 UI / submit fix
+   - 学習モードの決定連打を1秒ロック
+   - 難易度選択の隙間を削減
+   - 難易度選択の戻るボタンを非表示
+   - 終了後にランキングへ飛ぶ事故を抑制
+   - ランキング処理そのものは触らない
+   ========================================================= */
+(function(){
+  if(window.__mm336PatchLoaded) return;
+  window.__mm336PatchLoaded = true;
+
+  function byId(id){ return document.getElementById(id); }
+
+  // 決定ボタンを1秒ロック。二重正解・二重EXPを防ぐ。
+  let mm336SubmitLocked = false;
+  const oldSubmit336 = window.submit;
+  if(typeof oldSubmit336 === "function"){
+    window.submit = submit = async function(){
+      if(mm336SubmitLocked) return false;
+      mm336SubmitLocked = true;
+
+      // 決定ボタンっぽいものを一時的に無効化
+      const buttons = Array.from(document.querySelectorAll("button"));
+      const submitButtons = buttons.filter(b => {
+        const t = (b.textContent || "").trim();
+        const oc = String(b.getAttribute("onclick") || "");
+        return t === "決定" || t === "=" || oc.includes("submit()");
+      });
+      submitButtons.forEach(b=>{
+        b.dataset.mm336Disabled = b.disabled ? "already" : "new";
+        b.disabled = true;
+        b.style.opacity = "0.55";
+        b.style.pointerEvents = "none";
+      });
+
+      try{
+        await oldSubmit336.apply(this, arguments);
+      }catch(e){
+        console.error("submit error recovered by 3.3.6:", e);
+        const r = byId("result");
+        if(r) r.innerHTML = "エラーが出たため処理を止めました。もう一度入力してください。";
+      }finally{
+        setTimeout(()=>{
+          mm336SubmitLocked = false;
+          submitButtons.forEach(b=>{
+            if(b.dataset.mm336Disabled === "new") b.disabled = false;
+            b.style.opacity = "";
+            b.style.pointerEvents = "";
+            delete b.dataset.mm336Disabled;
+          });
+        }, 1000);
+      }
+      return false;
+    };
+  }
+
+  // 難易度選択UIの隙間と戻るボタンを整える
+  const style = document.createElement("style");
+  style.textContent = `
+    #panelArea .modeBtn{
+      margin-top: 8px !important;
+      margin-bottom: 8px !important;
+    }
+    #panelArea div[style*="display:grid"]{
+      gap: 8px !important;
+      margin-top: 10px !important;
+    }
+    .mm336-difficulty-screen .modeBtn{
+      margin-top: 7px !important;
+      margin-bottom: 7px !important;
+      min-height: 64px;
+    }
+    .mm336-difficulty-screen .backAfterDifficulty,
+    .mm336-difficulty-screen button[data-mm336-back="1"]{
+      display:none !important;
+    }
+  `;
+  document.head.appendChild(style);
+
+  // selectDifficultyを上書きして、戻るボタンなし＋隙間少なめにする
+  if(typeof window.selectDifficulty === "function"){
+    const baseSelectDifficulty336 = window.selectDifficulty;
+    window.selectDifficulty = selectDifficulty = function(m){
+      try{
+        window.mode = mode = m;
+        const names = {
+          integral:"積分",
+          derivative:"微分",
+          factor:"因数分解",
+          expand:"展開",
+          prime:"素因数分解",
+          arithmetic:"四則演算"
+        };
+        const name = names[m] || m;
+        const area = byId("panelArea");
+        if(!area) return baseSelectDifficulty336(m);
+        area.classList.add("mm336-difficulty-screen");
+        area.innerHTML = `
+          <h2 style="margin-bottom:6px;">📚 ${name}</h2>
+          <p style="opacity:.85;margin:0 0 10px;">難易度を選んでください</p>
+          <div style="display:grid;gap:8px;margin-top:10px;">
+            ${(m==="integral"||m==="derivative") ? `<button class="modeBtn" onclick="startMode('bunkei')">📘 文系 ${name} 📘</button>` : ""}
+            <button class="modeBtn" onclick="startMode('easy')">🟢 初級 ${name}</button>
+            <button class="modeBtn" onclick="startMode('normal')">🟡 中級 ${name}</button>
+            <button class="modeBtn" onclick="startMode('hard')">🔴 上級 ${name}</button>
+            <button class="modeBtn hardBtn" onclick="startMode('veryHard')">🔥 難問 ${name}</button>
+            ${m==="integral" ? `<button class="modeBtn hardBtn" onclick="startMode('superHard')">💀 超難問 ${name} 💀</button>` : ""}
+          </div>
+        `;
+      }catch(e){
+        baseSelectDifficulty336(m);
+        setTimeout(()=>{
+          const area = byId("panelArea");
+          if(area){
+            area.classList.add("mm336-difficulty-screen");
+            // 超難問の下の戻るなど、戻るボタンを消す
+            Array.from(area.querySelectorAll("button")).forEach(b=>{
+              if((b.textContent||"").trim()==="戻る") b.style.display="none";
+            });
+          }
+        },0);
+      }
+    };
+  }
+
+  // 問題終了後に勝手にランキングへ飛ぶ事故を抑制。
+  // 結果画面表示中はランキング系画面への自動遷移を無効化する。
+  const rankingNames = ["showWorldRanking","showWeeklyRanking","showLevelRanking","openWeeklyRanking","openLevelRanking","showRanking","openRanking"];
+  rankingNames.forEach(fn=>{
+    if(typeof window[fn] === "function"){
+      const oldFn = window[fn];
+      window[fn] = function(){
+        try{
+          const resultScreen = byId("resultScreen");
+          if(resultScreen && resultScreen.classList.contains("active")){
+            console.warn("Ranking transition blocked on result screen:", fn);
+            return false;
+          }
+        }catch(e){}
+        return oldFn.apply(this, arguments);
+      };
+    }
+  });
+
+  // showEnd / showResultPage 後にランキング画面がactiveになった場合、結果画面へ戻す保険
+  function guardRankingAfterResult(){
+    setTimeout(()=>{
+      try{
+        const resultScreen = byId("resultScreen");
+        if(!resultScreen || !resultScreen.classList.contains("active")) return;
+        document.querySelectorAll('[id*="ranking" i], [id*="Ranking"]').forEach(el=>{
+          if(el.classList && el.classList.contains("active")){
+            el.classList.remove("active");
+          }
+        });
+      }catch(e){}
+    }, 150);
+  }
+  if(typeof window.showEnd === "function"){
+    const oldShowEnd336 = window.showEnd;
+    window.showEnd = showEnd = function(){
+      const r = oldShowEnd336.apply(this, arguments);
+      guardRankingAfterResult();
+      return r;
+    };
+  }
+  if(typeof window.showResultPage === "function"){
+    const oldShowResultPage336 = window.showResultPage;
+    window.showResultPage = showResultPage = function(){
+      const r = oldShowResultPage336.apply(this, arguments);
+      guardRankingAfterResult();
+      return r;
+    };
+  }
+
+  // 既存画面に戻るボタンが残った時の保険
+  const obs = new MutationObserver(()=>{
+    const area = byId("panelArea");
+    if(!area) return;
+    if(area.classList.contains("mm336-difficulty-screen") || /難易度を選んでください/.test(area.textContent||"")){
+      Array.from(area.querySelectorAll("button")).forEach(b=>{
+        if((b.textContent||"").trim()==="戻る") b.style.display="none";
+      });
+    }
+  });
+  obs.observe(document.body, {childList:true, subtree:true});
+
+  window.MM336_NEWS = "📢 お知らせ\n\nVer 3.3.6\n\n・回答連打による二重判定を修正\n・難易度選択画面の余白を調整\n・超難問下の戻るボタンを削除\n・結果後にランキングへ飛ぶ不具合を修正";
+  console.log("Ver 3.3.6 UI / submit fix loaded");
 })();
