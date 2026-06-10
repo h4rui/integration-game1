@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.3.2";
+const VERSION = "3.3.3";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -6649,7 +6649,7 @@ ${ultra}
 (function(){
   if(window.__v332FullPatchLoaded) return;
   window.__v332FullPatchLoaded = true;
-  try{ window.VERSION = "3.3.2"; }catch(e){}
+  try{ window.VERSION = "3.3.3"; }catch(e){}
 
   function esc332(s){return String(s==null?"":s).replace(/[&<>"']/g,function(m){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m];});}
   function stripLabels332(s){
@@ -6844,7 +6844,7 @@ ${ultra}
         '分野・難易度の表示を統一しました',
         '問題を追加しました',
         'ヒントを削除し、AI解説を詳しくしました',
-        'レベルランキングの表示を修正しました'
+        'ランキング更新処理を安全版に戻しました'
       ];
     }
   }catch(e){}
@@ -6854,5 +6854,5 @@ ${ultra}
   console.log('Ver3.3.2 full update patch loaded');
 })();
 
-window.openWeeklyRanking=function(){alert('ランキングは現在メンテナンス中です。');return false;};
-window.openLevelRanking=function(){alert('ランキングは現在メンテナンス中です。');return false;};
+
+// Ver3.3.3 note: ranking writes are overridden by index/module safe patch.

@@ -119,7 +119,7 @@ if(user){
 window.__cloudLoginJustSignedIn = true;
 localStorage.setItem("googleLoginLinked","1");
 localStorage.setItem("googleLoginUid", user.uid);
-localStorage.setItem("googleDisplayNameHidden", user.displayName || "");
+localStorage.setItem("googleDisplayNameHidden", "");
 localStorage.removeItem("loginTrying");
 console.log("アカウント連携中:", user.uid);
 if(window.unlockAchievement){
@@ -208,7 +208,7 @@ const friendCode = await ensureFriendCode(user);
 await setDoc(doc(db,"userProfiles",user.uid),{
 uid:user.uid,
 friendCode:friendCode,
-googleDisplayName:user.displayName || "",
+googleDisplayName:"",
 playerName:playerName,
 updatedAt:serverTimestamp()
 },{merge:true});
@@ -540,7 +540,7 @@ uid:user.uid,
 friendCode:friendCode || "",
 name:(bundle.playerProfile && bundle.playerProfile.name) || "名無し",
 playerName:(bundle.playerProfile && bundle.playerProfile.name) || "名無し",
-googleDisplayName:user.displayName || "",
+googleDisplayName:"",
 playerProfile:bundle.playerProfile || {},
 playerData:bundle.playerData || {},
 settings:bundle.settings || {},
@@ -1075,5 +1075,117 @@ window.syncMyCloudFriends = async function(){
   };
 })();
 
-window.openWeeklyRanking=function(){alert('ランキングは現在メンテナンス中です。');return false;};
-window.openLevelRanking=function(){alert('ランキングは現在メンテナンス中です。');return false;};
+
+window.__rank333_doc = doc;
+window.__rank333_setDoc = setDoc;
+window.__rank333_serverTimestamp = serverTimestamp;
+
+// Ver3.3.3 emergency: ranking update rollback / account-safe write
+(function(){
+  if(window.__rankingRollback321SafeLoaded) return;
+  window.__rankingRollback321SafeLoaded = true;
+
+  function safeName333(){
+    try{
+      const bundle = window.getLocalGameData ? window.getLocalGameData() : {};
+      const pp = bundle.playerProfile || {};
+      const pd = bundle.playerData || {};
+      return String(pp.name || pd.profileName || pd.name || "名無し").slice(0,16);
+    }catch(e){ return "名無し"; }
+  }
+  function safeIcon333(){
+    try{
+      const bundle = window.getLocalGameData ? window.getLocalGameData() : {};
+      const pp = bundle.playerProfile || {};
+      return pp.icon || "";
+    }catch(e){ return ""; }
+  }
+  function safePlayerData333(){
+    try{
+      const bundle = window.getLocalGameData ? window.getLocalGameData() : {};
+      return bundle.playerData || window.playerData || {};
+    }catch(e){ return window.playerData || {}; }
+  }
+  function level333(exp){
+    if(typeof window.getLevel === "function"){
+      try{return Number(window.getLevel() || 1);}catch(e){}
+    }
+    exp = Number(exp || 0);
+    let lv = 1, need = 50, used = 0;
+    while(exp >= used + need && lv < 999){
+      used += need;
+      lv++;
+      need = Math.floor(50 * lv * 1.15);
+    }
+    return lv;
+  }
+  function day333(){
+    const now = new Date();
+    const jp = new Date(now.toLocaleString("en-US",{timeZone:"Asia/Tokyo"}));
+    return `${jp.getFullYear()}-${String(jp.getMonth()+1).padStart(2,"0")}-${String(jp.getDate()).padStart(2,"0")}`;
+  }
+  function currentUser333(){
+    return (window.firebaseAuth && window.firebaseAuth.currentUser) || window.currentUser || null;
+  }
+  function playerId333(user){
+    if(!user || !user.uid) return "";
+    return "google_" + user.uid;
+  }
+
+  // 重要：localStorageのplayerId/friendCodeではランキングを書かない。
+  // 重要：GoogleのdisplayName/email/photoURLはランキングに保存しない。
+  window.saveDailyQuestionTotal = async function(totalCount=0){
+    const user = currentUser333();
+    if(!user || !user.uid) return false;
+    const db = window.firebaseDb || window.db;
+    if(!db || !window.__rank333_setDoc || !window.__rank333_doc || !window.__rank333_serverTimestamp) return false;
+    const pid = playerId333(user);
+    const pd = safePlayerData333();
+    const ref = window.__rank333_doc(db, "dailyQuestionRankings", day333()+"_"+pid);
+    await window.__rank333_setDoc(ref, {
+      day: day333(),
+      playerId: pid,
+      uid: user.uid,
+      name: safeName333(),
+      playerName: safeName333(),
+      icon: safeIcon333(),
+      title: pd.equippedTitle || "初心者",
+      level: level333(pd.exp || 0),
+      count: Number(totalCount || 0),
+      updatedAt: window.__rank333_serverTimestamp()
+    }, {merge:true});
+    return true;
+  };
+
+  window.saveLevelRankingNow = async function(){
+    const user = currentUser333();
+    if(!user || !user.uid) return false;
+    const db = window.firebaseDb || window.db;
+    if(!db || !window.__rank333_setDoc || !window.__rank333_doc || !window.__rank333_serverTimestamp) return false;
+    const pd = safePlayerData333();
+    const exp = Number(pd.exp || 0);
+    const pid = playerId333(user);
+    const data = {
+      playerId: pid,
+      uid: user.uid,
+      name: safeName333(),
+      playerName: safeName333(),
+      icon: safeIcon333(),
+      title: pd.equippedTitle || "初心者",
+      level: level333(exp),
+      exp: exp,
+      totalQuestions: Number(pd.totalQuestions || 0),
+      bestRandomScore: Number(pd.bestRandomScore || 0),
+      updatedAt: window.__rank333_serverTimestamp()
+    };
+    await window.__rank333_setDoc(window.__rank333_doc(db, "players", pid), data, {merge:true});
+    return true;
+  };
+
+  window.savePlayerPublicData = async function(data){
+    return window.saveLevelRankingNow();
+  };
+
+  console.log("Ver3.3.3 ranking rollback 3.2.1 safe patch loaded");
+})();
+
