@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.3.6";
+const VERSION = "3.3.7";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -6544,7 +6544,7 @@ ${ultra}
 (function(){
   if(window.__v331DxUltraNewsPatchLoaded) return;
   window.__v331DxUltraNewsPatchLoaded = true;
-  try{ window.VERSION = "3.3.6"; }catch(e){}
+  try{ window.VERSION = "3.3.7"; }catch(e){}
 
   function stripUltraLabel331(text){
     return String(text==null?"":text).replace(/^\s*超難問\s*[：:]\s*/,'');
@@ -6649,7 +6649,7 @@ ${ultra}
 (function(){
   if(window.__v332FullPatchLoaded) return;
   window.__v332FullPatchLoaded = true;
-  try{ window.VERSION = "3.3.6"; }catch(e){}
+  try{ window.VERSION = "3.3.7"; }catch(e){}
 
   function esc332(s){return String(s==null?"":s).replace(/[&<>"']/g,function(m){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m];});}
   function stripLabels332(s){
@@ -7569,4 +7569,160 @@ ${ultra}
 
   window.MM336_NEWS = "📢 お知らせ\n\nVer 3.3.6\n\n・回答連打による二重判定を修正\n・難易度選択画面の余白を調整\n・超難問下の戻るボタンを削除\n・結果後にランキングへ飛ぶ不具合を修正";
   console.log("Ver 3.3.6 UI / submit fix loaded");
+})();
+
+
+
+/* Ver 3.3.7 math display fix: preview / integral / dx */
+(function(){
+  if(window.__mm337MathDisplayFixLoaded) return;
+  window.__mm337MathDisplayFixLoaded = true;
+
+  function byId(id){ return document.getElementById(id); }
+  function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(m){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m];}); }
+
+  var css = document.createElement("style");
+  css.textContent = `
+    #q{min-height:120px;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.35;overflow:visible;}
+    #q .mm337-question{font-size:clamp(24px,6vw,42px);max-width:100%;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:.12em;overflow-wrap:anywhere;}
+    .mm337-math{display:inline-flex;align-items:center;justify-content:center;gap:.18em;vertical-align:middle;line-height:1.25;flex-wrap:wrap;max-width:100%;}
+    .mm337-int{display:inline-grid;grid-template-columns:auto auto;grid-template-rows:auto auto auto;align-items:center;justify-items:center;column-gap:.08em;margin:0 .08em;vertical-align:middle;}
+    .mm337-int .sign{grid-column:1;grid-row:1/4;font-size:1.55em;line-height:.85;font-family:Georgia,'Times New Roman',serif;}
+    .mm337-int .up{grid-column:2;grid-row:1;font-size:.62em;line-height:1;white-space:nowrap;transform:translateY(.08em);}
+    .mm337-int .lo{grid-column:2;grid-row:3;font-size:.62em;line-height:1;white-space:nowrap;transform:translateY(-.08em);}
+    .mm337-frac{display:inline-grid;grid-template-rows:auto auto;align-items:center;justify-items:center;vertical-align:middle;line-height:1.05;margin:0 .16em;max-width:100%;}
+    .mm337-frac .num{border-bottom:2px solid currentColor;padding:0 .18em .08em;min-width:1.2em;text-align:center;white-space:nowrap;}
+    .mm337-frac .den{padding:.08em .18em 0;min-width:1.2em;text-align:center;white-space:nowrap;}
+    .mm337-root{display:inline-flex;align-items:flex-start;vertical-align:middle;margin:0 .08em;}
+    .mm337-root .rad{font-size:1.22em;line-height:1;transform:translateY(.08em);}
+    .mm337-root .inside{border-top:2px solid currentColor;padding:.03em .16em 0 .12em;line-height:1.05;min-width:.7em;white-space:nowrap;}
+    .mm337-dx{display:inline-block;font-size:1em!important;margin-left:.18em;vertical-align:baseline!important;white-space:nowrap;}
+    #answerPreview,.answer-preview,#preview{min-height:92px;display:flex;align-items:center;justify-content:center;overflow:auto;padding:8px 6px;box-sizing:border-box;}
+    #answerPreview .mm337-math,.answer-preview .mm337-math,#preview .mm337-math{font-size:clamp(22px,5.5vw,36px);}
+  `;
+  document.head.appendChild(css);
+
+  function plain(s){
+    return String(s == null ? "" : s)
+      .replace(/　/g," ")
+      .replace(/×/g,"*").replace(/÷/g,"/")
+      .replace(/＋/g,"+").replace(/－/g,"-")
+      .replace(/π/g,"pi")
+      .replace(/²/g,"^2").replace(/³/g,"^3").replace(/⁴/g,"^4").replace(/⁵/g,"^5").replace(/⁶/g,"^6")
+      .trim();
+  }
+  function frac(a,b){return '<span class="mm337-frac"><span class="num">'+fmt(a)+'</span><span class="den">'+fmt(b)+'</span></span>';}
+  function root(x){return '<span class="mm337-root"><span class="rad">√</span><span class="inside">'+fmt(x)+'</span></span>';}
+  function sup(p){
+    var m={"0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹","-":"⁻","+":"⁺"};
+    p=String(p);
+    if(/^-?\d+$/.test(p)) return p.split("").map(function(c){return m[c]||c;}).join("");
+    return "<sup>"+esc(p)+"</sup>";
+  }
+  function fmt(raw){
+    var s=plain(raw);
+    if(!s) return "";
+    s=s.replace(/\bpi\b/g,"π");
+    s=s.replace(/\*/g,"");
+
+    s=s.replace(/\(([^()]+)\)\^\(?1\/2\)?/g,function(_,a){return root(a);});
+    s=s.replace(/([A-Za-zπ0-9]+)\^\(?1\/2\)?/g,function(_,a){return root(a);});
+    s=s.replace(/\(([^()]+)\)\^0\.5/g,function(_,a){return root(a);});
+    s=s.replace(/([A-Za-zπ0-9]+)\^0\.5/g,function(_,a){return root(a);});
+
+    s=s.replace(/\bsqrt\(([^()]+)\)/g,function(_,a){return root(a);});
+    s=s.replace(/√\(([^()]+)\)/g,function(_,a){return root(a);});
+    s=s.replace(/√([A-Za-z0-9π]+)/g,function(_,a){return root(a);});
+
+    s=s.replace(/\b(sin|cos|tan|log|ln)\(([^()]+)\)/g,function(_,f,a){return f+fmt(a);});
+
+    s=s.replace(/\(([^()<>]+)\)\/\(([^()<>]+)\)/g,function(_,a,b){return frac(a,b);});
+    s=s.replace(/([A-Za-z0-9π+\-^]+)\/\(([^()<>]+)\)/g,function(_,a,b){return frac(a,b);});
+    s=s.replace(/\(([^()<>]+)\)\/([A-Za-z0-9π^+\-]+)/g,function(_,a,b){return frac(a,b);});
+    s=s.replace(/(^|[^\w<\/])([\-]?(?:\d+|x|π|e))\/([\-]?(?:\d+|x|π|e)(?:\^\d+)?)/g,function(_,pre,a,b){return pre+frac(a,b);});
+
+    s=s.replace(/\^(-?\d+)/g,function(_,p){return sup(p);});
+    s=s.replace(/\^\(([^()]+)\)/g,function(_,p){return "<sup>"+fmt(p)+"</sup>";});
+    return s;
+  }
+
+  function mathHTML(raw){
+    var s=String(raw == null ? "" : raw).replace(/^超難問：/,"").replace(/^文系：/,"").trim();
+    s=s.replace(/π(?=(sin|cos|tan|log|ln))/g,"π ");
+    s=s.replace(/(\d)(?=(sin|cos|tan|log|ln))/g,"$1 ");
+
+    var dxToken="@@DX337@@";
+    s=s.replace(/\s*d\s*x(?![A-Za-z])/gi," "+dxToken+" ");
+
+    s=s.replace(/∫_\{?([^}^{\s]+)\}?\^\{?([^}^{\s]+)\}?/g,function(_,lo,hi){
+      return '<span class="mm337-int"><span class="sign">∫</span><span class="up">'+fmt(hi)+'</span><span class="lo">'+fmt(lo)+'</span></span>';
+    });
+    s=s.replace(/∫/g,'<span class="mm337-int"><span class="sign">∫</span></span>');
+    s=fmt(s);
+    s=s.replace(new RegExp(dxToken,"g"),'<span class="mm337-dx">dx</span>');
+    return '<span class="mm337-math mm337-question">'+s+'</span>';
+  }
+
+  window.mm337FormatMath=mathHTML;
+  window.prettyMathHTML=mathHTML;
+  window.readableMathHTML3210=mathHTML;
+
+  function renderQ(){
+    try{
+      var q=byId("q");
+      if(q && window.current) {
+        q.innerHTML=mathHTML(current.q||"");
+        q.classList.add("questionAnim");
+      }
+    }catch(e){console.error(e);}
+  }
+
+  if(typeof window.nextQ==="function"){
+    var oldNext=window.nextQ;
+    window.nextQ=nextQ=function(){
+      try{
+        if(typeof clearHint==="function") clearHint();
+        var count=0;
+        do{ current=cleanQuestionObject(generateQuestion()); count++; }
+        while(usedQuestions.includes(current.q)&&count<100);
+        usedQuestions.push(current.q);
+        var q=byId("q"), go=byId("goText"), ans=byId("ans");
+        if(q) q.innerHTML="";
+        if(ans) ans.value="";
+        if(go) go.classList.remove("goAnim");
+        if(q) q.classList.remove("questionAnim");
+        if(go) void go.offsetWidth;
+        if(q) void q.offsetWidth;
+        setTimeout(function(){
+          if(go) go.classList.add("goAnim");
+          setTimeout(renderQ,300);
+        },200);
+      }catch(e){
+        console.error("nextQ fallback",e);
+        oldNext();
+        setTimeout(renderQ,350);
+      }
+    };
+  }
+
+  function preview(){
+    var ans=byId("ans");
+    var v=ans?ans.value:"";
+    [byId("answerPreview"),byId("preview"),document.querySelector(".answer-preview")].filter(Boolean).forEach(function(el){
+      el.innerHTML=v?mathHTML(v):"";
+    });
+  }
+  window.updateAnswerPreviewV329=preview;
+  window.updateAnswerPreview=preview;
+  document.addEventListener("input",function(e){
+    if(e.target&&e.target.id==="ans") setTimeout(preview,0);
+  });
+  setTimeout(function(){
+    var q=byId("q");
+    if(q&&q.textContent&&!q.querySelector(".mm337-math")) q.innerHTML=mathHTML(q.textContent);
+    preview();
+  },500);
+
+  window.MM337_NEWS="📢 お知らせ\n\nVer 3.3.7\n\n・入力プレビューを強化\n・問題表示を改善\n・∫とdxの位置を修正\n・定積分の上下限を調整\n・√と1/2乗の表示を改善";
+  console.log("Ver 3.3.7 math display fix loaded");
 })();
