@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.4.6";
+const VERSION = "3.4.7";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -5113,6 +5113,18 @@ console.log("app.js Ver 3.1.9 base loaded");
 
   function panel(){return document.getElementById("panelArea");}
   function homeBtn(){ if(typeof ensureHomeButton==="function") setTimeout(ensureHomeButton,0); }
+
+  window.showRankingMenu = showRankingMenu = function(){
+    const p=panel(); if(!p)return;
+    p.innerHTML=`
+      <h2>🏆 ランキング</h2>
+      <div class="profileItem"><p></p></div>
+      <button class="modeBtn" onclick="showLevelRanking319()">⭐ レベルランキング</button>
+      <button class="modeBtn" onclick="showDailyQuestionRanking319()">📚 日間正解数ランキング</button>
+      <button class="modeBtn" onclick="showRateRanking()">🏅 レートランキング</button>
+    `;
+    homeBtn();
+  };
   window.showFriendRanking = function(){
     const p=panel(); if(p){ p.innerHTML=`<h2>🤝 フレンドランキング</h2><div class="profileItem"><p>フレンドランキングは削除しました。</p></div>`; homeBtn(); }
   };
@@ -6744,7 +6756,7 @@ ${ultra}
 (function(){
   if(window.__v331DxUltraNewsPatchLoaded) return;
   window.__v331DxUltraNewsPatchLoaded = true;
-  try{ window.VERSION = "3.4.6"; }catch(e){}
+  try{ window.VERSION = "3.4.7"; }catch(e){}
 
   function stripUltraLabel331(text){
     return String(text==null?"":text).replace(/^\s*超難問\s*[：:]\s*/,'');
@@ -6845,7 +6857,7 @@ ${ultra}
 (function(){
   if(window.__v332FullPatchLoaded) return;
   window.__v332FullPatchLoaded = true;
-  try{ window.VERSION = "3.4.6"; }catch(e){}
+  try{ window.VERSION = "3.4.7"; }catch(e){}
 
   function esc332(s){return String(s==null?"":s).replace(/[&<>"']/g,function(m){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m];});}
   function stripLabels332(s){
@@ -7768,147 +7780,5 @@ ${ultra}
 })();
 
 
-
-/* =========================================================
-   Ver 3.4.6 ranking auth fix
-   - ランキング閲覧は実ログイン必須
-   - localStorageだけではログイン扱いにしない
-   - 読み込み中で止まらないようtimeoutを追加
-   - ランキング保存処理・Firebase構造は触らない
-   ========================================================= */
-(function(){
-  if(window.__mm346RankingAuthFixLoaded) return;
-  window.__mm346RankingAuthFixLoaded = true;
-
-  function panel(){ return document.getElementById("panelArea"); }
-
-  function realLoginUser346(){
-    try{
-      if(window.getGoogleLoginInfo){
-        const u = window.getGoogleLoginInfo();
-        if(u && (u.uid || u.email || u.displayName)) return u;
-      }
-      if(window.currentUser && (window.currentUser.uid || window.currentUser.email)) return window.currentUser;
-    }catch(e){}
-    return null;
-  }
-
-  function loginRequired346(title){
-    return `<h2>${title}</h2>
-      <div class="profileItem">
-        <button class="googleLoginBtn" onclick="loginGoogle()">Googleログイン</button>
-      </div>`;
-  }
-
-  function withTimeout346(promise, ms=9000){
-    return Promise.race([
-      promise,
-      new Promise((_, reject)=>setTimeout(()=>reject(new Error("ranking timeout")), ms))
-    ]);
-  }
-
-  function rankMenuHTML346(){
-    return `
-      <h2>🏆 ランキング</h2>
-      <button class="modeBtn" onclick="showLevelRanking319()">⭐ レベルランキング</button>
-      <button class="modeBtn" onclick="showDailyQuestionRanking319()">📚 日間問題数ランキング</button>
-      <button class="modeBtn" onclick="showRateRanking()">🏅 レートランキング</button>
-    `;
-  }
-
-  window.showRankingMenu = showRankingMenu = function(){
-    const p = panel(); if(!p) return;
-    if(!realLoginUser346()){
-      p.innerHTML = loginRequired346("🏆 ランキング");
-      if(typeof ensureHomeButton==="function") ensureHomeButton();
-      return;
-    }
-    p.innerHTML = rankMenuHTML346();
-    if(typeof ensureHomeButton==="function") ensureHomeButton();
-  };
-
-  window.showLevelRanking319 = async function(){
-    const box = panel(); if(!box) return;
-    if(!realLoginUser346()){
-      box.innerHTML = loginRequired346("⭐ レベルランキング");
-      if(typeof ensureHomeButton==="function") ensureHomeButton();
-      return;
-    }
-    box.innerHTML = "<h2>読み込み中...</h2>";
-    try{
-      if(window.savePlayerPublicData && typeof savePublicProfile==="function"){
-        await withTimeout346(savePublicProfile(), 7000);
-      }
-      const list = window.loadLevelRanking ? await withTimeout346(window.loadLevelRanking(), 9000) : [];
-      let html = "<h2>⭐ レベルランキング</h2>";
-      if(!list.length) html += "<p>まだ記録がありません</p>";
-      list.forEach((p,i)=>{
-        html += `<div class="rankItem">${i+1}位 ${p.icon?`<img class="rankIcon" src="${p.icon}">`:""}${p.name||p.playerName||"名無し"}<br>${titleHTML(p.title||"初心者")}<br>Lv${p.level||1}</div>`;
-      });
-      box.innerHTML = html;
-      if(typeof ensureHomeButton==="function") ensureHomeButton();
-    }catch(e){
-      console.error("level ranking failed", e);
-      box.innerHTML = "<h2>⭐ レベルランキング</h2><p>ランキング取得失敗</p>";
-      if(typeof ensureHomeButton==="function") ensureHomeButton();
-    }
-  };
-
-  window.showDailyQuestionRanking319 = async function(){
-    const box = panel(); if(!box) return;
-    if(!realLoginUser346()){
-      box.innerHTML = loginRequired346("📚 日間問題数ランキング");
-      if(typeof ensureHomeButton==="function") ensureHomeButton();
-      return;
-    }
-    box.innerHTML = "<h2>読み込み中...</h2>";
-    try{
-      const list = window.loadDailyQuestionRanking ? await withTimeout346(window.loadDailyQuestionRanking(), 9000) : [];
-      let html = "<h2>📚 日間問題数ランキング</h2>";
-      if(!list.length) html += "<p>まだ記録がありません</p>";
-      list.forEach((p,i)=>{
-        html += `<div class="rankItem">${i+1}位 ${p.icon?`<img class="rankIcon" src="${p.icon}">`:""}${p.name||"名無し"}<br>${titleHTML(p.title||"初心者")}<br>本日：${p.count||0}問</div>`;
-      });
-      box.innerHTML = html;
-      if(typeof ensureHomeButton==="function") ensureHomeButton();
-    }catch(e){
-      console.error("daily ranking failed", e);
-      box.innerHTML = "<h2>📚 日間問題数ランキング</h2><p>ランキング取得失敗</p>";
-      if(typeof ensureHomeButton==="function") ensureHomeButton();
-    }
-  };
-
-  const oldShowRateRanking346 = window.showRateRanking || (typeof showRateRanking==="function" ? showRateRanking : null);
-  window.showRateRanking = showRateRanking = async function(){
-    const box = panel(); if(!box) return;
-    if(!realLoginUser346()){
-      box.innerHTML = loginRequired346("🏅 レートランキング");
-      if(typeof ensureHomeButton==="function") ensureHomeButton();
-      return;
-    }
-    box.innerHTML = "<h2>読み込み中...</h2>";
-    try{
-      const list = window.loadRateRanking ? await withTimeout346(window.loadRateRanking(), 9000) : [];
-      let html = "<h2>🏅 レートランキング</h2>";
-      if(!list.length) html += "<p>まだ記録がありません</p>";
-      list.forEach((p,i)=>{
-        html += `<div class="rankItem">${i+1}位 ${p.icon?`<img class="rankIcon" src="${p.icon}">`:""}${p.name||"名無し"}<br>${titleHTML(p.title||"初心者")}<br>レート：${p.rating||1000}<br>${p.wins||0}勝 ${p.losses||0}敗</div>`;
-      });
-      box.innerHTML = html;
-      if(typeof ensureHomeButton==="function") ensureHomeButton();
-    }catch(e){
-      console.error("rate ranking failed", e);
-      box.innerHTML = "<h2>🏅 レートランキング</h2><p>ランキング取得失敗</p>";
-      if(typeof ensureHomeButton==="function") ensureHomeButton();
-    }
-  };
-
-  window.MM346_NEWS = `📢 お知らせ
-
-Ver 3.4.6
-
-・ランキング閲覧を実ログイン必須に修正
-・localStorageだけではログイン扱いにしないよう修正
-・ランキング読み込み中で止まらないよう調整`;
-  console.log("Ver 3.4.6 ranking auth fix loaded");
-})();
+/* 3.4.7 yesterday ranking window bindings */
+window.showRankingMenu=showRankingMenu;
