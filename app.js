@@ -7728,50 +7728,261 @@ ${ultra}
 })();
 
 
+function showNews(){
+  const area = document.getElementById("panelArea");
+  if(area) area.innerHTML = `<h2>📢 お知らせ</h2>
+<div class="guideItem">
+<h3>Ver 3.3.8</h3>
+<p>・タイトル画面を追加しました</p>
+<p>・画面のどこをタップしてもスタートできるようにしました</p>
+<p>・背景公式をランダムで3個表示するようにしました</p>
+<p>・公式が15秒ごとに切り替わるようにしました</p>
+<p>・起動時のニックネーム強制入力を改善しました</p>
+</div>
+<div class="guideItem">
+<h3>Ver 3.3.7</h3>
+<p>・入力プレビューを強化しました</p>
+<p>・問題表示を改善しました</p>
+<p>・∫とdxの位置を調整しました</p>
+<p>・√と1/2乗の表示を改善しました</p>
+</div>`;
+}
+function showNotice(){ showNews(); }
+function openNews(){ showNews(); }
 
-/* Ver 3.3.8 title formula screen */
+
+
+
+/* Ver 3.3.8 safe title screen hotfix
+   注意: 問題表示・nextQ・submit・ランキング処理は触らない */
 (function(){
-if(window.__mm338TitleLoaded)return;window.__mm338TitleLoaded=true;
-function id(x){return document.getElementById(x)}
-const F=[
-"a² + b² = c²","x = (-b ± √(b²-4ac)) / 2a","sin²θ + cos²θ = 1",
-"1 + tan²θ = 1 / cos²θ","d/dx xⁿ = nxⁿ⁻¹","∫xⁿdx = xⁿ⁺¹/(n+1)+C",
-"lim x→0 sinx/x = 1","e^(iθ)=cosθ+i sinθ","aₙ=a₁+(n-1)d","Sₙ=n(a₁+aₙ)/2",
-"Σk = n(n+1)/2","(a+b)ⁿ = Σ nCr aⁿ⁻ʳbʳ","logₐxy=logₐx+logₐy",
-"z=a+bi","a⃗・b⃗=|a⃗||b⃗|cosθ","コーシー・シュワルツ","(a⃗・b⃗)²≤|a⃗|²|b⃗|²",
-"ヘロンの公式","チェバの定理","メネラウスの定理"
-];
-function pick3(){let a=F.slice();for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a.slice(0,3)}
-function css(){
-if(id("mm338css"))return;
-let s=document.createElement("style");s.id="mm338css";s.textContent=`
-#mm338Title{position:fixed;inset:0;z-index:999999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:34px 24px;box-sizing:border-box;background:linear-gradient(180deg,#fffdf8,#eaf6ff);color:#073b78;font-family:system-ui,-apple-system,"Hiragino Sans","Yu Gothic",sans-serif;overflow:hidden;-webkit-tap-highlight-color:transparent;user-select:none}
-#mm338Title:before{content:"";position:absolute;left:-20%;right:-20%;bottom:-14%;height:34%;border-radius:50% 50% 0 0;background:#d9edff}
-.mm338Win{position:absolute;top:36px;left:22px;width:108px;height:120px;border:5px solid #8bbff0;border-radius:8px;background:linear-gradient(#8ed0ff,#e7f8ff);opacity:.75}
-.mm338Win:before{content:"";position:absolute;left:0;right:0;top:48%;height:5px;background:#8bbff0}.mm338Win:after{content:"";position:absolute;top:0;bottom:0;left:48%;width:5px;background:#8bbff0}
-.mm338Lamp{position:absolute;top:0;right:62px;width:76px;height:86px}.mm338Lamp:before{content:"";position:absolute;left:36px;top:0;width:5px;height:43px;background:#073b78}.mm338Lamp:after{content:"";position:absolute;left:8px;top:38px;width:60px;height:34px;background:#073b78;border-radius:24px 24px 10px 10px;box-shadow:0 10px 0 #ffe68b}
-.mm338TitleText{position:relative;z-index:2;font-size:clamp(42px,11vw,68px);font-weight:900;letter-spacing:.03em;text-align:center;color:#073b78}
-.mm338Sub{position:relative;z-index:2;margin-top:8px;color:#4b8fe5;font-size:clamp(17px,5vw,26px);letter-spacing:.14em;font-weight:800}
-.mm338Formulas{position:relative;z-index:2;width:min(86vw,520px);min-height:165px;margin:32px auto 10px;display:grid;gap:12px}
-.mm338F{text-align:center;color:rgba(71,112,164,.78);font-size:clamp(18px,4.7vw,28px);font-weight:800;opacity:0;transform:translateY(8px);transition:opacity .9s ease,transform .9s ease}
-.mm338F.show{opacity:1;transform:translateY(0)}
-.mm338Book{position:relative;z-index:2;width:min(230px,45vw);height:98px;margin:4px auto 20px}.mm338Book:before,.mm338Book:after{content:"";position:absolute;bottom:4px;width:50%;height:84px;background:white;border:5px solid #1d5ea8;box-sizing:border-box}.mm338Book:before{left:2px;border-radius:10px 6px 12px 18px;transform:skewY(8deg);border-right:0}.mm338Book:after{right:2px;border-radius:6px 10px 18px 12px;transform:skewY(-8deg);border-left:0}.mm338Book span{position:absolute;left:50%;bottom:0;width:20px;height:20px;transform:translateX(-50%);background:#1d5ea8;border-radius:50%;z-index:3}
-.mm338Start{position:relative;z-index:2;font-size:clamp(24px,6.3vw,36px);font-weight:900;color:#073b78;animation:mm338p 1.7s ease-in-out infinite}.mm338Hint{position:relative;z-index:2;margin-top:8px;color:rgba(7,59,120,.5);font-size:13px}
-.mm338P{position:absolute;font-weight:900;font-size:30px;color:#3b82f6;opacity:.5}.mm338Y{color:#f4c542}@keyframes mm338p{0%,100%{opacity:.75;transform:scale(1)}50%{opacity:1;transform:scale(1.035)}}
-@media(max-height:720px){.mm338TitleText{font-size:42px}.mm338Formulas{min-height:120px;margin:20px auto 6px}.mm338F{font-size:18px}.mm338Book{height:72px;width:170px}.mm338Book:before,.mm338Book:after{height:62px}}
-`;document.head.appendChild(s)}
-let timer=null;
-function update(){let box=id("mm338FormulaBox");if(!box)return;let fs=box.querySelectorAll(".mm338F");fs.forEach(x=>x.classList.remove("show"));let p=pick3();setTimeout(()=>{p.forEach((v,i)=>fs[i]&&(fs[i].textContent=v));setTimeout(()=>fs.forEach(x=>x.classList.add("show")),50)},400)}
-function close(){let e=id("mm338Title");if(!e)return;e.style.transition="opacity .35s,transform .35s";e.style.opacity=0;e.style.transform="scale(1.015)";clearInterval(timer);setTimeout(()=>e.remove(),380)}
-function show(){if(id("mm338Title"))return;css();let e=document.createElement("div");e.id="mm338Title";e.innerHTML=`
-<div class="mm338Win"></div><div class="mm338Lamp"></div>
-<div class="mm338P" style="top:24%;left:30%">＋</div><div class="mm338P mm338Y" style="top:33%;right:25%">＋</div><div class="mm338P" style="bottom:24%;right:15%">＋</div>
-<div class="mm338TitleText">数学マスター</div><div class="mm338Sub">Math Master</div>
-<div class="mm338Formulas" id="mm338FormulaBox"><div class="mm338F"></div><div class="mm338F"></div><div class="mm338F"></div></div>
-<div class="mm338Book"><span></span></div><div class="mm338Start">タップしてスタート</div><div class="mm338Hint">画面のどこをタップしても開始します</div>`;
-e.addEventListener("click",close);e.addEventListener("touchstart",function(ev){ev.preventDefault();close()},{passive:false});document.body.appendChild(e);update();timer=setInterval(update,15000)}
-const oldPrompt=window.prompt;window.prompt=function(m,d){if(/ニックネーム|名前|プレイヤー名/.test(String(m||""))){try{if(window.playerProfile&&!playerProfile.name)playerProfile.name="ゲスト";if(window.playerData&&!playerData.name)playerData.name="ゲスト"}catch(e){}return d||"ゲスト"}return oldPrompt.apply(this,arguments)}
-if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>setTimeout(show,250));else setTimeout(show,250);
-window.showTitleScreen338=show;
-window.MM338_NEWS="📢 お知らせ\n\nVer 3.3.8\n\n・タイトル画面を追加\n・画面タップでスタートできるように変更\n・背景公式をランダム3個表示\n・公式が15秒ごとに切り替わるように調整\n・起動時のニックネーム強制入力を改善";
+  if(window.__mm338SafeTitleLoaded) return;
+  window.__mm338SafeTitleLoaded = true;
+
+  const formulas = [
+    "a² + b² = c²",
+    "sin²θ + cos²θ = 1",
+    "d/dx xⁿ = nxⁿ⁻¹",
+    "∫xⁿdx = xⁿ⁺¹/(n+1)+C",
+    "lim x→0 sinx/x = 1",
+    "e^(iθ)=cosθ+i sinθ",
+    "Σk = n(n+1)/2",
+    "logₐxy = logₐx + logₐy",
+    "a⃗・b⃗ = |a⃗||b⃗|cosθ",
+    "コーシー・シュワルツ",
+    "(a⃗・b⃗)² ≤ |a⃗|²|b⃗|²",
+    "ヘロンの公式",
+    "チェバの定理",
+    "メネラウスの定理",
+    "ブラーマグプタの公式"
+  ];
+
+  function pick3(){
+    const a = formulas.slice();
+    for(let i=a.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      const t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a.slice(0,3);
+  }
+
+  function addStyle(){
+    if(document.getElementById("mm338SafeTitleStyle")) return;
+    const style = document.createElement("style");
+    style.id = "mm338SafeTitleStyle";
+    style.textContent = `
+      #mm338SafeTitle{
+        position:fixed;
+        inset:0;
+        z-index:999999;
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
+        padding:34px 24px;
+        box-sizing:border-box;
+        background:linear-gradient(180deg,#fffdf8,#eaf6ff);
+        color:#073b78;
+        font-family:system-ui,-apple-system,"Hiragino Sans","Yu Gothic",sans-serif;
+        overflow:hidden;
+        user-select:none;
+        -webkit-tap-highlight-color:transparent;
+      }
+      #mm338SafeTitle::before{
+        content:"";
+        position:absolute;
+        left:-20%;
+        right:-20%;
+        bottom:-14%;
+        height:34%;
+        border-radius:50% 50% 0 0;
+        background:#d9edff;
+      }
+      .mm338Window{
+        position:absolute;
+        top:36px;
+        left:22px;
+        width:108px;
+        height:120px;
+        border:5px solid #8bbff0;
+        border-radius:8px;
+        background:linear-gradient(#8ed0ff,#e7f8ff);
+        opacity:.75;
+      }
+      .mm338Window::before{
+        content:"";
+        position:absolute;
+        left:0;
+        right:0;
+        top:48%;
+        height:5px;
+        background:#8bbff0;
+      }
+      .mm338Window::after{
+        content:"";
+        position:absolute;
+        top:0;
+        bottom:0;
+        left:48%;
+        width:5px;
+        background:#8bbff0;
+      }
+      .mm338Title{
+        position:relative;
+        z-index:2;
+        font-size:clamp(42px,11vw,68px);
+        font-weight:900;
+        letter-spacing:.03em;
+        text-align:center;
+      }
+      .mm338Sub{
+        position:relative;
+        z-index:2;
+        margin-top:8px;
+        color:#4b8fe5;
+        font-size:clamp(17px,5vw,26px);
+        letter-spacing:.14em;
+        font-weight:800;
+      }
+      .mm338FormulaBox{
+        position:relative;
+        z-index:2;
+        width:min(86vw,520px);
+        min-height:165px;
+        margin:32px auto 10px;
+        display:grid;
+        gap:12px;
+      }
+      .mm338Formula{
+        text-align:center;
+        color:rgba(71,112,164,.78);
+        font-size:clamp(18px,4.7vw,28px);
+        font-weight:800;
+        opacity:0;
+        transform:translateY(8px);
+        transition:opacity .9s ease, transform .9s ease;
+      }
+      .mm338Formula.show{
+        opacity:1;
+        transform:translateY(0);
+      }
+      .mm338Start{
+        position:relative;
+        z-index:2;
+        font-size:clamp(24px,6.3vw,36px);
+        font-weight:900;
+        margin-top:28px;
+        animation:mm338pulse 1.7s ease-in-out infinite;
+      }
+      .mm338Hint{
+        position:relative;
+        z-index:2;
+        margin-top:8px;
+        color:rgba(7,59,120,.5);
+        font-size:13px;
+      }
+      @keyframes mm338pulse{
+        0%,100%{opacity:.75;transform:scale(1)}
+        50%{opacity:1;transform:scale(1.035)}
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  let timer = null;
+
+  function update(){
+    const box = document.getElementById("mm338FormulaBox");
+    if(!box) return;
+    const nodes = box.querySelectorAll(".mm338Formula");
+    nodes.forEach(n => n.classList.remove("show"));
+    const p = pick3();
+    setTimeout(()=>{
+      p.forEach((v,i)=>{ if(nodes[i]) nodes[i].textContent = v; });
+      setTimeout(()=>nodes.forEach(n=>n.classList.add("show")),60);
+    },350);
+  }
+
+  function closeTitle(){
+    const el = document.getElementById("mm338SafeTitle");
+    if(!el) return;
+    el.style.transition = "opacity .35s ease, transform .35s ease";
+    el.style.opacity = "0";
+    el.style.transform = "scale(1.015)";
+    clearInterval(timer);
+    setTimeout(()=>el.remove(),380);
+  }
+
+  function showTitle(){
+    if(document.getElementById("mm338SafeTitle")) return;
+    addStyle();
+    const el = document.createElement("div");
+    el.id = "mm338SafeTitle";
+    el.innerHTML = `
+      <div class="mm338Window"></div>
+      <div class="mm338Title">数学マスター</div>
+      <div class="mm338Sub">Math Master</div>
+      <div class="mm338FormulaBox" id="mm338FormulaBox">
+        <div class="mm338Formula"></div>
+        <div class="mm338Formula"></div>
+        <div class="mm338Formula"></div>
+      </div>
+      <div class="mm338Start">タップしてスタート</div>
+      <div class="mm338Hint">画面のどこをタップしても開始します</div>
+    `;
+    el.addEventListener("click", closeTitle);
+    el.addEventListener("touchstart", function(e){ e.preventDefault(); closeTitle(); }, {passive:false});
+    document.body.appendChild(el);
+    update();
+    timer = setInterval(update, 15000);
+  }
+
+  const oldPrompt = window.prompt;
+  window.prompt = function(message, def){
+    const msg = String(message || "");
+    if(/ニックネーム|名前|プレイヤー名/.test(msg)){
+      try{
+        if(window.playerProfile && !playerProfile.name) playerProfile.name = "ゲスト";
+        if(window.playerData && !playerData.name) playerData.name = "ゲスト";
+      }catch(e){}
+      return def || "ゲスト";
+    }
+    return oldPrompt.apply(this, arguments);
+  };
+
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", ()=>setTimeout(showTitle,250));
+  }else{
+    setTimeout(showTitle,250);
+  }
+
+  window.MM338_NEWS = `📢 お知らせ
+
+Ver 3.3.8
+
+・タイトル画面を追加しました
+・画面のどこをタップしてもスタートできるようにしました
+・背景公式をランダムで3個表示するようにしました
+・公式が15秒ごとに切り替わるようにしました
+・起動時のニックネーム強制入力を改善しました`;
 })();
