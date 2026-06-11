@@ -7728,261 +7728,398 @@ ${ultra}
 })();
 
 
-function showNews(){
-  const area = document.getElementById("panelArea");
-  if(area) area.innerHTML = `<h2>📢 お知らせ</h2>
-<div class="guideItem">
-<h3>Ver 3.3.8</h3>
-<p>・タイトル画面を追加しました</p>
-<p>・画面のどこをタップしてもスタートできるようにしました</p>
-<p>・背景公式をランダムで3個表示するようにしました</p>
-<p>・公式が15秒ごとに切り替わるようにしました</p>
-<p>・起動時のニックネーム強制入力を改善しました</p>
-</div>
-<div class="guideItem">
-<h3>Ver 3.3.7</h3>
-<p>・入力プレビューを強化しました</p>
-<p>・問題表示を改善しました</p>
-<p>・∫とdxの位置を調整しました</p>
-<p>・√と1/2乗の表示を改善しました</p>
-</div>`;
-}
-function showNotice(){ showNews(); }
-function openNews(){ showNews(); }
 
-
-
-
-/* Ver 3.3.8 safe title screen hotfix
-   注意: 問題表示・nextQ・submit・ランキング処理は触らない */
+/* =========================================================
+   Ver 3.3.8 fix3
+   - お知らせを実際に使われている showNewsPage/updateNotesHTML に反映
+   - タイトル画面を改善
+   - 公式は画面上にランダム配置で3個表示
+   - タップ前に次の画面へ飛ぶ問題を抑制
+   - 問題表示・nextQ・submit・ランキング処理は触らない
+   ========================================================= */
 (function(){
-  if(window.__mm338SafeTitleLoaded) return;
-  window.__mm338SafeTitleLoaded = true;
+  if(window.__mm338Fix3Loaded) return;
+  window.__mm338Fix3Loaded = true;
+
+  const NEWS338 = {
+    "3.3.8": [
+      "タイトル画面を追加しました",
+      "画面のどこをタップしてもスタートできるようにしました",
+      "背景公式をランダムで3個表示するようにしました",
+      "公式が15秒ごとに切り替わるようにしました",
+      "お知らせが更新されない不具合を修正しました",
+      "起動時のニックネーム強制入力を改善しました"
+    ],
+    "3.3.7": [
+      "入力プレビューを強化しました",
+      "問題表示を改善しました",
+      "∫とdxの位置を調整しました",
+      "√と1/2乗の表示を改善しました"
+    ],
+    "3.3.6": [
+      "回答連打による二重判定を修正しました",
+      "難易度選択画面の余白を調整しました",
+      "超難問下の戻るボタンを削除しました",
+      "結果後にランキングへ飛ぶ不具合を抑制しました"
+    ],
+    "3.3.5": [
+      "ランダムモードの不具合を修正しました",
+      "AI解説を大幅強化しました",
+      "四則演算は答えのみ正解に変更しました"
+    ],
+    "3.3.4": [
+      "判定精度を改善しました",
+      "sinx/cosx/tanx などの入力判定を改善しました",
+      "積分の正解判定を改善しました"
+    ]
+  };
+
+  function sortVers(obj){
+    return Object.keys(obj).sort((a,b)=>{
+      const pa=a.split(".").map(Number), pb=b.split(".").map(Number);
+      for(let i=0;i<3;i++) if(pb[i]!==pa[i]) return pb[i]-pa[i];
+      return 0;
+    });
+  }
+
+  window.updateNotesHTML = function(){
+    const versions = sortVers(NEWS338);
+    const latest = versions[0];
+    let html = `<h2>📢 お知らせ</h2>
+      <div class="newsCard">
+        <h3>🔴 最新アップデート Ver${latest}</h3>`;
+    for(const note of NEWS338[latest]){
+      html += `<p>・${note}</p>`;
+    }
+    html += `</div><div class="newsCard"><h3>📝 アップデート履歴</h3></div>`;
+    for(const ver of versions){
+      html += `<div class="newsCard"><h3>Ver${ver}</h3>`;
+      for(const note of NEWS338[ver]){
+        html += `<p>・${note}</p>`;
+      }
+      html += `</div>`;
+    }
+    return html;
+  };
+
+  window.showNewsPage = function(){
+    const menu=document.getElementById("homeMenu");
+    const panel=document.getElementById("panelArea");
+    if(menu) menu.classList.add("hidden");
+    if(panel) panel.innerHTML = window.updateNotesHTML();
+    if(typeof ensureHomeButton==="function") setTimeout(ensureHomeButton,0);
+  };
+  window.showNews = window.showNewsPage;
+  window.showNotice = window.showNewsPage;
+  window.openNews = window.showNewsPage;
 
   const formulas = [
     "a² + b² = c²",
+    "x = (-b ± √(b²-4ac)) / 2a",
     "sin²θ + cos²θ = 1",
+    "1 + tan²θ = 1 / cos²θ",
     "d/dx xⁿ = nxⁿ⁻¹",
     "∫xⁿdx = xⁿ⁺¹/(n+1)+C",
     "lim x→0 sinx/x = 1",
     "e^(iθ)=cosθ+i sinθ",
     "Σk = n(n+1)/2",
     "logₐxy = logₐx + logₐy",
+    "aₙ = a₁ + (n-1)d",
+    "Sₙ = n(a₁+aₙ)/2",
     "a⃗・b⃗ = |a⃗||b⃗|cosθ",
-    "コーシー・シュワルツ",
     "(a⃗・b⃗)² ≤ |a⃗|²|b⃗|²",
+    "コーシー・シュワルツ",
     "ヘロンの公式",
     "チェバの定理",
     "メネラウスの定理",
     "ブラーマグプタの公式"
   ];
 
-  function pick3(){
-    const a = formulas.slice();
+  const positions = [
+    {top:"18%", left:"9%"}, {top:"20%", left:"58%"},
+    {top:"31%", left:"13%"}, {top:"34%", left:"61%"},
+    {top:"46%", left:"7%"}, {top:"48%", left:"58%"},
+    {top:"60%", left:"12%"}, {top:"62%", left:"55%"}
+  ];
+
+  function shuffle(a){
+    a=a.slice();
     for(let i=a.length-1;i>0;i--){
-      const j = Math.floor(Math.random()*(i+1));
-      const t = a[i]; a[i] = a[j]; a[j] = t;
+      const j=Math.floor(Math.random()*(i+1));
+      const t=a[i]; a[i]=a[j]; a[j]=t;
     }
-    return a.slice(0,3);
+    return a;
   }
 
-  function addStyle(){
-    if(document.getElementById("mm338SafeTitleStyle")) return;
-    const style = document.createElement("style");
-    style.id = "mm338SafeTitleStyle";
-    style.textContent = `
-      #mm338SafeTitle{
+  function addTitleStyle(){
+    if(document.getElementById("mm338BetterStyle")) return;
+    const st=document.createElement("style");
+    st.id="mm338BetterStyle";
+    st.textContent=`
+      #mm338BetterTitle{
         position:fixed;
         inset:0;
-        z-index:999999;
-        display:flex;
-        flex-direction:column;
-        align-items:center;
-        justify-content:center;
-        padding:34px 24px;
-        box-sizing:border-box;
-        background:linear-gradient(180deg,#fffdf8,#eaf6ff);
+        z-index:2147483647;
+        background:
+          radial-gradient(circle at 50% 48%, rgba(255,255,255,.98), rgba(246,251,255,.98) 58%, rgba(221,239,255,.98)),
+          linear-gradient(180deg,#fffdf7,#e8f5ff);
         color:#073b78;
         font-family:system-ui,-apple-system,"Hiragino Sans","Yu Gothic",sans-serif;
         overflow:hidden;
         user-select:none;
         -webkit-tap-highlight-color:transparent;
+        touch-action:manipulation;
       }
-      #mm338SafeTitle::before{
-        content:"";
+      #mm338BetterTitle *{box-sizing:border-box;}
+      .mm338BgCurve{
         position:absolute;
-        left:-20%;
-        right:-20%;
-        bottom:-14%;
-        height:34%;
+        left:-25%;
+        right:-25%;
+        bottom:-15%;
+        height:38%;
+        background:linear-gradient(180deg,#d8edff,#cfe7fb);
         border-radius:50% 50% 0 0;
-        background:#d9edff;
       }
       .mm338Window{
         position:absolute;
-        top:36px;
-        left:22px;
-        width:108px;
-        height:120px;
-        border:5px solid #8bbff0;
-        border-radius:8px;
-        background:linear-gradient(#8ed0ff,#e7f8ff);
-        opacity:.75;
+        top:6%;
+        left:5%;
+        width:28vw;
+        max-width:135px;
+        height:135px;
+        border:6px solid rgba(117,181,235,.62);
+        border-radius:12px;
+        background:linear-gradient(#a3d9ff,#e7f8ff);
+        opacity:.78;
       }
-      .mm338Window::before{
-        content:"";
-        position:absolute;
-        left:0;
-        right:0;
-        top:48%;
-        height:5px;
-        background:#8bbff0;
-      }
-      .mm338Window::after{
-        content:"";
+      .mm338Window:before{content:"";position:absolute;left:0;right:0;top:48%;height:6px;background:rgba(117,181,235,.62);}
+      .mm338Window:after{content:"";position:absolute;top:0;bottom:0;left:48%;width:6px;background:rgba(117,181,235,.62);}
+      .mm338Lamp{
         position:absolute;
         top:0;
-        bottom:0;
-        left:48%;
-        width:5px;
-        background:#8bbff0;
+        right:12%;
+        width:78px;
+        height:110px;
       }
-      .mm338Title{
-        position:relative;
-        z-index:2;
-        font-size:clamp(42px,11vw,68px);
-        font-weight:900;
+      .mm338Lamp:before{content:"";position:absolute;left:37px;top:0;width:6px;height:58px;background:#073b78;border-radius:4px;}
+      .mm338Lamp:after{content:"";position:absolute;left:9px;top:52px;width:62px;height:35px;background:#073b78;border-radius:26px 26px 9px 9px;box-shadow:0 11px 0 #ffe28a;}
+      .mm338Main{
+        position:absolute;
+        inset:0;
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
+        padding:8vh 24px 8vh;
+      }
+      .mm338Logo{
+        font-size:clamp(48px,13vw,78px);
+        line-height:1;
+        font-weight:950;
         letter-spacing:.03em;
         text-align:center;
+        color:#073b78;
+        text-shadow:0 3px 0 rgba(255,255,255,.95),0 12px 28px rgba(29,94,168,.16);
+        margin-top:2vh;
       }
       .mm338Sub{
-        position:relative;
-        z-index:2;
-        margin-top:8px;
-        color:#4b8fe5;
-        font-size:clamp(17px,5vw,26px);
-        letter-spacing:.14em;
-        font-weight:800;
+        margin-top:12px;
+        color:#4c91e3;
+        font-size:clamp(18px,5vw,28px);
+        letter-spacing:.16em;
+        font-weight:850;
       }
-      .mm338FormulaBox{
+      .mm338Book{
         position:relative;
+        width:min(55vw,270px);
+        height:120px;
+        margin:16vh auto 22px;
+        filter:drop-shadow(0 12px 18px rgba(29,94,168,.16));
+      }
+      .mm338Book:before,.mm338Book:after{
+        content:"";
+        position:absolute;
+        bottom:5px;
+        width:50%;
+        height:102px;
+        background:#fff;
+        border:6px solid #1d5ea8;
+      }
+      .mm338Book:before{
+        left:2px;
+        border-right:none;
+        border-radius:14px 7px 13px 22px;
+        transform:skewY(8deg);
+      }
+      .mm338Book:after{
+        right:2px;
+        border-left:none;
+        border-radius:7px 14px 22px 13px;
+        transform:skewY(-8deg);
+      }
+      .mm338Book span{
+        position:absolute;
+        left:50%;
+        bottom:0;
+        transform:translateX(-50%);
+        width:25px;
+        height:25px;
+        border-radius:50%;
+        background:#1d5ea8;
         z-index:2;
-        width:min(86vw,520px);
-        min-height:165px;
-        margin:32px auto 10px;
-        display:grid;
-        gap:12px;
+      }
+      .mm338Start{
+        margin-top:4px;
+        font-size:clamp(28px,7vw,42px);
+        font-weight:950;
+        letter-spacing:.04em;
+        text-align:center;
+        color:#073b78;
+        animation:mm338Pulse 1.65s ease-in-out infinite;
+      }
+      .mm338Hint{
+        margin-top:10px;
+        font-size:14px;
+        color:rgba(7,59,120,.46);
+        text-align:center;
       }
       .mm338Formula{
+        position:absolute;
+        z-index:1;
+        max-width:44vw;
+        color:rgba(67,111,168,.42);
+        font-size:clamp(18px,4.8vw,31px);
+        font-weight:850;
+        line-height:1.22;
         text-align:center;
-        color:rgba(71,112,164,.78);
-        font-size:clamp(18px,4.7vw,28px);
-        font-weight:800;
         opacity:0;
-        transform:translateY(8px);
+        transform:translateY(8px) scale(.96);
         transition:opacity .9s ease, transform .9s ease;
+        pointer-events:none;
+        text-shadow:0 1px 0 rgba(255,255,255,.9);
       }
       .mm338Formula.show{
         opacity:1;
-        transform:translateY(0);
+        transform:translateY(0) scale(1);
       }
-      .mm338Start{
-        position:relative;
-        z-index:2;
-        font-size:clamp(24px,6.3vw,36px);
-        font-weight:900;
-        margin-top:28px;
-        animation:mm338pulse 1.7s ease-in-out infinite;
+      .mm338Plus{
+        position:absolute;
+        color:#4c91e3;
+        opacity:.42;
+        font-size:36px;
+        font-weight:950;
       }
-      .mm338Hint{
-        position:relative;
-        z-index:2;
-        margin-top:8px;
-        color:rgba(7,59,120,.5);
-        font-size:13px;
+      .mm338Plus.y{color:#f5c94c;}
+      @keyframes mm338Pulse{
+        0%,100%{opacity:.76;transform:scale(1);}
+        50%{opacity:1;transform:scale(1.035);}
       }
-      @keyframes mm338pulse{
-        0%,100%{opacity:.75;transform:scale(1)}
-        50%{opacity:1;transform:scale(1.035)}
+      @media(max-height:720px){
+        .mm338Logo{font-size:44px;}
+        .mm338Book{margin-top:13vh;height:86px;width:190px;}
+        .mm338Book:before,.mm338Book:after{height:74px;}
+        .mm338Formula{font-size:18px;}
       }
     `;
-    document.head.appendChild(style);
+    document.head.appendChild(st);
   }
 
-  let timer = null;
+  let titleTimer = null;
+  let closed = false;
 
-  function update(){
-    const box = document.getElementById("mm338FormulaBox");
-    if(!box) return;
-    const nodes = box.querySelectorAll(".mm338Formula");
-    nodes.forEach(n => n.classList.remove("show"));
-    const p = pick3();
+  function updateFormulas(){
+    const el=document.getElementById("mm338BetterTitle");
+    if(!el) return;
+    const nodes=el.querySelectorAll(".mm338Formula");
+    nodes.forEach(n=>n.classList.remove("show"));
+    const picked=shuffle(formulas).slice(0,3);
+    const pos=shuffle(positions).slice(0,3);
     setTimeout(()=>{
-      p.forEach((v,i)=>{ if(nodes[i]) nodes[i].textContent = v; });
-      setTimeout(()=>nodes.forEach(n=>n.classList.add("show")),60);
+      nodes.forEach((n,i)=>{
+        n.textContent=picked[i] || "";
+        n.style.top=pos[i].top;
+        n.style.left=pos[i].left;
+      });
+      setTimeout(()=>nodes.forEach(n=>n.classList.add("show")),50);
     },350);
   }
 
-  function closeTitle(){
-    const el = document.getElementById("mm338SafeTitle");
+  function closeTitle(e){
+    if(e){
+      e.preventDefault();
+      e.stopPropagation();
+      if(e.stopImmediatePropagation) e.stopImmediatePropagation();
+    }
+    if(closed) return;
+    closed = true;
+    const el=document.getElementById("mm338BetterTitle");
     if(!el) return;
-    el.style.transition = "opacity .35s ease, transform .35s ease";
-    el.style.opacity = "0";
-    el.style.transform = "scale(1.015)";
-    clearInterval(timer);
-    setTimeout(()=>el.remove(),380);
+    clearInterval(titleTimer);
+    el.style.transition="opacity .38s ease, transform .38s ease";
+    el.style.opacity="0";
+    el.style.transform="scale(1.012)";
+    setTimeout(()=>el.remove(),400);
   }
 
   function showTitle(){
-    if(document.getElementById("mm338SafeTitle")) return;
-    addStyle();
-    const el = document.createElement("div");
-    el.id = "mm338SafeTitle";
-    el.innerHTML = `
+    if(document.getElementById("mm338BetterTitle")) return;
+    addTitleStyle();
+    closed = false;
+    const el=document.createElement("div");
+    el.id="mm338BetterTitle";
+    el.innerHTML=`
+      <div class="mm338BgCurve"></div>
       <div class="mm338Window"></div>
-      <div class="mm338Title">数学マスター</div>
-      <div class="mm338Sub">Math Master</div>
-      <div class="mm338FormulaBox" id="mm338FormulaBox">
-        <div class="mm338Formula"></div>
-        <div class="mm338Formula"></div>
-        <div class="mm338Formula"></div>
+      <div class="mm338Lamp"></div>
+      <div class="mm338Plus" style="top:26%;left:48%;">＋</div>
+      <div class="mm338Plus y" style="top:40%;right:20%;">＋</div>
+      <div class="mm338Plus" style="bottom:28%;right:12%;">＋</div>
+      <div class="mm338Formula"></div>
+      <div class="mm338Formula"></div>
+      <div class="mm338Formula"></div>
+      <div class="mm338Main">
+        <div class="mm338Logo">数学マスター</div>
+        <div class="mm338Sub">Math Master</div>
+        <div class="mm338Book"><span></span></div>
+        <div class="mm338Start">タップしてスタート</div>
+        <div class="mm338Hint">画面のどこをタップしても開始します</div>
       </div>
-      <div class="mm338Start">タップしてスタート</div>
-      <div class="mm338Hint">画面のどこをタップしても開始します</div>
     `;
-    el.addEventListener("click", closeTitle);
-    el.addEventListener("touchstart", function(e){ e.preventDefault(); closeTitle(); }, {passive:false});
+    ["click","touchstart","pointerdown"].forEach(type=>{
+      el.addEventListener(type, closeTitle, {capture:true, passive:false});
+    });
     document.body.appendChild(el);
-    update();
-    timer = setInterval(update, 15000);
+    updateFormulas();
+    titleTimer=setInterval(updateFormulas,15000);
   }
 
-  const oldPrompt = window.prompt;
-  window.prompt = function(message, def){
-    const msg = String(message || "");
+  const oldPrompt=window.prompt;
+  window.prompt=function(message, def){
+    const msg=String(message||"");
     if(/ニックネーム|名前|プレイヤー名/.test(msg)){
       try{
-        if(window.playerProfile && !playerProfile.name) playerProfile.name = "ゲスト";
-        if(window.playerData && !playerData.name) playerData.name = "ゲスト";
+        if(window.playerProfile && !playerProfile.name) playerProfile.name="ゲスト";
+        if(window.playerData && !playerData.name) playerData.name="ゲスト";
       }catch(e){}
       return def || "ゲスト";
     }
     return oldPrompt.apply(this, arguments);
   };
 
-  if(document.readyState === "loading"){
-    document.addEventListener("DOMContentLoaded", ()=>setTimeout(showTitle,250));
+  if(document.readyState==="loading"){
+    document.addEventListener("DOMContentLoaded", ()=>setTimeout(showTitle,30));
   }else{
-    setTimeout(showTitle,250);
+    setTimeout(showTitle,30);
   }
 
+  window.showTitleScreen338 = showTitle;
   window.MM338_NEWS = `📢 お知らせ
 
 Ver 3.3.8
 
-・タイトル画面を追加しました
-・画面のどこをタップしてもスタートできるようにしました
-・背景公式をランダムで3個表示するようにしました
+・タイトル画面を改善しました
+・公式を画面上にランダム配置するようにしました
 ・公式が15秒ごとに切り替わるようにしました
-・起動時のニックネーム強制入力を改善しました`;
+・スタート前に次の画面へ飛ぶ不具合を抑制しました
+・お知らせが更新されない不具合を修正しました`;
 })();
