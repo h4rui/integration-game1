@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.4.7";
+const VERSION = "3.3.6";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -642,224 +642,17 @@ return [
 {title:"🌌宇宙の支配者🌌", rarity:"UR"},
 {title:"🔥原初の数式🔥", rarity:"UR"},
 {title:"👑究極数学王👑", rarity:"UR"}
-,
-{title:"計算の旅人", rarity:"R"},
-{title:"公式の旅人", rarity:"R"},
-{title:"解法の旅人", rarity:"R"},
-{title:"答案の旅人", rarity:"R"},
-{title:"途中式の旅人", rarity:"R"},
-{title:"数式の旅人", rarity:"R"},
-{title:"三角の旅人", rarity:"R"},
-{title:"数列の旅人", rarity:"R"},
-{title:"ベクトルの旅人", rarity:"R"},
-{title:"極限の旅人", rarity:"R"},
-{title:"計算見習い・改", rarity:"R"},
-{title:"公式見習い・改", rarity:"R"},
-{title:"微分見習い・改", rarity:"R"},
-{title:"積分見習い・改", rarity:"R"},
-{title:"因数見習い・改", rarity:"R"},
-{title:"展開見習い・改", rarity:"R"},
-{title:"素数見習い・改", rarity:"R"},
-{title:"グラフ見習い", rarity:"R"},
-{title:"関数見習い", rarity:"R"},
-{title:"答案見習い", rarity:"R"},
-{title:"朝の演習者", rarity:"R"},
-{title:"昼の演習者", rarity:"R"},
-{title:"夜の演習者", rarity:"R"},
-{title:"休日の演習者", rarity:"R"},
-{title:"毎日一問", rarity:"R"},
-{title:"計算習慣", rarity:"R"},
-{title:"復習習慣", rarity:"R"},
-{title:"公式暗記中", rarity:"R"},
-{title:"ミス直し中", rarity:"R"},
-{title:"答案整理中", rarity:"R"},
-{title:"分数の守り手", rarity:"R"},
-{title:"符号の守り手", rarity:"R"},
-{title:"括弧の守り手", rarity:"R"},
-{title:"約分の守り手", rarity:"R"},
-{title:"平方完成の守り手", rarity:"R"},
-{title:"展開の守り手", rarity:"R"},
-{title:"因数の守り手", rarity:"R"},
-{title:"素数の守り手", rarity:"R"},
-{title:"微分の守り手", rarity:"R"},
-{title:"積分の守り手", rarity:"R"},
-{title:"初級突破者", rarity:"R"},
-{title:"中級突破者", rarity:"R"},
-{title:"上級挑戦者", rarity:"R"},
-{title:"難問挑戦者", rarity:"R"},
-{title:"超難問見習い", rarity:"R"},
-{title:"計算安定者", rarity:"R"},
-{title:"式変形安定者", rarity:"R"},
-{title:"解答安定者", rarity:"R"},
-{title:"集中安定者", rarity:"R"},
-{title:"復習安定者", rarity:"R"},
-{title:"青ペンの民", rarity:"R"},
-{title:"赤ペンの民", rarity:"R"},
-{title:"黒板の民", rarity:"R"},
-{title:"チョークの民", rarity:"R"},
-{title:"ノートの民", rarity:"R"},
-{title:"問題集の民", rarity:"R"},
-{title:"模試の民", rarity:"R"},
-{title:"過去問の民", rarity:"R"},
-{title:"計算用紙の民", rarity:"R"},
-{title:"答案用紙の民", rarity:"R"},
-{title:"基礎演習者", rarity:"R"},
-{title:"標準演習者", rarity:"R"},
-{title:"応用演習者", rarity:"R"},
-{title:"公式確認者", rarity:"R"},
-{title:"定義確認者", rarity:"R"},
-{title:"グラフ確認者", rarity:"R"},
-{title:"符号確認者", rarity:"R"},
-{title:"分母確認者", rarity:"R"},
-{title:"条件確認者", rarity:"R"},
-{title:"範囲確認者", rarity:"R"},
-{title:"三角基本勢", rarity:"R"},
-{title:"指数基本勢", rarity:"R"},
-{title:"対数基本勢", rarity:"R"},
-{title:"数列基本勢", rarity:"R"},
-{title:"ベクトル基本勢", rarity:"R"},
-{title:"極限基本勢", rarity:"R"},
-{title:"微分基本勢", rarity:"R"},
-{title:"積分基本勢", rarity:"R"},
-{title:"確率基本勢", rarity:"R"},
-{title:"整数基本勢", rarity:"R"},
-{title:"数学ランナー", rarity:"R"},
-{title:"数学ウォーカー", rarity:"R"},
-{title:"数学スターター", rarity:"R"},
-{title:"数学チャレンジャー", rarity:"R"},
-{title:"数学メモラー", rarity:"R"},
-{title:"数学ノート係", rarity:"R"},
-{title:"数学演習係", rarity:"R"},
-{title:"数学復習係", rarity:"R"},
-{title:"数学整理係", rarity:"R"},
-{title:"数学確認係", rarity:"R"},
-{title:"計算の芽", rarity:"R"},
-{title:"公式の芽", rarity:"R"},
-{title:"解法の芽", rarity:"R"},
-{title:"答案の芽", rarity:"R"},
-{title:"努力の芽", rarity:"R"},
-{title:"集中の芽", rarity:"R"},
-{title:"復習の芽", rarity:"R"},
-{title:"成長の芽", rarity:"R"},
-{title:"理解の芽", rarity:"R"},
-{title:"閃きの芽", rarity:"R"},
-{title:"1問入魂", rarity:"R"},
-{title:"2次関数の民", rarity:"R"},
-{title:"三角比の民", rarity:"R"},
-{title:"場合の数の民", rarity:"R"},
-{title:"データ整理者", rarity:"R"},
-{title:"指数法則の民", rarity:"R"},
-{title:"対数法則の民", rarity:"R"},
-{title:"微積入門者", rarity:"R"},
-{title:"図形観察者", rarity:"R"},
-{title:"数学準備中", rarity:"R"},
-{title:"符号マスター候補", rarity:"R"},
-{title:"計算マスター候補", rarity:"R"},
-{title:"公式マスター候補", rarity:"R"},
-{title:"解法マスター候補", rarity:"R"},
-{title:"答案マスター候補", rarity:"R"},
-{title:"微分マスター候補", rarity:"R"},
-{title:"積分マスター候補", rarity:"R"},
-{title:"三角マスター候補", rarity:"R"},
-{title:"数列マスター候補", rarity:"R"},
-{title:"ベクトルマスター候補", rarity:"R"},
-{title:"高速計算士・改", rarity:"SR"},
-{title:"式変形士・改", rarity:"SR"},
-{title:"答案職人・改", rarity:"SR"},
-{title:"公式使い・改", rarity:"SR"},
-{title:"微分使い・改", rarity:"SR"},
-{title:"積分使い・改", rarity:"SR"},
-{title:"三角使い・改", rarity:"SR"},
-{title:"数列使い・改", rarity:"SR"},
-{title:"ベクトル使い・改", rarity:"SR"},
-{title:"極限使い・改", rarity:"SR"},
-{title:"計算の剣豪", rarity:"SR"},
-{title:"公式の剣豪", rarity:"SR"},
-{title:"答案の剣豪", rarity:"SR"},
-{title:"微分の剣豪", rarity:"SR"},
-{title:"積分の剣豪", rarity:"SR"},
-{title:"三角の剣豪", rarity:"SR"},
-{title:"数列の剣豪", rarity:"SR"},
-{title:"ベクトルの剣豪", rarity:"SR"},
-{title:"極限の剣豪", rarity:"SR"},
-{title:"難問の剣豪", rarity:"SR"},
-{title:"解法研究者・上", rarity:"SR"},
-{title:"公式研究者", rarity:"SR"},
-{title:"答案研究者", rarity:"SR"},
-{title:"関数研究者", rarity:"SR"},
-{title:"三角研究者", rarity:"SR"},
-{title:"数列研究者", rarity:"SR"},
-{title:"微積研究者", rarity:"SR"},
-{title:"極限研究者", rarity:"SR"},
-{title:"複素研究者", rarity:"SR"},
-{title:"ベクトル研究者", rarity:"SR"},
-{title:"青チャの民", rarity:"SR"},
-{title:"黄チャの民", rarity:"SR"},
-{title:"過去問の民・上", rarity:"SR"},
-{title:"模試対策者", rarity:"SR"},
-{title:"共テ対策者", rarity:"SR"},
-{title:"私大対策者", rarity:"SR"},
-{title:"理系対策者", rarity:"SR"},
-{title:"数学強化中", rarity:"SR"},
-{title:"計算特訓中", rarity:"SR"},
-{title:"答案特訓中", rarity:"SR"},
-{title:"置換積分使い", rarity:"SR"},
-{title:"部分積分使い", rarity:"SR"},
-{title:"定積分使い", rarity:"SR"},
-{title:"合成関数使い", rarity:"SR"},
-{title:"積の微分使い", rarity:"SR"},
-{title:"商の微分使い", rarity:"SR"},
-{title:"三角公式使い", rarity:"SR"},
-{title:"数列公式使い", rarity:"SR"},
-{title:"内積使い", rarity:"SR"},
-{title:"複素数平面使い", rarity:"SR"},
-{title:"演習の達人候補", rarity:"SR"},
-{title:"復習の達人候補", rarity:"SR"},
-{title:"計算の達人候補", rarity:"SR"},
-{title:"公式の達人候補", rarity:"SR"},
-{title:"難問の達人候補", rarity:"SR"},
-{title:"数学の成長株", rarity:"SR"},
-{title:"解法の成長株", rarity:"SR"},
-{title:"答案の成長株", rarity:"SR"},
-{title:"微積の成長株", rarity:"SR"},
-{title:"数式の成長株", rarity:"SR"},
-{title:"👑計算覇者👑", rarity:"SSR"},
-{title:"👑公式覇者👑", rarity:"SSR"},
-{title:"👑答案覇者👑", rarity:"SSR"},
-{title:"👑微分覇者👑", rarity:"SSR"},
-{title:"👑積分覇者👑", rarity:"SSR"},
-{title:"💎数式の支配者💎", rarity:"SSR"},
-{title:"💎関数の支配者💎", rarity:"SSR"},
-{title:"💎三角の支配者💎", rarity:"SSR"},
-{title:"💎数列の支配者💎", rarity:"SSR"},
-{title:"💎ベクトルの支配者💎", rarity:"SSR"},
-{title:"🔥難問攻略者🔥", rarity:"SSR"},
-{title:"🔥超難問攻略者🔥", rarity:"SSR"},
-{title:"⚔️数学騎士団長⚔️", rarity:"SSR"},
-{title:"📘青チャ覇王📘", rarity:"SSR"},
-{title:"📙黄チャ覇王📙", rarity:"SSR"},
-{title:"🌌無限級の数学者🌌", rarity:"UR"},
-{title:"👑究極数式王👑", rarity:"UR"},
-{title:"💫微積の支配神💫", rarity:"UR"},
-{title:"🔥難問殲滅神🔥", rarity:"UR"},
-{title:"🌈数学マスター極🌈", rarity:"UR"}];
-}
-function getGachaRarity(){
-let r=Math.random()*100;
-if(r<0.5)return "UR";
-if(r<3.5)return "SSR";
-if(r<25)return "SR";
-return "R";
+];
 }
 function getGachaResultNoDuplicate(){
 let owned=playerData.gachaTitles||[];
 let remaining=gachaPool().filter(x=>!owned.includes(x.title));
 if(remaining.length===0)return null;
-let first=getGachaRarity();
+let r=Math.random()*100;
 let order=[];
-if(first==="UR")order=["UR","SSR","SR","R"];
-else if(first==="SSR")order=["SSR","SR","R","UR"];
-else if(first==="SR")order=["SR","R","SSR","UR"];
+if(r<2)order=["UR","SSR","SR","R"];
+else if(r<10)order=["SSR","SR","R","UR"];
+else if(r<30)order=["SR","R","SSR","UR"];
 else order=["R","SR","SSR","UR"];
 for(let rarity of order){
 let pool=remaining.filter(x=>x.rarity===rarity);
@@ -868,9 +661,12 @@ if(pool.length>0)return pool[Math.floor(Math.random()*pool.length)];
 return remaining[Math.floor(Math.random()*remaining.length)];
 }
 function getGachaResult(){
-let rarity=getGachaRarity();
+let r=Math.random()*100;
+let rarity="R";
+if(r<2)rarity="UR";
+else if(r<10)rarity="SSR";
+else if(r<30)rarity="SR";
 let pool=gachaPool().filter(x=>x.rarity===rarity);
-if(pool.length===0)pool=gachaPool();
 return pool[Math.floor(Math.random()*pool.length)];
 }
 function showGacha(){
@@ -884,9 +680,9 @@ document.getElementById("panelArea").innerHTML=`
 </div>
 <div class="profileItem">
 <h3>排出率</h3>
-<p>R 75% / SR 21.5% / SSR 3% / UR 0.5%</p>
-<p>ガチャ称号300個。URのみ色付き。</p>
-<p></p>
+<p>R 70% / SR 20% / SSR 8% / UR 2%</p>
+<p>称号100個。URのみ色付き。</p>
+<p>コマンド称号はガチャから出ません。</p>
 </div>
 `;
 }
@@ -1088,7 +884,7 @@ document.getElementById("panelArea").innerHTML=`
 <div class="guideItem">
 <h3>🎰 ガチャ</h3>
 <p>10コインで1回引けます。</p>
-<p>ガチャ称号は300種類。URのみ色付きです。</p>
+<p>ガチャ称号は100種類。URは5種類のみ色付きです。</p>
 </div>
 <div class="guideItem">
 <h3>🏅 称号</h3><p>称号は1つだけ装備できます。</p>
@@ -3019,14 +2815,6 @@ e.preventDefault();
 }
 }, {passive:false});
 const UPDATE_NOTES = {
-"3.4.3": [
-"ランキング処理を3.3.6基準に戻しました",
-"ガチャ称号を200個追加しました",
-"ガチャ排出率をR75%、SR21.5%、SSR3%、UR0.5%に調整しました",
-"ガチャ説明文からコマンド称号の表記を削除しました",
-"コマンド称号はガチャ対象外のままです"
-],
-
   "3.1.7": ["テンキーにlogを追加", "テンキー初回タップ時に画面が上へずれる問題を修正", "テンキーの反応速度を改善", "バージョン変更時のお知らせ自動表示を強化"],
   "3.1.1": ["シリアルコード画面を調整","称号システムを調整","一部UIを改善"],
 "3.1.0": [
@@ -5118,7 +4906,7 @@ console.log("app.js Ver 3.1.9 base loaded");
     const p=panel(); if(!p)return;
     p.innerHTML=`
       <h2>🏆 ランキング</h2>
-      <div class="profileItem"><p></p></div>
+      <div class="profileItem"><p>ランキングは誰でも見れます。反映はGoogleログイン中のみです。</p></div>
       <button class="modeBtn" onclick="showLevelRanking319()">⭐ レベルランキング</button>
       <button class="modeBtn" onclick="showDailyQuestionRanking319()">📚 日間正解数ランキング</button>
       <button class="modeBtn" onclick="showRateRanking()">🏅 レートランキング</button>
@@ -5611,8 +5399,8 @@ ${ultra}
       </div>
       <div class="profileItem">
         <h3>排出率</h3>
-        <p>R 75% / SR 21.5% / SSR 3% / UR 0.5%</p>
-        <p>URのみ色付き。</p>
+        <p>R 70% / SR 20% / SSR 8% / UR 2%</p>
+        <p>URのみ色付き。コマンド称号はガチャから出ません。</p>
       </div>`;
   };
 
@@ -5964,7 +5752,7 @@ ${ultra}
   window.showGacha = showGacha = function(){
     const p = panel();
     if(!p) return;
-    p.innerHTML = `<h2>🎰 ガチャ</h2><div class="profileItem"><p>所持コイン：${playerData.coins||0}</p><p>1回：10コイン / 10連：100コイン</p><p>称号は被りあり。被ったら3コイン返金。</p><button onclick="drawGacha()">10コインで引く</button><button onclick="drawGacha10()">100コインで10連</button><button onclick="showGachaBook()">ガチャ図鑑を見る</button></div><div class="profileItem"><h3>排出率</h3><p>R 75% / SR 21.5% / SSR 3% / UR 0.5%</p><p>URのみ色付き。</p></div>`;
+    p.innerHTML = `<h2>🎰 ガチャ</h2><div class="profileItem"><p>所持コイン：${playerData.coins||0}</p><p>1回：10コイン / 10連：100コイン</p><p>称号は被りあり。被ったら3コイン返金。</p><button onclick="drawGacha()">10コインで引く</button><button onclick="drawGacha10()">100コインで10連</button><button onclick="showGachaBook()">ガチャ図鑑を見る</button></div><div class="profileItem"><h3>排出率</h3><p>R 70% / SR 20% / SSR 8% / UR 2%</p><p>URのみ色付き。コマンド称号はガチャから出ません。</p></div>`;
     home();
   };
 
@@ -6756,7 +6544,7 @@ ${ultra}
 (function(){
   if(window.__v331DxUltraNewsPatchLoaded) return;
   window.__v331DxUltraNewsPatchLoaded = true;
-  try{ window.VERSION = "3.4.7"; }catch(e){}
+  try{ window.VERSION = "3.3.6"; }catch(e){}
 
   function stripUltraLabel331(text){
     return String(text==null?"":text).replace(/^\s*超難問\s*[：:]\s*/,'');
@@ -6814,8 +6602,12 @@ ${ultra}
   }
   inject331Style();
 
-  function rerenderQuestion331(){}
-
+  function rerenderQuestion331(){
+    const qEl=document.getElementById('q');
+    if(qEl && typeof current !== 'undefined' && current && current.q){
+      try{ qEl.innerHTML = pretty331(current.q); }catch(e){}
+    }
+  }
   const oldNext331 = window.nextQ;
   if(typeof oldNext331 === 'function'){
     window.nextQ = nextQ = function(){
@@ -6857,7 +6649,7 @@ ${ultra}
 (function(){
   if(window.__v332FullPatchLoaded) return;
   window.__v332FullPatchLoaded = true;
-  try{ window.VERSION = "3.4.7"; }catch(e){}
+  try{ window.VERSION = "3.3.6"; }catch(e){}
 
   function esc332(s){return String(s==null?"":s).replace(/[&<>"']/g,function(m){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m];});}
   function stripLabels332(s){
@@ -7778,7 +7570,3 @@ ${ultra}
   window.MM336_NEWS = "📢 お知らせ\n\nVer 3.3.6\n\n・回答連打による二重判定を修正\n・難易度選択画面の余白を調整\n・超難問下の戻るボタンを削除\n・結果後にランキングへ飛ぶ不具合を修正";
   console.log("Ver 3.3.6 UI / submit fix loaded");
 })();
-
-
-/* 3.4.7 yesterday ranking window bindings */
-window.showRankingMenu=showRankingMenu;
