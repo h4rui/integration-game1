@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "β版";
+const VERSION = "3.3.6";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -844,22 +844,15 @@ return [
 {title:"🔥難問殲滅神🔥", rarity:"UR"},
 {title:"🌈数学マスター極🌈", rarity:"UR"}];
 }
-function getGachaRarity(){
-let r=Math.random()*100;
-if(r<0.5)return "UR";
-if(r<3.5)return "SSR";
-if(r<25)return "SR";
-return "R";
-}
 function getGachaResultNoDuplicate(){
 let owned=playerData.gachaTitles||[];
 let remaining=gachaPool().filter(x=>!owned.includes(x.title));
 if(remaining.length===0)return null;
-let first=getGachaRarity();
+let r=Math.random()*100;
 let order=[];
-if(first==="UR")order=["UR","SSR","SR","R"];
-else if(first==="SSR")order=["SSR","SR","R","UR"];
-else if(first==="SR")order=["SR","R","SSR","UR"];
+if(r<2)order=["UR","SSR","SR","R"];
+else if(r<10)order=["SSR","SR","R","UR"];
+else if(r<30)order=["SR","R","SSR","UR"];
 else order=["R","SR","SSR","UR"];
 for(let rarity of order){
 let pool=remaining.filter(x=>x.rarity===rarity);
@@ -868,9 +861,12 @@ if(pool.length>0)return pool[Math.floor(Math.random()*pool.length)];
 return remaining[Math.floor(Math.random()*remaining.length)];
 }
 function getGachaResult(){
-let rarity=getGachaRarity();
+let r=Math.random()*100;
+let rarity="R";
+if(r<2)rarity="UR";
+else if(r<10)rarity="SSR";
+else if(r<30)rarity="SR";
 let pool=gachaPool().filter(x=>x.rarity===rarity);
-if(pool.length===0)pool=gachaPool();
 return pool[Math.floor(Math.random()*pool.length)];
 }
 function showGacha(){
@@ -884,9 +880,9 @@ document.getElementById("panelArea").innerHTML=`
 </div>
 <div class="profileItem">
 <h3>排出率</h3>
-<p>R 75% / SR 21.5% / SSR 3% / UR 0.5%</p>
-<p>ガチャ称号300個。URのみ色付き。</p>
-<p></p>
+<p>R 70% / SR 20% / SSR 8% / UR 2%</p>
+<p>称号100個。URのみ色付き。</p>
+<p>コマンド称号はガチャから出ません。</p>
 </div>
 `;
 }
@@ -1088,7 +1084,7 @@ document.getElementById("panelArea").innerHTML=`
 <div class="guideItem">
 <h3>🎰 ガチャ</h3>
 <p>10コインで1回引けます。</p>
-<p>ガチャ称号は300種類。URのみ色付きです。</p>
+<p>ガチャ称号は100種類。URは5種類のみ色付きです。</p>
 </div>
 <div class="guideItem">
 <h3>🏅 称号</h3><p>称号は1つだけ装備できます。</p>
@@ -1384,12 +1380,6 @@ ${(typeof f==="string"?id:f.name)||id}<br>
 area.innerHTML=html;
 }
 async function showFriendRanking(){
-let area=document.getElementById("panelArea");
-if(!isGoogleLinkedForRanking()){
-area.innerHTML=rankingLoginOnlyHTML("🏆 フレンドランキング");
-ensureHomeButton();
-return;
-}
 let html="<h2>🏆 フレンドランキング</h2>";
 let list=[];
 try{
@@ -1410,7 +1400,8 @@ list.sort((a,b)=>(b.bestRandomScore||0)-(a.bestRandomScore||0));
 for(let i=0;i<list.length;i++){
 html+=`
 <div class="rankItem">
-${i+1}位 ${list[i].icon?`<img class="rankIcon" src="${list[i].icon}">`:""}
+${i+1}位
+${list[i].icon?`<img class="rankIcon" src="${list[i].icon}">`:""}
 ${list[i].name}<br>
 ${titleHTML(list[i].title||"初心者")}<br>
 Lv${list[i].level||1}<br>
@@ -1418,8 +1409,7 @@ Lv${list[i].level||1}<br>
 </div>
 `;
 }
-area.innerHTML=html;
-ensureHomeButton();
+document.getElementById("panelArea").innerHTML=html;
 }
 function aiExplain(q){
 q=String(q);
@@ -2041,12 +2031,6 @@ showResultPage(text);
 }
 async function showWorldRanking(){
 let box=document.getElementById("panelArea");
-if(!isGoogleLinkedForRanking()){
-box.innerHTML=rankingLoginOnlyHTML("🌍 週間ランキング");
-ensureHomeButton();
-ensurePanelBackButton();
-return;
-}
 box.innerHTML="<h2>読み込み中...</h2>";
 try{
 let ranking=await loadWorldRanking();
@@ -2073,7 +2057,6 @@ box.innerHTML=html;
 ensureHomeButton();
 ensurePanelBackButton();
 }catch(e){
-console.log(e);
 box.innerHTML="<p>ランキング取得失敗</p>";
 ensureHomeButton();
 ensurePanelBackButton();
@@ -2117,28 +2100,8 @@ saveAllData();
 savePublicProfile();
 updateHomeStatus();
 }
-
-function isGoogleLinkedForRanking(){
-try{
-if(window.getGoogleLoginInfo){
-const u=window.getGoogleLoginInfo();
-if(u && (u.uid || u.email))return true;
-}
-if(window.currentUser && (window.currentUser.uid || window.currentUser.email))return true;
-}catch(e){}
-return false;
-}
-function rankingLoginOnlyHTML(title){
-return `<h2>${title}</h2><button class="googleLoginBtn" onclick="loginGoogle()">Googleログイン</button>`;
-}
-
 function showRankingMenu(){
-const box=document.getElementById("panelArea");
-if(!isGoogleLinkedForRanking()){
-box.innerHTML=rankingLoginOnlyHTML("🏆 ランキング");
-return;
-}
-box.innerHTML=`
+document.getElementById("panelArea").innerHTML=`
 <h2>🏆 ランキング</h2>
 <button class="modeBtn" onclick="showWorldRanking()">🌍 週間ランキング</button>
 <button class="modeBtn" onclick="showRateRanking()">🏅 レートランキング</button>
@@ -2180,11 +2143,6 @@ document.getElementById("panelArea").innerHTML=`
 }
 async function showRateRanking(){
 let box=document.getElementById("panelArea");
-if(!isGoogleLinkedForRanking()){
-box.innerHTML=rankingLoginOnlyHTML("🏅 レートランキング");
-ensurePanelBackButton();
-return;
-}
 box.innerHTML="<h2>読み込み中...</h2>";
 try{
 let list=await loadRateRanking();
@@ -2205,7 +2163,6 @@ ${list[i].wins||0}勝 ${list[i].losses||0}敗
 box.innerHTML=html;
 ensurePanelBackButton();
 }catch(e){
-console.log(e);
 box.innerHTML="<p>レートランキング取得失敗</p>";
 ensurePanelBackButton();
 }
@@ -3058,13 +3015,6 @@ e.preventDefault();
 }
 }, {passive:false});
 const UPDATE_NOTES = {
-"β版": [
-"称号を200個追加しました",
-"ガチャ排出率をR75%、SR21.5%、SSR3%、UR0.5%に調整しました",
-"1/2乗、分数指数、指数の指数に対応しました",
-"ルート表示を調整しました"
-],
-
   "3.1.7": ["テンキーにlogを追加", "テンキー初回タップ時に画面が上へずれる問題を修正", "テンキーの反応速度を改善", "バージョン変更時のお知らせ自動表示を強化"],
   "3.1.1": ["シリアルコード画面を調整","称号システムを調整","一部UIを改善"],
 "3.1.0": [
@@ -5156,7 +5106,7 @@ console.log("app.js Ver 3.1.9 base loaded");
     const p=panel(); if(!p)return;
     p.innerHTML=`
       <h2>🏆 ランキング</h2>
-      <div class="profileItem"><p></p></div>
+      <div class="profileItem"><p>ランキングは誰でも見れます。反映はGoogleログイン中のみです。</p></div>
       <button class="modeBtn" onclick="showLevelRanking319()">⭐ レベルランキング</button>
       <button class="modeBtn" onclick="showDailyQuestionRanking319()">📚 日間正解数ランキング</button>
       <button class="modeBtn" onclick="showRateRanking()">🏅 レートランキング</button>
@@ -5649,8 +5599,8 @@ ${ultra}
       </div>
       <div class="profileItem">
         <h3>排出率</h3>
-        <p>R 75% / SR 21.5% / SSR 3% / UR 0.5%</p>
-        <p>URのみ色付き。</p>
+        <p>R 70% / SR 20% / SSR 8% / UR 2%</p>
+        <p>URのみ色付き。コマンド称号はガチャから出ません。</p>
       </div>`;
   };
 
@@ -6002,7 +5952,7 @@ ${ultra}
   window.showGacha = showGacha = function(){
     const p = panel();
     if(!p) return;
-    p.innerHTML = `<h2>🎰 ガチャ</h2><div class="profileItem"><p>所持コイン：${playerData.coins||0}</p><p>1回：10コイン / 10連：100コイン</p><p>称号は被りあり。被ったら3コイン返金。</p><button onclick="drawGacha()">10コインで引く</button><button onclick="drawGacha10()">100コインで10連</button><button onclick="showGachaBook()">ガチャ図鑑を見る</button></div><div class="profileItem"><h3>排出率</h3><p>R 75% / SR 21.5% / SSR 3% / UR 0.5%</p><p>URのみ色付き。</p></div>`;
+    p.innerHTML = `<h2>🎰 ガチャ</h2><div class="profileItem"><p>所持コイン：${playerData.coins||0}</p><p>1回：10コイン / 10連：100コイン</p><p>称号は被りあり。被ったら3コイン返金。</p><button onclick="drawGacha()">10コインで引く</button><button onclick="drawGacha10()">100コインで10連</button><button onclick="showGachaBook()">ガチャ図鑑を見る</button></div><div class="profileItem"><h3>排出率</h3><p>R 70% / SR 20% / SSR 8% / UR 2%</p><p>URのみ色付き。コマンド称号はガチャから出ません。</p></div>`;
     home();
   };
 
@@ -6794,7 +6744,7 @@ ${ultra}
 (function(){
   if(window.__v331DxUltraNewsPatchLoaded) return;
   window.__v331DxUltraNewsPatchLoaded = true;
-  try{ window.VERSION = "β版"; }catch(e){}
+  try{ window.VERSION = "3.3.6"; }catch(e){}
 
   function stripUltraLabel331(text){
     return String(text==null?"":text).replace(/^\s*超難問\s*[：:]\s*/,'');
@@ -6899,7 +6849,7 @@ ${ultra}
 (function(){
   if(window.__v332FullPatchLoaded) return;
   window.__v332FullPatchLoaded = true;
-  try{ window.VERSION = "β版"; }catch(e){}
+  try{ window.VERSION = "3.3.6"; }catch(e){}
 
   function esc332(s){return String(s==null?"":s).replace(/[&<>"']/g,function(m){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m];});}
   function stripLabels332(s){
@@ -7630,7 +7580,7 @@ ${ultra}
 
 
 /* =========================================================
-   β版 UI / submit fix
+   Ver 3.3.6 UI / submit fix
    - 学習モードの決定連打を1秒ロック
    - 難易度選択の隙間を削減
    - 難易度選択の戻るボタンを非表示
@@ -7817,35 +7767,36 @@ ${ultra}
   });
   obs.observe(document.body, {childList:true, subtree:true});
 
-  window.MM336_NEWS = "📢 お知らせ\n\nβ版\n\n・回答連打による二重判定を修正\n・難易度選択画面の余白を調整\n・超難問下の戻るボタンを削除\n・結果後にランキングへ飛ぶ不具合を修正";
-  console.log("β版 UI / submit fix loaded");
+  window.MM336_NEWS = "📢 お知らせ\n\nVer 3.3.6\n\n・回答連打による二重判定を修正\n・難易度選択画面の余白を調整\n・超難問下の戻るボタンを削除\n・結果後にランキングへ飛ぶ不具合を修正";
+  console.log("Ver 3.3.6 UI / submit fix loaded");
 })();
 
 
 
 (function(){
-if(window.__mm106PreviewLoaded)return;
-window.__mm106PreviewLoaded=true;
+if(window.__mm336ProblemPreviewOnly)return;
+window.__mm336ProblemPreviewOnly=true;
 const st=document.createElement("style");
 st.textContent=`
-.mm106Preview{min-height:88px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:.08em;font-size:clamp(24px,6vw,38px);line-height:1.25;overflow:auto;padding:8px 6px;box-sizing:border-box;}
-.mm106Root{display:inline-flex;align-items:flex-start;margin:0 .04em;}
-.mm106Root .sign{font-size:1.04em;line-height:1;transform:translateY(.10em);margin-right:-.04em;}
-.mm106Root .body{border-top:2px solid currentColor;padding:.02em .12em 0 .08em;line-height:1.05;transform:translateY(.08em);white-space:nowrap;}
-.mm106Frac{display:inline-grid;grid-template-rows:auto auto;align-items:center;justify-items:center;line-height:1.05;margin:0 .14em;}
-.mm106Frac .top{border-bottom:2px solid currentColor;padding:0 .18em .06em;min-width:1.05em;text-align:center;}
-.mm106Frac .bottom{padding:.06em .18em 0;min-width:1.05em;text-align:center;}
-.mm106Pow sup{font-size:.62em;line-height:1;margin-left:.03em;}
-.mm106Times{opacity:.72;margin:0 .12em;}`;
+.mm336pWrap{min-height:82px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:.08em;font-size:clamp(24px,6vw,38px);line-height:1.25;overflow:auto;padding:8px 6px;box-sizing:border-box;}
+.mm336pRoot{display:inline-flex;align-items:flex-start;margin:0 .04em;}
+.mm336pRoot .sign{font-size:1.04em;line-height:1;transform:translateY(.10em);margin-right:-.04em;}
+.mm336pRoot .body{border-top:2px solid currentColor;padding:.02em .12em 0 .08em;line-height:1.05;transform:translateY(.08em);white-space:nowrap;}
+.mm336pFrac{display:inline-grid;grid-template-rows:auto auto;align-items:center;justify-items:center;line-height:1.05;margin:0 .14em;}
+.mm336pFrac .top{border-bottom:2px solid currentColor;padding:0 .18em .06em;min-width:1.05em;text-align:center;}
+.mm336pFrac .bottom{padding:.06em .18em 0;min-width:1.05em;text-align:center;}
+.mm336pPow sup{font-size:.62em;line-height:1;margin-left:.03em;}
+.mm336pTimes{opacity:.72;margin:0 .12em;}`;
 document.head.appendChild(st);
+
 function makePreview(raw){
- const wrap=document.createElement("span"); wrap.className="mm106Preview";
+ const wrap=document.createElement("span"); wrap.className="mm336pWrap";
  const s=String(raw||"").trim().replace(/π/g,"pi").replace(/²/g,"^2").replace(/³/g,"^3").replace(/×/g,"*").replace(/÷/g,"/");
  function txt(t){wrap.appendChild(document.createTextNode(String(t).replace(/\bpi\b/g,"π")));}
- function times(){const e=document.createElement("span");e.className="mm106Times";e.textContent="×";wrap.appendChild(e);}
- function root(v){const r=document.createElement("span");r.className="mm106Root";const a=document.createElement("span");a.className="sign";a.textContent="√";const b=document.createElement("span");b.className="body";b.textContent=String(v).replace(/\bpi\b/g,"π");r.appendChild(a);r.appendChild(b);wrap.appendChild(r);}
- function frac(a,b){const f=document.createElement("span");f.className="mm106Frac";const n=document.createElement("span");n.className="top";n.textContent=String(a).replace(/\bpi\b/g,"π");const d=document.createElement("span");d.className="bottom";d.textContent=String(b).replace(/\bpi\b/g,"π");f.appendChild(n);f.appendChild(d);wrap.appendChild(f);}
- function pow(a,b){if(b==="1/2"||b==="(1/2)"||b==="0.5"){root(a);return;}const p=document.createElement("span");p.className="mm106Pow";p.appendChild(document.createTextNode(String(a).replace(/\bpi\b/g,"π")));const sup=document.createElement("sup");sup.textContent=String(b).replace(/\bpi\b/g,"π");p.appendChild(sup);wrap.appendChild(p);}
+ function times(){const e=document.createElement("span");e.className="mm336pTimes";e.textContent="×";wrap.appendChild(e);}
+ function root(v){const r=document.createElement("span");r.className="mm336pRoot";const a=document.createElement("span");a.className="sign";a.textContent="√";const b=document.createElement("span");b.className="body";b.textContent=String(v).replace(/\bpi\b/g,"π");r.appendChild(a);r.appendChild(b);wrap.appendChild(r);}
+ function frac(a,b){const f=document.createElement("span");f.className="mm336pFrac";const n=document.createElement("span");n.className="top";n.textContent=String(a).replace(/\bpi\b/g,"π");const d=document.createElement("span");d.className="bottom";d.textContent=String(b).replace(/\bpi\b/g,"π");f.appendChild(n);f.appendChild(d);wrap.appendChild(f);}
+ function pow(a,b){if(b==="1/2"||b==="(1/2)"||b==="0.5"){root(a);return;}const p=document.createElement("span");p.className="mm336pPow";p.appendChild(document.createTextNode(String(a).replace(/\bpi\b/g,"π")));const sup=document.createElement("sup");sup.textContent=String(b).replace(/\bpi\b/g,"π");p.appendChild(sup);wrap.appendChild(p);}
  let m=s.match(/^sqrt\(([^()]+)\)$/)||s.match(/^√\(([^()]+)\)$/)||s.match(/^√([A-Za-z0-9πpi]+)$/);
  if(m){root(m[1]);return wrap;}
  m=s.match(/^(.+?)\^\(?(.+?)\)?$/);
@@ -7855,13 +7806,13 @@ function makePreview(raw){
  const parts=s.split("*"); parts.forEach((p,i)=>{if(i)times();txt(p);});
  return wrap;
 }
-function update(){
+function updatePreview(){
  const ans=document.getElementById("ans"); if(!ans)return;
  const targets=[document.getElementById("answerPreview"),document.getElementById("preview"),document.querySelector(".answer-preview"),document.querySelector(".previewMath")].filter(Boolean);
  targets.forEach(el=>{el.innerHTML=""; if(ans.value)el.appendChild(makePreview(ans.value));});
 }
-window.updateAnswerPreview=update;
-window.updateAnswerPreviewV329=update;
-document.addEventListener("input",e=>{if(e.target&&e.target.id==="ans")setTimeout(update,0);});
-setInterval(update,1000);
+window.updateAnswerPreview=updatePreview;
+window.updateAnswerPreviewV329=updatePreview;
+document.addEventListener("input",e=>{if(e.target&&e.target.id==="ans")setTimeout(updatePreview,0);});
+setInterval(updatePreview,1000);
 })();
