@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.3.6";
+const VERSION = "β版";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -642,17 +642,224 @@ return [
 {title:"🌌宇宙の支配者🌌", rarity:"UR"},
 {title:"🔥原初の数式🔥", rarity:"UR"},
 {title:"👑究極数学王👑", rarity:"UR"}
-];
+,
+{title:"計算の旅人", rarity:"R"},
+{title:"公式の旅人", rarity:"R"},
+{title:"解法の旅人", rarity:"R"},
+{title:"答案の旅人", rarity:"R"},
+{title:"途中式の旅人", rarity:"R"},
+{title:"数式の旅人", rarity:"R"},
+{title:"三角の旅人", rarity:"R"},
+{title:"数列の旅人", rarity:"R"},
+{title:"ベクトルの旅人", rarity:"R"},
+{title:"極限の旅人", rarity:"R"},
+{title:"計算見習い・改", rarity:"R"},
+{title:"公式見習い・改", rarity:"R"},
+{title:"微分見習い・改", rarity:"R"},
+{title:"積分見習い・改", rarity:"R"},
+{title:"因数見習い・改", rarity:"R"},
+{title:"展開見習い・改", rarity:"R"},
+{title:"素数見習い・改", rarity:"R"},
+{title:"グラフ見習い", rarity:"R"},
+{title:"関数見習い", rarity:"R"},
+{title:"答案見習い", rarity:"R"},
+{title:"朝の演習者", rarity:"R"},
+{title:"昼の演習者", rarity:"R"},
+{title:"夜の演習者", rarity:"R"},
+{title:"休日の演習者", rarity:"R"},
+{title:"毎日一問", rarity:"R"},
+{title:"計算習慣", rarity:"R"},
+{title:"復習習慣", rarity:"R"},
+{title:"公式暗記中", rarity:"R"},
+{title:"ミス直し中", rarity:"R"},
+{title:"答案整理中", rarity:"R"},
+{title:"分数の守り手", rarity:"R"},
+{title:"符号の守り手", rarity:"R"},
+{title:"括弧の守り手", rarity:"R"},
+{title:"約分の守り手", rarity:"R"},
+{title:"平方完成の守り手", rarity:"R"},
+{title:"展開の守り手", rarity:"R"},
+{title:"因数の守り手", rarity:"R"},
+{title:"素数の守り手", rarity:"R"},
+{title:"微分の守り手", rarity:"R"},
+{title:"積分の守り手", rarity:"R"},
+{title:"初級突破者", rarity:"R"},
+{title:"中級突破者", rarity:"R"},
+{title:"上級挑戦者", rarity:"R"},
+{title:"難問挑戦者", rarity:"R"},
+{title:"超難問見習い", rarity:"R"},
+{title:"計算安定者", rarity:"R"},
+{title:"式変形安定者", rarity:"R"},
+{title:"解答安定者", rarity:"R"},
+{title:"集中安定者", rarity:"R"},
+{title:"復習安定者", rarity:"R"},
+{title:"青ペンの民", rarity:"R"},
+{title:"赤ペンの民", rarity:"R"},
+{title:"黒板の民", rarity:"R"},
+{title:"チョークの民", rarity:"R"},
+{title:"ノートの民", rarity:"R"},
+{title:"問題集の民", rarity:"R"},
+{title:"模試の民", rarity:"R"},
+{title:"過去問の民", rarity:"R"},
+{title:"計算用紙の民", rarity:"R"},
+{title:"答案用紙の民", rarity:"R"},
+{title:"基礎演習者", rarity:"R"},
+{title:"標準演習者", rarity:"R"},
+{title:"応用演習者", rarity:"R"},
+{title:"公式確認者", rarity:"R"},
+{title:"定義確認者", rarity:"R"},
+{title:"グラフ確認者", rarity:"R"},
+{title:"符号確認者", rarity:"R"},
+{title:"分母確認者", rarity:"R"},
+{title:"条件確認者", rarity:"R"},
+{title:"範囲確認者", rarity:"R"},
+{title:"三角基本勢", rarity:"R"},
+{title:"指数基本勢", rarity:"R"},
+{title:"対数基本勢", rarity:"R"},
+{title:"数列基本勢", rarity:"R"},
+{title:"ベクトル基本勢", rarity:"R"},
+{title:"極限基本勢", rarity:"R"},
+{title:"微分基本勢", rarity:"R"},
+{title:"積分基本勢", rarity:"R"},
+{title:"確率基本勢", rarity:"R"},
+{title:"整数基本勢", rarity:"R"},
+{title:"数学ランナー", rarity:"R"},
+{title:"数学ウォーカー", rarity:"R"},
+{title:"数学スターター", rarity:"R"},
+{title:"数学チャレンジャー", rarity:"R"},
+{title:"数学メモラー", rarity:"R"},
+{title:"数学ノート係", rarity:"R"},
+{title:"数学演習係", rarity:"R"},
+{title:"数学復習係", rarity:"R"},
+{title:"数学整理係", rarity:"R"},
+{title:"数学確認係", rarity:"R"},
+{title:"計算の芽", rarity:"R"},
+{title:"公式の芽", rarity:"R"},
+{title:"解法の芽", rarity:"R"},
+{title:"答案の芽", rarity:"R"},
+{title:"努力の芽", rarity:"R"},
+{title:"集中の芽", rarity:"R"},
+{title:"復習の芽", rarity:"R"},
+{title:"成長の芽", rarity:"R"},
+{title:"理解の芽", rarity:"R"},
+{title:"閃きの芽", rarity:"R"},
+{title:"1問入魂", rarity:"R"},
+{title:"2次関数の民", rarity:"R"},
+{title:"三角比の民", rarity:"R"},
+{title:"場合の数の民", rarity:"R"},
+{title:"データ整理者", rarity:"R"},
+{title:"指数法則の民", rarity:"R"},
+{title:"対数法則の民", rarity:"R"},
+{title:"微積入門者", rarity:"R"},
+{title:"図形観察者", rarity:"R"},
+{title:"数学準備中", rarity:"R"},
+{title:"符号マスター候補", rarity:"R"},
+{title:"計算マスター候補", rarity:"R"},
+{title:"公式マスター候補", rarity:"R"},
+{title:"解法マスター候補", rarity:"R"},
+{title:"答案マスター候補", rarity:"R"},
+{title:"微分マスター候補", rarity:"R"},
+{title:"積分マスター候補", rarity:"R"},
+{title:"三角マスター候補", rarity:"R"},
+{title:"数列マスター候補", rarity:"R"},
+{title:"ベクトルマスター候補", rarity:"R"},
+{title:"高速計算士・改", rarity:"SR"},
+{title:"式変形士・改", rarity:"SR"},
+{title:"答案職人・改", rarity:"SR"},
+{title:"公式使い・改", rarity:"SR"},
+{title:"微分使い・改", rarity:"SR"},
+{title:"積分使い・改", rarity:"SR"},
+{title:"三角使い・改", rarity:"SR"},
+{title:"数列使い・改", rarity:"SR"},
+{title:"ベクトル使い・改", rarity:"SR"},
+{title:"極限使い・改", rarity:"SR"},
+{title:"計算の剣豪", rarity:"SR"},
+{title:"公式の剣豪", rarity:"SR"},
+{title:"答案の剣豪", rarity:"SR"},
+{title:"微分の剣豪", rarity:"SR"},
+{title:"積分の剣豪", rarity:"SR"},
+{title:"三角の剣豪", rarity:"SR"},
+{title:"数列の剣豪", rarity:"SR"},
+{title:"ベクトルの剣豪", rarity:"SR"},
+{title:"極限の剣豪", rarity:"SR"},
+{title:"難問の剣豪", rarity:"SR"},
+{title:"解法研究者・上", rarity:"SR"},
+{title:"公式研究者", rarity:"SR"},
+{title:"答案研究者", rarity:"SR"},
+{title:"関数研究者", rarity:"SR"},
+{title:"三角研究者", rarity:"SR"},
+{title:"数列研究者", rarity:"SR"},
+{title:"微積研究者", rarity:"SR"},
+{title:"極限研究者", rarity:"SR"},
+{title:"複素研究者", rarity:"SR"},
+{title:"ベクトル研究者", rarity:"SR"},
+{title:"青チャの民", rarity:"SR"},
+{title:"黄チャの民", rarity:"SR"},
+{title:"過去問の民・上", rarity:"SR"},
+{title:"模試対策者", rarity:"SR"},
+{title:"共テ対策者", rarity:"SR"},
+{title:"私大対策者", rarity:"SR"},
+{title:"理系対策者", rarity:"SR"},
+{title:"数学強化中", rarity:"SR"},
+{title:"計算特訓中", rarity:"SR"},
+{title:"答案特訓中", rarity:"SR"},
+{title:"置換積分使い", rarity:"SR"},
+{title:"部分積分使い", rarity:"SR"},
+{title:"定積分使い", rarity:"SR"},
+{title:"合成関数使い", rarity:"SR"},
+{title:"積の微分使い", rarity:"SR"},
+{title:"商の微分使い", rarity:"SR"},
+{title:"三角公式使い", rarity:"SR"},
+{title:"数列公式使い", rarity:"SR"},
+{title:"内積使い", rarity:"SR"},
+{title:"複素数平面使い", rarity:"SR"},
+{title:"演習の達人候補", rarity:"SR"},
+{title:"復習の達人候補", rarity:"SR"},
+{title:"計算の達人候補", rarity:"SR"},
+{title:"公式の達人候補", rarity:"SR"},
+{title:"難問の達人候補", rarity:"SR"},
+{title:"数学の成長株", rarity:"SR"},
+{title:"解法の成長株", rarity:"SR"},
+{title:"答案の成長株", rarity:"SR"},
+{title:"微積の成長株", rarity:"SR"},
+{title:"数式の成長株", rarity:"SR"},
+{title:"👑計算覇者👑", rarity:"SSR"},
+{title:"👑公式覇者👑", rarity:"SSR"},
+{title:"👑答案覇者👑", rarity:"SSR"},
+{title:"👑微分覇者👑", rarity:"SSR"},
+{title:"👑積分覇者👑", rarity:"SSR"},
+{title:"💎数式の支配者💎", rarity:"SSR"},
+{title:"💎関数の支配者💎", rarity:"SSR"},
+{title:"💎三角の支配者💎", rarity:"SSR"},
+{title:"💎数列の支配者💎", rarity:"SSR"},
+{title:"💎ベクトルの支配者💎", rarity:"SSR"},
+{title:"🔥難問攻略者🔥", rarity:"SSR"},
+{title:"🔥超難問攻略者🔥", rarity:"SSR"},
+{title:"⚔️数学騎士団長⚔️", rarity:"SSR"},
+{title:"📘青チャ覇王📘", rarity:"SSR"},
+{title:"📙黄チャ覇王📙", rarity:"SSR"},
+{title:"🌌無限級の数学者🌌", rarity:"UR"},
+{title:"👑究極数式王👑", rarity:"UR"},
+{title:"💫微積の支配神💫", rarity:"UR"},
+{title:"🔥難問殲滅神🔥", rarity:"UR"},
+{title:"🌈数学マスター極🌈", rarity:"UR"}];
+}
+function getGachaRarity(){
+let r=Math.random()*100;
+if(r<0.5)return "UR";
+if(r<3.5)return "SSR";
+if(r<25)return "SR";
+return "R";
 }
 function getGachaResultNoDuplicate(){
 let owned=playerData.gachaTitles||[];
 let remaining=gachaPool().filter(x=>!owned.includes(x.title));
 if(remaining.length===0)return null;
-let r=Math.random()*100;
+let first=getGachaRarity();
 let order=[];
-if(r<2)order=["UR","SSR","SR","R"];
-else if(r<10)order=["SSR","SR","R","UR"];
-else if(r<30)order=["SR","R","SSR","UR"];
+if(first==="UR")order=["UR","SSR","SR","R"];
+else if(first==="SSR")order=["SSR","SR","R","UR"];
+else if(first==="SR")order=["SR","R","SSR","UR"];
 else order=["R","SR","SSR","UR"];
 for(let rarity of order){
 let pool=remaining.filter(x=>x.rarity===rarity);
@@ -661,12 +868,9 @@ if(pool.length>0)return pool[Math.floor(Math.random()*pool.length)];
 return remaining[Math.floor(Math.random()*remaining.length)];
 }
 function getGachaResult(){
-let r=Math.random()*100;
-let rarity="R";
-if(r<2)rarity="UR";
-else if(r<10)rarity="SSR";
-else if(r<30)rarity="SR";
+let rarity=getGachaRarity();
 let pool=gachaPool().filter(x=>x.rarity===rarity);
+if(pool.length===0)pool=gachaPool();
 return pool[Math.floor(Math.random()*pool.length)];
 }
 function showGacha(){
@@ -680,9 +884,9 @@ document.getElementById("panelArea").innerHTML=`
 </div>
 <div class="profileItem">
 <h3>排出率</h3>
-<p>R 70% / SR 20% / SSR 8% / UR 2%</p>
-<p>称号100個。URのみ色付き。</p>
-<p>コマンド称号はガチャから出ません。</p>
+<p>R 75% / SR 21.5% / SSR 3% / UR 0.5%</p>
+<p>ガチャ称号300個。URのみ色付き。</p>
+<p></p>
 </div>
 `;
 }
@@ -884,7 +1088,7 @@ document.getElementById("panelArea").innerHTML=`
 <div class="guideItem">
 <h3>🎰 ガチャ</h3>
 <p>10コインで1回引けます。</p>
-<p>ガチャ称号は100種類。URは5種類のみ色付きです。</p>
+<p>ガチャ称号は300種類。URのみ色付きです。</p>
 </div>
 <div class="guideItem">
 <h3>🏅 称号</h3><p>称号は1つだけ装備できます。</p>
@@ -2815,6 +3019,14 @@ e.preventDefault();
 }
 }, {passive:false});
 const UPDATE_NOTES = {
+"β版": [
+"称号を200個追加しました",
+"ガチャ排出率をR75%、SR21.5%、SSR3%、UR0.5%に調整しました",
+"1/2乗、分数指数、指数の指数に対応しました",
+"ルート表示を調整しました",
+"問題表示で掛け算位置を見やすくしました"
+],
+
   "3.1.7": ["テンキーにlogを追加", "テンキー初回タップ時に画面が上へずれる問題を修正", "テンキーの反応速度を改善", "バージョン変更時のお知らせ自動表示を強化"],
   "3.1.1": ["シリアルコード画面を調整","称号システムを調整","一部UIを改善"],
 "3.1.0": [
@@ -5399,8 +5611,8 @@ ${ultra}
       </div>
       <div class="profileItem">
         <h3>排出率</h3>
-        <p>R 70% / SR 20% / SSR 8% / UR 2%</p>
-        <p>URのみ色付き。コマンド称号はガチャから出ません。</p>
+        <p>R 75% / SR 21.5% / SSR 3% / UR 0.5%</p>
+        <p>URのみ色付き。</p>
       </div>`;
   };
 
@@ -5752,7 +5964,7 @@ ${ultra}
   window.showGacha = showGacha = function(){
     const p = panel();
     if(!p) return;
-    p.innerHTML = `<h2>🎰 ガチャ</h2><div class="profileItem"><p>所持コイン：${playerData.coins||0}</p><p>1回：10コイン / 10連：100コイン</p><p>称号は被りあり。被ったら3コイン返金。</p><button onclick="drawGacha()">10コインで引く</button><button onclick="drawGacha10()">100コインで10連</button><button onclick="showGachaBook()">ガチャ図鑑を見る</button></div><div class="profileItem"><h3>排出率</h3><p>R 70% / SR 20% / SSR 8% / UR 2%</p><p>URのみ色付き。コマンド称号はガチャから出ません。</p></div>`;
+    p.innerHTML = `<h2>🎰 ガチャ</h2><div class="profileItem"><p>所持コイン：${playerData.coins||0}</p><p>1回：10コイン / 10連：100コイン</p><p>称号は被りあり。被ったら3コイン返金。</p><button onclick="drawGacha()">10コインで引く</button><button onclick="drawGacha10()">100コインで10連</button><button onclick="showGachaBook()">ガチャ図鑑を見る</button></div><div class="profileItem"><h3>排出率</h3><p>R 75% / SR 21.5% / SSR 3% / UR 0.5%</p><p>URのみ色付き。</p></div>`;
     home();
   };
 
@@ -6544,7 +6756,7 @@ ${ultra}
 (function(){
   if(window.__v331DxUltraNewsPatchLoaded) return;
   window.__v331DxUltraNewsPatchLoaded = true;
-  try{ window.VERSION = "3.3.6"; }catch(e){}
+  try{ window.VERSION = "β版"; }catch(e){}
 
   function stripUltraLabel331(text){
     return String(text==null?"":text).replace(/^\s*超難問\s*[：:]\s*/,'');
@@ -6649,7 +6861,7 @@ ${ultra}
 (function(){
   if(window.__v332FullPatchLoaded) return;
   window.__v332FullPatchLoaded = true;
-  try{ window.VERSION = "3.3.6"; }catch(e){}
+  try{ window.VERSION = "β版"; }catch(e){}
 
   function esc332(s){return String(s==null?"":s).replace(/[&<>"']/g,function(m){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m];});}
   function stripLabels332(s){
@@ -6860,7 +7072,7 @@ ${ultra}
 
 
 /* =========================================================
-   Ver 3.3.4 判定根本改善 + AI解説鬼強化
+   β版 判定根本改善 + AI解説鬼強化
    - ランキング処理は触らない
    - sinx/cosx/tanx と sin(x)/cos(x)/tan(x) を同一扱い
    - logx/lnx と log(x)/ln(x) を同一扱い
@@ -7158,18 +7370,18 @@ ${ultra}
     const newsCandidates = document.querySelectorAll(".news, #news, .notice, #notice");
     newsCandidates.forEach(el=>{
       if(el && /お知らせ|Ver|問題|更新/.test(el.textContent)){
-        el.innerHTML = "<b>お知らせ</b><br>Ver 3.3.4<br>・判定精度改善<br>・AI解説強化<br>・表示調整";
+        el.innerHTML = "<b>お知らせ</b><br>β版<br>・判定精度改善<br>・AI解説強化<br>・表示調整";
       }
     });
   }catch(e){}
 
-  console.log("Ver 3.3.4 judge + AI explanation fix loaded");
+  console.log("β版 judge + AI explanation fix loaded");
 })();
 
 
 
 
-/* Ver 3.3.5 AI解説強化・判定調整・ランダム修正。ランキング処理は触らない。 */
+/* β版 AI解説強化・判定調整・ランダム修正。ランキング処理は触らない。 */
 (function(){
   if(window.__mm335PatchLoaded) return;
   window.__mm335PatchLoaded = true;
@@ -7373,14 +7585,14 @@ ${ultra}
     };
   }
 
-  window.MM335_NEWS = "📢 お知らせ\n\nVer 3.3.5\n\n・ランダムモードの不具合を修正\n・判定精度を改善\n・AI解説を大幅強化\n・問題を追加\n・数式表示を改善";
-  console.log("Ver 3.3.5 AI / judge / random fix loaded");
+  window.MM335_NEWS = "📢 お知らせ\n\nβ版\n\n・ランダムモードの不具合を修正\n・判定精度を改善\n・AI解説を大幅強化\n・問題を追加\n・数式表示を改善";
+  console.log("β版 AI / judge / random fix loaded");
 })();
 
 
 
 /* =========================================================
-   Ver 3.3.6 UI / submit fix
+   β版 UI / submit fix
    - 学習モードの決定連打を1秒ロック
    - 難易度選択の隙間を削減
    - 難易度選択の戻るボタンを非表示
@@ -7567,6 +7779,161 @@ ${ultra}
   });
   obs.observe(document.body, {childList:true, subtree:true});
 
-  window.MM336_NEWS = "📢 お知らせ\n\nVer 3.3.6\n\n・回答連打による二重判定を修正\n・難易度選択画面の余白を調整\n・超難問下の戻るボタンを削除\n・結果後にランキングへ飛ぶ不具合を修正";
-  console.log("Ver 3.3.6 UI / submit fix loaded");
+  window.MM336_NEWS = "📢 お知らせ\n\nβ版\n\n・回答連打による二重判定を修正\n・難易度選択画面の余白を調整\n・超難問下の戻るボタンを削除\n・結果後にランキングへ飛ぶ不具合を修正";
+  console.log("β版 UI / submit fix loaded");
+})();
+
+
+
+/* β版 preview / display patch
+   ランキング・ログイン・Firebaseは触らない */
+(function(){
+  if(window.__betaPreviewDisplayPatchLoaded) return;
+  window.__betaPreviewDisplayPatchLoaded = true;
+
+  function byId(id){return document.getElementById(id);}
+  function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(m){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m];});}
+
+  const st=document.createElement("style");
+  st.textContent=`
+    .betaMath{display:inline-flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:.08em;line-height:1.25;max-width:100%;overflow-wrap:anywhere;}
+    .betaFrac{display:inline-grid;grid-template-rows:auto auto;align-items:center;justify-items:center;vertical-align:middle;line-height:1.05;margin:0 .14em;}
+    .betaFrac .num{border-bottom:2px solid currentColor;padding:0 .18em .06em;min-width:1.05em;text-align:center;white-space:nowrap;}
+    .betaFrac .den{padding:.06em .18em 0;min-width:1.05em;text-align:center;white-space:nowrap;}
+    .betaRoot{display:inline-flex;align-items:flex-start;vertical-align:middle;margin:0 .04em;}
+    .betaRoot .rad{font-size:1.08em;line-height:1;transform:translateY(.08em);margin-right:-.03em;}
+    .betaRoot .inside{border-top:2px solid currentColor;padding:.01em .10em 0 .06em;line-height:1.04;min-width:.55em;white-space:nowrap;transform:translateY(.07em);}
+    .betaPow{display:inline-flex;align-items:flex-start;vertical-align:baseline;}
+    .betaPow sup{font-size:.62em;line-height:1;margin-left:.03em;transform:translateY(-.15em);}
+    .betaTimes{opacity:.7;margin:0 .12em;}
+    #answerPreview,#preview,.answer-preview,.previewMath{min-height:88px;display:flex;align-items:center;justify-content:center;overflow:auto;padding:8px 6px;box-sizing:border-box;}
+    #answerPreview .betaMath,#preview .betaMath,.answer-preview .betaMath,.previewMath .betaMath{font-size:clamp(22px,5.5vw,36px);}
+    #q .betaMath{font-size:clamp(24px,6vw,42px);}
+  `;
+  document.head.appendChild(st);
+
+  function plain(s){
+    return String(s==null?"":s)
+      .replace(/　/g," ")
+      .replace(/×/g,"*").replace(/÷/g,"/")
+      .replace(/＋/g,"+").replace(/－/g,"-")
+      .replace(/π/g,"pi")
+      .replace(/²/g,"^2").replace(/³/g,"^3").replace(/⁴/g,"^4").replace(/⁵/g,"^5").replace(/⁶/g,"^6").replace(/⁷/g,"^7").replace(/⁸/g,"^8").replace(/⁹/g,"^9")
+      .trim();
+  }
+  function frac(a,b){return `<span class="betaFrac"><span class="num">${fmt(a)}</span><span class="den">${fmt(b)}</span></span>`;}
+  function root(a){return `<span class="betaRoot"><span class="rad">√</span><span class="inside">${fmt(a)}</span></span>`;}
+  function pow(base,exp){
+    exp=String(exp).replace(/\s+/g,"");
+    if(exp==="1/2"||exp==="(1/2)"||exp==="0.5") return root(base);
+    if(/^-?\d+\/-?\d+$/.test(exp)){
+      let p=exp.split("/");
+      return `<span class="betaPow">${fmt(base)}<sup>${frac(p[0],p[1])}</sup></span>`;
+    }
+    return `<span class="betaPow">${fmt(base)}<sup>${fmt(exp)}</sup></span>`;
+  }
+  function matchParen(s,i){
+    let d=0;
+    for(let j=i;j<s.length;j++){
+      if(s[j]==="(")d++;
+      else if(s[j]===")"){d--; if(d===0)return j;}
+    }
+    return -1;
+  }
+  function transformPowers(s){
+    let out="";
+    for(let i=0;i<s.length;i++){
+      if(s[i]==="("){
+        let end=matchParen(s,i);
+        if(end!==-1 && s[end+1]==="^"){
+          let base=s.slice(i+1,end), j=end+2, exp="";
+          if(s[j]==="("){
+            let eend=matchParen(s,j);
+            if(eend!==-1){exp=s.slice(j+1,eend); out+=pow(base,exp); i=eend; continue;}
+          }else{
+            while(j<s.length && /[A-Za-z0-9+\-*/πpi^]/.test(s[j])){exp+=s[j];j++;}
+            if(exp){out+=pow(base,exp); i=j-1; continue;}
+          }
+        }
+      }
+      if(/[A-Za-z0-9π]/.test(s[i])){
+        let j=i, base="";
+        while(j<s.length && /[A-Za-z0-9π]/.test(s[j])){base+=s[j];j++;}
+        if(s[j]==="^"){
+          j++;
+          let exp="";
+          if(s[j]==="("){
+            let eend=matchParen(s,j);
+            if(eend!==-1){exp=s.slice(j+1,eend); out+=pow(base,exp); i=eend; continue;}
+          }else{
+            while(j<s.length && /[A-Za-z0-9+\-*/πpi^]/.test(s[j])){exp+=s[j];j++;}
+            if(exp){out+=pow(base,exp); i=j-1; continue;}
+          }
+        }
+        out+=esc(base).replace(/\bpi\b/g,"π");
+        i=j-1; continue;
+      }
+      out+=esc(s[i]);
+    }
+    return out;
+  }
+  function clarifyMul(s){
+    // 数字/文字と関数の積を明確化
+    s=s.replace(/([0-9xπ])(?=(sin|cos|tan|log|ln))/g, `$1<span class="betaTimes">×</span>`);
+    s=s.replace(/(e<sup>[^<]+<\/sup>|e\^[A-Za-z0-9]+)(?=(sin|cos|tan))/g, `$1<span class="betaTimes">×</span>`);
+    s=s.replace(/([0-9xπ])(?=<span class="betaRoot")/g, `$1<span class="betaTimes">×</span>`);
+    return s;
+  }
+  function fmt(raw){
+    let s=plain(raw);
+    if(!s)return "";
+    s=s.replace(/\bpi\b/g,"π");
+    s=s.replace(/\*/g,`<span class="betaTimes">×</span>`);
+    s=s.replace(/\bsqrt\(([^()]+)\)/g,(_,a)=>root(a));
+    s=s.replace(/√\(([^()]+)\)/g,(_,a)=>root(a));
+    s=s.replace(/√([A-Za-z0-9π]+)/g,(_,a)=>root(a));
+    s=s.replace(/\(([^()]+)\)\^\(?1\/2\)?/g,(_,a)=>root(a));
+    s=s.replace(/([A-Za-zπ0-9]+)\^\(?1\/2\)?/g,(_,a)=>root(a));
+    s=s.replace(/\(([^()<>]+)\)\/\(([^()<>]+)\)/g,(_,a,b)=>frac(a,b));
+    s=s.replace(/([A-Za-z0-9π+\-^]+)\/\(([^()<>]+)\)/g,(_,a,b)=>frac(a,b));
+    s=s.replace(/\(([^()<>]+)\)\/([A-Za-z0-9π^+\-]+)/g,(_,a,b)=>frac(a,b));
+    s=s.replace(/(^|[^\w<\/])([\-]?(?:\d+|x|π|e))\/([\-]?(?:\d+|x|π|e)(?:\^\d+)?)/g,(_,pre,a,b)=>pre+frac(a,b));
+    s=s.replace(/\b(sin|cos|tan|log|ln)\(([^()]+)\)/g,(_,f,a)=>f+fmt(a));
+    s=transformPowers(s);
+    s=s.replace(/\s*d\s*x\s*$/i, ` <span style="white-space:nowrap">dx</span>`);
+    return clarifyMul(s);
+  }
+  function html(v){return `<span class="betaMath">${fmt(v)}</span>`;}
+
+  function updatePreview(){
+    let ans=byId("ans"); if(!ans)return;
+    let v=ans.value||"";
+    [byId("answerPreview"),byId("preview"),document.querySelector(".answer-preview"),document.querySelector(".previewMath")].filter(Boolean).forEach(el=>el.innerHTML=v?html(v):"");
+  }
+  window.updateAnswerPreview=updatePreview;
+  window.updateAnswerPreviewV329=updatePreview;
+  document.addEventListener("input",e=>{if(e.target&&e.target.id==="ans")setTimeout(updatePreview,0);});
+  setInterval(updatePreview,1000);
+
+  // 問題表示は生成処理を触らず、出ているテキストだけ見やすくする
+  function beautifyQuestion(){
+    const q=byId("q");
+    if(!q || q.querySelector(".betaMath"))return;
+    const text=(q.textContent||"").trim();
+    if(!text)return;
+    if(/[∫^√*/]|sin|cos|tan|log|ln|dx/.test(text)){
+      q.innerHTML=html(text.replace(/∫/g,"∫ ").replace(/dx/g," dx"));
+    }
+  }
+  setInterval(beautifyQuestion,700);
+
+  window.MM_BETA_NEWS=`📢 お知らせ
+
+β版
+
+・称号を200個追加しました
+・ガチャ排出率を調整しました
+・1/2乗、分数指数、指数の指数に対応しました
+・ルート表示を調整しました
+・問題表示で掛け算位置を見やすくしました`;
 })();
