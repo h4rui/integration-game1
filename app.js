@@ -7774,29 +7774,28 @@ ${ultra}
 
 
 (function(){
-if(window.__mm336ProblemPreviewOnly)return;
-window.__mm336ProblemPreviewOnly=true;
+if(window.__mm108PreviewOnly)return;
+window.__mm108PreviewOnly=true;
 const st=document.createElement("style");
 st.textContent=`
-.mm336pWrap{min-height:82px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:.08em;font-size:clamp(24px,6vw,38px);line-height:1.25;overflow:auto;padding:8px 6px;box-sizing:border-box;}
-.mm336pRoot{display:inline-flex;align-items:flex-start;margin:0 .04em;}
-.mm336pRoot .sign{font-size:1.04em;line-height:1;transform:translateY(.10em);margin-right:-.04em;}
-.mm336pRoot .body{border-top:2px solid currentColor;padding:.02em .12em 0 .08em;line-height:1.05;transform:translateY(.08em);white-space:nowrap;}
-.mm336pFrac{display:inline-grid;grid-template-rows:auto auto;align-items:center;justify-items:center;line-height:1.05;margin:0 .14em;}
-.mm336pFrac .top{border-bottom:2px solid currentColor;padding:0 .18em .06em;min-width:1.05em;text-align:center;}
-.mm336pFrac .bottom{padding:.06em .18em 0;min-width:1.05em;text-align:center;}
-.mm336pPow sup{font-size:.62em;line-height:1;margin-left:.03em;}
-.mm336pTimes{opacity:.72;margin:0 .12em;}`;
+.mm108Wrap{min-height:82px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:.08em;font-size:clamp(24px,6vw,38px);line-height:1.25;overflow:auto;padding:8px 6px;box-sizing:border-box;}
+.mm108Root{display:inline-flex;align-items:flex-start;margin:0 .04em;}
+.mm108Root .sign{font-size:1.04em;line-height:1;transform:translateY(.10em);margin-right:-.04em;}
+.mm108Root .body{border-top:2px solid currentColor;padding:.02em .12em 0 .08em;line-height:1.05;transform:translateY(.08em);white-space:nowrap;}
+.mm108Frac{display:inline-grid;grid-template-rows:auto auto;align-items:center;justify-items:center;line-height:1.05;margin:0 .14em;}
+.mm108Frac .top{border-bottom:2px solid currentColor;padding:0 .18em .06em;min-width:1.05em;text-align:center;}
+.mm108Frac .bottom{padding:.06em .18em 0;min-width:1.05em;text-align:center;}
+.mm108Pow sup{font-size:.62em;line-height:1;margin-left:.03em;}
+.mm108Times{opacity:.72;margin:0 .12em;}`;
 document.head.appendChild(st);
-
-function makePreview(raw){
- const wrap=document.createElement("span"); wrap.className="mm336pWrap";
+function makeMath(raw){
+ const wrap=document.createElement("span"); wrap.className="mm108Wrap";
  const s=String(raw||"").trim().replace(/π/g,"pi").replace(/²/g,"^2").replace(/³/g,"^3").replace(/×/g,"*").replace(/÷/g,"/");
  function txt(t){wrap.appendChild(document.createTextNode(String(t).replace(/\bpi\b/g,"π")));}
- function times(){const e=document.createElement("span");e.className="mm336pTimes";e.textContent="×";wrap.appendChild(e);}
- function root(v){const r=document.createElement("span");r.className="mm336pRoot";const a=document.createElement("span");a.className="sign";a.textContent="√";const b=document.createElement("span");b.className="body";b.textContent=String(v).replace(/\bpi\b/g,"π");r.appendChild(a);r.appendChild(b);wrap.appendChild(r);}
- function frac(a,b){const f=document.createElement("span");f.className="mm336pFrac";const n=document.createElement("span");n.className="top";n.textContent=String(a).replace(/\bpi\b/g,"π");const d=document.createElement("span");d.className="bottom";d.textContent=String(b).replace(/\bpi\b/g,"π");f.appendChild(n);f.appendChild(d);wrap.appendChild(f);}
- function pow(a,b){if(b==="1/2"||b==="(1/2)"||b==="0.5"){root(a);return;}const p=document.createElement("span");p.className="mm336pPow";p.appendChild(document.createTextNode(String(a).replace(/\bpi\b/g,"π")));const sup=document.createElement("sup");sup.textContent=String(b).replace(/\bpi\b/g,"π");p.appendChild(sup);wrap.appendChild(p);}
+ function times(){const e=document.createElement("span");e.className="mm108Times";e.textContent="×";wrap.appendChild(e);}
+ function root(v){const r=document.createElement("span");r.className="mm108Root";const a=document.createElement("span");a.className="sign";a.textContent="√";const b=document.createElement("span");b.className="body";b.textContent=String(v).replace(/\bpi\b/g,"π");r.appendChild(a);r.appendChild(b);wrap.appendChild(r);}
+ function frac(a,b){const f=document.createElement("span");f.className="mm108Frac";const n=document.createElement("span");n.className="top";n.textContent=String(a).replace(/\bpi\b/g,"π");const d=document.createElement("span");d.className="bottom";d.textContent=String(b).replace(/\bpi\b/g,"π");f.appendChild(n);f.appendChild(d);wrap.appendChild(f);}
+ function pow(a,b){if(b==="1/2"||b==="(1/2)"||b==="0.5"){root(a);return;}const p=document.createElement("span");p.className="mm108Pow";p.appendChild(document.createTextNode(String(a).replace(/\bpi\b/g,"π")));const sup=document.createElement("sup");sup.textContent=String(b).replace(/\bpi\b/g,"π");p.appendChild(sup);wrap.appendChild(p);}
  let m=s.match(/^sqrt\(([^()]+)\)$/)||s.match(/^√\(([^()]+)\)$/)||s.match(/^√([A-Za-z0-9πpi]+)$/);
  if(m){root(m[1]);return wrap;}
  m=s.match(/^(.+?)\^\(?(.+?)\)?$/);
@@ -7806,13 +7805,13 @@ function makePreview(raw){
  const parts=s.split("*"); parts.forEach((p,i)=>{if(i)times();txt(p);});
  return wrap;
 }
-function updatePreview(){
+function updateMathPreview(){
  const ans=document.getElementById("ans"); if(!ans)return;
  const targets=[document.getElementById("answerPreview"),document.getElementById("preview"),document.querySelector(".answer-preview"),document.querySelector(".previewMath")].filter(Boolean);
- targets.forEach(el=>{el.innerHTML=""; if(ans.value)el.appendChild(makePreview(ans.value));});
+ targets.forEach(el=>{el.innerHTML=""; if(ans.value)el.appendChild(makeMath(ans.value));});
 }
-window.updateAnswerPreview=updatePreview;
-window.updateAnswerPreviewV329=updatePreview;
-document.addEventListener("input",e=>{if(e.target&&e.target.id==="ans")setTimeout(updatePreview,0);});
-setInterval(updatePreview,1000);
+window.updateAnswerPreview=updateMathPreview;
+window.updateAnswerPreviewV329=updateMathPreview;
+document.addEventListener("input",e=>{if(e.target&&e.target.id==="ans")setTimeout(updateMathPreview,0);});
+setInterval(updateMathPreview,1000);
 })();
