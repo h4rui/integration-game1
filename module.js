@@ -240,14 +240,15 @@ return "local_" + playerId;
 }
 window.getMyPlayerId = () => (window.getMyFriendCode ? window.getMyFriendCode() : getPlayerId());
 window.saveWorldScore = async function(data){
+if(!auth.currentUser) return false;
 const week = getWeekKey();
-const playerId = getPlayerId();
+const playerId = "google_" + auth.currentUser.uid;
 const docId = week + "_" + data.mode + "_" + playerId;
 const ref = doc(db,"rankings",docId);
 const old = await getDoc(ref);
 if(old.exists()){
 const oldScore = old.data().score || 0;
-if(oldScore >= data.score) return;
+if(oldScore >= data.score) return false;
 }
 await setDoc(ref,{
 name:data.name,
@@ -260,8 +261,10 @@ week:week,
 playerId:playerId,
 updatedAt:serverTimestamp()
 });
+return true;
 };
 window.loadWorldRanking = async function(){
+if(!auth.currentUser) return [];
 const q = query(collection(db,"rankings"), where("week","==",getWeekKey()), where("mode","==","random"), limit(100));
 const snap = await getDocs(q);
 let list = [];
@@ -354,7 +357,8 @@ const after = await getDoc(ref);
 return after.data();
 };
 window.saveRateData = async function(result){
-const playerId = getPlayerId();
+if(!auth.currentUser) return null;
+const playerId = "google_" + auth.currentUser.uid;
 const ref = doc(db,"ratings",playerId);
 const snap = await getDoc(ref);
 let data = snap.exists() ? snap.data() : {};
@@ -382,6 +386,7 @@ updatedAt:serverTimestamp()
 return {rating,wins,losses};
 };
 window.loadRateRanking = async function(){
+if(!auth.currentUser) return [];
 const snap = await getDocs(collection(db,"ratings"));
 let list=[];
 snap.forEach(d=>list.push(d.data()));
