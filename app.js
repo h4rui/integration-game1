@@ -3023,8 +3023,7 @@ const UPDATE_NOTES = {
 "称号を200個追加しました",
 "ガチャ排出率をR75%、SR21.5%、SSR3%、UR0.5%に調整しました",
 "1/2乗、分数指数、指数の指数に対応しました",
-"ルート表示を調整しました",
-"問題表示で掛け算位置を見やすくしました"
+"ルート表示を調整しました"
 ],
 
   "3.1.7": ["テンキーにlogを追加", "テンキー初回タップ時に画面が上へずれる問題を修正", "テンキーの反応速度を改善", "バージョン変更時のお知らせ自動表示を強化"],
@@ -5118,7 +5117,7 @@ console.log("app.js Ver 3.1.9 base loaded");
     const p=panel(); if(!p)return;
     p.innerHTML=`
       <h2>🏆 ランキング</h2>
-      
+      <div class="profileItem"><p></p></div>
       <button class="modeBtn" onclick="showLevelRanking319()">⭐ レベルランキング</button>
       <button class="modeBtn" onclick="showDailyQuestionRanking319()">📚 日間正解数ランキング</button>
       <button class="modeBtn" onclick="showRateRanking()">🏅 レートランキング</button>
@@ -7785,143 +7784,50 @@ ${ultra}
 
 
 
-/* internal 1.0.2 beta preview patch
-   ランキング・ログイン・Firebaseには触らない */
+/* internal 1.0.4 clean preview patch
+   3.3.6基準。ランキング・ログイン・Firebaseは触らない。 */
 (function(){
-  if(window.__mm102PreviewPatchLoaded) return;
-  window.__mm102PreviewPatchLoaded = true;
+if(window.__mm104CleanPreviewLoaded)return;
+window.__mm104CleanPreviewLoaded=true;
+const st=document.createElement("style");
+st.textContent=`
+.mm104Preview{min-height:88px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:.08em;font-size:clamp(24px,6vw,38px);line-height:1.25;overflow:auto;padding:8px 6px;box-sizing:border-box;}
+.mm104Root{display:inline-flex;align-items:flex-start;margin:0 .04em;}
+.mm104Root .sign{font-size:1.04em;line-height:1;transform:translateY(.10em);margin-right:-.04em;}
+.mm104Root .body{border-top:2px solid currentColor;padding:.02em .12em 0 .08em;line-height:1.05;transform:translateY(.08em);white-space:nowrap;}
+.mm104Frac{display:inline-grid;grid-template-rows:auto auto;align-items:center;justify-items:center;line-height:1.05;margin:0 .14em;}
+.mm104Frac .top{border-bottom:2px solid currentColor;padding:0 .18em .06em;min-width:1.05em;text-align:center;}
+.mm104Frac .bottom{padding:.06em .18em 0;min-width:1.05em;text-align:center;}
+.mm104Pow sup{font-size:.62em;line-height:1;margin-left:.03em;}
+.mm104Times{opacity:.72;margin:0 .12em;}`;
+document.head.appendChild(st);
 
-  function id(x){return document.getElementById(x);}
-  function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(m){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m];});}
-
-  const st=document.createElement("style");
-  st.textContent=`
-    .mm102Math{display:inline-flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:.08em;line-height:1.25;max-width:100%;overflow-wrap:anywhere;}
-    .mm102Frac{display:inline-grid;grid-template-rows:auto auto;align-items:center;justify-items:center;vertical-align:middle;line-height:1.05;margin:0 .14em;}
-    .mm102Frac .num{border-bottom:2px solid currentColor;padding:0 .18em .06em;min-width:1.05em;text-align:center;white-space:nowrap;}
-    .mm102Frac .den{padding:.06em .18em 0;min-width:1.05em;text-align:center;white-space:nowrap;}
-    .mm102Root{display:inline-flex;align-items:flex-start;vertical-align:middle;margin:0 .03em;}
-    .mm102Root .rad{font-size:1.04em;line-height:1;transform:translateY(.10em);margin-right:-.02em;}
-    .mm102Root .inside{border-top:2px solid currentColor;padding:.00em .10em 0 .06em;line-height:1.04;min-width:.55em;white-space:nowrap;transform:translateY(.08em);}
-    .mm102Pow{display:inline-flex;align-items:flex-start;vertical-align:baseline;}
-    .mm102Pow sup{font-size:.62em;line-height:1;margin-left:.03em;transform:translateY(-.15em);}
-    .mm102Times{opacity:.72;margin:0 .12em;}
-    #answerPreview,#preview,.answer-preview,.previewMath{min-height:88px;display:flex;align-items:center;justify-content:center;overflow:auto;padding:8px 6px;box-sizing:border-box;}
-    #answerPreview .mm102Math,#preview .mm102Math,.answer-preview .mm102Math,.previewMath .mm102Math{font-size:clamp(22px,5.5vw,36px);}
-    #q .mm102Math{font-size:clamp(24px,6vw,42px);}
-  `;
-  document.head.appendChild(st);
-
-  function plain(s){
-    return String(s==null?"":s)
-      .replace(/　/g," ")
-      .replace(/×/g,"*").replace(/÷/g,"/")
-      .replace(/＋/g,"+").replace(/－/g,"-")
-      .replace(/π/g,"pi")
-      .replace(/²/g,"^2").replace(/³/g,"^3").replace(/⁴/g,"^4").replace(/⁵/g,"^5").replace(/⁶/g,"^6").replace(/⁷/g,"^7").replace(/⁸/g,"^8").replace(/⁹/g,"^9")
-      .trim();
-  }
-  function frac(a,b){return `<span class="mm102Frac"><span class="num">${fmt(a)}</span><span class="den">${fmt(b)}</span></span>`;}
-  function root(a){return `<span class="mm102Root"><span class="rad">√</span><span class="inside">${fmt(a)}</span></span>`;}
-  function pow(base,exp){
-    exp=String(exp).replace(/\s+/g,"");
-    if(exp==="1/2"||exp==="(1/2)"||exp==="0.5") return root(base);
-    if(/^-?\d+\/-?\d+$/.test(exp)){
-      let p=exp.split("/");
-      return `<span class="mm102Pow">${fmt(base)}<sup>${frac(p[0],p[1])}</sup></span>`;
-    }
-    return `<span class="mm102Pow">${fmt(base)}<sup>${fmt(exp)}</sup></span>`;
-  }
-  function matchParen(s,i){
-    let d=0;
-    for(let j=i;j<s.length;j++){
-      if(s[j]==="(")d++;
-      else if(s[j]===")"){d--; if(d===0)return j;}
-    }
-    return -1;
-  }
-  function transformPowers(s){
-    let out="";
-    for(let i=0;i<s.length;i++){
-      if(s[i]==="("){
-        let end=matchParen(s,i);
-        if(end!==-1 && s[end+1]==="^"){
-          let base=s.slice(i+1,end), j=end+2, exp="";
-          if(s[j]==="("){
-            let eend=matchParen(s,j);
-            if(eend!==-1){exp=s.slice(j+1,eend); out+=pow(base,exp); i=eend; continue;}
-          }else{
-            while(j<s.length && /[A-Za-z0-9+\-*/πpi^]/.test(s[j])){exp+=s[j];j++;}
-            if(exp){out+=pow(base,exp); i=j-1; continue;}
-          }
-        }
-      }
-      if(/[A-Za-z0-9π]/.test(s[i])){
-        let j=i, base="";
-        while(j<s.length && /[A-Za-z0-9π]/.test(s[j])){base+=s[j];j++;}
-        if(s[j]==="^"){
-          j++;
-          let exp="";
-          if(s[j]==="("){
-            let eend=matchParen(s,j);
-            if(eend!==-1){exp=s.slice(j+1,eend); out+=pow(base,exp); i=eend; continue;}
-          }else{
-            while(j<s.length && /[A-Za-z0-9+\-*/πpi^]/.test(s[j])){exp+=s[j];j++;}
-            if(exp){out+=pow(base,exp); i=j-1; continue;}
-          }
-        }
-        out+=esc(base).replace(/\bpi\b/g,"π");
-        i=j-1; continue;
-      }
-      out+=esc(s[i]);
-    }
-    return out;
-  }
-  function clarifyMul(s){
-    s=s.replace(/([0-9xπ])(?=(sin|cos|tan|log|ln))/g, `$1<span class="mm102Times">×</span>`);
-    s=s.replace(/(e<sup>[^<]+<\/sup>|e\^[A-Za-z0-9]+)(?=(sin|cos|tan))/g, `$1<span class="mm102Times">×</span>`);
-    s=s.replace(/([0-9xπ])(?=<span class="mm102Root")/g, `$1<span class="mm102Times">×</span>`);
-    return s;
-  }
-  function fmt(raw){
-    let s=plain(raw);
-    if(!s)return "";
-    s=s.replace(/\bpi\b/g,"π");
-    s=s.replace(/\*/g,`<span class="mm102Times">×</span>`);
-    s=s.replace(/\bsqrt\(([^()]+)\)/g,(_,a)=>root(a));
-    s=s.replace(/√\(([^()]+)\)/g,(_,a)=>root(a));
-    s=s.replace(/√([A-Za-z0-9π]+)/g,(_,a)=>root(a));
-    s=s.replace(/\(([^()]+)\)\^\(?1\/2\)?/g,(_,a)=>root(a));
-    s=s.replace(/([A-Za-zπ0-9]+)\^\(?1\/2\)?/g,(_,a)=>root(a));
-    s=s.replace(/\(([^()<>]+)\)\/\(([^()<>]+)\)/g,(_,a,b)=>frac(a,b));
-    s=s.replace(/([A-Za-z0-9π+\-^]+)\/\(([^()<>]+)\)/g,(_,a,b)=>frac(a,b));
-    s=s.replace(/\(([^()<>]+)\)\/([A-Za-z0-9π^+\-]+)/g,(_,a,b)=>frac(a,b));
-    s=s.replace(/(^|[^\w<\/])([\-]?(?:\d+|x|π|e))\/([\-]?(?:\d+|x|π|e)(?:\^\d+)?)/g,(_,pre,a,b)=>pre+frac(a,b));
-    s=s.replace(/\b(sin|cos|tan|log|ln)\(([^()]+)\)/g,(_,f,a)=>f+fmt(a));
-    s=transformPowers(s);
-    s=s.replace(/\s*d\s*x\s*$/i, ` <span style="white-space:nowrap">dx</span>`);
-    return clarifyMul(s);
-  }
-  function html(v){return `<span class="mm102Math">${fmt(v)}</span>`;}
-
-  function updatePreview(){
-    let ans=id("ans"); if(!ans)return;
-    let v=ans.value||"";
-    [id("answerPreview"),id("preview"),document.querySelector(".answer-preview"),document.querySelector(".previewMath")].filter(Boolean).forEach(el=>el.innerHTML=v?html(v):"");
-  }
-  window.updateAnswerPreview=updatePreview;
-  window.updateAnswerPreviewV329=updatePreview;
-  document.addEventListener("input",e=>{if(e.target&&e.target.id==="ans")setTimeout(updatePreview,0);});
-  setInterval(updatePreview,1000);
-
-  function beautifyQuestion(){
-    const q=id("q");
-    if(!q || q.querySelector(".mm102Math"))return;
-    const text=(q.textContent||"").trim();
-    if(!text)return;
-    if(/[∫^√*/]|sin|cos|tan|log|ln|dx/.test(text)){
-      q.innerHTML=html(text.replace(/∫/g,"∫ ").replace(/dx/g," dx"));
-    }
-  }
-  setInterval(beautifyQuestion,700);
+function makePreview(raw){
+ const wrap=document.createElement("span");
+ wrap.className="mm104Preview";
+ const s=String(raw||"").trim().replace(/π/g,"pi").replace(/²/g,"^2").replace(/³/g,"^3").replace(/×/g,"*").replace(/÷/g,"/");
+ function txt(t){wrap.appendChild(document.createTextNode(String(t).replace(/\bpi\b/g,"π")));}
+ function times(){const e=document.createElement("span");e.className="mm104Times";e.textContent="×";wrap.appendChild(e);}
+ function root(v){const r=document.createElement("span");r.className="mm104Root";const a=document.createElement("span");a.className="sign";a.textContent="√";const b=document.createElement("span");b.className="body";b.textContent=String(v).replace(/\bpi\b/g,"π");r.appendChild(a);r.appendChild(b);wrap.appendChild(r);}
+ function frac(a,b){const f=document.createElement("span");f.className="mm104Frac";const n=document.createElement("span");n.className="top";n.textContent=String(a).replace(/\bpi\b/g,"π");const d=document.createElement("span");d.className="bottom";d.textContent=String(b).replace(/\bpi\b/g,"π");f.appendChild(n);f.appendChild(d);wrap.appendChild(f);}
+ function pow(a,b){if(b==="1/2"||b==="(1/2)"||b==="0.5"){root(a);return;}const p=document.createElement("span");p.className="mm104Pow";p.appendChild(document.createTextNode(String(a).replace(/\bpi\b/g,"π")));const sup=document.createElement("sup");sup.textContent=String(b).replace(/\bpi\b/g,"π");p.appendChild(sup);wrap.appendChild(p);}
+ let m=s.match(/^sqrt\(([^()]+)\)$/)||s.match(/^√\(([^()]+)\)$/)||s.match(/^√([A-Za-z0-9πpi]+)$/);
+ if(m){root(m[1]);return wrap;}
+ m=s.match(/^(.+?)\^\(?(.+?)\)?$/);
+ if(m){pow(m[1],m[2]);return wrap;}
+ m=s.match(/^(.+?)\/(.+)$/);
+ if(m&&!s.includes("http")){frac(m[1],m[2]);return wrap;}
+ const parts=s.split("*");
+ parts.forEach((p,i)=>{if(i)times();txt(p);});
+ return wrap;
+}
+function update(){
+ const ans=document.getElementById("ans"); if(!ans)return;
+ const targets=[document.getElementById("answerPreview"),document.getElementById("preview"),document.querySelector(".answer-preview"),document.querySelector(".previewMath")].filter(Boolean);
+ targets.forEach(el=>{el.innerHTML=""; if(ans.value)el.appendChild(makePreview(ans.value));});
+}
+window.updateAnswerPreview=update;
+window.updateAnswerPreviewV329=update;
+document.addEventListener("input",e=>{if(e.target&&e.target.id==="ans")setTimeout(update,0);});
+setInterval(update,1000);
 })();
