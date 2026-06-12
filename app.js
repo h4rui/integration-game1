@@ -5118,7 +5118,7 @@ console.log("app.js Ver 3.1.9 base loaded");
     const p=panel(); if(!p)return;
     p.innerHTML=`
       <h2>🏆 ランキング</h2>
-      <div class="profileItem"><p>ランキングは誰でも見れます。反映はGoogleログイン中のみです。</p></div>
+      
       <button class="modeBtn" onclick="showLevelRanking319()">⭐ レベルランキング</button>
       <button class="modeBtn" onclick="showDailyQuestionRanking319()">📚 日間正解数ランキング</button>
       <button class="modeBtn" onclick="showRateRanking()">🏅 レートランキング</button>
@@ -7785,30 +7785,30 @@ ${ultra}
 
 
 
-/* β版 preview / display patch
-   ランキング・ログイン・Firebaseは触らない */
+/* internal 1.0.2 beta preview patch
+   ランキング・ログイン・Firebaseには触らない */
 (function(){
-  if(window.__betaPreviewDisplayPatchLoaded) return;
-  window.__betaPreviewDisplayPatchLoaded = true;
+  if(window.__mm102PreviewPatchLoaded) return;
+  window.__mm102PreviewPatchLoaded = true;
 
-  function byId(id){return document.getElementById(id);}
+  function id(x){return document.getElementById(x);}
   function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(m){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m];});}
 
   const st=document.createElement("style");
   st.textContent=`
-    .betaMath{display:inline-flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:.08em;line-height:1.25;max-width:100%;overflow-wrap:anywhere;}
-    .betaFrac{display:inline-grid;grid-template-rows:auto auto;align-items:center;justify-items:center;vertical-align:middle;line-height:1.05;margin:0 .14em;}
-    .betaFrac .num{border-bottom:2px solid currentColor;padding:0 .18em .06em;min-width:1.05em;text-align:center;white-space:nowrap;}
-    .betaFrac .den{padding:.06em .18em 0;min-width:1.05em;text-align:center;white-space:nowrap;}
-    .betaRoot{display:inline-flex;align-items:flex-start;vertical-align:middle;margin:0 .04em;}
-    .betaRoot .rad{font-size:1.08em;line-height:1;transform:translateY(.08em);margin-right:-.03em;}
-    .betaRoot .inside{border-top:2px solid currentColor;padding:.01em .10em 0 .06em;line-height:1.04;min-width:.55em;white-space:nowrap;transform:translateY(.07em);}
-    .betaPow{display:inline-flex;align-items:flex-start;vertical-align:baseline;}
-    .betaPow sup{font-size:.62em;line-height:1;margin-left:.03em;transform:translateY(-.15em);}
-    .betaTimes{opacity:.7;margin:0 .12em;}
+    .mm102Math{display:inline-flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:.08em;line-height:1.25;max-width:100%;overflow-wrap:anywhere;}
+    .mm102Frac{display:inline-grid;grid-template-rows:auto auto;align-items:center;justify-items:center;vertical-align:middle;line-height:1.05;margin:0 .14em;}
+    .mm102Frac .num{border-bottom:2px solid currentColor;padding:0 .18em .06em;min-width:1.05em;text-align:center;white-space:nowrap;}
+    .mm102Frac .den{padding:.06em .18em 0;min-width:1.05em;text-align:center;white-space:nowrap;}
+    .mm102Root{display:inline-flex;align-items:flex-start;vertical-align:middle;margin:0 .03em;}
+    .mm102Root .rad{font-size:1.04em;line-height:1;transform:translateY(.10em);margin-right:-.02em;}
+    .mm102Root .inside{border-top:2px solid currentColor;padding:.00em .10em 0 .06em;line-height:1.04;min-width:.55em;white-space:nowrap;transform:translateY(.08em);}
+    .mm102Pow{display:inline-flex;align-items:flex-start;vertical-align:baseline;}
+    .mm102Pow sup{font-size:.62em;line-height:1;margin-left:.03em;transform:translateY(-.15em);}
+    .mm102Times{opacity:.72;margin:0 .12em;}
     #answerPreview,#preview,.answer-preview,.previewMath{min-height:88px;display:flex;align-items:center;justify-content:center;overflow:auto;padding:8px 6px;box-sizing:border-box;}
-    #answerPreview .betaMath,#preview .betaMath,.answer-preview .betaMath,.previewMath .betaMath{font-size:clamp(22px,5.5vw,36px);}
-    #q .betaMath{font-size:clamp(24px,6vw,42px);}
+    #answerPreview .mm102Math,#preview .mm102Math,.answer-preview .mm102Math,.previewMath .mm102Math{font-size:clamp(22px,5.5vw,36px);}
+    #q .mm102Math{font-size:clamp(24px,6vw,42px);}
   `;
   document.head.appendChild(st);
 
@@ -7821,16 +7821,16 @@ ${ultra}
       .replace(/²/g,"^2").replace(/³/g,"^3").replace(/⁴/g,"^4").replace(/⁵/g,"^5").replace(/⁶/g,"^6").replace(/⁷/g,"^7").replace(/⁸/g,"^8").replace(/⁹/g,"^9")
       .trim();
   }
-  function frac(a,b){return `<span class="betaFrac"><span class="num">${fmt(a)}</span><span class="den">${fmt(b)}</span></span>`;}
-  function root(a){return `<span class="betaRoot"><span class="rad">√</span><span class="inside">${fmt(a)}</span></span>`;}
+  function frac(a,b){return `<span class="mm102Frac"><span class="num">${fmt(a)}</span><span class="den">${fmt(b)}</span></span>`;}
+  function root(a){return `<span class="mm102Root"><span class="rad">√</span><span class="inside">${fmt(a)}</span></span>`;}
   function pow(base,exp){
     exp=String(exp).replace(/\s+/g,"");
     if(exp==="1/2"||exp==="(1/2)"||exp==="0.5") return root(base);
     if(/^-?\d+\/-?\d+$/.test(exp)){
       let p=exp.split("/");
-      return `<span class="betaPow">${fmt(base)}<sup>${frac(p[0],p[1])}</sup></span>`;
+      return `<span class="mm102Pow">${fmt(base)}<sup>${frac(p[0],p[1])}</sup></span>`;
     }
-    return `<span class="betaPow">${fmt(base)}<sup>${fmt(exp)}</sup></span>`;
+    return `<span class="mm102Pow">${fmt(base)}<sup>${fmt(exp)}</sup></span>`;
   }
   function matchParen(s,i){
     let d=0;
@@ -7878,17 +7878,16 @@ ${ultra}
     return out;
   }
   function clarifyMul(s){
-    // 数字/文字と関数の積を明確化
-    s=s.replace(/([0-9xπ])(?=(sin|cos|tan|log|ln))/g, `$1<span class="betaTimes">×</span>`);
-    s=s.replace(/(e<sup>[^<]+<\/sup>|e\^[A-Za-z0-9]+)(?=(sin|cos|tan))/g, `$1<span class="betaTimes">×</span>`);
-    s=s.replace(/([0-9xπ])(?=<span class="betaRoot")/g, `$1<span class="betaTimes">×</span>`);
+    s=s.replace(/([0-9xπ])(?=(sin|cos|tan|log|ln))/g, `$1<span class="mm102Times">×</span>`);
+    s=s.replace(/(e<sup>[^<]+<\/sup>|e\^[A-Za-z0-9]+)(?=(sin|cos|tan))/g, `$1<span class="mm102Times">×</span>`);
+    s=s.replace(/([0-9xπ])(?=<span class="mm102Root")/g, `$1<span class="mm102Times">×</span>`);
     return s;
   }
   function fmt(raw){
     let s=plain(raw);
     if(!s)return "";
     s=s.replace(/\bpi\b/g,"π");
-    s=s.replace(/\*/g,`<span class="betaTimes">×</span>`);
+    s=s.replace(/\*/g,`<span class="mm102Times">×</span>`);
     s=s.replace(/\bsqrt\(([^()]+)\)/g,(_,a)=>root(a));
     s=s.replace(/√\(([^()]+)\)/g,(_,a)=>root(a));
     s=s.replace(/√([A-Za-z0-9π]+)/g,(_,a)=>root(a));
@@ -7903,22 +7902,21 @@ ${ultra}
     s=s.replace(/\s*d\s*x\s*$/i, ` <span style="white-space:nowrap">dx</span>`);
     return clarifyMul(s);
   }
-  function html(v){return `<span class="betaMath">${fmt(v)}</span>`;}
+  function html(v){return `<span class="mm102Math">${fmt(v)}</span>`;}
 
   function updatePreview(){
-    let ans=byId("ans"); if(!ans)return;
+    let ans=id("ans"); if(!ans)return;
     let v=ans.value||"";
-    [byId("answerPreview"),byId("preview"),document.querySelector(".answer-preview"),document.querySelector(".previewMath")].filter(Boolean).forEach(el=>el.innerHTML=v?html(v):"");
+    [id("answerPreview"),id("preview"),document.querySelector(".answer-preview"),document.querySelector(".previewMath")].filter(Boolean).forEach(el=>el.innerHTML=v?html(v):"");
   }
   window.updateAnswerPreview=updatePreview;
   window.updateAnswerPreviewV329=updatePreview;
   document.addEventListener("input",e=>{if(e.target&&e.target.id==="ans")setTimeout(updatePreview,0);});
   setInterval(updatePreview,1000);
 
-  // 問題表示は生成処理を触らず、出ているテキストだけ見やすくする
   function beautifyQuestion(){
-    const q=byId("q");
-    if(!q || q.querySelector(".betaMath"))return;
+    const q=id("q");
+    if(!q || q.querySelector(".mm102Math"))return;
     const text=(q.textContent||"").trim();
     if(!text)return;
     if(/[∫^√*/]|sin|cos|tan|log|ln|dx/.test(text)){
@@ -7926,14 +7924,4 @@ ${ultra}
     }
   }
   setInterval(beautifyQuestion,700);
-
-  window.MM_BETA_NEWS=`📢 お知らせ
-
-β版
-
-・称号を200個追加しました
-・ガチャ排出率を調整しました
-・1/2乗、分数指数、指数の指数に対応しました
-・ルート表示を調整しました
-・問題表示で掛け算位置を見やすくしました`;
 })();
