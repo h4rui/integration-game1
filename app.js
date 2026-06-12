@@ -5117,7 +5117,7 @@ console.log("app.js Ver 3.1.9 base loaded");
     const p=panel(); if(!p)return;
     p.innerHTML=`
       <h2>🏆 ランキング</h2>
-      <div class="profileItem"><p></p></div>
+      <div class="profileItem"><p>ランキングは誰でも見れます。反映はGoogleログイン中のみです。</p></div>
       <button class="modeBtn" onclick="showLevelRanking319()">⭐ レベルランキング</button>
       <button class="modeBtn" onclick="showDailyQuestionRanking319()">📚 日間正解数ランキング</button>
       <button class="modeBtn" onclick="showRateRanking()">🏅 レートランキング</button>
@@ -7784,41 +7784,38 @@ ${ultra}
 
 
 
-/* internal 1.0.4 clean preview patch
-   3.3.6基準。ランキング・ログイン・Firebaseは触らない。 */
+/* internal 1.0.5 clean preview patch
+   ランキング・ログイン・Firebaseは触らない */
 (function(){
-if(window.__mm104CleanPreviewLoaded)return;
-window.__mm104CleanPreviewLoaded=true;
+if(window.__mm105CleanPreviewLoaded)return;
+window.__mm105CleanPreviewLoaded=true;
 const st=document.createElement("style");
 st.textContent=`
-.mm104Preview{min-height:88px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:.08em;font-size:clamp(24px,6vw,38px);line-height:1.25;overflow:auto;padding:8px 6px;box-sizing:border-box;}
-.mm104Root{display:inline-flex;align-items:flex-start;margin:0 .04em;}
-.mm104Root .sign{font-size:1.04em;line-height:1;transform:translateY(.10em);margin-right:-.04em;}
-.mm104Root .body{border-top:2px solid currentColor;padding:.02em .12em 0 .08em;line-height:1.05;transform:translateY(.08em);white-space:nowrap;}
-.mm104Frac{display:inline-grid;grid-template-rows:auto auto;align-items:center;justify-items:center;line-height:1.05;margin:0 .14em;}
-.mm104Frac .top{border-bottom:2px solid currentColor;padding:0 .18em .06em;min-width:1.05em;text-align:center;}
-.mm104Frac .bottom{padding:.06em .18em 0;min-width:1.05em;text-align:center;}
-.mm104Pow sup{font-size:.62em;line-height:1;margin-left:.03em;}
-.mm104Times{opacity:.72;margin:0 .12em;}`;
+.mm105Preview{min-height:88px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:.08em;font-size:clamp(24px,6vw,38px);line-height:1.25;overflow:auto;padding:8px 6px;box-sizing:border-box;}
+.mm105Root{display:inline-flex;align-items:flex-start;margin:0 .04em;}
+.mm105Root .sign{font-size:1.04em;line-height:1;transform:translateY(.10em);margin-right:-.04em;}
+.mm105Root .body{border-top:2px solid currentColor;padding:.02em .12em 0 .08em;line-height:1.05;transform:translateY(.08em);white-space:nowrap;}
+.mm105Frac{display:inline-grid;grid-template-rows:auto auto;align-items:center;justify-items:center;line-height:1.05;margin:0 .14em;}
+.mm105Frac .top{border-bottom:2px solid currentColor;padding:0 .18em .06em;min-width:1.05em;text-align:center;}
+.mm105Frac .bottom{padding:.06em .18em 0;min-width:1.05em;text-align:center;}
+.mm105Pow sup{font-size:.62em;line-height:1;margin-left:.03em;}
+.mm105Times{opacity:.72;margin:0 .12em;}`;
 document.head.appendChild(st);
-
 function makePreview(raw){
- const wrap=document.createElement("span");
- wrap.className="mm104Preview";
+ const wrap=document.createElement("span"); wrap.className="mm105Preview";
  const s=String(raw||"").trim().replace(/π/g,"pi").replace(/²/g,"^2").replace(/³/g,"^3").replace(/×/g,"*").replace(/÷/g,"/");
  function txt(t){wrap.appendChild(document.createTextNode(String(t).replace(/\bpi\b/g,"π")));}
- function times(){const e=document.createElement("span");e.className="mm104Times";e.textContent="×";wrap.appendChild(e);}
- function root(v){const r=document.createElement("span");r.className="mm104Root";const a=document.createElement("span");a.className="sign";a.textContent="√";const b=document.createElement("span");b.className="body";b.textContent=String(v).replace(/\bpi\b/g,"π");r.appendChild(a);r.appendChild(b);wrap.appendChild(r);}
- function frac(a,b){const f=document.createElement("span");f.className="mm104Frac";const n=document.createElement("span");n.className="top";n.textContent=String(a).replace(/\bpi\b/g,"π");const d=document.createElement("span");d.className="bottom";d.textContent=String(b).replace(/\bpi\b/g,"π");f.appendChild(n);f.appendChild(d);wrap.appendChild(f);}
- function pow(a,b){if(b==="1/2"||b==="(1/2)"||b==="0.5"){root(a);return;}const p=document.createElement("span");p.className="mm104Pow";p.appendChild(document.createTextNode(String(a).replace(/\bpi\b/g,"π")));const sup=document.createElement("sup");sup.textContent=String(b).replace(/\bpi\b/g,"π");p.appendChild(sup);wrap.appendChild(p);}
+ function times(){const e=document.createElement("span");e.className="mm105Times";e.textContent="×";wrap.appendChild(e);}
+ function root(v){const r=document.createElement("span");r.className="mm105Root";const a=document.createElement("span");a.className="sign";a.textContent="√";const b=document.createElement("span");b.className="body";b.textContent=String(v).replace(/\bpi\b/g,"π");r.appendChild(a);r.appendChild(b);wrap.appendChild(r);}
+ function frac(a,b){const f=document.createElement("span");f.className="mm105Frac";const n=document.createElement("span");n.className="top";n.textContent=String(a).replace(/\bpi\b/g,"π");const d=document.createElement("span");d.className="bottom";d.textContent=String(b).replace(/\bpi\b/g,"π");f.appendChild(n);f.appendChild(d);wrap.appendChild(f);}
+ function pow(a,b){if(b==="1/2"||b==="(1/2)"||b==="0.5"){root(a);return;}const p=document.createElement("span");p.className="mm105Pow";p.appendChild(document.createTextNode(String(a).replace(/\bpi\b/g,"π")));const sup=document.createElement("sup");sup.textContent=String(b).replace(/\bpi\b/g,"π");p.appendChild(sup);wrap.appendChild(p);}
  let m=s.match(/^sqrt\(([^()]+)\)$/)||s.match(/^√\(([^()]+)\)$/)||s.match(/^√([A-Za-z0-9πpi]+)$/);
  if(m){root(m[1]);return wrap;}
  m=s.match(/^(.+?)\^\(?(.+?)\)?$/);
  if(m){pow(m[1],m[2]);return wrap;}
  m=s.match(/^(.+?)\/(.+)$/);
  if(m&&!s.includes("http")){frac(m[1],m[2]);return wrap;}
- const parts=s.split("*");
- parts.forEach((p,i)=>{if(i)times();txt(p);});
+ const parts=s.split("*"); parts.forEach((p,i)=>{if(i)times();txt(p);});
  return wrap;
 }
 function update(){
