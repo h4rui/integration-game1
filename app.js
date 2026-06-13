@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.3.11";
+const VERSION = "3.3.12";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -6757,7 +6757,7 @@ ${ultra}
 (function(){
   if(window.__v331DxUltraNewsPatchLoaded) return;
   window.__v331DxUltraNewsPatchLoaded = true;
-  try{ window.VERSION = "3.3.11"; }catch(e){}
+  try{ window.VERSION = "3.3.12"; }catch(e){}
 
   function stripUltraLabel331(text){
     return String(text==null?"":text).replace(/^\s*超難問\s*[：:]\s*/,'');
@@ -6862,7 +6862,7 @@ ${ultra}
 (function(){
   if(window.__v332FullPatchLoaded) return;
   window.__v332FullPatchLoaded = true;
-  try{ window.VERSION = "3.3.11"; }catch(e){}
+  try{ window.VERSION = "3.3.12"; }catch(e){}
 
   function esc332(s){return String(s==null?"":s).replace(/[&<>"']/g,function(m){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m];});}
   function stripLabels332(s){
@@ -7073,7 +7073,7 @@ ${ultra}
 
 
 /* =========================================================
-   Ver 3.3.11 判定根本改善 + AI解説鬼強化
+   Ver 3.3.12 判定根本改善 + AI解説鬼強化
    - ランキング処理は触らない
    - sinx/cosx/tanx と sin(x)/cos(x)/tan(x) を同一扱い
    - logx/lnx と log(x)/ln(x) を同一扱い
@@ -7371,18 +7371,18 @@ ${ultra}
     const newsCandidates = document.querySelectorAll(".news, #news, .notice, #notice");
     newsCandidates.forEach(el=>{
       if(el && /お知らせ|Ver|問題|更新/.test(el.textContent)){
-        el.innerHTML = "<b>お知らせ</b><br>Ver 3.3.11<br>・判定精度改善<br>・AI解説強化<br>・表示調整";
+        el.innerHTML = "<b>お知らせ</b><br>Ver 3.3.12<br>・判定精度改善<br>・AI解説強化<br>・表示調整";
       }
     });
   }catch(e){}
 
-  console.log("Ver 3.3.11 judge + AI explanation fix loaded");
+  console.log("Ver 3.3.12 judge + AI explanation fix loaded");
 })();
 
 
 
 
-/* Ver 3.3.11 AI解説強化・判定調整・ランダム修正。ランキング処理は触らない。 */
+/* Ver 3.3.12 AI解説強化・判定調整・ランダム修正。ランキング処理は触らない。 */
 (function(){
   if(window.__mm335PatchLoaded) return;
   window.__mm335PatchLoaded = true;
@@ -7586,14 +7586,14 @@ ${ultra}
     };
   }
 
-  window.MM335_NEWS = "📢 お知らせ\n\nVer 3.3.11\n\n・ランダムモードの不具合を修正\n・判定精度を改善\n・AI解説を大幅強化\n・問題を追加\n・数式表示を改善";
-  console.log("Ver 3.3.11 AI / judge / random fix loaded");
+  window.MM335_NEWS = "📢 お知らせ\n\nVer 3.3.12\n\n・ランダムモードの不具合を修正\n・判定精度を改善\n・AI解説を大幅強化\n・問題を追加\n・数式表示を改善";
+  console.log("Ver 3.3.12 AI / judge / random fix loaded");
 })();
 
 
 
 /* =========================================================
-   Ver 3.3.11 UI / submit fix
+   Ver 3.3.12 UI / submit fix
    - 学習モードの決定連打を1秒ロック
    - 難易度選択の隙間を削減
    - 難易度選択の戻るボタンを非表示
@@ -7780,8 +7780,8 @@ ${ultra}
   });
   obs.observe(document.body, {childList:true, subtree:true});
 
-  window.MM336_NEWS = "📢 お知らせ\n\nVer 3.3.11\n\n・回答連打による二重判定を修正\n・難易度選択画面の余白を調整\n・超難問下の戻るボタンを削除\n・結果後にランキングへ飛ぶ不具合を修正";
-  console.log("Ver 3.3.11 UI / submit fix loaded");
+  window.MM336_NEWS = "📢 お知らせ\n\nVer 3.3.12\n\n・回答連打による二重判定を修正\n・難易度選択画面の余白を調整\n・超難問下の戻るボタンを削除\n・結果後にランキングへ飛ぶ不具合を修正";
+  console.log("Ver 3.3.12 UI / submit fix loaded");
 })();
 
 
@@ -8163,8 +8163,8 @@ setInterval(beautifyQuestion339,700);
 
 /* v3.3.11 ranking login required */
 (function(){
-if(window.__mm3310RankingLoginFix)return;
-window.__mm3310RankingLoginFix=true;
+return; /* disabled old ranking login patch */
+window.__mm3310RankingLoginFix=false;
 
 function mm3310LoginUser(){
   try{
@@ -8265,5 +8265,143 @@ window.saveRateData=async function(){
   if(!isRankingLoggedIn3310())return null;
   if(typeof oldSaveRateData==="function")return await oldSaveRateData.apply(this,arguments);
   return null;
+};
+})();
+
+
+
+/* v3.3.12 login state + ranking gate fix */
+(function(){
+if(window.__mm3312LoginStateFix)return;
+window.__mm3312LoginStateFix=true;
+
+function mm3312User(){
+  try{ if(window.auth && window.auth.currentUser)return window.auth.currentUser; }catch(e){}
+  try{ if(window.firebase && firebase.auth && firebase.auth().currentUser)return firebase.auth().currentUser; }catch(e){}
+  try{ if(window.currentUser && (currentUser.uid || currentUser.email))return currentUser; }catch(e){}
+  try{
+    if(typeof getGoogleLoginInfo==="function"){
+      const u=getGoogleLoginInfo();
+      if(u && (u.uid || u.email || u.displayName))return u;
+    }
+  }catch(e){}
+  try{
+    const keys=["googleUser","currentUser","firebaseUser","loginUser","user"];
+    for(const k of keys){
+      const v=localStorage.getItem(k);
+      if(v && v!=="null" && v!=="undefined"){
+        try{
+          const o=JSON.parse(v);
+          if(o && (o.uid || o.email || o.displayName))return o;
+        }catch(e){ return {uid:v}; }
+      }
+    }
+  }catch(e){}
+  try{
+    const bodyText=document.body ? document.body.innerText : "";
+    if(bodyText.includes("ログアウト") || bodyText.includes("アカウント連携済み"))return {uid:"display-login"};
+  }catch(e){}
+  return null;
+}
+window.isRankingLoggedIn3312=function(){return !!mm3312User();};
+
+function loginOnly3312(title){
+  return `<h2>${title}</h2>
+  <div class="profileItem">
+    <p>Googleログインしてください</p>
+    <button class="modeBtn" onclick="loginGoogle()">Googleログイン</button>
+  </div>`;
+}
+
+window.logoutGoogle3312=async function(){
+  let done=false;
+  try{
+    if(typeof logoutGoogle==="function"){ await logoutGoogle(); done=true; }
+  }catch(e){console.log(e);}
+  if(!done){
+    try{
+      if(window.auth && auth.signOut){ await auth.signOut(); done=true; }
+      else if(window.firebase && firebase.auth){ await firebase.auth().signOut(); done=true; }
+    }catch(e){console.log(e);}
+  }
+  try{["googleUser","currentUser","firebaseUser","loginUser","user"].forEach(k=>localStorage.removeItem(k));}catch(e){}
+  if(!done)location.reload();
+};
+
+function attachLogoutFallback3312(){
+  document.querySelectorAll("button").forEach(btn=>{
+    const t=(btn.textContent||"").trim();
+    if(t.includes("ログアウト") && !btn.dataset.mm3312Logout){
+      btn.dataset.mm3312Logout="1";
+      btn.addEventListener("click",function(){
+        setTimeout(function(){
+          try{
+            const bodyText=document.body ? document.body.innerText : "";
+            if(bodyText.includes("ログアウト"))logoutGoogle3312();
+          }catch(e){}
+        },350);
+      });
+    }
+  });
+}
+setInterval(attachLogoutFallback3312,800);
+
+const oldShowRankingMenu3312=window.showRankingMenu;
+window.showRankingMenu=function(){
+  const box=document.getElementById("panelArea");
+  if(!box)return;
+  if(!isRankingLoggedIn3312()){
+    box.innerHTML=loginOnly3312("🏆 ランキング");
+    if(typeof ensureHomeButton==="function")ensureHomeButton();
+    return;
+  }
+  if(typeof oldShowRankingMenu3312==="function")return oldShowRankingMenu3312.apply(this,arguments);
+};
+
+const oldShowWorldRanking3312=window.showWorldRanking;
+window.showWorldRanking=async function(){
+  const box=document.getElementById("panelArea");
+  if(!isRankingLoggedIn3312()){
+    if(box)box.innerHTML=loginOnly3312("🌍 週間ランキング");
+    if(typeof ensureHomeButton==="function")ensureHomeButton();
+    if(typeof ensurePanelBackButton==="function")ensurePanelBackButton();
+    return;
+  }
+  if(typeof oldShowWorldRanking3312==="function"){
+    const timer=setTimeout(()=>{if(box && box.textContent.includes("読み込み中"))box.innerHTML="<p>ランキング取得失敗</p>";},8000);
+    try{return await oldShowWorldRanking3312.apply(this,arguments);}
+    finally{clearTimeout(timer);}
+  }
+};
+
+const oldShowRateRanking3312=window.showRateRanking;
+window.showRateRanking=async function(){
+  const box=document.getElementById("panelArea");
+  if(!isRankingLoggedIn3312()){
+    if(box)box.innerHTML=loginOnly3312("🏅 レートランキング");
+    if(typeof ensureHomeButton==="function")ensureHomeButton();
+    if(typeof ensurePanelBackButton==="function")ensurePanelBackButton();
+    return;
+  }
+  if(typeof oldShowRateRanking3312==="function")return await oldShowRateRanking3312.apply(this,arguments);
+};
+
+const oldShowFriendRanking3312=window.showFriendRanking;
+window.showFriendRanking=async function(){
+  const box=document.getElementById("panelArea");
+  if(!isRankingLoggedIn3312()){
+    if(box)box.innerHTML=loginOnly3312("👥 フレンドランキング");
+    if(typeof ensureHomeButton==="function")ensureHomeButton();
+    if(typeof ensurePanelBackButton==="function")ensurePanelBackButton();
+    return;
+  }
+  if(typeof oldShowFriendRanking3312==="function")return await oldShowFriendRanking3312.apply(this,arguments);
+};
+
+const oldSavePublicProfile3312=window.savePublicProfile;
+window.savePublicProfile=async function(){
+  if(!isRankingLoggedIn3312())return false;
+  if(typeof oldSavePublicProfile3312==="function")return await oldSavePublicProfile3312.apply(this,arguments);
+  return false;
 };
 })();
