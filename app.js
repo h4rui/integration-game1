@@ -844,22 +844,15 @@ return [
 {title:"🔥難問殲滅神🔥", rarity:"UR"},
 {title:"🌈数学マスター極🌈", rarity:"UR"}];
 }
-function getGachaRarity(){
-let r=Math.random()*100;
-if(r<0.5)return "UR";
-if(r<3.5)return "SSR";
-if(r<25)return "SR";
-return "R";
-}
 function getGachaResultNoDuplicate(){
 let owned=playerData.gachaTitles||[];
 let remaining=gachaPool().filter(x=>!owned.includes(x.title));
 if(remaining.length===0)return null;
-let first=getGachaRarity();
+let r=Math.random()*100;
 let order=[];
-if(first==="UR")order=["UR","SSR","SR","R"];
-else if(first==="SSR")order=["SSR","SR","R","UR"];
-else if(first==="SR")order=["SR","R","SSR","UR"];
+if(r<2)order=["UR","SSR","SR","R"];
+else if(r<10)order=["SSR","SR","R","UR"];
+else if(r<30)order=["SR","R","SSR","UR"];
 else order=["R","SR","SSR","UR"];
 for(let rarity of order){
 let pool=remaining.filter(x=>x.rarity===rarity);
@@ -868,9 +861,12 @@ if(pool.length>0)return pool[Math.floor(Math.random()*pool.length)];
 return remaining[Math.floor(Math.random()*remaining.length)];
 }
 function getGachaResult(){
-let rarity=getGachaRarity();
+let r=Math.random()*100;
+let rarity="R";
+if(r<2)rarity="UR";
+else if(r<10)rarity="SSR";
+else if(r<30)rarity="SR";
 let pool=gachaPool().filter(x=>x.rarity===rarity);
-if(pool.length===0)pool=gachaPool();
 return pool[Math.floor(Math.random()*pool.length)];
 }
 function showGacha(){
@@ -884,8 +880,8 @@ document.getElementById("panelArea").innerHTML=`
 </div>
 <div class="profileItem">
 <h3>排出率</h3>
-<p>R 75% / SR 21.5% / SSR 3% / UR 0.5%</p>
-<p>ガチャ称号300個。URのみ色付き。</p>
+<p>R 70% / SR 20% / SSR 8% / UR 2%</p>
+<p>称号100個。URのみ色付き。</p>
 <p>コマンド称号はガチャから出ません。</p>
 </div>
 `;
@@ -1088,7 +1084,7 @@ document.getElementById("panelArea").innerHTML=`
 <div class="guideItem">
 <h3>🎰 ガチャ</h3>
 <p>10コインで1回引けます。</p>
-<p>ガチャ称号は300種類。URのみ色付きです。</p>
+<p>ガチャ称号は100種類。URは5種類のみ色付きです。</p>
 </div>
 <div class="guideItem">
 <h3>🏅 称号</h3><p>称号は1つだけ装備できます。</p>
@@ -3020,10 +3016,9 @@ e.preventDefault();
 }, {passive:false});
 const UPDATE_NOTES = {
 "3.3.7": [
-"称号を200個追加しました",
-"ガチャ排出率をR75%、SR21.5%、SSR3%、UR0.5%に調整しました",
+"名前付き称号を200個追加しました",
+"称号一覧の並び順をレアリティ順に調整しました",
 "問題表示で指数・分数・ルート・積分範囲を見やすくしました",
-"AI解説を強化しました",
 "第5条（免責）を更新しました"
 ],
 
@@ -5611,7 +5606,7 @@ ${ultra}
       </div>
       <div class="profileItem">
         <h3>排出率</h3>
-        <p>R 75% / SR 21.5% / SSR 3% / UR 0.5%</p>
+        <p>R 70% / SR 20% / SSR 8% / UR 2%</p>
         <p>URのみ色付き。コマンド称号はガチャから出ません。</p>
       </div>`;
   };
@@ -5964,7 +5959,7 @@ ${ultra}
   window.showGacha = showGacha = function(){
     const p = panel();
     if(!p) return;
-    p.innerHTML = `<h2>🎰 ガチャ</h2><div class="profileItem"><p>所持コイン：${playerData.coins||0}</p><p>1回：10コイン / 10連：100コイン</p><p>称号は被りあり。被ったら3コイン返金。</p><button onclick="drawGacha()">10コインで引く</button><button onclick="drawGacha10()">100コインで10連</button><button onclick="showGachaBook()">ガチャ図鑑を見る</button></div><div class="profileItem"><h3>排出率</h3><p>R 75% / SR 21.5% / SSR 3% / UR 0.5%</p><p>URのみ色付き。コマンド称号はガチャから出ません。</p></div>`;
+    p.innerHTML = `<h2>🎰 ガチャ</h2><div class="profileItem"><p>所持コイン：${playerData.coins||0}</p><p>1回：10コイン / 10連：100コイン</p><p>称号は被りあり。被ったら3コイン返金。</p><button onclick="drawGacha()">10コインで引く</button><button onclick="drawGacha10()">100コインで10連</button><button onclick="showGachaBook()">ガチャ図鑑を見る</button></div><div class="profileItem"><h3>排出率</h3><p>R 70% / SR 20% / SSR 8% / UR 2%</p><p>URのみ色付き。コマンド称号はガチャから出ません。</p></div>`;
     home();
   };
 
@@ -7072,7 +7067,7 @@ ${ultra}
 
 
 /* =========================================================
-   Ver 3.3.4 判定根本改善 + AI解説鬼強化
+   Ver 3.3.7 判定根本改善 + AI解説鬼強化
    - ランキング処理は触らない
    - sinx/cosx/tanx と sin(x)/cos(x)/tan(x) を同一扱い
    - logx/lnx と log(x)/ln(x) を同一扱い
@@ -7370,18 +7365,18 @@ ${ultra}
     const newsCandidates = document.querySelectorAll(".news, #news, .notice, #notice");
     newsCandidates.forEach(el=>{
       if(el && /お知らせ|Ver|問題|更新/.test(el.textContent)){
-        el.innerHTML = "<b>お知らせ</b><br>Ver 3.3.4<br>・判定精度改善<br>・AI解説強化<br>・表示調整";
+        el.innerHTML = "<b>お知らせ</b><br>Ver 3.3.7<br>・判定精度改善<br>・AI解説強化<br>・表示調整";
       }
     });
   }catch(e){}
 
-  console.log("Ver 3.3.4 judge + AI explanation fix loaded");
+  console.log("Ver 3.3.7 judge + AI explanation fix loaded");
 })();
 
 
 
 
-/* Ver 3.3.5 AI解説強化・判定調整・ランダム修正。ランキング処理は触らない。 */
+/* Ver 3.3.7 AI解説強化・判定調整・ランダム修正。ランキング処理は触らない。 */
 (function(){
   if(window.__mm335PatchLoaded) return;
   window.__mm335PatchLoaded = true;
@@ -7585,14 +7580,14 @@ ${ultra}
     };
   }
 
-  window.MM335_NEWS = "📢 お知らせ\n\nVer 3.3.5\n\n・ランダムモードの不具合を修正\n・判定精度を改善\n・AI解説を大幅強化\n・問題を追加\n・数式表示を改善";
-  console.log("Ver 3.3.5 AI / judge / random fix loaded");
+  window.MM335_NEWS = "📢 お知らせ\n\nVer 3.3.7\n\n・ランダムモードの不具合を修正\n・判定精度を改善\n・AI解説を大幅強化\n・問題を追加\n・数式表示を改善";
+  console.log("Ver 3.3.7 AI / judge / random fix loaded");
 })();
 
 
 
 /* =========================================================
-   Ver 3.3.6 UI / submit fix
+   Ver 3.3.7 UI / submit fix
    - 学習モードの決定連打を1秒ロック
    - 難易度選択の隙間を削減
    - 難易度選択の戻るボタンを非表示
@@ -7779,8 +7774,43 @@ ${ultra}
   });
   obs.observe(document.body, {childList:true, subtree:true});
 
-  window.MM336_NEWS = "📢 お知らせ\n\nVer 3.3.6\n\n・回答連打による二重判定を修正\n・難易度選択画面の余白を調整\n・超難問下の戻るボタンを削除\n・結果後にランキングへ飛ぶ不具合を修正";
-  console.log("Ver 3.3.6 UI / submit fix loaded");
+  window.MM336_NEWS = "📢 お知らせ\n\nVer 3.3.7\n\n・回答連打による二重判定を修正\n・難易度選択画面の余白を調整\n・超難問下の戻るボタンを削除\n・結果後にランキングへ飛ぶ不具合を修正";
+  console.log("Ver 3.3.7 UI / submit fix loaded");
+})();
+
+
+
+(function(){
+if(window.__mm337TitleOrderLoaded)return;
+window.__mm337TitleOrderLoaded=true;
+const rarityRank={SPECIAL:0,UR:1,SSR:2,SR:3,R:4,N:5};
+function titleRarity337(t){
+try{
+const special=["⚡創設者","👾MENERU👾","🧊なかなか","なかなか🧊","👾MENERU👾"];
+if(special.includes(t))return "SPECIAL";
+if(typeof gachaPool==="function"){
+const hit=gachaPool().find(x=>x.title===t);
+if(hit&&hit.rarity)return hit.rarity;
+}
+}catch(e){}
+return "N";
+}
+function sortTitleList337(list){
+return (list||[]).slice().sort((a,b)=>{
+const ra=rarityRank[titleRarity337(a)]??9;
+const rb=rarityRank[titleRarity337(b)]??9;
+if(ra!==rb)return ra-rb;
+return String(a).localeCompare(String(b),"ja");
+});
+}
+window.sortTitleList337=sortTitleList337;
+if(typeof showTitles==="function"&&!window.__oldShowTitles337){
+window.__oldShowTitles337=showTitles;
+window.showTitles=function(){
+if(playerData&&Array.isArray(playerData.titles))playerData.titles=sortTitleList337(playerData.titles);
+return window.__oldShowTitles337.apply(this,arguments);
+};
+}
 })();
 
 
@@ -7838,18 +7868,4 @@ window.updateAnswerPreview=updatePreview;
 window.updateAnswerPreviewV329=updatePreview;
 document.addEventListener("input",e=>{if(e.target&&e.target.id==="ans")setTimeout(updatePreview,0);});
 setInterval(updatePreview,1000);
-})();
-
-(function(){
-if(window.__mm337ExplainLoaded)return;
-window.__mm337ExplainLoaded=true;
-function strongExplain(q){
-q=String(q||"");
-if(q.includes("∫"))return "【考え方】<br>式のまとまりを見る。中身の微分が外にあるなら置換積分、積の形なら部分積分を考える。<br><br>【確認】<br>答えを微分して元の式に戻るか確認する。<br><br>【注意】<br>係数、符号、dx、+Cを落とさない。";
-if(q.includes("微分")||q.includes("d/dx"))return "【考え方】<br>外側の関数と内側の関数を分ける。合成関数なら外側を微分して、最後に内側の微分をかける。";
-if(q.includes("因数分解"))return "【考え方】<br>共通因数、平方差、和と積の順に見る。最後に展開して確認する。";
-if(q.includes("展開"))return "【考え方】<br>分配法則で全ての項をかける。同類項をまとめ、符号ミスに注意する。";
-return "【考え方】<br>式の形を見て、使える公式を選ぶ。指数、分母、括弧の範囲を確認する。";
-}
-window.aiExplain=strongExplain;
 })();
