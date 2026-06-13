@@ -263,7 +263,6 @@ updatedAt:serverTimestamp()
 });
 };
 window.loadWorldRanking = async function(){
-if(!auth.currentUser) return [];
 const q = query(collection(db,"rankings"), where("week","==",getWeekKey()), where("mode","==","random"), limit(100));
 const snap = await getDocs(q);
 let list = [];
@@ -385,7 +384,6 @@ updatedAt:serverTimestamp()
 return {rating,wins,losses};
 };
 window.loadRateRanking = async function(){
-if(!auth.currentUser) return [];
 const snap = await getDocs(collection(db,"ratings"));
 let list=[];
 snap.forEach(d=>list.push(d.data()));

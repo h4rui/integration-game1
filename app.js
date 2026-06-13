@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.3.10";
+const VERSION = "3.3.11";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -6757,7 +6757,7 @@ ${ultra}
 (function(){
   if(window.__v331DxUltraNewsPatchLoaded) return;
   window.__v331DxUltraNewsPatchLoaded = true;
-  try{ window.VERSION = "3.3.10"; }catch(e){}
+  try{ window.VERSION = "3.3.11"; }catch(e){}
 
   function stripUltraLabel331(text){
     return String(text==null?"":text).replace(/^\s*超難問\s*[：:]\s*/,'');
@@ -6862,7 +6862,7 @@ ${ultra}
 (function(){
   if(window.__v332FullPatchLoaded) return;
   window.__v332FullPatchLoaded = true;
-  try{ window.VERSION = "3.3.10"; }catch(e){}
+  try{ window.VERSION = "3.3.11"; }catch(e){}
 
   function esc332(s){return String(s==null?"":s).replace(/[&<>"']/g,function(m){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m];});}
   function stripLabels332(s){
@@ -7073,7 +7073,7 @@ ${ultra}
 
 
 /* =========================================================
-   Ver 3.3.10 判定根本改善 + AI解説鬼強化
+   Ver 3.3.11 判定根本改善 + AI解説鬼強化
    - ランキング処理は触らない
    - sinx/cosx/tanx と sin(x)/cos(x)/tan(x) を同一扱い
    - logx/lnx と log(x)/ln(x) を同一扱い
@@ -7371,18 +7371,18 @@ ${ultra}
     const newsCandidates = document.querySelectorAll(".news, #news, .notice, #notice");
     newsCandidates.forEach(el=>{
       if(el && /お知らせ|Ver|問題|更新/.test(el.textContent)){
-        el.innerHTML = "<b>お知らせ</b><br>Ver 3.3.10<br>・判定精度改善<br>・AI解説強化<br>・表示調整";
+        el.innerHTML = "<b>お知らせ</b><br>Ver 3.3.11<br>・判定精度改善<br>・AI解説強化<br>・表示調整";
       }
     });
   }catch(e){}
 
-  console.log("Ver 3.3.10 judge + AI explanation fix loaded");
+  console.log("Ver 3.3.11 judge + AI explanation fix loaded");
 })();
 
 
 
 
-/* Ver 3.3.10 AI解説強化・判定調整・ランダム修正。ランキング処理は触らない。 */
+/* Ver 3.3.11 AI解説強化・判定調整・ランダム修正。ランキング処理は触らない。 */
 (function(){
   if(window.__mm335PatchLoaded) return;
   window.__mm335PatchLoaded = true;
@@ -7586,14 +7586,14 @@ ${ultra}
     };
   }
 
-  window.MM335_NEWS = "📢 お知らせ\n\nVer 3.3.10\n\n・ランダムモードの不具合を修正\n・判定精度を改善\n・AI解説を大幅強化\n・問題を追加\n・数式表示を改善";
-  console.log("Ver 3.3.10 AI / judge / random fix loaded");
+  window.MM335_NEWS = "📢 お知らせ\n\nVer 3.3.11\n\n・ランダムモードの不具合を修正\n・判定精度を改善\n・AI解説を大幅強化\n・問題を追加\n・数式表示を改善";
+  console.log("Ver 3.3.11 AI / judge / random fix loaded");
 })();
 
 
 
 /* =========================================================
-   Ver 3.3.10 UI / submit fix
+   Ver 3.3.11 UI / submit fix
    - 学習モードの決定連打を1秒ロック
    - 難易度選択の隙間を削減
    - 難易度選択の戻るボタンを非表示
@@ -7780,8 +7780,8 @@ ${ultra}
   });
   obs.observe(document.body, {childList:true, subtree:true});
 
-  window.MM336_NEWS = "📢 お知らせ\n\nVer 3.3.10\n\n・回答連打による二重判定を修正\n・難易度選択画面の余白を調整\n・超難問下の戻るボタンを削除\n・結果後にランキングへ飛ぶ不具合を修正";
-  console.log("Ver 3.3.10 UI / submit fix loaded");
+  window.MM336_NEWS = "📢 お知らせ\n\nVer 3.3.11\n\n・回答連打による二重判定を修正\n・難易度選択画面の余白を調整\n・超難問下の戻るボタンを削除\n・結果後にランキングへ飛ぶ不具合を修正";
+  console.log("Ver 3.3.11 UI / submit fix loaded");
 })();
 
 
@@ -8161,7 +8161,7 @@ setInterval(beautifyQuestion339,700);
 
 
 
-/* v3.3.10 ranking login required */
+/* v3.3.11 ranking login required */
 (function(){
 if(window.__mm3310RankingLoginFix)return;
 window.__mm3310RankingLoginFix=true;
