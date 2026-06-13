@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.3.12";
+const VERSION = "3.3.6";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -642,224 +642,17 @@ return [
 {title:"🌌宇宙の支配者🌌", rarity:"UR"},
 {title:"🔥原初の数式🔥", rarity:"UR"},
 {title:"👑究極数学王👑", rarity:"UR"}
-,
-{title:"計算の旅人", rarity:"R"},
-{title:"公式の旅人", rarity:"R"},
-{title:"解法の旅人", rarity:"R"},
-{title:"答案の旅人", rarity:"R"},
-{title:"途中式の旅人", rarity:"R"},
-{title:"数式の旅人", rarity:"R"},
-{title:"三角の旅人", rarity:"R"},
-{title:"数列の旅人", rarity:"R"},
-{title:"ベクトルの旅人", rarity:"R"},
-{title:"極限の旅人", rarity:"R"},
-{title:"計算見習い・改", rarity:"R"},
-{title:"公式見習い・改", rarity:"R"},
-{title:"微分見習い・改", rarity:"R"},
-{title:"積分見習い・改", rarity:"R"},
-{title:"因数見習い・改", rarity:"R"},
-{title:"展開見習い・改", rarity:"R"},
-{title:"素数見習い・改", rarity:"R"},
-{title:"グラフ見習い", rarity:"R"},
-{title:"関数見習い", rarity:"R"},
-{title:"答案見習い", rarity:"R"},
-{title:"朝の演習者", rarity:"R"},
-{title:"昼の演習者", rarity:"R"},
-{title:"夜の演習者", rarity:"R"},
-{title:"休日の演習者", rarity:"R"},
-{title:"毎日一問", rarity:"R"},
-{title:"計算習慣", rarity:"R"},
-{title:"復習習慣", rarity:"R"},
-{title:"公式暗記中", rarity:"R"},
-{title:"ミス直し中", rarity:"R"},
-{title:"答案整理中", rarity:"R"},
-{title:"分数の守り手", rarity:"R"},
-{title:"符号の守り手", rarity:"R"},
-{title:"括弧の守り手", rarity:"R"},
-{title:"約分の守り手", rarity:"R"},
-{title:"平方完成の守り手", rarity:"R"},
-{title:"展開の守り手", rarity:"R"},
-{title:"因数の守り手", rarity:"R"},
-{title:"素数の守り手", rarity:"R"},
-{title:"微分の守り手", rarity:"R"},
-{title:"積分の守り手", rarity:"R"},
-{title:"初級突破者", rarity:"R"},
-{title:"中級突破者", rarity:"R"},
-{title:"上級挑戦者", rarity:"R"},
-{title:"難問挑戦者", rarity:"R"},
-{title:"超難問見習い", rarity:"R"},
-{title:"計算安定者", rarity:"R"},
-{title:"式変形安定者", rarity:"R"},
-{title:"解答安定者", rarity:"R"},
-{title:"集中安定者", rarity:"R"},
-{title:"復習安定者", rarity:"R"},
-{title:"青ペンの民", rarity:"R"},
-{title:"赤ペンの民", rarity:"R"},
-{title:"黒板の民", rarity:"R"},
-{title:"チョークの民", rarity:"R"},
-{title:"ノートの民", rarity:"R"},
-{title:"問題集の民", rarity:"R"},
-{title:"模試の民", rarity:"R"},
-{title:"過去問の民", rarity:"R"},
-{title:"計算用紙の民", rarity:"R"},
-{title:"答案用紙の民", rarity:"R"},
-{title:"基礎演習者", rarity:"R"},
-{title:"標準演習者", rarity:"R"},
-{title:"応用演習者", rarity:"R"},
-{title:"公式確認者", rarity:"R"},
-{title:"定義確認者", rarity:"R"},
-{title:"グラフ確認者", rarity:"R"},
-{title:"符号確認者", rarity:"R"},
-{title:"分母確認者", rarity:"R"},
-{title:"条件確認者", rarity:"R"},
-{title:"範囲確認者", rarity:"R"},
-{title:"三角基本勢", rarity:"R"},
-{title:"指数基本勢", rarity:"R"},
-{title:"対数基本勢", rarity:"R"},
-{title:"数列基本勢", rarity:"R"},
-{title:"ベクトル基本勢", rarity:"R"},
-{title:"極限基本勢", rarity:"R"},
-{title:"微分基本勢", rarity:"R"},
-{title:"積分基本勢", rarity:"R"},
-{title:"確率基本勢", rarity:"R"},
-{title:"整数基本勢", rarity:"R"},
-{title:"数学ランナー", rarity:"R"},
-{title:"数学ウォーカー", rarity:"R"},
-{title:"数学スターター", rarity:"R"},
-{title:"数学チャレンジャー", rarity:"R"},
-{title:"数学メモラー", rarity:"R"},
-{title:"数学ノート係", rarity:"R"},
-{title:"数学演習係", rarity:"R"},
-{title:"数学復習係", rarity:"R"},
-{title:"数学整理係", rarity:"R"},
-{title:"数学確認係", rarity:"R"},
-{title:"計算の芽", rarity:"R"},
-{title:"公式の芽", rarity:"R"},
-{title:"解法の芽", rarity:"R"},
-{title:"答案の芽", rarity:"R"},
-{title:"努力の芽", rarity:"R"},
-{title:"集中の芽", rarity:"R"},
-{title:"復習の芽", rarity:"R"},
-{title:"成長の芽", rarity:"R"},
-{title:"理解の芽", rarity:"R"},
-{title:"閃きの芽", rarity:"R"},
-{title:"1問入魂", rarity:"R"},
-{title:"2次関数の民", rarity:"R"},
-{title:"三角比の民", rarity:"R"},
-{title:"場合の数の民", rarity:"R"},
-{title:"データ整理者", rarity:"R"},
-{title:"指数法則の民", rarity:"R"},
-{title:"対数法則の民", rarity:"R"},
-{title:"微積入門者", rarity:"R"},
-{title:"図形観察者", rarity:"R"},
-{title:"数学準備中", rarity:"R"},
-{title:"符号マスター候補", rarity:"R"},
-{title:"計算マスター候補", rarity:"R"},
-{title:"公式マスター候補", rarity:"R"},
-{title:"解法マスター候補", rarity:"R"},
-{title:"答案マスター候補", rarity:"R"},
-{title:"微分マスター候補", rarity:"R"},
-{title:"積分マスター候補", rarity:"R"},
-{title:"三角マスター候補", rarity:"R"},
-{title:"数列マスター候補", rarity:"R"},
-{title:"ベクトルマスター候補", rarity:"R"},
-{title:"高速計算士・改", rarity:"SR"},
-{title:"式変形士・改", rarity:"SR"},
-{title:"答案職人・改", rarity:"SR"},
-{title:"公式使い・改", rarity:"SR"},
-{title:"微分使い・改", rarity:"SR"},
-{title:"積分使い・改", rarity:"SR"},
-{title:"三角使い・改", rarity:"SR"},
-{title:"数列使い・改", rarity:"SR"},
-{title:"ベクトル使い・改", rarity:"SR"},
-{title:"極限使い・改", rarity:"SR"},
-{title:"計算の剣豪", rarity:"SR"},
-{title:"公式の剣豪", rarity:"SR"},
-{title:"答案の剣豪", rarity:"SR"},
-{title:"微分の剣豪", rarity:"SR"},
-{title:"積分の剣豪", rarity:"SR"},
-{title:"三角の剣豪", rarity:"SR"},
-{title:"数列の剣豪", rarity:"SR"},
-{title:"ベクトルの剣豪", rarity:"SR"},
-{title:"極限の剣豪", rarity:"SR"},
-{title:"難問の剣豪", rarity:"SR"},
-{title:"解法研究者・上", rarity:"SR"},
-{title:"公式研究者", rarity:"SR"},
-{title:"答案研究者", rarity:"SR"},
-{title:"関数研究者", rarity:"SR"},
-{title:"三角研究者", rarity:"SR"},
-{title:"数列研究者", rarity:"SR"},
-{title:"微積研究者", rarity:"SR"},
-{title:"極限研究者", rarity:"SR"},
-{title:"複素研究者", rarity:"SR"},
-{title:"ベクトル研究者", rarity:"SR"},
-{title:"青チャの民", rarity:"SR"},
-{title:"黄チャの民", rarity:"SR"},
-{title:"過去問の民・上", rarity:"SR"},
-{title:"模試対策者", rarity:"SR"},
-{title:"共テ対策者", rarity:"SR"},
-{title:"私大対策者", rarity:"SR"},
-{title:"理系対策者", rarity:"SR"},
-{title:"数学強化中", rarity:"SR"},
-{title:"計算特訓中", rarity:"SR"},
-{title:"答案特訓中", rarity:"SR"},
-{title:"置換積分使い", rarity:"SR"},
-{title:"部分積分使い", rarity:"SR"},
-{title:"定積分使い", rarity:"SR"},
-{title:"合成関数使い", rarity:"SR"},
-{title:"積の微分使い", rarity:"SR"},
-{title:"商の微分使い", rarity:"SR"},
-{title:"三角公式使い", rarity:"SR"},
-{title:"数列公式使い", rarity:"SR"},
-{title:"内積使い", rarity:"SR"},
-{title:"複素数平面使い", rarity:"SR"},
-{title:"演習の達人候補", rarity:"SR"},
-{title:"復習の達人候補", rarity:"SR"},
-{title:"計算の達人候補", rarity:"SR"},
-{title:"公式の達人候補", rarity:"SR"},
-{title:"難問の達人候補", rarity:"SR"},
-{title:"数学の成長株", rarity:"SR"},
-{title:"解法の成長株", rarity:"SR"},
-{title:"答案の成長株", rarity:"SR"},
-{title:"微積の成長株", rarity:"SR"},
-{title:"数式の成長株", rarity:"SR"},
-{title:"👑計算覇者👑", rarity:"SSR"},
-{title:"👑公式覇者👑", rarity:"SSR"},
-{title:"👑答案覇者👑", rarity:"SSR"},
-{title:"👑微分覇者👑", rarity:"SSR"},
-{title:"👑積分覇者👑", rarity:"SSR"},
-{title:"💎数式の支配者💎", rarity:"SSR"},
-{title:"💎関数の支配者💎", rarity:"SSR"},
-{title:"💎三角の支配者💎", rarity:"SSR"},
-{title:"💎数列の支配者💎", rarity:"SSR"},
-{title:"💎ベクトルの支配者💎", rarity:"SSR"},
-{title:"🔥難問攻略者🔥", rarity:"SSR"},
-{title:"🔥超難問攻略者🔥", rarity:"SSR"},
-{title:"⚔️数学騎士団長⚔️", rarity:"SSR"},
-{title:"📘青チャ覇王📘", rarity:"SSR"},
-{title:"📙黄チャ覇王📙", rarity:"SSR"},
-{title:"🌌無限級の数学者🌌", rarity:"UR"},
-{title:"👑究極数式王👑", rarity:"UR"},
-{title:"💫微積の支配神💫", rarity:"UR"},
-{title:"🔥難問殲滅神🔥", rarity:"UR"},
-{title:"🌈数学マスター極🌈", rarity:"UR"}];
-}
-function getGachaRarity(){
-let r=Math.random()*100;
-if(r<0.5)return "UR";
-if(r<3.5)return "SSR";
-if(r<25)return "SR";
-return "R";
+];
 }
 function getGachaResultNoDuplicate(){
 let owned=playerData.gachaTitles||[];
 let remaining=gachaPool().filter(x=>!owned.includes(x.title));
 if(remaining.length===0)return null;
-let first=getGachaRarity();
+let r=Math.random()*100;
 let order=[];
-if(first==="UR")order=["UR","SSR","SR","R"];
-else if(first==="SSR")order=["SSR","SR","R","UR"];
-else if(first==="SR")order=["SR","R","SSR","UR"];
+if(r<2)order=["UR","SSR","SR","R"];
+else if(r<10)order=["SSR","SR","R","UR"];
+else if(r<30)order=["SR","R","SSR","UR"];
 else order=["R","SR","SSR","UR"];
 for(let rarity of order){
 let pool=remaining.filter(x=>x.rarity===rarity);
@@ -868,9 +661,12 @@ if(pool.length>0)return pool[Math.floor(Math.random()*pool.length)];
 return remaining[Math.floor(Math.random()*remaining.length)];
 }
 function getGachaResult(){
-let rarity=getGachaRarity();
+let r=Math.random()*100;
+let rarity="R";
+if(r<2)rarity="UR";
+else if(r<10)rarity="SSR";
+else if(r<30)rarity="SR";
 let pool=gachaPool().filter(x=>x.rarity===rarity);
-if(pool.length===0)pool=gachaPool();
 return pool[Math.floor(Math.random()*pool.length)];
 }
 function showGacha(){
@@ -884,7 +680,7 @@ document.getElementById("panelArea").innerHTML=`
 </div>
 <div class="profileItem">
 <h3>排出率</h3>
-<p>R 75% / SR 21.5% / SSR 3% / UR 0.5%</p>
+<p>R 70% / SR 20% / SSR 8% / UR 2%</p>
 <p>称号100個。URのみ色付き。</p>
 <p>コマンド称号はガチャから出ません。</p>
 </div>
@@ -3019,15 +2815,6 @@ e.preventDefault();
 }
 }, {passive:false});
 const UPDATE_NOTES = {
-"3.3.8": [
-"既存称号もレアリティ区分に追加しました",
-"追加UR称号が光るように修正しました",
-"名前付き称号を200個追加しました",
-"称号一覧の並び順をレアリティ順に調整しました",
-"問題表示で指数・分数・ルート・積分範囲を見やすくしました",
-"第5条（免責）を更新しました"
-],
-
   "3.1.7": ["テンキーにlogを追加", "テンキー初回タップ時に画面が上へずれる問題を修正", "テンキーの反応速度を改善", "バージョン変更時のお知らせ自動表示を強化"],
   "3.1.1": ["シリアルコード画面を調整","称号システムを調整","一部UIを改善"],
 "3.1.0": [
@@ -3804,7 +3591,7 @@ document.getElementById("openRoomList").innerHTML=`<p>募集中一覧の取得�
       <div class="guideItem"><h3>第2条 禁止事項</h3><p>チート、不正アクセス、ランキング改ざん、荒らし、他ユーザーへの迷惑行為を禁止します。</p></div>
       <div class="guideItem"><h3>第3条 データの扱い</h3><p>不正または不適切と判断したデータは、運営側で削除・制限する場合があります。</p></div>
       <div class="guideItem"><h3>第4条 サービス変更</h3><p>本サービスの内容は、予告なく変更・停止する場合があります。</p></div>
-      <div class="guideItem"><h3>第5条 免責</h3><p>運営は、本サービスの安全性および正確性の向上に努めますが、不正アクセス、システム障害、通信障害、データ消失その他の事由により利用者に損害が生じた場合、運営に故意または重大な過失がある場合を除き、一切の責任を負わないものとします。</p></div>`;
+      <div class="guideItem"><h3>第5条 免責</h3><p>本サービスの利用により生じた損害について、運営者は法令上必要な範囲を除き責任を負いません。</p></div>`;
     openSimplePage(html);
   };
   window.showPrivacyPage = function(){
@@ -5119,7 +4906,7 @@ console.log("app.js Ver 3.1.9 base loaded");
     const p=panel(); if(!p)return;
     p.innerHTML=`
       <h2>🏆 ランキング</h2>
-      <div class="profileItem"><p></p></div>
+      <div class="profileItem"><p>ランキングは誰でも見れます。反映はGoogleログイン中のみです。</p></div>
       <button class="modeBtn" onclick="showLevelRanking319()">⭐ レベルランキング</button>
       <button class="modeBtn" onclick="showDailyQuestionRanking319()">📚 日間正解数ランキング</button>
       <button class="modeBtn" onclick="showRateRanking()">🏅 レートランキング</button>
@@ -5612,7 +5399,7 @@ ${ultra}
       </div>
       <div class="profileItem">
         <h3>排出率</h3>
-        <p>R 75% / SR 21.5% / SSR 3% / UR 0.5%</p>
+        <p>R 70% / SR 20% / SSR 8% / UR 2%</p>
         <p>URのみ色付き。コマンド称号はガチャから出ません。</p>
       </div>`;
   };
@@ -5965,7 +5752,7 @@ ${ultra}
   window.showGacha = showGacha = function(){
     const p = panel();
     if(!p) return;
-    p.innerHTML = `<h2>🎰 ガチャ</h2><div class="profileItem"><p>所持コイン：${playerData.coins||0}</p><p>1回：10コイン / 10連：100コイン</p><p>称号は被りあり。被ったら3コイン返金。</p><button onclick="drawGacha()">10コインで引く</button><button onclick="drawGacha10()">100コインで10連</button><button onclick="showGachaBook()">ガチャ図鑑を見る</button></div><div class="profileItem"><h3>排出率</h3><p>R 75% / SR 21.5% / SSR 3% / UR 0.5%</p><p>URのみ色付き。コマンド称号はガチャから出ません。</p></div>`;
+    p.innerHTML = `<h2>🎰 ガチャ</h2><div class="profileItem"><p>所持コイン：${playerData.coins||0}</p><p>1回：10コイン / 10連：100コイン</p><p>称号は被りあり。被ったら3コイン返金。</p><button onclick="drawGacha()">10コインで引く</button><button onclick="drawGacha10()">100コインで10連</button><button onclick="showGachaBook()">ガチャ図鑑を見る</button></div><div class="profileItem"><h3>排出率</h3><p>R 70% / SR 20% / SSR 8% / UR 2%</p><p>URのみ色付き。コマンド称号はガチャから出ません。</p></div>`;
     home();
   };
 
@@ -6757,7 +6544,7 @@ ${ultra}
 (function(){
   if(window.__v331DxUltraNewsPatchLoaded) return;
   window.__v331DxUltraNewsPatchLoaded = true;
-  try{ window.VERSION = "3.3.12"; }catch(e){}
+  try{ window.VERSION = "3.3.6"; }catch(e){}
 
   function stripUltraLabel331(text){
     return String(text==null?"":text).replace(/^\s*超難問\s*[：:]\s*/,'');
@@ -6862,7 +6649,7 @@ ${ultra}
 (function(){
   if(window.__v332FullPatchLoaded) return;
   window.__v332FullPatchLoaded = true;
-  try{ window.VERSION = "3.3.12"; }catch(e){}
+  try{ window.VERSION = "3.3.6"; }catch(e){}
 
   function esc332(s){return String(s==null?"":s).replace(/[&<>"']/g,function(m){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m];});}
   function stripLabels332(s){
@@ -7073,7 +6860,7 @@ ${ultra}
 
 
 /* =========================================================
-   Ver 3.3.12 判定根本改善 + AI解説鬼強化
+   Ver 3.3.4 判定根本改善 + AI解説鬼強化
    - ランキング処理は触らない
    - sinx/cosx/tanx と sin(x)/cos(x)/tan(x) を同一扱い
    - logx/lnx と log(x)/ln(x) を同一扱い
@@ -7371,18 +7158,18 @@ ${ultra}
     const newsCandidates = document.querySelectorAll(".news, #news, .notice, #notice");
     newsCandidates.forEach(el=>{
       if(el && /お知らせ|Ver|問題|更新/.test(el.textContent)){
-        el.innerHTML = "<b>お知らせ</b><br>Ver 3.3.12<br>・判定精度改善<br>・AI解説強化<br>・表示調整";
+        el.innerHTML = "<b>お知らせ</b><br>Ver 3.3.4<br>・判定精度改善<br>・AI解説強化<br>・表示調整";
       }
     });
   }catch(e){}
 
-  console.log("Ver 3.3.12 judge + AI explanation fix loaded");
+  console.log("Ver 3.3.4 judge + AI explanation fix loaded");
 })();
 
 
 
 
-/* Ver 3.3.12 AI解説強化・判定調整・ランダム修正。ランキング処理は触らない。 */
+/* Ver 3.3.5 AI解説強化・判定調整・ランダム修正。ランキング処理は触らない。 */
 (function(){
   if(window.__mm335PatchLoaded) return;
   window.__mm335PatchLoaded = true;
@@ -7586,14 +7373,14 @@ ${ultra}
     };
   }
 
-  window.MM335_NEWS = "📢 お知らせ\n\nVer 3.3.12\n\n・ランダムモードの不具合を修正\n・判定精度を改善\n・AI解説を大幅強化\n・問題を追加\n・数式表示を改善";
-  console.log("Ver 3.3.12 AI / judge / random fix loaded");
+  window.MM335_NEWS = "📢 お知らせ\n\nVer 3.3.5\n\n・ランダムモードの不具合を修正\n・判定精度を改善\n・AI解説を大幅強化\n・問題を追加\n・数式表示を改善";
+  console.log("Ver 3.3.5 AI / judge / random fix loaded");
 })();
 
 
 
 /* =========================================================
-   Ver 3.3.12 UI / submit fix
+   Ver 3.3.6 UI / submit fix
    - 学習モードの決定連打を1秒ロック
    - 難易度選択の隙間を削減
    - 難易度選択の戻るボタンを非表示
@@ -7780,628 +7567,6 @@ ${ultra}
   });
   obs.observe(document.body, {childList:true, subtree:true});
 
-  window.MM336_NEWS = "📢 お知らせ\n\nVer 3.3.12\n\n・回答連打による二重判定を修正\n・難易度選択画面の余白を調整\n・超難問下の戻るボタンを削除\n・結果後にランキングへ飛ぶ不具合を修正";
-  console.log("Ver 3.3.12 UI / submit fix loaded");
-})();
-
-
-
-(function(){
-if(window.__mm337TitleOrderLoaded)return;
-window.__mm337TitleOrderLoaded=true;
-const rarityRank={SPECIAL:0,UR:1,SSR:2,SR:3,R:4,N:5};
-function titleRarity337(t){
-try{
-const special=["⚡創設者","👾MENERU👾","🧊なかなか","なかなか🧊","👾MENERU👾"];
-if(special.includes(t))return "SPECIAL";
-if(typeof gachaPool==="function"){
-const hit=gachaPool().find(x=>x.title===t);
-if(hit&&hit.rarity)return hit.rarity;
-}
-}catch(e){}
-return "N";
-}
-function sortTitleList337(list){
-return (list||[]).slice().sort((a,b)=>{
-const ra=rarityRank[titleRarity337(a)]??9;
-const rb=rarityRank[titleRarity337(b)]??9;
-if(ra!==rb)return ra-rb;
-return String(a).localeCompare(String(b),"ja");
-});
-}
-window.sortTitleList337=sortTitleList337;
-if(typeof showTitles==="function"&&!window.__oldShowTitles337){
-window.__oldShowTitles337=showTitles;
-window.showTitles=function(){
-if(playerData&&Array.isArray(playerData.titles))playerData.titles=sortTitleList337(playerData.titles);
-return window.__oldShowTitles337.apply(this,arguments);
-};
-}
-})();
-
-
-
-(function(){
-if(true)return; /* old display patch disabled: __mm337MathDisplayLoaded */
-window.__mm337MathDisplayLoaded=true;
-const st=document.createElement("style");
-st.textContent=`
-.mm337Wrap{display:inline-flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:.04em;line-height:1.25;max-width:100%;overflow-wrap:anywhere;}
-.mm337Preview{min-height:82px;display:flex;align-items:center;justify-content:center;overflow:auto;padding:8px 6px;box-sizing:border-box;}
-.mm337Preview .mm337Wrap{font-size:clamp(24px,6vw,38px);}
-#q .mm337Wrap{font-size:clamp(24px,6vw,42px);}
-.mm337Root{display:inline-flex;align-items:flex-start;margin:0 .04em;}
-.mm337Root .sign{font-size:1.05em;line-height:1;transform:translateY(.10em);margin-right:-.04em;}
-.mm337Root .body{border-top:2px solid currentColor;padding:.02em .12em 0 .08em;line-height:1.05;transform:translateY(.08em);white-space:nowrap;}
-.mm337Frac{display:inline-grid;grid-template-rows:auto auto;align-items:center;justify-items:center;line-height:1.05;margin:0 .14em;vertical-align:middle;}
-.mm337Frac .top{border-bottom:2px solid currentColor;padding:0 .18em .06em;min-width:1.05em;text-align:center;}
-.mm337Frac .bottom{padding:.06em .18em 0;min-width:1.05em;text-align:center;}
-.mm337Pow sup{font-size:.62em;line-height:1;margin-left:.03em;}
-.mm337Int{display:inline-grid;grid-template-rows:auto auto auto;align-items:center;justify-items:center;line-height:.9;margin:0 .08em;font-size:1.05em;}
-.mm337Int .upper,.mm337Int .lower{font-size:.48em;line-height:1;}
-.mm337Int .sign{font-size:1.25em;line-height:.9;}
-`;
-document.head.appendChild(st);
-function norm(s){return String(s||"").trim().replace(/π/g,"pi").replace(/²/g,"^2").replace(/³/g,"^3").replace(/⁴/g,"^4").replace(/⁵/g,"^5").replace(/⁶/g,"^6").replace(/⁷/g,"^7").replace(/⁸/g,"^8").replace(/⁹/g,"^9").replace(/×/g,"*").replace(/÷/g,"/");}
-function tn(t){return document.createTextNode(String(t).replace(/\bpi\b/g,"π"));}
-function wrap(){const w=document.createElement("span");w.className="mm337Wrap";return w;}
-function addText(w,t){w.appendChild(tn(t));}
-function root(w,v){const r=document.createElement("span");r.className="mm337Root";const a=document.createElement("span");a.className="sign";a.textContent="√";const b=document.createElement("span");b.className="body";b.textContent=String(v).replace(/\bpi\b/g,"π");r.appendChild(a);r.appendChild(b);w.appendChild(r);}
-function frac(w,a,b){const f=document.createElement("span");f.className="mm337Frac";const n=document.createElement("span");n.className="top";n.textContent=String(a).replace(/\bpi\b/g,"π");const d=document.createElement("span");d.className="bottom";d.textContent=String(b).replace(/\bpi\b/g,"π");f.appendChild(n);f.appendChild(d);w.appendChild(f);}
-function pow(w,a,b){b=String(b).trim();if(b==="1/2"||b==="(1/2)"||b==="0.5"){root(w,a);return;}const p=document.createElement("span");p.className="mm337Pow";p.appendChild(tn(a));const s=document.createElement("sup");s.textContent=String(b).replace(/\bpi\b/g,"π");p.appendChild(s);w.appendChild(p);}
-function integral(w,lo,up){const it=document.createElement("span");it.className="mm337Int";const u=document.createElement("span");u.className="upper";u.textContent=up||"";const sg=document.createElement("span");sg.className="sign";sg.textContent="∫";const l=document.createElement("span");l.className="lower";l.textContent=lo||"";it.appendChild(u);it.appendChild(sg);it.appendChild(l);w.appendChild(it);}
-function render(raw){
-const s=norm(raw);const w=wrap();if(!s)return w;
-let m=s.match(/^sqrt\(([^()]+)\)$/)||s.match(/^√\(([^()]+)\)$/)||s.match(/^√([A-Za-z0-9pi]+)$/);
-if(m){root(w,m[1]);return w;}
-m=s.match(/^∫_([^_^ ]+)\^([^ ]+)\s*(.+?)\s*d\s*x$/);
-if(m){integral(w,m[1],m[2]);w.appendChild(render(m[3]));addText(w," dx");return w;}
-m=s.match(/^∫\s*(.+?)\s*d\s*x$/);
-if(m){integral(w,"","");w.appendChild(render(m[1]));addText(w," dx");return w;}
-m=s.match(/^(.+?)\^\((.+)\)$/)||s.match(/^(.+?)\^(.+)$/);
-if(m){pow(w,m[1],m[2]);return w;}
-m=s.match(/^(.+?)\/(.+)$/);
-if(m&&!s.includes("http")){frac(w,m[1],m[2]);return w;}
-addText(w,s.replace(/\*/g," "));
-return w;
-}
-function updatePreview(){
-const ans=document.getElementById("ans");if(!ans)return;
-const targets=[document.getElementById("answerPreview"),document.getElementById("preview"),document.querySelector(".answer-preview"),document.querySelector(".previewMath")].filter(Boolean);
-targets.forEach(el=>{el.classList.add("mm337Preview");el.innerHTML="";if(ans.value)el.appendChild(render(ans.value));});
-}
-window.updateAnswerPreview=updatePreview;
-window.updateAnswerPreviewV329=updatePreview;
-document.addEventListener("input",e=>{if(e.target&&e.target.id==="ans")setTimeout(updatePreview,0);});
-setInterval(updatePreview,1000);
-})();
-
-
-
-
-
-
-/* v3.3.8 existing title rarity + UR glow fix */
-(function(){
-if(window.__mm338RarityExistingFix)return;
-window.__mm338RarityExistingFix=true;
-
-const existingTitleRarity338={
-  "理系":"R","数学初心者":"R","数学中級者":"R","数学上級者":"SR",
-  "数学の鬼👹":"SSR","数学の申し子🪽":"SSR","数学王👑":"UR",
-  "数学好き":"R","数学大好き":"R","数学者🎓":"SR","努力家":"SR",
-  "秀才":"SR","鬼才":"SSR","天才":"UR",
-  "⚡創設者":"SPECIAL","👾MENERU👾":"SPECIAL","なかなか🧊":"SPECIAL","🧊なかなか":"SPECIAL"
-};
-
-function getTitleRarity338(title){
-  if(existingTitleRarity338[title])return existingTitleRarity338[title];
-  try{
-    if(typeof gachaPool==="function"){
-      const hit=gachaPool().find(x=>x.title===title);
-      if(hit&&hit.rarity)return hit.rarity;
-    }
-  }catch(e){}
-  return "R";
-}
-
-function titleClass338(title){
-  const r=getTitleRarity338(title);
-  if(r==="SPECIAL")return "titleSpecial";
-  if(r==="UR")return "titleUR";
-  if(r==="SSR")return "titleSSR";
-  if(r==="SR")return "titleSR";
-  return "titleR";
-}
-
-const css=document.createElement("style");
-css.textContent=`
-.titleUR{
-  color:#fff7a8;
-  font-weight:900;
-  text-shadow:0 0 6px #fff,0 0 12px #ffd700,0 0 22px #ff9900;
-  animation:mm338Glow 1.4s ease-in-out infinite alternate;
-}
-.titleSSR{color:#ffb7f7;font-weight:800;text-shadow:0 0 8px #ff66e8;}
-.titleSR{color:#8fd3ff;font-weight:700;text-shadow:0 0 6px #4db8ff;}
-.titleR{color:#ffffff;font-weight:600;}
-.titleSpecial{color:#ffd700;font-weight:900;text-shadow:0 0 8px #fff,0 0 16px #ffd700,0 0 28px #ff8c00;}
-@keyframes mm338Glow{from{filter:brightness(1);}to{filter:brightness(1.35);}}
-.rarityTabs{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:10px 0;}
-.rarityTabs button{padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:white;font-weight:700;}
-.rarityCount{opacity:.85;font-size:.9em;}
-`;
-document.head.appendChild(css);
-
-// titleHTMLを上書きして追加URも確実に光らせる
-window.titleHTML=function(title){
-  title=title||"初心者";
-  return `<span class="${titleClass338(title)}">${title}</span>`;
-};
-
-function ownedTitles338(){
-  const a=(window.playerData&&Array.isArray(playerData.titles))?playerData.titles:[];
-  const b=(window.playerData&&Array.isArray(playerData.gachaTitles))?playerData.gachaTitles:[];
-  return Array.from(new Set([...a,...b]));
-}
-
-function allGachaTitles338(){
-  try{return gachaPool().map(x=>x.title);}catch(e){return [];}
-}
-
-function countByRarity338(rarity){
-  let all=[];
-  try{
-    all=gachaPool().filter(x=>x.rarity===rarity).map(x=>x.title);
-  }catch(e){}
-  Object.entries(existingTitleRarity338).forEach(([t,r])=>{
-    if(r===rarity&&!all.includes(t))all.push(t);
-  });
-  return all.length;
-}
-
-window.showTitlesByRarity338=function(rarity){
-  const area=document.getElementById("panelArea");
-  const owned=ownedTitles338();
-  const list=owned.filter(t=>getTitleRarity338(t)===rarity).sort((a,b)=>String(a).localeCompare(String(b),"ja"));
-  const total=countByRarity338(rarity);
-  let html=`<h2>🏅 称号一覧</h2>
-  <div class="rarityTabs">
-    <button onclick="showTitlesByRarity338('SPECIAL')">特別<br><span class="rarityCount">${countByRarity338('SPECIAL')}個</span></button>
-    <button onclick="showTitlesByRarity338('UR')">UR<br><span class="rarityCount">${countByRarity338('UR')}個</span></button>
-    <button onclick="showTitlesByRarity338('SSR')">SSR<br><span class="rarityCount">${countByRarity338('SSR')}個</span></button>
-    <button onclick="showTitlesByRarity338('SR')">SR<br><span class="rarityCount">${countByRarity338('SR')}個</span></button>
-    <button onclick="showTitlesByRarity338('R')">R<br><span class="rarityCount">${countByRarity338('R')}個</span></button>
-  </div>
-  <h3>${rarity} ${list.length}/${total}</h3>`;
-  if(list.length===0){
-    html+=`<p>取得済みの${rarity}称号はありません</p>`;
-  }else{
-    for(const t of list){
-      html+=`<div class="profileItem">${titleHTML(t)} <button onclick="equipTitle('${String(t).replace(/'/g,"\\'")}')">装備</button></div>`;
-    }
-  }
-  area.innerHTML=html;
-  if(typeof ensureHomeButton==="function")ensureHomeButton();
-};
-
-// 既存の称号一覧をレアリティボタン式に変更
-window.showTitles=function(){
-  showTitlesByRarity338("UR");
-};
-})();
-
-
-
-/* v3.3.9 rebuilt math display */
-(function(){
-if(window.__mm339DisplayRebuildLoaded)return;
-window.__mm339DisplayRebuildLoaded=true;
-
-const st=document.createElement("style");
-st.textContent=`
-.mm339Box{display:inline-flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:.045em;line-height:1.25;max-width:100%;overflow-wrap:anywhere;}
-.mm339PreviewBox{min-height:82px;display:flex;align-items:center;justify-content:center;overflow:auto;padding:8px 6px;box-sizing:border-box;}
-.mm339PreviewBox .mm339Box{font-size:clamp(24px,6vw,38px);}
-#q .mm339Box{font-size:clamp(24px,6vw,42px);}
-.mm339Pow sup{font-size:.62em;line-height:1;margin-left:.035em;}
-.mm339Root{display:inline-flex;align-items:flex-start;margin:0 .045em;}
-.mm339Root .sign{font-size:1.06em;line-height:1;transform:translateY(.10em);margin-right:-.045em;}
-.mm339Root .body{border-top:2px solid currentColor;padding:.02em .12em 0 .08em;line-height:1.05;transform:translateY(.08em);white-space:nowrap;}
-.mm339Frac{display:inline-grid;grid-template-rows:auto auto;align-items:center;justify-items:center;line-height:1.05;margin:0 .16em;vertical-align:middle;}
-.mm339Frac .num{border-bottom:2px solid currentColor;padding:0 .2em .06em;min-width:1.05em;text-align:center;}
-.mm339Frac .den{padding:.06em .2em 0;min-width:1.05em;text-align:center;}
-.mm339Int{display:inline-grid;grid-template-rows:auto auto auto;align-items:center;justify-items:center;line-height:.9;margin:0 .09em .02em .03em;font-size:1.05em;}
-.mm339Int .up,.mm339Int .lo{font-size:.48em;line-height:1;min-height:.6em;}
-.mm339Int .sg{font-size:1.28em;line-height:.88;}
-.mm339Dx{white-space:nowrap;margin-left:.12em;}
-.mm339Mul{margin:0 .13em;}
-.mm339Func{white-space:nowrap;}
-`;
-document.head.appendChild(st);
-
-function clean(s){
- return String(s||"").trim()
-  .replace(/　/g," ")
-  .replace(/π/g,"pi")
-  .replace(/²/g,"^2").replace(/³/g,"^3").replace(/⁴/g,"^4").replace(/⁵/g,"^5")
-  .replace(/⁶/g,"^6").replace(/⁷/g,"^7").replace(/⁸/g,"^8").replace(/⁹/g,"^9")
-  .replace(/×/g,"*").replace(/÷/g,"/");
-}
-function tn(t){return document.createTextNode(String(t).replace(/\bpi\b/g,"π"));}
-function box(){const b=document.createElement("span");b.className="mm339Box";return b;}
-function addText(b,t){if(t!==""&&t!=null)b.appendChild(tn(t));}
-function addMul(b){const m=document.createElement("span");m.className="mm339Mul";m.textContent="×";b.appendChild(m);}
-function addDx(b){const d=document.createElement("span");d.className="mm339Dx";d.textContent="dx";b.appendChild(d);}
-function addRoot(b,inside){const r=document.createElement("span");r.className="mm339Root";const s=document.createElement("span");s.className="sign";s.textContent="√";const body=document.createElement("span");body.className="body";body.appendChild(renderInline(inside));r.appendChild(s);r.appendChild(body);b.appendChild(r);}
-function addFrac(b,num,den){const f=document.createElement("span");f.className="mm339Frac";const n=document.createElement("span");n.className="num";n.appendChild(renderInline(num));const d=document.createElement("span");d.className="den";d.appendChild(renderInline(den));f.appendChild(n);f.appendChild(d);b.appendChild(f);}
-function addPow(b,base,exp){
- exp=String(exp||"").trim();
- if(exp==="1/2"||exp==="(1/2)"||exp==="0.5"){addRoot(b,base);return;}
- const p=document.createElement("span");p.className="mm339Pow";
- p.appendChild(renderInline(base));
- const s=document.createElement("sup");
- // 指数の指数や複数文字は中身を見せる。e^x+1 の誤解防止のため複数文字は括弧付き。
- const expText=String(exp).replace(/\bpi\b/g,"π");
- if(expText.length>1 && !/^[0-9]$/.test(expText)){s.textContent="("+expText.replace(/^\((.*)\)$/,"$1")+")";}
- else s.textContent=expText;
- p.appendChild(s);b.appendChild(p);
-}
-function addIntegral(b,lo,up){const it=document.createElement("span");it.className="mm339Int";const u=document.createElement("span");u.className="up";u.textContent=up||"";const sg=document.createElement("span");sg.className="sg";sg.textContent="∫";const l=document.createElement("span");l.className="lo";l.textContent=lo||"";it.appendChild(u);it.appendChild(sg);it.appendChild(l);b.appendChild(it);}
-function stripOuterParens(s){
- s=String(s||"").trim();
- if(!(s.startsWith("(")&&s.endsWith(")")))return s;
- let depth=0;
- for(let i=0;i<s.length;i++){
-   if(s[i]==="(")depth++;
-   if(s[i]===")")depth--;
-   if(depth===0 && i<s.length-1)return s;
- }
- return s.slice(1,-1);
-}
-function splitTop(s,op){
- let d=0;
- for(let i=0;i<s.length;i++){
-   if(s[i]==="(")d++;
-   else if(s[i]===")")d--;
-   else if(d===0 && s[i]===op)return [s.slice(0,i),s.slice(i+1)];
- }
- return null;
-}
-function renderInline(raw){
- const s=clean(raw);
- const b=box();
- if(!s)return b;
-
- // 微分 d/dx(x+1) -> d/dx x+1、ただし分数など括弧必要な形は残す
- let m=s.match(/^d\/dx\((.+)\)$/);
- if(m){
-   const inner=m[1];
-   const simple=!/[\/]/.test(inner);
-   addText(b,"d/dx ");
-   b.appendChild(renderInline(simple?inner:"("+inner+")"));
-   return b;
- }
- m=s.match(/^d\/dx\s*(.+)$/);
- if(m){addText(b,"d/dx ");b.appendChild(renderInline(m[1]));return b;}
-
- // 積分範囲とdx位置
- m=s.match(/^∫_([^_^ ]+)\^([^ ]+)\s*(.+?)\s*d\s*x$/);
- if(m){addIntegral(b,m[1],m[2]);b.appendChild(renderInline(m[3]));addDx(b);return b;}
- m=s.match(/^∫\s*(.+?)\s*d\s*x$/);
- if(m){addIntegral(b,"","");b.appendChild(renderInline(m[1]));addDx(b);return b;}
-
- // sqrt / root
- m=s.match(/^sqrt\((.+)\)$/)||s.match(/^√\((.+)\)$/);
- if(m){addRoot(b,m[1]);return b;}
- m=s.match(/^√([A-Za-z0-9pi]+)$/);
- if(m){addRoot(b,m[1]);return b;}
-
- // 分数
- const div=splitTop(s,"/");
- if(div && !s.includes("http")){addFrac(b,stripOuterParens(div[0]),stripOuterParens(div[1]));return b;}
-
- // 掛け算：3*2は32にしない。数字同士は×、それ以外は参考書風に少し間隔。
- let mul=splitTop(s,"*");
- if(mul){
-   const left=mul[0], right=mul[1];
-   b.appendChild(renderInline(left));
-   if(/^\d+(\.\d+)?$/.test(left.trim()) && /^\d+(\.\d)?$/.test(right.trim())) addMul(b);
-   else addText(b," ");
-   b.appendChild(renderInline(right));
-   return b;
- }
-
- // 三角関数の累乗: sin^2x -> (sin x)^2
- m=s.match(/^(sin|cos|tan)\^(.+?)([A-Za-z0-9pi]+)$/);
- if(m){addPow(b,m[1]+" "+m[3],m[2]);return b;}
-
- // 一般の指数。e^x+1 は指数範囲が曖昧なので e^(x+1) 形式で見えるよう括弧付け
- m=s.match(/^(.+?)\^\((.+)\)$/);
- if(m){addPow(b,m[1],m[2]);return b;}
- m=s.match(/^(.+?)\^(.+)$/);
- if(m){addPow(b,m[1],m[2]);return b;}
-
- // 関数表示
- m=s.match(/^(sin|cos|tan|log|ln)\((.+)\)$/);
- if(m){const f=document.createElement("span");f.className="mm339Func";f.appendChild(tn(m[1]+" "));f.appendChild(renderInline(m[2]));b.appendChild(f);return b;}
-
- addText(b,s.replace(/\bpi\b/g,"π"));
- return b;
-}
-function renderTo(el,value){
- el.classList.add("mm339PreviewBox");
- el.innerHTML="";
- if(value)el.appendChild(renderInline(value));
-}
-function updatePreview339(){
- const ans=document.getElementById("ans");
- if(!ans)return;
- [document.getElementById("answerPreview"),document.getElementById("preview"),document.querySelector(".answer-preview"),document.querySelector(".previewMath")].filter(Boolean).forEach(el=>renderTo(el,ans.value));
-}
-window.updateAnswerPreview=updatePreview339;
-window.updateAnswerPreviewV329=updatePreview339;
-document.addEventListener("input",e=>{if(e.target&&e.target.id==="ans")setTimeout(updatePreview339,0);});
-setInterval(updatePreview339,900);
-
-// 問題文の表示も、元の問題データは変えず見た目だけ整える
-function beautifyQuestion339(){
- const q=document.getElementById("q");
- if(!q||q.dataset.mm339Done==="1")return;
- const text=(q.textContent||"").trim();
- if(!text)return;
- if(/[∫√^*/]|d\/dx|sin|cos|tan|log|ln/.test(text)){
-   q.innerHTML="";
-   q.appendChild(renderInline(text));
-   q.dataset.mm339Done="1";
- }
-}
-setInterval(beautifyQuestion339,700);
-})();
-
-
-
-/* v3.3.11 ranking login required */
-(function(){
-return; /* disabled old ranking login patch */
-window.__mm3310RankingLoginFix=false;
-
-function mm3310LoginUser(){
-  try{
-    if(window.firebase && firebase.auth && firebase.auth().currentUser)return firebase.auth().currentUser;
-  }catch(e){}
-  try{
-    if(window.auth && window.auth.currentUser)return window.auth.currentUser;
-  }catch(e){}
-  try{
-    if(window.currentUser && (currentUser.uid || currentUser.email))return currentUser;
-  }catch(e){}
-  try{
-    if(typeof getGoogleLoginInfo==="function"){
-      const u=getGoogleLoginInfo();
-      if(u && (u.uid || u.email || u.displayName))return u;
-    }
-  }catch(e){}
-  return null;
-}
-window.isRankingLoggedIn3310=function(){return !!mm3310LoginUser();};
-
-function loginOnlyHTML3310(title){
-  return `<h2>${title}</h2>
-  <div class="profileItem">
-    <p>Googleログインしてください</p>
-    <button class="modeBtn" onclick="loginGoogle()">Googleログイン</button>
-  </div>`;
-}
-
-const oldShowRankingMenu=window.showRankingMenu;
-window.showRankingMenu=function(){
-  const box=document.getElementById("panelArea");
-  if(!box)return;
-  if(!isRankingLoggedIn3310()){
-    box.innerHTML=loginOnlyHTML3310("🏆 ランキング");
-    if(typeof ensureHomeButton==="function")ensureHomeButton();
-    return;
-  }
-  if(typeof oldShowRankingMenu==="function")return oldShowRankingMenu.apply(this,arguments);
-  box.innerHTML=`<h2>🏆 ランキング</h2>
-  <button class="modeBtn" onclick="showWorldRanking()">🌍 週間ランキング</button>
-  <button class="modeBtn" onclick="showRateRanking()">🏅 レートランキング</button>`;
-};
-
-const oldShowWorldRanking=window.showWorldRanking;
-window.showWorldRanking=async function(){
-  const box=document.getElementById("panelArea");
-  if(!isRankingLoggedIn3310()){
-    if(box)box.innerHTML=loginOnlyHTML3310("🌍 週間ランキング");
-    if(typeof ensureHomeButton==="function")ensureHomeButton();
-    if(typeof ensurePanelBackButton==="function")ensurePanelBackButton();
-    return;
-  }
-  if(typeof oldShowWorldRanking==="function")return await oldShowWorldRanking.apply(this,arguments);
-};
-
-const oldShowRateRanking=window.showRateRanking;
-window.showRateRanking=async function(){
-  const box=document.getElementById("panelArea");
-  if(!isRankingLoggedIn3310()){
-    if(box)box.innerHTML=loginOnlyHTML3310("🏅 レートランキング");
-    if(typeof ensureHomeButton==="function")ensureHomeButton();
-    if(typeof ensurePanelBackButton==="function")ensurePanelBackButton();
-    return;
-  }
-  if(typeof oldShowRateRanking==="function")return await oldShowRateRanking.apply(this,arguments);
-};
-
-const oldShowFriendRanking=window.showFriendRanking;
-window.showFriendRanking=async function(){
-  const box=document.getElementById("panelArea");
-  if(!isRankingLoggedIn3310()){
-    if(box)box.innerHTML=loginOnlyHTML3310("👥 フレンドランキング");
-    if(typeof ensureHomeButton==="function")ensureHomeButton();
-    if(typeof ensurePanelBackButton==="function")ensurePanelBackButton();
-    return;
-  }
-  if(typeof oldShowFriendRanking==="function")return await oldShowFriendRanking.apply(this,arguments);
-};
-
-// ランキング反映もログイン必須。未ログインなら保存関数を呼ばない。
-const oldSavePublicProfile=window.savePublicProfile;
-window.savePublicProfile=async function(){
-  if(!isRankingLoggedIn3310())return false;
-  if(typeof oldSavePublicProfile==="function")return await oldSavePublicProfile.apply(this,arguments);
-  return false;
-};
-
-const oldSaveWorldScore=window.saveWorldScore;
-window.saveWorldScore=async function(){
-  if(!isRankingLoggedIn3310())return false;
-  if(typeof oldSaveWorldScore==="function")return await oldSaveWorldScore.apply(this,arguments);
-  return false;
-};
-
-const oldSaveRateData=window.saveRateData;
-window.saveRateData=async function(){
-  if(!isRankingLoggedIn3310())return null;
-  if(typeof oldSaveRateData==="function")return await oldSaveRateData.apply(this,arguments);
-  return null;
-};
-})();
-
-
-
-/* v3.3.12 login state + ranking gate fix */
-(function(){
-if(window.__mm3312LoginStateFix)return;
-window.__mm3312LoginStateFix=true;
-
-function mm3312User(){
-  try{ if(window.auth && window.auth.currentUser)return window.auth.currentUser; }catch(e){}
-  try{ if(window.firebase && firebase.auth && firebase.auth().currentUser)return firebase.auth().currentUser; }catch(e){}
-  try{ if(window.currentUser && (currentUser.uid || currentUser.email))return currentUser; }catch(e){}
-  try{
-    if(typeof getGoogleLoginInfo==="function"){
-      const u=getGoogleLoginInfo();
-      if(u && (u.uid || u.email || u.displayName))return u;
-    }
-  }catch(e){}
-  try{
-    const keys=["googleUser","currentUser","firebaseUser","loginUser","user"];
-    for(const k of keys){
-      const v=localStorage.getItem(k);
-      if(v && v!=="null" && v!=="undefined"){
-        try{
-          const o=JSON.parse(v);
-          if(o && (o.uid || o.email || o.displayName))return o;
-        }catch(e){ return {uid:v}; }
-      }
-    }
-  }catch(e){}
-  try{
-    const bodyText=document.body ? document.body.innerText : "";
-    if(bodyText.includes("ログアウト") || bodyText.includes("アカウント連携済み"))return {uid:"display-login"};
-  }catch(e){}
-  return null;
-}
-window.isRankingLoggedIn3312=function(){return !!mm3312User();};
-
-function loginOnly3312(title){
-  return `<h2>${title}</h2>
-  <div class="profileItem">
-    <p>Googleログインしてください</p>
-    <button class="modeBtn" onclick="loginGoogle()">Googleログイン</button>
-  </div>`;
-}
-
-window.logoutGoogle3312=async function(){
-  let done=false;
-  try{
-    if(typeof logoutGoogle==="function"){ await logoutGoogle(); done=true; }
-  }catch(e){console.log(e);}
-  if(!done){
-    try{
-      if(window.auth && auth.signOut){ await auth.signOut(); done=true; }
-      else if(window.firebase && firebase.auth){ await firebase.auth().signOut(); done=true; }
-    }catch(e){console.log(e);}
-  }
-  try{["googleUser","currentUser","firebaseUser","loginUser","user"].forEach(k=>localStorage.removeItem(k));}catch(e){}
-  if(!done)location.reload();
-};
-
-function attachLogoutFallback3312(){
-  document.querySelectorAll("button").forEach(btn=>{
-    const t=(btn.textContent||"").trim();
-    if(t.includes("ログアウト") && !btn.dataset.mm3312Logout){
-      btn.dataset.mm3312Logout="1";
-      btn.addEventListener("click",function(){
-        setTimeout(function(){
-          try{
-            const bodyText=document.body ? document.body.innerText : "";
-            if(bodyText.includes("ログアウト"))logoutGoogle3312();
-          }catch(e){}
-        },350);
-      });
-    }
-  });
-}
-setInterval(attachLogoutFallback3312,800);
-
-const oldShowRankingMenu3312=window.showRankingMenu;
-window.showRankingMenu=function(){
-  const box=document.getElementById("panelArea");
-  if(!box)return;
-  if(!isRankingLoggedIn3312()){
-    box.innerHTML=loginOnly3312("🏆 ランキング");
-    if(typeof ensureHomeButton==="function")ensureHomeButton();
-    return;
-  }
-  if(typeof oldShowRankingMenu3312==="function")return oldShowRankingMenu3312.apply(this,arguments);
-};
-
-const oldShowWorldRanking3312=window.showWorldRanking;
-window.showWorldRanking=async function(){
-  const box=document.getElementById("panelArea");
-  if(!isRankingLoggedIn3312()){
-    if(box)box.innerHTML=loginOnly3312("🌍 週間ランキング");
-    if(typeof ensureHomeButton==="function")ensureHomeButton();
-    if(typeof ensurePanelBackButton==="function")ensurePanelBackButton();
-    return;
-  }
-  if(typeof oldShowWorldRanking3312==="function"){
-    const timer=setTimeout(()=>{if(box && box.textContent.includes("読み込み中"))box.innerHTML="<p>ランキング取得失敗</p>";},8000);
-    try{return await oldShowWorldRanking3312.apply(this,arguments);}
-    finally{clearTimeout(timer);}
-  }
-};
-
-const oldShowRateRanking3312=window.showRateRanking;
-window.showRateRanking=async function(){
-  const box=document.getElementById("panelArea");
-  if(!isRankingLoggedIn3312()){
-    if(box)box.innerHTML=loginOnly3312("🏅 レートランキング");
-    if(typeof ensureHomeButton==="function")ensureHomeButton();
-    if(typeof ensurePanelBackButton==="function")ensurePanelBackButton();
-    return;
-  }
-  if(typeof oldShowRateRanking3312==="function")return await oldShowRateRanking3312.apply(this,arguments);
-};
-
-const oldShowFriendRanking3312=window.showFriendRanking;
-window.showFriendRanking=async function(){
-  const box=document.getElementById("panelArea");
-  if(!isRankingLoggedIn3312()){
-    if(box)box.innerHTML=loginOnly3312("👥 フレンドランキング");
-    if(typeof ensureHomeButton==="function")ensureHomeButton();
-    if(typeof ensurePanelBackButton==="function")ensurePanelBackButton();
-    return;
-  }
-  if(typeof oldShowFriendRanking3312==="function")return await oldShowFriendRanking3312.apply(this,arguments);
-};
-
-const oldSavePublicProfile3312=window.savePublicProfile;
-window.savePublicProfile=async function(){
-  if(!isRankingLoggedIn3312())return false;
-  if(typeof oldSavePublicProfile3312==="function")return await oldSavePublicProfile3312.apply(this,arguments);
-  return false;
-};
+  window.MM336_NEWS = "📢 お知らせ\n\nVer 3.3.6\n\n・回答連打による二重判定を修正\n・難易度選択画面の余白を調整\n・超難問下の戻るボタンを削除\n・結果後にランキングへ飛ぶ不具合を修正";
+  console.log("Ver 3.3.6 UI / submit fix loaded");
 })();

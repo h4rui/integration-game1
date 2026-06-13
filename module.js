@@ -240,7 +240,6 @@ return "local_" + playerId;
 }
 window.getMyPlayerId = () => (window.getMyFriendCode ? window.getMyFriendCode() : getPlayerId());
 window.saveWorldScore = async function(data){
-if(!auth.currentUser) return false;
 const week = getWeekKey();
 const playerId = getPlayerId();
 const docId = week + "_" + data.mode + "_" + playerId;
@@ -355,7 +354,6 @@ const after = await getDoc(ref);
 return after.data();
 };
 window.saveRateData = async function(result){
-if(!auth.currentUser) return null;
 const playerId = getPlayerId();
 const ref = doc(db,"ratings",playerId);
 const snap = await getDoc(ref);
