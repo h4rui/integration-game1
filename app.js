@@ -1091,19 +1091,9 @@ document.getElementById("panelArea").innerHTML=`
 `;
 if(typeof ensureHomeButton==="function")ensureHomeButton();
 }
-async function savePublicProfile(){
-try{
-if(window.savePlayerPublicData){
-await savePlayerPublicData({
-name:playerProfile.name||"名無し",
-icon:playerProfile.icon||"",
-title:playerData.equippedTitle||"初心者",
-level:getLevel(),
-bestRandomScore:playerData.bestRandomScore||0
-});
-}
-}catch(e){console.log(e);}
-}
+
+/* savePublicProfile moved to ranking.js */
+
 function showFriendMenu(){
 const friendCode = window.getMyFriendCode ? window.getMyFriendCode() : (window.getMyPlayerId?window.getMyPlayerId():"未取得");
 let html=`
@@ -1179,38 +1169,9 @@ ${(typeof f==="string"?id:f.name)||id}<br>
 }
 area.innerHTML=html;
 }
-async function showFriendRanking(){
-let html="<h2>🏆 フレンドランキング</h2>";
-let list=[];
-try{
-for(let f of playerData.friends){
-let id=typeof f==="string"?f:f.id;
-let data=await loadFriendData(id);
-if(data)list.push(data);
-}
-}catch(e){console.log(e);}
-list.push({
-name:playerProfile.name,
-icon:playerProfile.icon,
-title:playerData.equippedTitle,
-level:getLevel(),
-bestRandomScore:playerData.bestRandomScore
-});
-list.sort((a,b)=>(b.bestRandomScore||0)-(a.bestRandomScore||0));
-for(let i=0;i<list.length;i++){
-html+=`
-<div class="rankItem">
-${i+1}位
-${list[i].icon?`<img class="rankIcon" src="${list[i].icon}">`:""}
-${list[i].name}<br>
-${titleHTML(list[i].title||"初心者")}<br>
-Lv${list[i].level||1}<br>
-スコア：${list[i].bestRandomScore||0}
-</div>
-`;
-}
-document.getElementById("panelArea").innerHTML=html;
-}
+
+/* showFriendRanking moved to ranking.js */
+
 function aiExplain(q){
 q=String(q);
 if(q.includes("∫"))return"積分は、基本的に次数を1つ上げて、その新しい次数で割ります。";
@@ -1829,39 +1790,9 @@ function showEnd(text){
 updatePlayTime();
 showResultPage(text);
 }
-async function showWorldRanking(){
-let box=document.getElementById("panelArea");
-box.innerHTML="<h2>読み込み中...</h2>";
-try{
-let ranking=await loadWorldRanking();
-let myName=playerProfile.name||"名無し";
-let myBest=playerData.bestRandomScore||0;
-let myRank="-";
-for(let i=0;i<ranking.length;i++){
-if((ranking[i].score||0)===myBest && (ranking[i].name||"名無し")===myName){
-myRank=i+1;
-break;
-}
-}
-let html=`<h2>🌍 週間ランキング</h2>
-<div class="profileItem">
-<h3>あなたの順位</h3>
-<p>順位：${myRank}位</p>
-<p>自己ベスト：${myBest}問</p>
-</div>`;
-if(ranking.length===0)html+="<p>まだ記録がありません</p>";
-for(let i=0;i<ranking.length;i++){
-html+=`<div class="rankItem">${i+1}位 ${ranking[i].icon?`<img class="rankIcon" src="${ranking[i].icon}">`:""}${ranking[i].name}<br>${titleHTML(ranking[i].title||"初心者")}<br>Lv${ranking[i].level||1}<br>${ranking[i].score}問</div>`;
-}
-box.innerHTML=html;
-ensureHomeButton();
-ensurePanelBackButton();
-}catch(e){
-box.innerHTML="<p>ランキング取得失敗</p>";
-ensureHomeButton();
-ensurePanelBackButton();
-}
-}
+
+/* showWorldRanking moved to ranking.js */
+
 function showResultPage(text){
 setInputVisible(false);
 document.getElementById("gameScreen").classList.remove("active");
@@ -1900,13 +1831,9 @@ saveAllData();
 savePublicProfile();
 updateHomeStatus();
 }
-function showRankingMenu(){
-document.getElementById("panelArea").innerHTML=`
-<h2>🏆 ランキング</h2>
-<button class="modeBtn" onclick="showWorldRanking()">🌍 週間ランキング</button>
-<button class="modeBtn" onclick="showRateRanking()">🏅 レートランキング</button>
-`;
-}
+
+/* showRankingMenu moved to ranking.js */
+
 function showMatchMenu(){
 document.getElementById("panelArea").innerHTML=`
 <h2>⚔️ 対戦</h2>
@@ -1941,32 +1868,9 @@ document.getElementById("panelArea").innerHTML=`
 <button class="modeBtn" onclick="showContact()">📩 お問い合わせ</button>
 `;
 }
-async function showRateRanking(){
-let box=document.getElementById("panelArea");
-box.innerHTML="<h2>読み込み中...</h2>";
-try{
-let list=await loadRateRanking();
-let html="<h2>🏅 レートランキング</h2>";
-if(list.length===0)html+="<p>まだ記録がありません</p>";
-for(let i=0;i<list.length;i++){
-html+=`
-<div class="rankItem">
-${i+1}位
-${list[i].icon?`<img class="rankIcon" src="${list[i].icon}">`:""}
-${list[i].name}<br>
-${titleHTML(list[i].title||"初心者")}<br>
-レート：${list[i].rating||1000}<br>
-${list[i].wins||0}勝 ${list[i].losses||0}敗
-</div>
-`;
-}
-box.innerHTML=html;
-ensurePanelBackButton();
-}catch(e){
-box.innerHTML="<p>レートランキング取得失敗</p>";
-ensurePanelBackButton();
-}
-}
+
+/* showRateRanking moved to ranking.js */
+
 function showOnlineMatchMenu(){
 document.getElementById("panelArea").innerHTML=`
 <h2>⚔️ ランダムマッチ</h2>
