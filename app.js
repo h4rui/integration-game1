@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.3.7";
+const VERSION = "3.3.9";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -844,15 +844,22 @@ return [
 {title:"🔥難問殲滅神🔥", rarity:"UR"},
 {title:"🌈数学マスター極🌈", rarity:"UR"}];
 }
+function getGachaRarity(){
+let r=Math.random()*100;
+if(r<0.5)return "UR";
+if(r<3.5)return "SSR";
+if(r<25)return "SR";
+return "R";
+}
 function getGachaResultNoDuplicate(){
 let owned=playerData.gachaTitles||[];
 let remaining=gachaPool().filter(x=>!owned.includes(x.title));
 if(remaining.length===0)return null;
-let r=Math.random()*100;
+let first=getGachaRarity();
 let order=[];
-if(r<2)order=["UR","SSR","SR","R"];
-else if(r<10)order=["SSR","SR","R","UR"];
-else if(r<30)order=["SR","R","SSR","UR"];
+if(first==="UR")order=["UR","SSR","SR","R"];
+else if(first==="SSR")order=["SSR","SR","R","UR"];
+else if(first==="SR")order=["SR","R","SSR","UR"];
 else order=["R","SR","SSR","UR"];
 for(let rarity of order){
 let pool=remaining.filter(x=>x.rarity===rarity);
@@ -861,12 +868,9 @@ if(pool.length>0)return pool[Math.floor(Math.random()*pool.length)];
 return remaining[Math.floor(Math.random()*remaining.length)];
 }
 function getGachaResult(){
-let r=Math.random()*100;
-let rarity="R";
-if(r<2)rarity="UR";
-else if(r<10)rarity="SSR";
-else if(r<30)rarity="SR";
+let rarity=getGachaRarity();
 let pool=gachaPool().filter(x=>x.rarity===rarity);
+if(pool.length===0)pool=gachaPool();
 return pool[Math.floor(Math.random()*pool.length)];
 }
 function showGacha(){
@@ -880,7 +884,7 @@ document.getElementById("panelArea").innerHTML=`
 </div>
 <div class="profileItem">
 <h3>排出率</h3>
-<p>R 70% / SR 20% / SSR 8% / UR 2%</p>
+<p>R 75% / SR 21.5% / SSR 3% / UR 0.5%</p>
 <p>称号100個。URのみ色付き。</p>
 <p>コマンド称号はガチャから出ません。</p>
 </div>
@@ -3015,7 +3019,9 @@ e.preventDefault();
 }
 }, {passive:false});
 const UPDATE_NOTES = {
-"3.3.7": [
+"3.3.8": [
+"既存称号もレアリティ区分に追加しました",
+"追加UR称号が光るように修正しました",
 "名前付き称号を200個追加しました",
 "称号一覧の並び順をレアリティ順に調整しました",
 "問題表示で指数・分数・ルート・積分範囲を見やすくしました",
@@ -5606,7 +5612,7 @@ ${ultra}
       </div>
       <div class="profileItem">
         <h3>排出率</h3>
-        <p>R 70% / SR 20% / SSR 8% / UR 2%</p>
+        <p>R 75% / SR 21.5% / SSR 3% / UR 0.5%</p>
         <p>URのみ色付き。コマンド称号はガチャから出ません。</p>
       </div>`;
   };
@@ -5959,7 +5965,7 @@ ${ultra}
   window.showGacha = showGacha = function(){
     const p = panel();
     if(!p) return;
-    p.innerHTML = `<h2>🎰 ガチャ</h2><div class="profileItem"><p>所持コイン：${playerData.coins||0}</p><p>1回：10コイン / 10連：100コイン</p><p>称号は被りあり。被ったら3コイン返金。</p><button onclick="drawGacha()">10コインで引く</button><button onclick="drawGacha10()">100コインで10連</button><button onclick="showGachaBook()">ガチャ図鑑を見る</button></div><div class="profileItem"><h3>排出率</h3><p>R 70% / SR 20% / SSR 8% / UR 2%</p><p>URのみ色付き。コマンド称号はガチャから出ません。</p></div>`;
+    p.innerHTML = `<h2>🎰 ガチャ</h2><div class="profileItem"><p>所持コイン：${playerData.coins||0}</p><p>1回：10コイン / 10連：100コイン</p><p>称号は被りあり。被ったら3コイン返金。</p><button onclick="drawGacha()">10コインで引く</button><button onclick="drawGacha10()">100コインで10連</button><button onclick="showGachaBook()">ガチャ図鑑を見る</button></div><div class="profileItem"><h3>排出率</h3><p>R 75% / SR 21.5% / SSR 3% / UR 0.5%</p><p>URのみ色付き。コマンド称号はガチャから出ません。</p></div>`;
     home();
   };
 
@@ -6751,7 +6757,7 @@ ${ultra}
 (function(){
   if(window.__v331DxUltraNewsPatchLoaded) return;
   window.__v331DxUltraNewsPatchLoaded = true;
-  try{ window.VERSION = "3.3.7"; }catch(e){}
+  try{ window.VERSION = "3.3.9"; }catch(e){}
 
   function stripUltraLabel331(text){
     return String(text==null?"":text).replace(/^\s*超難問\s*[：:]\s*/,'');
@@ -6856,7 +6862,7 @@ ${ultra}
 (function(){
   if(window.__v332FullPatchLoaded) return;
   window.__v332FullPatchLoaded = true;
-  try{ window.VERSION = "3.3.7"; }catch(e){}
+  try{ window.VERSION = "3.3.9"; }catch(e){}
 
   function esc332(s){return String(s==null?"":s).replace(/[&<>"']/g,function(m){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m];});}
   function stripLabels332(s){
@@ -7067,7 +7073,7 @@ ${ultra}
 
 
 /* =========================================================
-   Ver 3.3.7 判定根本改善 + AI解説鬼強化
+   Ver 3.3.9 判定根本改善 + AI解説鬼強化
    - ランキング処理は触らない
    - sinx/cosx/tanx と sin(x)/cos(x)/tan(x) を同一扱い
    - logx/lnx と log(x)/ln(x) を同一扱い
@@ -7365,18 +7371,18 @@ ${ultra}
     const newsCandidates = document.querySelectorAll(".news, #news, .notice, #notice");
     newsCandidates.forEach(el=>{
       if(el && /お知らせ|Ver|問題|更新/.test(el.textContent)){
-        el.innerHTML = "<b>お知らせ</b><br>Ver 3.3.7<br>・判定精度改善<br>・AI解説強化<br>・表示調整";
+        el.innerHTML = "<b>お知らせ</b><br>Ver 3.3.9<br>・判定精度改善<br>・AI解説強化<br>・表示調整";
       }
     });
   }catch(e){}
 
-  console.log("Ver 3.3.7 judge + AI explanation fix loaded");
+  console.log("Ver 3.3.9 judge + AI explanation fix loaded");
 })();
 
 
 
 
-/* Ver 3.3.7 AI解説強化・判定調整・ランダム修正。ランキング処理は触らない。 */
+/* Ver 3.3.9 AI解説強化・判定調整・ランダム修正。ランキング処理は触らない。 */
 (function(){
   if(window.__mm335PatchLoaded) return;
   window.__mm335PatchLoaded = true;
@@ -7580,14 +7586,14 @@ ${ultra}
     };
   }
 
-  window.MM335_NEWS = "📢 お知らせ\n\nVer 3.3.7\n\n・ランダムモードの不具合を修正\n・判定精度を改善\n・AI解説を大幅強化\n・問題を追加\n・数式表示を改善";
-  console.log("Ver 3.3.7 AI / judge / random fix loaded");
+  window.MM335_NEWS = "📢 お知らせ\n\nVer 3.3.9\n\n・ランダムモードの不具合を修正\n・判定精度を改善\n・AI解説を大幅強化\n・問題を追加\n・数式表示を改善";
+  console.log("Ver 3.3.9 AI / judge / random fix loaded");
 })();
 
 
 
 /* =========================================================
-   Ver 3.3.7 UI / submit fix
+   Ver 3.3.9 UI / submit fix
    - 学習モードの決定連打を1秒ロック
    - 難易度選択の隙間を削減
    - 難易度選択の戻るボタンを非表示
@@ -7774,8 +7780,8 @@ ${ultra}
   });
   obs.observe(document.body, {childList:true, subtree:true});
 
-  window.MM336_NEWS = "📢 お知らせ\n\nVer 3.3.7\n\n・回答連打による二重判定を修正\n・難易度選択画面の余白を調整\n・超難問下の戻るボタンを削除\n・結果後にランキングへ飛ぶ不具合を修正";
-  console.log("Ver 3.3.7 UI / submit fix loaded");
+  window.MM336_NEWS = "📢 お知らせ\n\nVer 3.3.9\n\n・回答連打による二重判定を修正\n・難易度選択画面の余白を調整\n・超難問下の戻るボタンを削除\n・結果後にランキングへ飛ぶ不具合を修正";
+  console.log("Ver 3.3.9 UI / submit fix loaded");
 })();
 
 
@@ -7816,7 +7822,7 @@ return window.__oldShowTitles337.apply(this,arguments);
 
 
 (function(){
-if(window.__mm337MathDisplayLoaded)return;
+if(true)return; /* old display patch disabled: __mm337MathDisplayLoaded */
 window.__mm337MathDisplayLoaded=true;
 const st=document.createElement("style");
 st.textContent=`
@@ -7868,4 +7874,291 @@ window.updateAnswerPreview=updatePreview;
 window.updateAnswerPreviewV329=updatePreview;
 document.addEventListener("input",e=>{if(e.target&&e.target.id==="ans")setTimeout(updatePreview,0);});
 setInterval(updatePreview,1000);
+})();
+
+
+/* v3.3.8 title rarity filter + login ranking gate */
+window.__v338TitleFilter=true;
+window.RANKING_LOGIN_REQUIRED=true;
+window.RANKING_SUBMIT_LOGIN_REQUIRED=true;
+window.TITLE_FILTER_COUNTS={UR:5,SSR:15,SR:60,R:120};
+
+
+
+/* v3.3.8 existing title rarity + UR glow fix */
+(function(){
+if(window.__mm338RarityExistingFix)return;
+window.__mm338RarityExistingFix=true;
+
+const existingTitleRarity338={
+  "理系":"R","数学初心者":"R","数学中級者":"R","数学上級者":"SR",
+  "数学の鬼👹":"SSR","数学の申し子🪽":"SSR","数学王👑":"UR",
+  "数学好き":"R","数学大好き":"R","数学者🎓":"SR","努力家":"SR",
+  "秀才":"SR","鬼才":"SSR","天才":"UR",
+  "⚡創設者":"SPECIAL","👾MENERU👾":"SPECIAL","なかなか🧊":"SPECIAL","🧊なかなか":"SPECIAL"
+};
+
+function getTitleRarity338(title){
+  if(existingTitleRarity338[title])return existingTitleRarity338[title];
+  try{
+    if(typeof gachaPool==="function"){
+      const hit=gachaPool().find(x=>x.title===title);
+      if(hit&&hit.rarity)return hit.rarity;
+    }
+  }catch(e){}
+  return "R";
+}
+
+function titleClass338(title){
+  const r=getTitleRarity338(title);
+  if(r==="SPECIAL")return "titleSpecial";
+  if(r==="UR")return "titleUR";
+  if(r==="SSR")return "titleSSR";
+  if(r==="SR")return "titleSR";
+  return "titleR";
+}
+
+const css=document.createElement("style");
+css.textContent=`
+.titleUR{
+  color:#fff7a8;
+  font-weight:900;
+  text-shadow:0 0 6px #fff,0 0 12px #ffd700,0 0 22px #ff9900;
+  animation:mm338Glow 1.4s ease-in-out infinite alternate;
+}
+.titleSSR{color:#ffb7f7;font-weight:800;text-shadow:0 0 8px #ff66e8;}
+.titleSR{color:#8fd3ff;font-weight:700;text-shadow:0 0 6px #4db8ff;}
+.titleR{color:#ffffff;font-weight:600;}
+.titleSpecial{color:#ffd700;font-weight:900;text-shadow:0 0 8px #fff,0 0 16px #ffd700,0 0 28px #ff8c00;}
+@keyframes mm338Glow{from{filter:brightness(1);}to{filter:brightness(1.35);}}
+.rarityTabs{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:10px 0;}
+.rarityTabs button{padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:white;font-weight:700;}
+.rarityCount{opacity:.85;font-size:.9em;}
+`;
+document.head.appendChild(css);
+
+// titleHTMLを上書きして追加URも確実に光らせる
+window.titleHTML=function(title){
+  title=title||"初心者";
+  return `<span class="${titleClass338(title)}">${title}</span>`;
+};
+
+function ownedTitles338(){
+  const a=(window.playerData&&Array.isArray(playerData.titles))?playerData.titles:[];
+  const b=(window.playerData&&Array.isArray(playerData.gachaTitles))?playerData.gachaTitles:[];
+  return Array.from(new Set([...a,...b]));
+}
+
+function allGachaTitles338(){
+  try{return gachaPool().map(x=>x.title);}catch(e){return [];}
+}
+
+function countByRarity338(rarity){
+  let all=[];
+  try{
+    all=gachaPool().filter(x=>x.rarity===rarity).map(x=>x.title);
+  }catch(e){}
+  Object.entries(existingTitleRarity338).forEach(([t,r])=>{
+    if(r===rarity&&!all.includes(t))all.push(t);
+  });
+  return all.length;
+}
+
+window.showTitlesByRarity338=function(rarity){
+  const area=document.getElementById("panelArea");
+  const owned=ownedTitles338();
+  const list=owned.filter(t=>getTitleRarity338(t)===rarity).sort((a,b)=>String(a).localeCompare(String(b),"ja"));
+  const total=countByRarity338(rarity);
+  let html=`<h2>🏅 称号一覧</h2>
+  <div class="rarityTabs">
+    <button onclick="showTitlesByRarity338('SPECIAL')">特別<br><span class="rarityCount">${countByRarity338('SPECIAL')}個</span></button>
+    <button onclick="showTitlesByRarity338('UR')">UR<br><span class="rarityCount">${countByRarity338('UR')}個</span></button>
+    <button onclick="showTitlesByRarity338('SSR')">SSR<br><span class="rarityCount">${countByRarity338('SSR')}個</span></button>
+    <button onclick="showTitlesByRarity338('SR')">SR<br><span class="rarityCount">${countByRarity338('SR')}個</span></button>
+    <button onclick="showTitlesByRarity338('R')">R<br><span class="rarityCount">${countByRarity338('R')}個</span></button>
+  </div>
+  <h3>${rarity} ${list.length}/${total}</h3>`;
+  if(list.length===0){
+    html+=`<p>取得済みの${rarity}称号はありません</p>`;
+  }else{
+    for(const t of list){
+      html+=`<div class="profileItem">${titleHTML(t)} <button onclick="equipTitle('${String(t).replace(/'/g,"\\'")}')">装備</button></div>`;
+    }
+  }
+  area.innerHTML=html;
+  if(typeof ensureHomeButton==="function")ensureHomeButton();
+};
+
+// 既存の称号一覧をレアリティボタン式に変更
+window.showTitles=function(){
+  showTitlesByRarity338("UR");
+};
+})();
+
+
+
+/* v3.3.9 rebuilt math display */
+(function(){
+if(window.__mm339DisplayRebuildLoaded)return;
+window.__mm339DisplayRebuildLoaded=true;
+
+const st=document.createElement("style");
+st.textContent=`
+.mm339Box{display:inline-flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:.045em;line-height:1.25;max-width:100%;overflow-wrap:anywhere;}
+.mm339PreviewBox{min-height:82px;display:flex;align-items:center;justify-content:center;overflow:auto;padding:8px 6px;box-sizing:border-box;}
+.mm339PreviewBox .mm339Box{font-size:clamp(24px,6vw,38px);}
+#q .mm339Box{font-size:clamp(24px,6vw,42px);}
+.mm339Pow sup{font-size:.62em;line-height:1;margin-left:.035em;}
+.mm339Root{display:inline-flex;align-items:flex-start;margin:0 .045em;}
+.mm339Root .sign{font-size:1.06em;line-height:1;transform:translateY(.10em);margin-right:-.045em;}
+.mm339Root .body{border-top:2px solid currentColor;padding:.02em .12em 0 .08em;line-height:1.05;transform:translateY(.08em);white-space:nowrap;}
+.mm339Frac{display:inline-grid;grid-template-rows:auto auto;align-items:center;justify-items:center;line-height:1.05;margin:0 .16em;vertical-align:middle;}
+.mm339Frac .num{border-bottom:2px solid currentColor;padding:0 .2em .06em;min-width:1.05em;text-align:center;}
+.mm339Frac .den{padding:.06em .2em 0;min-width:1.05em;text-align:center;}
+.mm339Int{display:inline-grid;grid-template-rows:auto auto auto;align-items:center;justify-items:center;line-height:.9;margin:0 .09em .02em .03em;font-size:1.05em;}
+.mm339Int .up,.mm339Int .lo{font-size:.48em;line-height:1;min-height:.6em;}
+.mm339Int .sg{font-size:1.28em;line-height:.88;}
+.mm339Dx{white-space:nowrap;margin-left:.12em;}
+.mm339Mul{margin:0 .13em;}
+.mm339Func{white-space:nowrap;}
+`;
+document.head.appendChild(st);
+
+function clean(s){
+ return String(s||"").trim()
+  .replace(/　/g," ")
+  .replace(/π/g,"pi")
+  .replace(/²/g,"^2").replace(/³/g,"^3").replace(/⁴/g,"^4").replace(/⁵/g,"^5")
+  .replace(/⁶/g,"^6").replace(/⁷/g,"^7").replace(/⁸/g,"^8").replace(/⁹/g,"^9")
+  .replace(/×/g,"*").replace(/÷/g,"/");
+}
+function tn(t){return document.createTextNode(String(t).replace(/\bpi\b/g,"π"));}
+function box(){const b=document.createElement("span");b.className="mm339Box";return b;}
+function addText(b,t){if(t!==""&&t!=null)b.appendChild(tn(t));}
+function addMul(b){const m=document.createElement("span");m.className="mm339Mul";m.textContent="×";b.appendChild(m);}
+function addDx(b){const d=document.createElement("span");d.className="mm339Dx";d.textContent="dx";b.appendChild(d);}
+function addRoot(b,inside){const r=document.createElement("span");r.className="mm339Root";const s=document.createElement("span");s.className="sign";s.textContent="√";const body=document.createElement("span");body.className="body";body.appendChild(renderInline(inside));r.appendChild(s);r.appendChild(body);b.appendChild(r);}
+function addFrac(b,num,den){const f=document.createElement("span");f.className="mm339Frac";const n=document.createElement("span");n.className="num";n.appendChild(renderInline(num));const d=document.createElement("span");d.className="den";d.appendChild(renderInline(den));f.appendChild(n);f.appendChild(d);b.appendChild(f);}
+function addPow(b,base,exp){
+ exp=String(exp||"").trim();
+ if(exp==="1/2"||exp==="(1/2)"||exp==="0.5"){addRoot(b,base);return;}
+ const p=document.createElement("span");p.className="mm339Pow";
+ p.appendChild(renderInline(base));
+ const s=document.createElement("sup");
+ // 指数の指数や複数文字は中身を見せる。e^x+1 の誤解防止のため複数文字は括弧付き。
+ const expText=String(exp).replace(/\bpi\b/g,"π");
+ if(expText.length>1 && !/^[0-9]$/.test(expText)){s.textContent="("+expText.replace(/^\((.*)\)$/,"$1")+")";}
+ else s.textContent=expText;
+ p.appendChild(s);b.appendChild(p);
+}
+function addIntegral(b,lo,up){const it=document.createElement("span");it.className="mm339Int";const u=document.createElement("span");u.className="up";u.textContent=up||"";const sg=document.createElement("span");sg.className="sg";sg.textContent="∫";const l=document.createElement("span");l.className="lo";l.textContent=lo||"";it.appendChild(u);it.appendChild(sg);it.appendChild(l);b.appendChild(it);}
+function stripOuterParens(s){
+ s=String(s||"").trim();
+ if(!(s.startsWith("(")&&s.endsWith(")")))return s;
+ let depth=0;
+ for(let i=0;i<s.length;i++){
+   if(s[i]==="(")depth++;
+   if(s[i]===")")depth--;
+   if(depth===0 && i<s.length-1)return s;
+ }
+ return s.slice(1,-1);
+}
+function splitTop(s,op){
+ let d=0;
+ for(let i=0;i<s.length;i++){
+   if(s[i]==="(")d++;
+   else if(s[i]===")")d--;
+   else if(d===0 && s[i]===op)return [s.slice(0,i),s.slice(i+1)];
+ }
+ return null;
+}
+function renderInline(raw){
+ const s=clean(raw);
+ const b=box();
+ if(!s)return b;
+
+ // 微分 d/dx(x+1) -> d/dx x+1、ただし分数など括弧必要な形は残す
+ let m=s.match(/^d\/dx\((.+)\)$/);
+ if(m){
+   const inner=m[1];
+   const simple=!/[\/]/.test(inner);
+   addText(b,"d/dx ");
+   b.appendChild(renderInline(simple?inner:"("+inner+")"));
+   return b;
+ }
+ m=s.match(/^d\/dx\s*(.+)$/);
+ if(m){addText(b,"d/dx ");b.appendChild(renderInline(m[1]));return b;}
+
+ // 積分範囲とdx位置
+ m=s.match(/^∫_([^_^ ]+)\^([^ ]+)\s*(.+?)\s*d\s*x$/);
+ if(m){addIntegral(b,m[1],m[2]);b.appendChild(renderInline(m[3]));addDx(b);return b;}
+ m=s.match(/^∫\s*(.+?)\s*d\s*x$/);
+ if(m){addIntegral(b,"","");b.appendChild(renderInline(m[1]));addDx(b);return b;}
+
+ // sqrt / root
+ m=s.match(/^sqrt\((.+)\)$/)||s.match(/^√\((.+)\)$/);
+ if(m){addRoot(b,m[1]);return b;}
+ m=s.match(/^√([A-Za-z0-9pi]+)$/);
+ if(m){addRoot(b,m[1]);return b;}
+
+ // 分数
+ const div=splitTop(s,"/");
+ if(div && !s.includes("http")){addFrac(b,stripOuterParens(div[0]),stripOuterParens(div[1]));return b;}
+
+ // 掛け算：3*2は32にしない。数字同士は×、それ以外は参考書風に少し間隔。
+ let mul=splitTop(s,"*");
+ if(mul){
+   const left=mul[0], right=mul[1];
+   b.appendChild(renderInline(left));
+   if(/^\d+(\.\d+)?$/.test(left.trim()) && /^\d+(\.\d)?$/.test(right.trim())) addMul(b);
+   else addText(b," ");
+   b.appendChild(renderInline(right));
+   return b;
+ }
+
+ // 三角関数の累乗: sin^2x -> (sin x)^2
+ m=s.match(/^(sin|cos|tan)\^(.+?)([A-Za-z0-9pi]+)$/);
+ if(m){addPow(b,m[1]+" "+m[3],m[2]);return b;}
+
+ // 一般の指数。e^x+1 は指数範囲が曖昧なので e^(x+1) 形式で見えるよう括弧付け
+ m=s.match(/^(.+?)\^\((.+)\)$/);
+ if(m){addPow(b,m[1],m[2]);return b;}
+ m=s.match(/^(.+?)\^(.+)$/);
+ if(m){addPow(b,m[1],m[2]);return b;}
+
+ // 関数表示
+ m=s.match(/^(sin|cos|tan|log|ln)\((.+)\)$/);
+ if(m){const f=document.createElement("span");f.className="mm339Func";f.appendChild(tn(m[1]+" "));f.appendChild(renderInline(m[2]));b.appendChild(f);return b;}
+
+ addText(b,s.replace(/\bpi\b/g,"π"));
+ return b;
+}
+function renderTo(el,value){
+ el.classList.add("mm339PreviewBox");
+ el.innerHTML="";
+ if(value)el.appendChild(renderInline(value));
+}
+function updatePreview339(){
+ const ans=document.getElementById("ans");
+ if(!ans)return;
+ [document.getElementById("answerPreview"),document.getElementById("preview"),document.querySelector(".answer-preview"),document.querySelector(".previewMath")].filter(Boolean).forEach(el=>renderTo(el,ans.value));
+}
+window.updateAnswerPreview=updatePreview339;
+window.updateAnswerPreviewV329=updatePreview339;
+document.addEventListener("input",e=>{if(e.target&&e.target.id==="ans")setTimeout(updatePreview339,0);});
+setInterval(updatePreview339,900);
+
+// 問題文の表示も、元の問題データは変えず見た目だけ整える
+function beautifyQuestion339(){
+ const q=document.getElementById("q");
+ if(!q||q.dataset.mm339Done==="1")return;
+ const text=(q.textContent||"").trim();
+ if(!text)return;
+ if(/[∫√^*/]|d\/dx|sin|cos|tan|log|ln/.test(text)){
+   q.innerHTML="";
+   q.appendChild(renderInline(text));
+   q.dataset.mm339Done="1";
+ }
+}
+setInterval(beautifyQuestion339,700);
 })();
