@@ -240,6 +240,7 @@ return "local_" + playerId;
 }
 window.getMyPlayerId = () => (window.getMyFriendCode ? window.getMyFriendCode() : getPlayerId());
 window.saveWorldScore = async function(data){
+if(!auth.currentUser) return false;
 const week = getWeekKey();
 const playerId = getPlayerId();
 const docId = week + "_" + data.mode + "_" + playerId;
@@ -262,6 +263,7 @@ updatedAt:serverTimestamp()
 });
 };
 window.loadWorldRanking = async function(){
+if(!auth.currentUser) return [];
 const q = query(collection(db,"rankings"), where("week","==",getWeekKey()), where("mode","==","random"), limit(100));
 const snap = await getDocs(q);
 let list = [];
@@ -354,6 +356,7 @@ const after = await getDoc(ref);
 return after.data();
 };
 window.saveRateData = async function(result){
+if(!auth.currentUser) return null;
 const playerId = getPlayerId();
 const ref = doc(db,"ratings",playerId);
 const snap = await getDoc(ref);
@@ -382,6 +385,7 @@ updatedAt:serverTimestamp()
 return {rating,wins,losses};
 };
 window.loadRateRanking = async function(){
+if(!auth.currentUser) return [];
 const snap = await getDocs(collection(db,"ratings"));
 let list=[];
 snap.forEach(d=>list.push(d.data()));

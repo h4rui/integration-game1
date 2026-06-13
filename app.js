@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.3.9";
+const VERSION = "3.3.10";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -5119,7 +5119,7 @@ console.log("app.js Ver 3.1.9 base loaded");
     const p=panel(); if(!p)return;
     p.innerHTML=`
       <h2>🏆 ランキング</h2>
-      <div class="profileItem"><p>ランキングは誰でも見れます。反映はGoogleログイン中のみです。</p></div>
+      <div class="profileItem"><p></p></div>
       <button class="modeBtn" onclick="showLevelRanking319()">⭐ レベルランキング</button>
       <button class="modeBtn" onclick="showDailyQuestionRanking319()">📚 日間正解数ランキング</button>
       <button class="modeBtn" onclick="showRateRanking()">🏅 レートランキング</button>
@@ -6757,7 +6757,7 @@ ${ultra}
 (function(){
   if(window.__v331DxUltraNewsPatchLoaded) return;
   window.__v331DxUltraNewsPatchLoaded = true;
-  try{ window.VERSION = "3.3.9"; }catch(e){}
+  try{ window.VERSION = "3.3.10"; }catch(e){}
 
   function stripUltraLabel331(text){
     return String(text==null?"":text).replace(/^\s*超難問\s*[：:]\s*/,'');
@@ -6862,7 +6862,7 @@ ${ultra}
 (function(){
   if(window.__v332FullPatchLoaded) return;
   window.__v332FullPatchLoaded = true;
-  try{ window.VERSION = "3.3.9"; }catch(e){}
+  try{ window.VERSION = "3.3.10"; }catch(e){}
 
   function esc332(s){return String(s==null?"":s).replace(/[&<>"']/g,function(m){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m];});}
   function stripLabels332(s){
@@ -7073,7 +7073,7 @@ ${ultra}
 
 
 /* =========================================================
-   Ver 3.3.9 判定根本改善 + AI解説鬼強化
+   Ver 3.3.10 判定根本改善 + AI解説鬼強化
    - ランキング処理は触らない
    - sinx/cosx/tanx と sin(x)/cos(x)/tan(x) を同一扱い
    - logx/lnx と log(x)/ln(x) を同一扱い
@@ -7371,18 +7371,18 @@ ${ultra}
     const newsCandidates = document.querySelectorAll(".news, #news, .notice, #notice");
     newsCandidates.forEach(el=>{
       if(el && /お知らせ|Ver|問題|更新/.test(el.textContent)){
-        el.innerHTML = "<b>お知らせ</b><br>Ver 3.3.9<br>・判定精度改善<br>・AI解説強化<br>・表示調整";
+        el.innerHTML = "<b>お知らせ</b><br>Ver 3.3.10<br>・判定精度改善<br>・AI解説強化<br>・表示調整";
       }
     });
   }catch(e){}
 
-  console.log("Ver 3.3.9 judge + AI explanation fix loaded");
+  console.log("Ver 3.3.10 judge + AI explanation fix loaded");
 })();
 
 
 
 
-/* Ver 3.3.9 AI解説強化・判定調整・ランダム修正。ランキング処理は触らない。 */
+/* Ver 3.3.10 AI解説強化・判定調整・ランダム修正。ランキング処理は触らない。 */
 (function(){
   if(window.__mm335PatchLoaded) return;
   window.__mm335PatchLoaded = true;
@@ -7586,14 +7586,14 @@ ${ultra}
     };
   }
 
-  window.MM335_NEWS = "📢 お知らせ\n\nVer 3.3.9\n\n・ランダムモードの不具合を修正\n・判定精度を改善\n・AI解説を大幅強化\n・問題を追加\n・数式表示を改善";
-  console.log("Ver 3.3.9 AI / judge / random fix loaded");
+  window.MM335_NEWS = "📢 お知らせ\n\nVer 3.3.10\n\n・ランダムモードの不具合を修正\n・判定精度を改善\n・AI解説を大幅強化\n・問題を追加\n・数式表示を改善";
+  console.log("Ver 3.3.10 AI / judge / random fix loaded");
 })();
 
 
 
 /* =========================================================
-   Ver 3.3.9 UI / submit fix
+   Ver 3.3.10 UI / submit fix
    - 学習モードの決定連打を1秒ロック
    - 難易度選択の隙間を削減
    - 難易度選択の戻るボタンを非表示
@@ -7780,8 +7780,8 @@ ${ultra}
   });
   obs.observe(document.body, {childList:true, subtree:true});
 
-  window.MM336_NEWS = "📢 お知らせ\n\nVer 3.3.9\n\n・回答連打による二重判定を修正\n・難易度選択画面の余白を調整\n・超難問下の戻るボタンを削除\n・結果後にランキングへ飛ぶ不具合を修正";
-  console.log("Ver 3.3.9 UI / submit fix loaded");
+  window.MM336_NEWS = "📢 お知らせ\n\nVer 3.3.10\n\n・回答連打による二重判定を修正\n・難易度選択画面の余白を調整\n・超難問下の戻るボタンを削除\n・結果後にランキングへ飛ぶ不具合を修正";
+  console.log("Ver 3.3.10 UI / submit fix loaded");
 })();
 
 
@@ -7877,11 +7877,7 @@ setInterval(updatePreview,1000);
 })();
 
 
-/* v3.3.8 title rarity filter + login ranking gate */
-window.__v338TitleFilter=true;
-window.RANKING_LOGIN_REQUIRED=true;
-window.RANKING_SUBMIT_LOGIN_REQUIRED=true;
-window.TITLE_FILTER_COUNTS={UR:5,SSR:15,SR:60,R:120};
+
 
 
 
@@ -8161,4 +8157,113 @@ function beautifyQuestion339(){
  }
 }
 setInterval(beautifyQuestion339,700);
+})();
+
+
+
+/* v3.3.10 ranking login required */
+(function(){
+if(window.__mm3310RankingLoginFix)return;
+window.__mm3310RankingLoginFix=true;
+
+function mm3310LoginUser(){
+  try{
+    if(window.firebase && firebase.auth && firebase.auth().currentUser)return firebase.auth().currentUser;
+  }catch(e){}
+  try{
+    if(window.auth && window.auth.currentUser)return window.auth.currentUser;
+  }catch(e){}
+  try{
+    if(window.currentUser && (currentUser.uid || currentUser.email))return currentUser;
+  }catch(e){}
+  try{
+    if(typeof getGoogleLoginInfo==="function"){
+      const u=getGoogleLoginInfo();
+      if(u && (u.uid || u.email || u.displayName))return u;
+    }
+  }catch(e){}
+  return null;
+}
+window.isRankingLoggedIn3310=function(){return !!mm3310LoginUser();};
+
+function loginOnlyHTML3310(title){
+  return `<h2>${title}</h2>
+  <div class="profileItem">
+    <p>Googleログインしてください</p>
+    <button class="modeBtn" onclick="loginGoogle()">Googleログイン</button>
+  </div>`;
+}
+
+const oldShowRankingMenu=window.showRankingMenu;
+window.showRankingMenu=function(){
+  const box=document.getElementById("panelArea");
+  if(!box)return;
+  if(!isRankingLoggedIn3310()){
+    box.innerHTML=loginOnlyHTML3310("🏆 ランキング");
+    if(typeof ensureHomeButton==="function")ensureHomeButton();
+    return;
+  }
+  if(typeof oldShowRankingMenu==="function")return oldShowRankingMenu.apply(this,arguments);
+  box.innerHTML=`<h2>🏆 ランキング</h2>
+  <button class="modeBtn" onclick="showWorldRanking()">🌍 週間ランキング</button>
+  <button class="modeBtn" onclick="showRateRanking()">🏅 レートランキング</button>`;
+};
+
+const oldShowWorldRanking=window.showWorldRanking;
+window.showWorldRanking=async function(){
+  const box=document.getElementById("panelArea");
+  if(!isRankingLoggedIn3310()){
+    if(box)box.innerHTML=loginOnlyHTML3310("🌍 週間ランキング");
+    if(typeof ensureHomeButton==="function")ensureHomeButton();
+    if(typeof ensurePanelBackButton==="function")ensurePanelBackButton();
+    return;
+  }
+  if(typeof oldShowWorldRanking==="function")return await oldShowWorldRanking.apply(this,arguments);
+};
+
+const oldShowRateRanking=window.showRateRanking;
+window.showRateRanking=async function(){
+  const box=document.getElementById("panelArea");
+  if(!isRankingLoggedIn3310()){
+    if(box)box.innerHTML=loginOnlyHTML3310("🏅 レートランキング");
+    if(typeof ensureHomeButton==="function")ensureHomeButton();
+    if(typeof ensurePanelBackButton==="function")ensurePanelBackButton();
+    return;
+  }
+  if(typeof oldShowRateRanking==="function")return await oldShowRateRanking.apply(this,arguments);
+};
+
+const oldShowFriendRanking=window.showFriendRanking;
+window.showFriendRanking=async function(){
+  const box=document.getElementById("panelArea");
+  if(!isRankingLoggedIn3310()){
+    if(box)box.innerHTML=loginOnlyHTML3310("👥 フレンドランキング");
+    if(typeof ensureHomeButton==="function")ensureHomeButton();
+    if(typeof ensurePanelBackButton==="function")ensurePanelBackButton();
+    return;
+  }
+  if(typeof oldShowFriendRanking==="function")return await oldShowFriendRanking.apply(this,arguments);
+};
+
+// ランキング反映もログイン必須。未ログインなら保存関数を呼ばない。
+const oldSavePublicProfile=window.savePublicProfile;
+window.savePublicProfile=async function(){
+  if(!isRankingLoggedIn3310())return false;
+  if(typeof oldSavePublicProfile==="function")return await oldSavePublicProfile.apply(this,arguments);
+  return false;
+};
+
+const oldSaveWorldScore=window.saveWorldScore;
+window.saveWorldScore=async function(){
+  if(!isRankingLoggedIn3310())return false;
+  if(typeof oldSaveWorldScore==="function")return await oldSaveWorldScore.apply(this,arguments);
+  return false;
+};
+
+const oldSaveRateData=window.saveRateData;
+window.saveRateData=async function(){
+  if(!isRankingLoggedIn3310())return null;
+  if(typeof oldSaveRateData==="function")return await oldSaveRateData.apply(this,arguments);
+  return null;
+};
 })();
