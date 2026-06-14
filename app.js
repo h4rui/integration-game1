@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.3.6";
+const VERSION = "3.3.7";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -1091,19 +1091,9 @@ document.getElementById("panelArea").innerHTML=`
 `;
 if(typeof ensureHomeButton==="function")ensureHomeButton();
 }
-async function savePublicProfile(){
-try{
-if(window.savePlayerPublicData){
-await savePlayerPublicData({
-name:playerProfile.name||"名無し",
-icon:playerProfile.icon||"",
-title:playerData.equippedTitle||"初心者",
-level:getLevel(),
-bestRandomScore:playerData.bestRandomScore||0
-});
-}
-}catch(e){console.log(e);}
-}
+
+/* savePublicProfile moved to ranking.js - frozen */
+
 function showFriendMenu(){
 const friendCode = window.getMyFriendCode ? window.getMyFriendCode() : (window.getMyPlayerId?window.getMyPlayerId():"未取得");
 let html=`
@@ -1179,38 +1169,9 @@ ${(typeof f==="string"?id:f.name)||id}<br>
 }
 area.innerHTML=html;
 }
-async function showFriendRanking(){
-let html="<h2>🏆 フレンドランキング</h2>";
-let list=[];
-try{
-for(let f of playerData.friends){
-let id=typeof f==="string"?f:f.id;
-let data=await loadFriendData(id);
-if(data)list.push(data);
-}
-}catch(e){console.log(e);}
-list.push({
-name:playerProfile.name,
-icon:playerProfile.icon,
-title:playerData.equippedTitle,
-level:getLevel(),
-bestRandomScore:playerData.bestRandomScore
-});
-list.sort((a,b)=>(b.bestRandomScore||0)-(a.bestRandomScore||0));
-for(let i=0;i<list.length;i++){
-html+=`
-<div class="rankItem">
-${i+1}位
-${list[i].icon?`<img class="rankIcon" src="${list[i].icon}">`:""}
-${list[i].name}<br>
-${titleHTML(list[i].title||"初心者")}<br>
-Lv${list[i].level||1}<br>
-スコア：${list[i].bestRandomScore||0}
-</div>
-`;
-}
-document.getElementById("panelArea").innerHTML=html;
-}
+
+/* showFriendRanking moved to ranking.js - frozen */
+
 function aiExplain(q){
 q=String(q);
 if(q.includes("∫"))return"積分は、基本的に次数を1つ上げて、その新しい次数で割ります。";
@@ -1829,39 +1790,9 @@ function showEnd(text){
 updatePlayTime();
 showResultPage(text);
 }
-async function showWorldRanking(){
-let box=document.getElementById("panelArea");
-box.innerHTML="<h2>読み込み中...</h2>";
-try{
-let ranking=await loadWorldRanking();
-let myName=playerProfile.name||"名無し";
-let myBest=playerData.bestRandomScore||0;
-let myRank="-";
-for(let i=0;i<ranking.length;i++){
-if((ranking[i].score||0)===myBest && (ranking[i].name||"名無し")===myName){
-myRank=i+1;
-break;
-}
-}
-let html=`<h2>🌍 週間ランキング</h2>
-<div class="profileItem">
-<h3>あなたの順位</h3>
-<p>順位：${myRank}位</p>
-<p>自己ベスト：${myBest}問</p>
-</div>`;
-if(ranking.length===0)html+="<p>まだ記録がありません</p>";
-for(let i=0;i<ranking.length;i++){
-html+=`<div class="rankItem">${i+1}位 ${ranking[i].icon?`<img class="rankIcon" src="${ranking[i].icon}">`:""}${ranking[i].name}<br>${titleHTML(ranking[i].title||"初心者")}<br>Lv${ranking[i].level||1}<br>${ranking[i].score}問</div>`;
-}
-box.innerHTML=html;
-ensureHomeButton();
-ensurePanelBackButton();
-}catch(e){
-box.innerHTML="<p>ランキング取得失敗</p>";
-ensureHomeButton();
-ensurePanelBackButton();
-}
-}
+
+/* showWorldRanking moved to ranking.js - frozen */
+
 function showResultPage(text){
 setInputVisible(false);
 document.getElementById("gameScreen").classList.remove("active");
@@ -1900,13 +1831,9 @@ saveAllData();
 savePublicProfile();
 updateHomeStatus();
 }
-function showRankingMenu(){
-document.getElementById("panelArea").innerHTML=`
-<h2>🏆 ランキング</h2>
-<button class="modeBtn" onclick="showWorldRanking()">🌍 週間ランキング</button>
-<button class="modeBtn" onclick="showRateRanking()">🏅 レートランキング</button>
-`;
-}
+
+/* showRankingMenu moved to ranking.js - frozen */
+
 function showMatchMenu(){
 document.getElementById("panelArea").innerHTML=`
 <h2>⚔️ 対戦</h2>
@@ -1941,32 +1868,9 @@ document.getElementById("panelArea").innerHTML=`
 <button class="modeBtn" onclick="showContact()">📩 お問い合わせ</button>
 `;
 }
-async function showRateRanking(){
-let box=document.getElementById("panelArea");
-box.innerHTML="<h2>読み込み中...</h2>";
-try{
-let list=await loadRateRanking();
-let html="<h2>🏅 レートランキング</h2>";
-if(list.length===0)html+="<p>まだ記録がありません</p>";
-for(let i=0;i<list.length;i++){
-html+=`
-<div class="rankItem">
-${i+1}位
-${list[i].icon?`<img class="rankIcon" src="${list[i].icon}">`:""}
-${list[i].name}<br>
-${titleHTML(list[i].title||"初心者")}<br>
-レート：${list[i].rating||1000}<br>
-${list[i].wins||0}勝 ${list[i].losses||0}敗
-</div>
-`;
-}
-box.innerHTML=html;
-ensurePanelBackButton();
-}catch(e){
-box.innerHTML="<p>レートランキング取得失敗</p>";
-ensurePanelBackButton();
-}
-}
+
+/* showRateRanking moved to ranking.js - frozen */
+
 function showOnlineMatchMenu(){
 document.getElementById("panelArea").innerHTML=`
 <h2>⚔️ ランダムマッチ</h2>
@@ -7569,4 +7473,321 @@ ${ultra}
 
   window.MM336_NEWS = "📢 お知らせ\n\nVer 3.3.6\n\n・回答連打による二重判定を修正\n・難易度選択画面の余白を調整\n・超難問下の戻るボタンを削除\n・結果後にランキングへ飛ぶ不具合を修正";
   console.log("Ver 3.3.6 UI / submit fix loaded");
+})();
+
+
+
+/* Ver3.3.7 title add patch / ranking frozen untouched */
+(function(){
+if(window.__titleAdd337Loaded)return;
+window.__titleAdd337Loaded=true;
+
+const oldGachaPool337 = gachaPool;
+
+function gachaExtraPool337(){
+return [
+{title:"計算の見張り番", rarity:"R"},
+{title:"式の配達人", rarity:"R"},
+{title:"数字の旅人", rarity:"R"},
+{title:"ノートの守人", rarity:"R"},
+{title:"黒板ランナー", rarity:"R"},
+{title:"朝練計算者", rarity:"R"},
+{title:"夜更かし復習者", rarity:"R"},
+{title:"鉛筆の騎士", rarity:"R"},
+{title:"消しゴムの相棒", rarity:"R"},
+{title:"問題採集家", rarity:"R"},
+{title:"集中スターター", rarity:"R"},
+{title:"公式メモ職人", rarity:"R"},
+{title:"理系スタート", rarity:"R"},
+{title:"努力の若葉", rarity:"R"},
+{title:"復習ウォーカー", rarity:"R"},
+{title:"一問前進", rarity:"R"},
+{title:"答えの探索者", rarity:"R"},
+{title:"基礎ビルダー", rarity:"R"},
+{title:"足し算ガード", rarity:"R"},
+{title:"引き算ガード", rarity:"R"},
+{title:"かけ算ガード", rarity:"R"},
+{title:"割り算ガード", rarity:"R"},
+{title:"小さな解法家", rarity:"R"},
+{title:"計算トレーニー", rarity:"R"},
+{title:"学習トラベラー", rarity:"R"},
+{title:"紙ペン使い", rarity:"R"},
+{title:"解答ルーキー", rarity:"R"},
+{title:"式読みビギナー", rarity:"R"},
+{title:"正解ハンター", rarity:"R"},
+{title:"デイリー数学民", rarity:"R"},
+{title:"数学ゲート", rarity:"R"},
+{title:"成長途中", rarity:"R"},
+{title:"問題ウォーカー", rarity:"R"},
+{title:"数字の使い手", rarity:"R"},
+{title:"公式ルーキー", rarity:"R"},
+{title:"計算修行者", rarity:"R"},
+{title:"努力の一手", rarity:"R"},
+{title:"本日の数学", rarity:"R"},
+{title:"式の観測者", rarity:"R"},
+{title:"ミス研究生", rarity:"R"},
+{title:"ゆっくり前進", rarity:"R"},
+{title:"ペース職人", rarity:"R"},
+{title:"コツコツランナー", rarity:"R"},
+{title:"答え合わせ係", rarity:"R"},
+{title:"基礎の番人", rarity:"R"},
+{title:"小数チャレンジャー", rarity:"R"},
+{title:"分数ルーキー", rarity:"R"},
+{title:"符号チェッカー", rarity:"R"},
+{title:"暗算ルーキー", rarity:"R"},
+{title:"式変形ビギナー", rarity:"R"},
+{title:"解法ノート", rarity:"R"},
+{title:"練習の芽", rarity:"R"},
+{title:"問題集パートナー", rarity:"R"},
+{title:"一点集中", rarity:"R"},
+{title:"計算の芽吹き", rarity:"R"},
+{title:"数学さんぽ", rarity:"R"},
+{title:"黒板サポーター", rarity:"R"},
+{title:"積み上げ屋", rarity:"R"},
+{title:"ノート冒険者", rarity:"R"},
+{title:"数の整備士", rarity:"R"},
+{title:"計算パトロール", rarity:"R"},
+{title:"式の案内人", rarity:"R"},
+{title:"数字メッセンジャー", rarity:"R"},
+{title:"数学メモリアル", rarity:"R"},
+{title:"復習ガイド", rarity:"R"},
+{title:"基礎ランナー", rarity:"R"},
+{title:"公式のかけら", rarity:"R"},
+{title:"解法サーチャー", rarity:"R"},
+{title:"一日一問", rarity:"R"},
+{title:"符号の番人", rarity:"R"},
+{title:"約分見習い", rarity:"R"},
+{title:"通分見習い", rarity:"R"},
+{title:"平方の入口", rarity:"R"},
+{title:"平方根の入口", rarity:"R"},
+{title:"指数の入口", rarity:"R"},
+{title:"グラフの入口", rarity:"R"},
+{title:"関数の入口", rarity:"R"},
+{title:"積分の入口", rarity:"R"},
+{title:"微分の入口", rarity:"R"},
+{title:"展開の入口", rarity:"R"},
+{title:"因数分解の入口", rarity:"R"},
+{title:"素数の入口", rarity:"R"},
+{title:"計算フレンド", rarity:"R"},
+{title:"数式メモ係", rarity:"R"},
+{title:"学校帰り数学", rarity:"R"},
+{title:"朝の一問", rarity:"R"},
+{title:"夜の一問", rarity:"R"},
+{title:"休日数学", rarity:"R"},
+{title:"平日数学", rarity:"R"},
+{title:"練習ノート", rarity:"R"},
+{title:"解き直し隊", rarity:"R"},
+{title:"基礎確認係", rarity:"R"},
+{title:"公式確認係", rarity:"R"},
+{title:"途中式係", rarity:"R"},
+{title:"計算チェック係", rarity:"R"},
+{title:"答えの門番", rarity:"R"},
+{title:"数学見回り", rarity:"R"},
+{title:"数の配達員", rarity:"R"},
+{title:"式の整理係", rarity:"R"},
+{title:"数学メモ係", rarity:"R"},
+{title:"黒板クリーナー", rarity:"R"},
+{title:"ノート整理士", rarity:"R"},
+{title:"鉛筆ブースター", rarity:"R"},
+{title:"消しゴムマスター見習い", rarity:"R"},
+{title:"計算ライト", rarity:"R"},
+{title:"式変形ライト", rarity:"R"},
+{title:"復習ライト", rarity:"R"},
+{title:"努力ライト", rarity:"R"},
+{title:"正解ライト", rarity:"R"},
+{title:"学習ライト", rarity:"R"},
+{title:"問題ライト", rarity:"R"},
+{title:"数字ライト", rarity:"R"},
+{title:"公式ライト", rarity:"R"},
+{title:"基礎ライト", rarity:"R"},
+{title:"積分ライト", rarity:"R"},
+{title:"微分ライト", rarity:"R"},
+{title:"展開ライト", rarity:"R"},
+{title:"因数ライト", rarity:"R"},
+{title:"素数ライト", rarity:"R"},
+{title:"数学ライト", rarity:"R"},
+{title:"高速計算剣士", rarity:"SR"},
+{title:"数式レンジャー", rarity:"SR"},
+{title:"復習の達人", rarity:"SR"},
+{title:"公式マイスター", rarity:"SR"},
+{title:"集中ブースター", rarity:"SR"},
+{title:"努力の結晶体", rarity:"SR"},
+{title:"解法アナリスト", rarity:"SR"},
+{title:"朝活の数学者", rarity:"SR"},
+{title:"夜型の数学者", rarity:"SR"},
+{title:"ミス克服マスター", rarity:"SR"},
+{title:"計算ソードマン", rarity:"SR"},
+{title:"積分トラベラー", rarity:"SR"},
+{title:"微分トラベラー", rarity:"SR"},
+{title:"因数分解クラフター", rarity:"SR"},
+{title:"展開クラフター", rarity:"SR"},
+{title:"素数スナイパー", rarity:"SR"},
+{title:"連勝ランナー", rarity:"SR"},
+{title:"継続の証明者", rarity:"SR"},
+{title:"青の閃光", rarity:"SR"},
+{title:"赤の集中力", rarity:"SR"},
+{title:"知識コレクター", rarity:"SR"},
+{title:"問題ブレイカー", rarity:"SR"},
+{title:"式変形マスター", rarity:"SR"},
+{title:"数学ミドル", rarity:"SR"},
+{title:"実力上昇者", rarity:"SR"},
+{title:"関数の使い手", rarity:"SR"},
+{title:"グラフの観測者", rarity:"SR"},
+{title:"平方完成職人", rarity:"SR"},
+{title:"三角関数使い", rarity:"SR"},
+{title:"指数対数使い", rarity:"SR"},
+{title:"微積チャレンジャー", rarity:"SR"},
+{title:"解答スプリンター", rarity:"SR"},
+{title:"計算アタッカー", rarity:"SR"},
+{title:"公式コンダクター", rarity:"SR"},
+{title:"数列ウォーカー", rarity:"SR"},
+{title:"ベクトル見習い卒業", rarity:"SR"},
+{title:"証明ファイター", rarity:"SR"},
+{title:"解法ストラテジスト", rarity:"SR"},
+{title:"復習リーダー", rarity:"SR"},
+{title:"集中リーダー", rarity:"SR"},
+{title:"数学ブレイザー", rarity:"SR"},
+{title:"問題突破隊長", rarity:"SR"},
+{title:"途中式マスター", rarity:"SR"},
+{title:"暗算ファイター", rarity:"SR"},
+{title:"約分マスター", rarity:"SR"},
+{title:"通分マスター", rarity:"SR"},
+{title:"ルートハンドラー", rarity:"SR"},
+{title:"指数ハンドラー", rarity:"SR"},
+{title:"分数ハンドラー", rarity:"SR"},
+{title:"計算ブースト", rarity:"SR"},
+{title:"学習キーパー", rarity:"SR"},
+{title:"公式ハンター改", rarity:"SR"},
+{title:"数式ガーディアン", rarity:"SR"},
+{title:"数学の挑戦者", rarity:"SR"},
+{title:"成長の証", rarity:"SR"},
+{title:"毎日数学隊長", rarity:"SR"},
+{title:"ノートの達人", rarity:"SR"},
+{title:"答案職人", rarity:"SR"},
+{title:"式の突破者", rarity:"SR"},
+{title:"基礎完成者", rarity:"SR"},
+{title:"👑数式覇者👑", rarity:"SSR"},
+{title:"🏆解答レジェンド🏆", rarity:"SSR"},
+{title:"⚔️計算戦神⚔️", rarity:"SSR"},
+{title:"🧠知恵の超越者🧠", rarity:"SSR"},
+{title:"🔥限界突破者🔥", rarity:"SSR"},
+{title:"💎王立数学士💎", rarity:"SSR"},
+{title:"🌙深夜の支配者🌙", rarity:"SSR"},
+{title:"☀️白昼の王者☀️", rarity:"SSR"},
+{title:"🎯必中の解答者🎯", rarity:"SSR"},
+{title:"📖知識の支配者📖", rarity:"SSR"},
+{title:"🚀高速解法王🚀", rarity:"SSR"},
+{title:"🛡️基礎完全防衛🛡️", rarity:"SSR"},
+{title:"🔮数式予言者🔮", rarity:"SSR"},
+{title:"⚡閃光の計算士⚡", rarity:"SSR"},
+{title:"🌟努力の英雄🌟", rarity:"SSR"},
+{title:"🌠星海の数学神🌠", rarity:"UR"},
+{title:"🪽天空の証明者🪽", rarity:"UR"},
+{title:"🐉数式龍王🐉", rarity:"UR"},
+{title:"💫無限の開拓者💫", rarity:"UR"},
+{title:"👑超越数学皇👑", rarity:"UR"}
+];
+}
+
+gachaPool = function(){
+  return [...oldGachaPool337(), ...gachaExtraPool337()];
+};
+
+function gachaRarityOrder337(r){
+  return {UR:0,SSR:1,SR:2,R:3}[r] ?? 9;
+}
+function getGachaPoolSorted337(){
+  return gachaPool().slice().sort((a,b)=>{
+    const ro=gachaRarityOrder337(a.rarity)-gachaRarityOrder337(b.rarity);
+    if(ro!==0)return ro;
+    return String(a.title).localeCompare(String(b.title),"ja");
+  });
+}
+function rarityClass337(r){
+  return r==="UR" ? "urTitle" : "";
+}
+function getGachaResultNoDuplicate(){
+  let owned=playerData.gachaTitles||[];
+  let remaining=gachaPool().filter(x=>!owned.includes(x.title));
+  if(remaining.length===0)return null;
+  let r=Math.random()*100;
+  let rarity="R";
+  if(r<0.5)rarity="UR";
+  else if(r<3.5)rarity="SSR";
+  else if(r<25.0)rarity="SR";
+  else rarity="R";
+  let pool=remaining.filter(x=>x.rarity===rarity);
+  if(pool.length>0)return pool[Math.floor(Math.random()*pool.length)];
+  const fallback=["R","SR","SSR","UR"];
+  for(const rr of fallback){
+    pool=remaining.filter(x=>x.rarity===rr);
+    if(pool.length>0)return pool[Math.floor(Math.random()*pool.length)];
+  }
+  return remaining[Math.floor(Math.random()*remaining.length)];
+}
+function getGachaResult(){
+  let r=Math.random()*100;
+  let rarity="R";
+  if(r<0.5)rarity="UR";
+  else if(r<3.5)rarity="SSR";
+  else if(r<25.0)rarity="SR";
+  let pool=gachaPool().filter(x=>x.rarity===rarity);
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+function showGacha(){
+  document.getElementById("panelArea").innerHTML=`
+<h2>🎰 ガチャ</h2>
+<div class="profileItem">
+<p>所持コイン：${playerData.coins||0}</p>
+<p>1回：10コイン</p>
+<button onclick="drawGacha()">10コインで引く</button><button onclick="drawGacha10()">100コインで10連</button>
+<button onclick="showGachaBook()">ガチャ図鑑を見る</button>
+</div>
+<div class="profileItem">
+<h3>排出率</h3>
+<p>R 75% / SR 21.5% / SSR 3% / UR 0.5%</p>
+<p>称号300個。URのみ色付き。</p>
+<p>コマンド称号・配布称号はガチャから出ません。</p>
+</div>
+`;
+}
+function showGachaBook(filter="ALL"){
+  let pool=getGachaPoolSorted337();
+  let owned=playerData.gachaTitles||[];
+  const count=(rarity)=>pool.filter(x=>x.rarity===rarity).length;
+  const have=(rarity)=>pool.filter(x=>x.rarity===rarity && owned.includes(x.title)).length;
+  let visible = filter==="ALL" ? pool : pool.filter(x=>x.rarity===filter);
+  let html=`
+<h2>📖 ガチャ図鑑</h2>
+<div class="profileItem">
+<p>所持数：${owned.filter(t=>pool.some(x=>x.title===t)).length} / ${pool.length}</p>
+<p>R：${have("R")} / ${count("R")}</p>
+<p>SR：${have("SR")} / ${count("SR")}</p>
+<p>SSR：${have("SSR")} / ${count("SSR")}</p>
+<p>UR：${have("UR")} / ${count("UR")}</p>
+</div>
+<div class="profileItem">
+<button onclick="showGachaBook('ALL')">全部 ${pool.length}個</button>
+<button onclick="showGachaBook('UR')">UR ${count("UR")}個</button>
+<button onclick="showGachaBook('SSR')">SSR ${count("SSR")}個</button>
+<button onclick="showGachaBook('SR')">SR ${count("SR")}個</button>
+<button onclick="showGachaBook('R')">R ${count("R")}個</button>
+</div>
+`;
+  for(let item of visible){
+    let got=owned.includes(item.title);
+    html+=`
+<div class="titleItem">
+${got ? "✅ " + titleHTML(item.title) : "⬜ ？？？"}
+<br>
+レアリティ：${item.rarity}
+</div>
+`;
+  }
+  document.getElementById("panelArea").innerHTML=html;
+}
+window.showGacha = showGacha;
+window.showGachaBook = showGachaBook;
+window.getGachaResult = getGachaResult;
+window.getGachaResultNoDuplicate = getGachaResultNoDuplicate;
 })();

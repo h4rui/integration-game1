@@ -1,7 +1,8 @@
 /* ranking.js
-   数学マスター v3.3.6 ranking module
-   このファイルにランキング関連処理を分離。
-   今後、称号・問題・UIを更新しても、このファイルを更新しなければランキング処理は維持される。
+   数学マスター v3.3.6 ranking frozen module
+   ランキング表示系はこのファイルに分離。
+   今後の称号・問題・UI更新では、このファイルを触らなければランキング表示処理は維持される。
+   注意：Firestore保存/取得系（saveWorldScore, loadWorldRanking, saveRateData, loadRateRanking, loadFriendData, savePlayerPublicData）は既存のFirebaseコード側を利用する。
 */
 (function(){
 "use strict";
@@ -128,21 +129,12 @@ ensurePanelBackButton();
 }
 
 
-// onclick / 他ファイルから呼べるように明示的に公開
 try{
-  if(typeof showRankingMenu !== "undefined") window.showRankingMenu = showRankingMenu;
-  if(typeof showWorldRanking !== "undefined") window.showWorldRanking = showWorldRanking;
-  if(typeof showFriendRanking !== "undefined") window.showFriendRanking = showFriendRanking;
-  if(typeof showRateRanking !== "undefined") window.showRateRanking = showRateRanking;
-  if(typeof savePublicProfile !== "undefined") window.savePublicProfile = savePublicProfile;
-  if(typeof loadWorldRanking !== "undefined") window.loadWorldRanking = loadWorldRanking;
-  if(typeof loadFriendData !== "undefined") window.loadFriendData = loadFriendData;
-  if(typeof savePlayerPublicData !== "undefined") window.savePlayerPublicData = savePlayerPublicData;
-  if(typeof showRateMatch !== "undefined") window.showRateMatch = showRateMatch;
-  if(typeof startRateMatch !== "undefined") window.startRateMatch = startRateMatch;
-  if(typeof showRateResult !== "undefined") window.showRateResult = showRateResult;
-  if(typeof saveRateData !== "undefined") window.saveRateData = saveRateData;
-  if(typeof loadRateRanking !== "undefined") window.loadRateRanking = loadRateRanking;
+  window.showRankingMenu = showRankingMenu;
+  window.showWorldRanking = showWorldRanking;
+  window.showFriendRanking = showFriendRanking;
+  window.showRateRanking = showRateRanking;
+  window.savePublicProfile = savePublicProfile;
 }catch(e){
   console.error("ranking.js export error", e);
 }
