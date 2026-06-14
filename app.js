@@ -8005,3 +8005,202 @@ showNewsPage = function(){
 window.showTitles = showTitles;
 window.showNewsPage = showNewsPage;
 })();
+
+
+
+/* force add missing titles + UR color fix only - ranking untouched */
+(function(){
+if(window.__forceAddTitlesUrColor336)return;
+window.__forceAddTitlesUrColor336=true;
+
+function forceExtraTitles336(){
+return [
+{title:"計算の灯火", rarity:"R"},
+{title:"式の守備隊", rarity:"R"},
+{title:"数字の風来坊", rarity:"R"},
+{title:"ノートランナー", rarity:"R"},
+{title:"黒板の案内人", rarity:"R"},
+{title:"朝練の証", rarity:"R"},
+{title:"夜学の民", rarity:"R"},
+{title:"鉛筆ブレイブ", rarity:"R"},
+{title:"消しゴムナイト", rarity:"R"},
+{title:"問題コレクター", rarity:"R"},
+{title:"集中チャージ", rarity:"R"},
+{title:"公式スカウト", rarity:"R"},
+{title:"理系ルーキー改", rarity:"R"},
+{title:"努力の一歩", rarity:"R"},
+{title:"復習レンジャー", rarity:"R"},
+{title:"一問入魂", rarity:"R"},
+{title:"答えの追跡者", rarity:"R"},
+{title:"基礎クラフター", rarity:"R"},
+{title:"足し算ガーディアン", rarity:"R"},
+{title:"引き算ガーディアン", rarity:"R"},
+{title:"かけ算ガーディアン", rarity:"R"},
+{title:"割り算ガーディアン", rarity:"R"},
+{title:"小さな証明者", rarity:"R"},
+{title:"計算チャレンジャー", rarity:"R"},
+{title:"学習パイロット", rarity:"R"},
+{title:"紙ペンマスター見習い", rarity:"R"},
+{title:"解答スカウト", rarity:"R"},
+{title:"式読みチャレンジ", rarity:"R"},
+{title:"正解ウォーカー", rarity:"R"},
+{title:"デイリー解答者", rarity:"R"},
+{title:"数学ドアマン", rarity:"R"},
+{title:"成長ログ", rarity:"R"},
+{title:"問題パトロール", rarity:"R"},
+{title:"数字ハンドラー", rarity:"R"},
+{title:"公式チェックマン", rarity:"R"},
+{title:"計算特訓生", rarity:"R"},
+{title:"努力の積み木", rarity:"R"},
+{title:"今日の一問勢", rarity:"R"},
+{title:"式の見習い観測者", rarity:"R"},
+{title:"ミス分析係", rarity:"R"},
+{title:"確実前進", rarity:"R"},
+{title:"ペースキーパー", rarity:"R"},
+{title:"コツコツファイター", rarity:"R"},
+{title:"答え合わせ隊", rarity:"R"},
+{title:"基礎防衛隊", rarity:"R"},
+{title:"小数ウォーカー", rarity:"R"},
+{title:"分数ウォーカー", rarity:"R"},
+{title:"符号パトロール", rarity:"R"},
+{title:"暗算トライ", rarity:"R"},
+{title:"式変形トライ", rarity:"R"},
+{title:"解法メモリー", rarity:"R"},
+{title:"練習の種火", rarity:"R"},
+{title:"問題集ナビ", rarity:"R"},
+{title:"一点突破見習い", rarity:"R"},
+{title:"計算の若葉", rarity:"R"},
+{title:"数学散策者", rarity:"R"},
+{title:"黒板アシスト", rarity:"R"},
+{title:"積み上げ職人", rarity:"R"},
+{title:"ノート探検家", rarity:"R"},
+{title:"数の修理屋", rarity:"R"},
+{title:"高速計算士改", rarity:"SR"},
+{title:"数式ブレイカー", rarity:"SR"},
+{title:"復習の指揮官", rarity:"SR"},
+{title:"公式マスター改", rarity:"SR"},
+{title:"集中オーバードライブ", rarity:"SR"},
+{title:"努力の結晶改", rarity:"SR"},
+{title:"解法サイエンティスト", rarity:"SR"},
+{title:"朝活計算王", rarity:"SR"},
+{title:"夜型解法王", rarity:"SR"},
+{title:"ミス克服隊長", rarity:"SR"},
+{title:"計算ブレード", rarity:"SR"},
+{title:"積分チャレンジャー", rarity:"SR"},
+{title:"微分チャレンジャー", rarity:"SR"},
+{title:"因数分解マイスター", rarity:"SR"},
+{title:"展開マイスター", rarity:"SR"},
+{title:"素数レンジャー", rarity:"SR"},
+{title:"連勝ブースター", rarity:"SR"},
+{title:"継続の賢者", rarity:"SR"},
+{title:"青の計算光", rarity:"SR"},
+{title:"赤の解法炎", rarity:"SR"},
+{title:"知識アーカイバー", rarity:"SR"},
+{title:"問題クラッシャー", rarity:"SR"},
+{title:"式変形エース", rarity:"SR"},
+{title:"数学アドバンサー", rarity:"SR"},
+{title:"実力覚醒中", rarity:"SR"},
+{title:"👑数式帝王👑", rarity:"SSR"},
+{title:"🏆完全解答者🏆", rarity:"SSR"},
+{title:"⚔️数学武神⚔️", rarity:"SSR"},
+{title:"🧠思考の覇者🧠", rarity:"SSR"},
+{title:"🔥極限覚醒🔥", rarity:"SSR"},
+{title:"💎数理貴族💎", rarity:"SSR"},
+{title:"🌙月光の数学者🌙", rarity:"SSR"},
+{title:"☀️太陽の解答者☀️", rarity:"SSR"},
+{title:"🎯無敗の照準🎯", rarity:"SSR"},
+{title:"📖真理の探究者📖", rarity:"SSR"},
+{title:"🌌銀河数式神🌌", rarity:"UR"},
+{title:"⚡雷鳴の証明者⚡", rarity:"UR"},
+{title:"🧊絶対数理領域🧊", rarity:"UR"},
+{title:"🔥終焉の公式王🔥", rarity:"UR"},
+{title:"👑無限数学帝👑", rarity:"UR"}
+];
+}
+
+const beforeForceGachaPool336 = gachaPool;
+gachaPool = function(){
+  const map = new Map();
+  for(const item of beforeForceGachaPool336()) {
+    if(item && item.title) map.set(item.title, item);
+  }
+  for(const item of forceExtraTitles336()) {
+    if(item && item.title) map.set(item.title, item);
+  }
+  return Array.from(map.values());
+};
+
+function rarityMapForce336(){
+  const m = {};
+  for(const item of gachaPool()) m[item.title] = item.rarity;
+  return m;
+}
+
+const oldTitleHTMLForce336 = titleHTML;
+titleHTML = function(t){
+  const rarity = rarityMapForce336()[t];
+  if(rarity === "UR"){
+    return `<span class="urTitle" style="color:#ffd700;text-shadow:0 0 10px #ffd700,0 0 22px #ff8c00,0 0 36px #fff;">${t}</span>`;
+  }
+  return oldTitleHTMLForce336(t);
+};
+
+function rarityOrderForce336(r){
+  return {UR:0,SSR:1,SR:2,R:3}[r] ?? 9;
+}
+
+function sortedGachaPoolForce336(){
+  return gachaPool().slice().sort((a,b)=>{
+    const d=rarityOrderForce336(a.rarity)-rarityOrderForce336(b.rarity);
+    if(d!==0)return d;
+    return String(a.title).localeCompare(String(b.title),"ja");
+  });
+}
+
+showGachaBook = function(filter="ALL"){
+  let pool=sortedGachaPoolForce336();
+  let owned=playerData.gachaTitles||[];
+  let count=(rarity)=>pool.filter(x=>x.rarity===rarity).length;
+  let have=(rarity)=>pool.filter(x=>x.rarity===rarity && owned.includes(x.title)).length;
+  let ownedInPool=owned.filter(t=>pool.some(x=>x.title===t)).length;
+  let visible=filter==="ALL"?pool:pool.filter(x=>x.rarity===filter);
+  let html=`
+<h2>📖 ガチャ図鑑</h2>
+<div class="profileItem">
+<p>所持数：${ownedInPool} / ${pool.length}</p>
+<p>R：${have("R")} / ${count("R")}</p>
+<p>SR：${have("SR")} / ${count("SR")}</p>
+<p>SSR：${have("SSR")} / ${count("SSR")}</p>
+<p>UR：${have("UR")} / ${count("UR")}</p>
+</div>
+<div class="profileItem">
+<button onclick="showGachaBook('ALL')">全部 ${pool.length}個</button>
+<button onclick="showGachaBook('UR')">UR ${count("UR")}個</button>
+<button onclick="showGachaBook('SSR')">SSR ${count("SSR")}個</button>
+<button onclick="showGachaBook('SR')">SR ${count("SR")}個</button>
+<button onclick="showGachaBook('R')">R ${count("R")}個</button>
+</div>
+`;
+  for(let item of visible){
+    let got=owned.includes(item.title);
+    html+=`
+<div class="titleItem">
+${got ? "✅ " + titleHTML(item.title) : "⬜ ？？？"}
+<br>
+レアリティ：${item.rarity}
+</div>
+`;
+  }
+  document.getElementById("panelArea").innerHTML=html;
+};
+
+const oldGetAllDisplayTitlesForce336 = getAllDisplayTitles;
+getAllDisplayTitles = function(){
+  return [...new Set([...oldGetAllDisplayTitlesForce336(), ...gachaPool().map(x=>x.title)])];
+};
+
+window.gachaPool = gachaPool;
+window.titleHTML = titleHTML;
+window.showGachaBook = showGachaBook;
+window.getAllDisplayTitles = getAllDisplayTitles;
+})();
