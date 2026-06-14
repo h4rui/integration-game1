@@ -7792,3 +7792,216 @@ window.showGachaBook = showGachaBook;
 window.getGachaResult = getGachaResult;
 window.getGachaResultNoDuplicate = getGachaResultNoDuplicate;
 })();
+
+
+
+/* title/news/profile title filter add only - ranking untouched */
+(function(){
+if(window.__titleNewsProfileAdd336)return;
+window.__titleNewsProfileAdd336=true;
+
+const oldGachaPool_titleNewsProfile = gachaPool;
+function extraGachaTitles_titleNewsProfile(){
+return [
+{title:"計算の灯火", rarity:"R"},
+{title:"式の守備隊", rarity:"R"},
+{title:"数字の風来坊", rarity:"R"},
+{title:"ノートランナー", rarity:"R"},
+{title:"黒板の案内人", rarity:"R"},
+{title:"朝練の証", rarity:"R"},
+{title:"夜学の民", rarity:"R"},
+{title:"鉛筆ブレイブ", rarity:"R"},
+{title:"消しゴムナイト", rarity:"R"},
+{title:"問題コレクター", rarity:"R"},
+{title:"集中チャージ", rarity:"R"},
+{title:"公式スカウト", rarity:"R"},
+{title:"理系ルーキー改", rarity:"R"},
+{title:"努力の一歩", rarity:"R"},
+{title:"復習レンジャー", rarity:"R"},
+{title:"一問入魂", rarity:"R"},
+{title:"答えの追跡者", rarity:"R"},
+{title:"基礎クラフター", rarity:"R"},
+{title:"足し算ガーディアン", rarity:"R"},
+{title:"引き算ガーディアン", rarity:"R"},
+{title:"かけ算ガーディアン", rarity:"R"},
+{title:"割り算ガーディアン", rarity:"R"},
+{title:"小さな証明者", rarity:"R"},
+{title:"計算チャレンジャー", rarity:"R"},
+{title:"学習パイロット", rarity:"R"},
+{title:"紙ペンマスター見習い", rarity:"R"},
+{title:"解答スカウト", rarity:"R"},
+{title:"式読みチャレンジ", rarity:"R"},
+{title:"正解ウォーカー", rarity:"R"},
+{title:"デイリー解答者", rarity:"R"},
+{title:"数学ドアマン", rarity:"R"},
+{title:"成長ログ", rarity:"R"},
+{title:"問題パトロール", rarity:"R"},
+{title:"数字ハンドラー", rarity:"R"},
+{title:"公式チェックマン", rarity:"R"},
+{title:"計算特訓生", rarity:"R"},
+{title:"努力の積み木", rarity:"R"},
+{title:"今日の一問勢", rarity:"R"},
+{title:"式の見習い観測者", rarity:"R"},
+{title:"ミス分析係", rarity:"R"},
+{title:"確実前進", rarity:"R"},
+{title:"ペースキーパー", rarity:"R"},
+{title:"コツコツファイター", rarity:"R"},
+{title:"答え合わせ隊", rarity:"R"},
+{title:"基礎防衛隊", rarity:"R"},
+{title:"小数ウォーカー", rarity:"R"},
+{title:"分数ウォーカー", rarity:"R"},
+{title:"符号パトロール", rarity:"R"},
+{title:"暗算トライ", rarity:"R"},
+{title:"式変形トライ", rarity:"R"},
+{title:"解法メモリー", rarity:"R"},
+{title:"練習の種火", rarity:"R"},
+{title:"問題集ナビ", rarity:"R"},
+{title:"一点突破見習い", rarity:"R"},
+{title:"計算の若葉", rarity:"R"},
+{title:"数学散策者", rarity:"R"},
+{title:"黒板アシスト", rarity:"R"},
+{title:"積み上げ職人", rarity:"R"},
+{title:"ノート探検家", rarity:"R"},
+{title:"数の修理屋", rarity:"R"},
+{title:"高速計算士改", rarity:"SR"},
+{title:"数式ブレイカー", rarity:"SR"},
+{title:"復習の指揮官", rarity:"SR"},
+{title:"公式マスター改", rarity:"SR"},
+{title:"集中オーバードライブ", rarity:"SR"},
+{title:"努力の結晶改", rarity:"SR"},
+{title:"解法サイエンティスト", rarity:"SR"},
+{title:"朝活計算王", rarity:"SR"},
+{title:"夜型解法王", rarity:"SR"},
+{title:"ミス克服隊長", rarity:"SR"},
+{title:"計算ブレード", rarity:"SR"},
+{title:"積分チャレンジャー", rarity:"SR"},
+{title:"微分チャレンジャー", rarity:"SR"},
+{title:"因数分解マイスター", rarity:"SR"},
+{title:"展開マイスター", rarity:"SR"},
+{title:"素数レンジャー", rarity:"SR"},
+{title:"連勝ブースター", rarity:"SR"},
+{title:"継続の賢者", rarity:"SR"},
+{title:"青の計算光", rarity:"SR"},
+{title:"赤の解法炎", rarity:"SR"},
+{title:"知識アーカイバー", rarity:"SR"},
+{title:"問題クラッシャー", rarity:"SR"},
+{title:"式変形エース", rarity:"SR"},
+{title:"数学アドバンサー", rarity:"SR"},
+{title:"実力覚醒中", rarity:"SR"},
+{title:"👑数式帝王👑", rarity:"SSR"},
+{title:"🏆完全解答者🏆", rarity:"SSR"},
+{title:"⚔️数学武神⚔️", rarity:"SSR"},
+{title:"🧠思考の覇者🧠", rarity:"SSR"},
+{title:"🔥極限覚醒🔥", rarity:"SSR"},
+{title:"💎数理貴族💎", rarity:"SSR"},
+{title:"🌙月光の数学者🌙", rarity:"SSR"},
+{title:"☀️太陽の解答者☀️", rarity:"SSR"},
+{title:"🎯無敗の照準🎯", rarity:"SSR"},
+{title:"📖真理の探究者📖", rarity:"SSR"},
+{title:"🌌銀河数式神🌌", rarity:"UR"},
+{title:"⚡雷鳴の証明者⚡", rarity:"UR"},
+{title:"🧊絶対数理領域🧊", rarity:"UR"},
+{title:"🔥終焉の公式王🔥", rarity:"UR"},
+{title:"👑無限数学帝👑", rarity:"UR"}
+];
+}
+
+gachaPool = function(){
+  const map = new Map();
+  for(const item of [...oldGachaPool_titleNewsProfile(), ...extraGachaTitles_titleNewsProfile()]){
+    if(item && item.title && !map.has(item.title)) map.set(item.title, item);
+  }
+  return Array.from(map.values());
+};
+
+function rarityOrder_titleNewsProfile(r){
+  return {SPECIAL:0,UR:1,SSR:2,SR:3,R:4,NORMAL:5}[r] ?? 9;
+}
+function getGachaRarityMap_titleNewsProfile(){
+  const map = {};
+  for(const item of gachaPool()) map[item.title] = item.rarity;
+  return map;
+}
+function getTitleRarity_titleNewsProfile(t){
+  const special = ["⚡️創設者⚡️","🧊なかなか🧊","古参勢","👾MENERU👾"];
+  if(special.includes(t)) return "SPECIAL";
+  const gm = getGachaRarityMap_titleNewsProfile();
+  return gm[t] || "NORMAL";
+}
+function sortedDisplayTitles_titleNewsProfile(){
+  return getAllDisplayTitles().slice().sort((a,b)=>{
+    const ra=getTitleRarity_titleNewsProfile(a);
+    const rb=getTitleRarity_titleNewsProfile(b);
+    const d=rarityOrder_titleNewsProfile(ra)-rarityOrder_titleNewsProfile(rb);
+    if(d!==0)return d;
+    return String(a).localeCompare(String(b),"ja");
+  });
+}
+function titleCountByRarity_titleNewsProfile(rarity){
+  return sortedDisplayTitles_titleNewsProfile().filter(t=>getTitleRarity_titleNewsProfile(t)===rarity).length;
+}
+function titleHaveByRarity_titleNewsProfile(rarity){
+  return sortedDisplayTitles_titleNewsProfile().filter(t=>getTitleRarity_titleNewsProfile(t)===rarity && playerData.unlockedTitles.includes(t)).length;
+}
+
+showTitles = function(filter="ALL"){
+  checkTitles();
+  const all = sortedDisplayTitles_titleNewsProfile();
+  const visible = filter==="ALL" ? all : all.filter(t=>getTitleRarity_titleNewsProfile(t)===filter);
+  let html = `
+<h2>🏅 称号一覧</h2>
+<div class="profileItem">
+<p>所持：${playerData.unlockedTitles.length}個</p>
+<p>UR：${titleHaveByRarity_titleNewsProfile("UR")} / ${titleCountByRarity_titleNewsProfile("UR")}</p>
+<p>SSR：${titleHaveByRarity_titleNewsProfile("SSR")} / ${titleCountByRarity_titleNewsProfile("SSR")}</p>
+<p>SR：${titleHaveByRarity_titleNewsProfile("SR")} / ${titleCountByRarity_titleNewsProfile("SR")}</p>
+<p>R：${titleHaveByRarity_titleNewsProfile("R")} / ${titleCountByRarity_titleNewsProfile("R")}</p>
+</div>
+<div class="profileItem">
+<button onclick="showTitles('ALL')">全部 ${all.length}個</button>
+<button onclick="showTitles('UR')">UR ${titleCountByRarity_titleNewsProfile("UR")}個</button>
+<button onclick="showTitles('SSR')">SSR ${titleCountByRarity_titleNewsProfile("SSR")}個</button>
+<button onclick="showTitles('SR')">SR ${titleCountByRarity_titleNewsProfile("SR")}個</button>
+<button onclick="showTitles('R')">R ${titleCountByRarity_titleNewsProfile("R")}個</button>
+</div>
+`;
+  if(visible.length===0) html += "<p>称号がありません。</p>";
+  for(let t of visible){
+    const unlocked = playerData.unlockedTitles.includes(t);
+    const rarity = getTitleRarity_titleNewsProfile(t);
+    html += `<div class="titleItem">
+${unlocked ? titleHTML(t) : "❓？？？"}
+<br>レアリティ：${rarity==="NORMAL" ? "通常" : rarity==="SPECIAL" ? "特別" : rarity}
+${unlocked ? `<br><button onclick="equipTitle('${String(t).replace(/'/g,"\\'")}')">装備</button>` : ""}
+</div>`;
+  }
+  document.getElementById("panelArea").innerHTML = html;
+};
+
+const oldShowNewsPage_titleNewsProfile = typeof showNewsPage === "function" ? showNewsPage : null;
+showNewsPage = function(){
+  let html = `
+<h2>📢 お知らせ</h2>
+<div class="newsCard">
+<h3>Ver 3.3.6 称号アップデート</h3>
+<p>ガチャ称号をさらに100個追加しました。</p>
+<p>プロフィールの称号一覧にレアリティ別ボタンを追加しました。</p>
+<p>ガチャ排出率は R75% / SR21.5% / SSR3% / UR0.5% です。</p>
+<p>ランキング・ログイン・Firebase処理は変更していません。</p>
+</div>
+`;
+  if(oldShowNewsPage_titleNewsProfile){
+    try{
+      oldShowNewsPage_titleNewsProfile();
+      const panel=document.getElementById("panelArea");
+      if(panel) panel.innerHTML = html + panel.innerHTML;
+      return;
+    }catch(e){ console.log(e); }
+  }
+  document.getElementById("panelArea").innerHTML = html;
+  if(typeof ensureHomeButton==="function") ensureHomeButton();
+};
+
+window.showTitles = showTitles;
+window.showNewsPage = showNewsPage;
+})();
