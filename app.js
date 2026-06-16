@@ -8399,3 +8399,455 @@ window.titleHTML=titleHTML;
 window.drawGacha=drawGacha;
 window.drawGacha10=drawGacha10;
 })();
+
+
+
+/* Ver3.3.7 formula summon gate gacha only - ranking untouched */
+(function(){
+if(window.__formulaGateGacha337)return;
+window.__formulaGateGacha337=true;
+
+function ensureFormulaGateStyle337(){
+  if(document.getElementById("formulaGateStyle337"))return;
+  const style=document.createElement("style");
+  style.id="formulaGateStyle337";
+  style.textContent=`
+.formulaGate337{
+  position:relative;
+  min-height:520px;
+  overflow:hidden;
+  text-align:center;
+  background:
+    radial-gradient(circle at 50% 35%,rgba(0,255,204,.22),transparent 22%),
+    radial-gradient(circle at 50% 45%,rgba(124,58,237,.28),transparent 42%),
+    linear-gradient(180deg,rgba(2,6,23,.96),rgba(15,23,42,.9));
+}
+.formulaSymbol337{
+  position:absolute;
+  font-size:30px;
+  font-weight:900;
+  color:rgba(125,211,252,.88);
+  text-shadow:0 0 10px #22d3ee,0 0 22px #7c3aed;
+  animation:formulaFly337 linear infinite;
+  pointer-events:none;
+}
+@keyframes formulaFly337{
+  from{transform:translateY(560px) rotate(0deg);opacity:0}
+  12%{opacity:1}
+  88%{opacity:.95}
+  to{transform:translateY(-90px) rotate(360deg);opacity:0}
+}
+.formulaCircle337{
+  width:240px;
+  height:240px;
+  margin:46px auto 14px;
+  border-radius:50%;
+  position:relative;
+  border:3px solid rgba(103,232,249,.95);
+  box-shadow:
+    0 0 20px #67e8f9,
+    0 0 52px #7c3aed,
+    inset 0 0 30px rgba(103,232,249,.42);
+  animation:gateRotate337 4.2s linear infinite, gatePulse337 .9s ease-in-out infinite alternate;
+}
+.formulaCircle337::before{
+  content:"";
+  position:absolute;
+  inset:24px;
+  border-radius:50%;
+  border:2px dashed rgba(255,255,255,.8);
+  animation:gateRotateReverse337 2.7s linear infinite;
+}
+.formulaCircle337::after{
+  content:"∫  Σ  π  √  ∞";
+  white-space:pre;
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:30px;
+  font-weight:900;
+  color:#fff;
+  text-shadow:0 0 12px #fff,0 0 24px #22d3ee;
+}
+@keyframes gateRotate337{to{transform:rotate(360deg)}}
+@keyframes gateRotateReverse337{to{transform:rotate(-360deg)}}
+@keyframes gatePulse337{from{filter:brightness(1);transform:scale(.96)}to{filter:brightness(1.45);transform:scale(1.04)}}
+.formulaTap337{
+  font-size:30px;
+  font-weight:900;
+  color:#fde68a;
+  margin:12px auto;
+  text-shadow:0 0 12px #f59e0b,0 0 24px #fff;
+  animation:tapBlink337 .82s ease-in-out infinite alternate;
+}
+@keyframes tapBlink337{from{opacity:.55;transform:scale(.96)}to{opacity:1;transform:scale(1.06)}}
+.formulaAnalyze337{
+  font-size:24px;
+  color:#e0f2fe;
+  text-shadow:0 0 10px #38bdf8;
+}
+.formulaGateCollapse337 .formulaCircle337{
+  animation:gateCollapse337 .7s ease-in forwards;
+}
+@keyframes gateCollapse337{
+  0%{transform:scale(1) rotate(0deg);opacity:1}
+  70%{transform:scale(.25) rotate(540deg);opacity:1;filter:brightness(2.6)}
+  100%{transform:scale(3.2) rotate(720deg);opacity:0;filter:brightness(5)}
+}
+.rarityJudge337{
+  font-size:56px;
+  font-weight:900;
+  margin:22px auto;
+  text-shadow:0 0 18px currentColor,0 0 42px currentColor;
+  animation:rarityJudgePop337 .5s ease-out both;
+}
+@keyframes rarityJudgePop337{
+  from{opacity:0;transform:scale(.2) rotate(-8deg)}
+  65%{opacity:1;transform:scale(1.2) rotate(4deg)}
+  to{opacity:1;transform:scale(1) rotate(0)}
+}
+.rarityUpgrade337{
+  font-size:34px;
+  font-weight:900;
+  color:#fde68a;
+  text-shadow:0 0 12px #f59e0b,0 0 28px #fff;
+  animation:upgradeShake337 .45s ease-in-out both;
+}
+@keyframes upgradeShake337{
+  0%{transform:translateX(0) scale(.9)}
+  25%{transform:translateX(-8px) scale(1.05)}
+  50%{transform:translateX(8px) scale(1.15)}
+  75%{transform:translateX(-4px) scale(1.05)}
+  100%{transform:translateX(0) scale(1)}
+}
+.urUniverse337{
+  animation:urUniverseBg337 .9s ease-in-out infinite alternate;
+}
+@keyframes urUniverseBg337{
+  from{box-shadow:inset 0 0 35px rgba(255,255,255,.14),0 0 25px #22d3ee}
+  to{box-shadow:inset 0 0 95px rgba(255,255,255,.28),0 0 70px #ff00ff}
+}
+.bigPi337{
+  font-size:110px;
+  font-weight:900;
+  margin:8px auto;
+  color:#fff;
+  text-shadow:0 0 15px #fff,0 0 35px #ffd700,0 0 70px #ff00ff;
+  animation:bigPiBreak337 .95s ease-out both;
+}
+@keyframes bigPiBreak337{
+  0%{opacity:0;transform:scale(.1) rotate(-12deg)}
+  45%{opacity:1;transform:scale(1.25) rotate(4deg)}
+  75%{opacity:1;transform:scale(.9) rotate(-2deg);filter:brightness(2)}
+  100%{opacity:0;transform:scale(2.2) rotate(18deg);filter:brightness(5)}
+}
+.gachaResultTitle337{
+  font-size:42px;
+  font-weight:900;
+  margin:18px auto;
+  animation:resultDrop337 .72s ease-out both;
+}
+@keyframes resultDrop337{
+  from{opacity:0;transform:translateY(-35px) scale(.5)}
+  60%{opacity:1;transform:translateY(8px) scale(1.15)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+.formulaParticle337{
+  position:absolute;
+  font-size:24px;
+  pointer-events:none;
+  animation:particleRise337 1.3s ease-out forwards;
+}
+@keyframes particleRise337{
+  from{opacity:1;transform:translateY(0) scale(.75)}
+  to{opacity:0;transform:translateY(-180px) scale(1.7)}
+}
+`;
+  document.head.appendChild(style);
+}
+
+function rarityColorGate337(r){
+  if(r==="UR")return "#ffd700";
+  if(r==="SSR")return "#ff5cff";
+  if(r==="SR")return "#66e7ff";
+  return "#ffffff";
+}
+
+function addFlyingFormula337(stage){
+  const symbols=["∫","Σ","π","∞","√","lim","dx","dy","log","sin","cos","tan","x²","e^x"];
+  for(let i=0;i<28;i++){
+    const s=document.createElement("div");
+    s.className="formulaSymbol337";
+    s.textContent=symbols[Math.floor(Math.random()*symbols.length)];
+    s.style.left=(Math.random()*94)+"%";
+    s.style.animationDuration=(3+Math.random()*4.5)+"s";
+    s.style.animationDelay=(-Math.random()*5)+"s";
+    s.style.fontSize=(22+Math.random()*25)+"px";
+    stage.appendChild(s);
+  }
+}
+
+function spawnParticlesGate337(stage, rarity){
+  const marks = rarity==="UR" ? ["✨","🌈","💎","👑","⚡","🔥","🌌","π"] :
+                rarity==="SSR" ? ["✨","💎","⭐","🔥","Σ"] :
+                rarity==="SR" ? ["✨","⭐","√","∫"] : ["✨","∫","π"];
+  const n = rarity==="UR"?42:rarity==="SSR"?28:rarity==="SR"?18:10;
+  for(let i=0;i<n;i++){
+    const p=document.createElement("div");
+    p.className="formulaParticle337";
+    p.textContent=marks[Math.floor(Math.random()*marks.length)];
+    p.style.left=(8+Math.random()*84)+"%";
+    p.style.top=(48+Math.random()*36)+"%";
+    p.style.animationDelay=(Math.random()*0.6)+"s";
+    stage.appendChild(p);
+  }
+}
+
+function raritySequence337(rarity){
+  if(rarity==="UR")return [
+    {label:"R", color:rarityColorGate337("R")},
+    {label:"SRへ昇格！", color:rarityColorGate337("SR"), up:true},
+    {label:"SSRへ昇格！！", color:rarityColorGate337("SSR"), up:true},
+    {label:"🌈 UR確定！！！ 🌈", color:rarityColorGate337("UR"), up:true, ur:true}
+  ];
+  if(rarity==="SSR")return [
+    {label:"R", color:rarityColorGate337("R")},
+    {label:"SRへ昇格！", color:rarityColorGate337("SR"), up:true},
+    {label:"SSR！！", color:rarityColorGate337("SSR"), up:true}
+  ];
+  if(rarity==="SR")return [
+    {label:"R", color:rarityColorGate337("R")},
+    {label:"SR！", color:rarityColorGate337("SR"), up:true}
+  ];
+  return [{label:"R", color:rarityColorGate337("R")}];
+}
+
+function finalizeSingleGacha337(item, box, stage){
+  unlockTitle(item.title);
+  if(!playerData.gachaTitles)playerData.gachaTitles=[];
+  if(!playerData.gachaTitles.includes(item.title))playerData.gachaTitles.push(item.title);
+  unlockAchievement("初ガチャ");
+  if(item.rarity==="UR"){
+    unlockAchievement("UR獲得");
+    document.body.classList.add("urFlash");
+    setTimeout(()=>document.body.classList.remove("urFlash"),1000);
+  }
+  saveAllData();
+  updateHomeStatus();
+
+  const showResult=()=>{
+    box.innerHTML=`
+<h2>🎰 ガチャ結果</h2>
+<div class="profileItem formulaGate337 ${item.rarity==="UR"?"urUniverse337":""}">
+<div class="rarityJudge337" style="color:${rarityColorGate337(item.rarity)}">${item.rarity}</div>
+<div class="gachaResultTitle337">${titleHTML(item.title)}</div>
+<p>所持コイン：${playerData.coins||0}</p>
+<button onclick="drawGacha()">もう一回引く</button>
+<button onclick="showGacha()">ガチャ画面へ</button>
+</div>
+`;
+    const resultStage=document.querySelector(".formulaGate337");
+    if(resultStage){
+      addFlyingFormula337(resultStage);
+      spawnParticlesGate337(resultStage,item.rarity);
+    }
+  };
+
+  if(item.rarity==="UR"){
+    box.innerHTML=`
+<h2>🌌 数学宇宙モード</h2>
+<div class="profileItem formulaGate337 urUniverse337">
+<div class="bigPi337">π</div>
+<p class="formulaAnalyze337">数式の核が解放される...</p>
+</div>`;
+    setTimeout(showResult,980);
+  }else{
+    showResult();
+  }
+}
+
+drawGacha = function(){
+  if((playerData.coins||0)<10){
+    alert("コインが足りません");
+    return;
+  }
+  playerData.coins-=10;
+  const item=getGachaResultNoDuplicate();
+  if(!item){ alert("ガチャ称号をすべて入手済みです"); showGacha(); return; }
+
+  ensureFormulaGateStyle337();
+  const box=document.getElementById("panelArea");
+  box.innerHTML=`
+<h2>🌌 数式召喚ゲート</h2>
+<div id="formulaGateStage337" class="profileItem formulaGate337">
+<div class="formulaCircle337"></div>
+<div class="formulaAnalyze337">数式解析中...</div>
+<div class="formulaTap337">画面をタップして解析開始</div>
+</div>
+`;
+  const stage=document.getElementById("formulaGateStage337");
+  addFlyingFormula337(stage);
+
+  let started=false;
+  const startJudge=()=>{
+    if(started)return;
+    started=true;
+    if(window.playTapBlackoutConfirm337) window.playTapBlackoutConfirm337("解析開始");
+    stage.classList.add("formulaGateCollapse337");
+    setTimeout(()=>{
+      const seq=raritySequence337(item.rarity);
+      let i=0;
+      const showStep=()=>{
+        const step=seq[i];
+        box.innerHTML=`
+<h2>⚡ レア度判定</h2>
+<div id="formulaGateStage337" class="profileItem formulaGate337 ${step.ur?"urUniverse337":""}">
+<div class="${step.up?'rarityUpgrade337':'rarityJudge337'}" style="color:${step.color}">${step.label}</div>
+<p class="formulaAnalyze337">${i+1} / ${seq.length}</p>
+</div>
+`;
+        const newStage=document.getElementById("formulaGateStage337");
+        addFlyingFormula337(newStage);
+        spawnParticlesGate337(newStage, step.ur?"UR":item.rarity);
+        i++;
+        if(i<seq.length){
+          setTimeout(showStep,850);
+        }else{
+          setTimeout(()=>finalizeSingleGacha337(item, box, newStage),900);
+        }
+      };
+      showStep();
+    },720);
+  };
+  stage.addEventListener("click", startJudge);
+  stage.addEventListener("touchstart", function(e){e.preventDefault(); startJudge();}, {passive:false});
+};
+
+drawGacha10 = function(){
+  if((playerData.coins||0)<100){
+    alert("コインが足りません");
+    return;
+  }
+  playerData.coins-=100;
+  let results=[];
+  let hasUR=false;
+  for(let i=0;i<10;i++){
+    let item=getGachaResultNoDuplicate();
+    if(!item){ alert("ガチャ称号をすべて入手済みです"); showGacha(); return; }
+    results.push(item);
+    unlockTitle(item.title);
+    if(!playerData.gachaTitles)playerData.gachaTitles=[];
+    if(!playerData.gachaTitles.includes(item.title))playerData.gachaTitles.push(item.title);
+    if(item.rarity==="UR")hasUR=true;
+  }
+  unlockAchievement("初ガチャ");
+  if(hasUR){
+    unlockAchievement("UR獲得");
+    document.body.classList.add("urFlash");
+    setTimeout(()=>document.body.classList.remove("urFlash"),1000);
+  }
+  saveAllData();
+  updateHomeStatus();
+  ensureFormulaGateStyle337();
+  results.sort((a,b)=>({UR:0,SSR:1,SR:2,R:3}[a.rarity]-{UR:0,SSR:1,SR:2,R:3}[b.rarity]));
+  let box=document.getElementById("panelArea");
+  let html=`<h2>🎰 10連ガチャ結果</h2>
+<div id="formulaGateStage337" class="profileItem formulaGate337 ${hasUR?"urUniverse337":""}">
+<div class="formulaCircle337"></div>
+<div class="formulaAnalyze337">${hasUR?"🌈 UR反応あり！":"10連解析完了"}</div>
+<p>所持コイン：${playerData.coins||0}</p>
+<button onclick="drawGacha10()">もう一度10連</button>
+<button onclick="showGacha()">ガチャ画面へ</button>
+</div>`;
+  for(let item of results){
+    html+=`<div class="titleItem"><b style="color:${rarityColorGate337(item.rarity)}">${item.rarity}</b><br>${titleHTML(item.title)}</div>`;
+  }
+  box.innerHTML=html;
+  const stage=document.getElementById("formulaGateStage337");
+  if(stage){
+    addFlyingFormula337(stage);
+    spawnParticlesGate337(stage,hasUR?"UR":"SSR");
+  }
+};
+
+window.drawGacha=drawGacha;
+window.drawGacha10=drawGacha10;
+})();
+
+
+
+/* Ver3.3.7 tap blackout confirm overlay - intentionally overlaps gacha gate */
+(function(){
+if(window.__tapBlackoutConfirm337)return;
+window.__tapBlackoutConfirm337=true;
+
+function ensureTapBlackoutStyle337(){
+  if(document.getElementById("tapBlackoutStyle337"))return;
+  const style=document.createElement("style");
+  style.id="tapBlackoutStyle337";
+  style.textContent=`
+.tapBlackout337{
+  position:fixed;
+  inset:0;
+  background:#000;
+  z-index:99999;
+  opacity:0;
+  pointer-events:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  animation:tapBlackoutFlash337 .72s ease-out forwards;
+}
+.tapBlackout337 .tapBlackoutText337{
+  font-size:42px;
+  font-weight:900;
+  color:#fff;
+  text-shadow:0 0 12px #fff,0 0 30px #22d3ee,0 0 55px #7c3aed;
+  opacity:0;
+  animation:tapBlackoutText337 .72s ease-out forwards;
+}
+@keyframes tapBlackoutFlash337{
+  0%{opacity:0}
+  18%{opacity:1}
+  58%{opacity:1}
+  100%{opacity:0}
+}
+@keyframes tapBlackoutText337{
+  0%{opacity:0;transform:scale(.45)}
+  20%{opacity:1;transform:scale(1.16)}
+  62%{opacity:1;transform:scale(1)}
+  100%{opacity:0;transform:scale(1.35)}
+}
+.confirmShake337{
+  animation:confirmShake337 .55s ease-in-out both;
+}
+@keyframes confirmShake337{
+  0%{transform:translateX(0)}
+  20%{transform:translateX(-10px)}
+  40%{transform:translateX(10px)}
+  60%{transform:translateX(-7px)}
+  80%{transform:translateX(7px)}
+  100%{transform:translateX(0)}
+}
+`;
+  document.head.appendChild(style);
+}
+
+window.playTapBlackoutConfirm337 = function(label="解析開始"){
+  ensureTapBlackoutStyle337();
+  const old=document.getElementById("tapBlackout337");
+  if(old)old.remove();
+  const div=document.createElement("div");
+  div.id="tapBlackout337";
+  div.className="tapBlackout337";
+  div.innerHTML=`<div class="tapBlackoutText337">${label}</div>`;
+  document.body.appendChild(div);
+  try{
+    const stage=document.getElementById("formulaGateStage337");
+    if(stage)stage.classList.add("confirmShake337");
+  }catch(e){}
+  setTimeout(()=>div.remove(),760);
+};
+})();
