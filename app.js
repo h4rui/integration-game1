@@ -8204,3 +8204,198 @@ window.titleHTML = titleHTML;
 window.showGachaBook = showGachaBook;
 window.getAllDisplayTitles = getAllDisplayTitles;
 })();
+
+
+
+/* UR color variety + gacha animation only - ranking untouched */
+(function(){
+if(window.__urColorGachaAnim336)return;
+window.__urColorGachaAnim336=true;
+
+const urColorStyles336 = [
+  {keys:["🌈虹の数学神🌈","星海","銀河"], cls:"rainbowTitle", style:""},
+  {keys:["❄️絶対零度❄️","🧊絶対数理領域🧊","氷","零度"], cls:"urTitle", style:"color:#66e7ff;text-shadow:0 0 10px #66e7ff,0 0 24px #00aaff,0 0 42px #e0fbff;"},
+  {keys:["🔥原初の数式🔥","🔥終焉の公式王🔥","炎","火","原初","終焉"], cls:"urTitle", style:"color:#ff4d2e;text-shadow:0 0 10px #ff4d2e,0 0 24px #ff9800,0 0 42px #ffd166;"},
+  {keys:["👑究極数学王👑","👑超越数学皇👑","👑無限数学帝👑","王","皇","帝"], cls:"urTitle", style:"color:#ffd700;text-shadow:0 0 10px #ffd700,0 0 24px #ffb300,0 0 42px #fff4a3;"},
+  {keys:["🌌宇宙の支配者🌌","宇宙","支配者"], cls:"urTitle", style:"color:#b388ff;text-shadow:0 0 10px #b388ff,0 0 24px #7c4dff,0 0 42px #18ffff;"},
+  {keys:["⚡雷鳴の証明者⚡","雷","証明"], cls:"urTitle", style:"color:#fff176;text-shadow:0 0 10px #fff176,0 0 24px #00e5ff,0 0 42px #ffffff;"},
+  {keys:["🐉数式龍王🐉","龍"], cls:"urTitle", style:"color:#00e676;text-shadow:0 0 10px #00e676,0 0 24px #00c853,0 0 42px #b9f6ca;"},
+  {keys:["💫無限の開拓者💫","無限","開拓"], cls:"urTitle", style:"color:#ff80ab;text-shadow:0 0 10px #ff80ab,0 0 24px #ea80fc,0 0 42px #8c9eff;"},
+  {keys:["🪽天空の証明者🪽","天空"], cls:"urTitle", style:"color:#80d8ff;text-shadow:0 0 10px #80d8ff,0 0 24px #ffffff,0 0 42px #b388ff;"}
+];
+
+function urStyleForTitle336(t){
+  const s=String(t||"");
+  for(const rule of urColorStyles336){
+    if(rule.keys.some(k=>s.includes(k))) return rule;
+  }
+  return {cls:"urTitle", style:"color:#ffd700;text-shadow:0 0 10px #ffd700,0 0 24px #ff8c00,0 0 42px #fff;"};
+}
+
+function rarityMapUrAnim336(){
+  const m={};
+  try{ for(const item of gachaPool()) m[item.title]=item.rarity; }catch(e){}
+  return m;
+}
+
+const prevTitleHTML_urAnim336 = titleHTML;
+titleHTML = function(t){
+  const rarity = rarityMapUrAnim336()[t];
+  if(rarity==="UR"){
+    const rule=urStyleForTitle336(t);
+    if(rule.cls==="rainbowTitle") return `<span class="rainbowTitle">${t}</span>`;
+    return `<span class="${rule.cls}" style="${rule.style}">${t}</span>`;
+  }
+  return prevTitleHTML_urAnim336(t);
+};
+
+function ensureGachaAnimStyle336(){
+  if(document.getElementById("gachaAnimStyle336"))return;
+  const style=document.createElement("style");
+  style.id="gachaAnimStyle336";
+  style.textContent=`
+.gachaStage336{position:relative;overflow:hidden;min-height:360px;text-align:center;background:radial-gradient(circle at 50% 25%,rgba(255,255,255,.18),rgba(0,0,0,.08) 35%,rgba(0,0,0,.42));}
+.gachaOrb336{width:150px;height:150px;border-radius:50%;margin:24px auto 16px;background:radial-gradient(circle,#fff,#67e8f9 35%,#7c3aed 70%,#111 100%);box-shadow:0 0 24px #67e8f9,0 0 60px #7c3aed;animation:gachaOrbPulse336 .62s ease-in-out infinite alternate;}
+@keyframes gachaOrbPulse336{from{transform:scale(.92) rotate(-4deg);filter:brightness(1)}to{transform:scale(1.12) rotate(4deg);filter:brightness(1.45)}}
+.gachaRareText336{font-size:32px;font-weight:900;margin:12px;text-shadow:0 0 14px currentColor,0 0 30px currentColor;animation:gachaTextPop336 .55s ease-out both;}
+@keyframes gachaTextPop336{from{opacity:0;transform:scale(.45) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.gachaResultBig336{font-size:38px;font-weight:900;margin:18px auto;animation:gachaResultPop336 .7s ease-out both;}
+@keyframes gachaResultPop336{0%{opacity:0;transform:scale(.2) rotate(-8deg)}60%{opacity:1;transform:scale(1.18) rotate(3deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
+.gachaURStage336{animation:gachaURBg336 1.15s ease-in-out infinite alternate;}
+@keyframes gachaURBg336{from{box-shadow:inset 0 0 30px rgba(255,255,255,.1),0 0 18px #ffd700}to{box-shadow:inset 0 0 80px rgba(255,255,255,.25),0 0 60px #ff00ff}}
+.gachaParticle336{position:absolute;font-size:22px;animation:gachaFloat336 1.2s ease-out forwards;pointer-events:none;}
+@keyframes gachaFloat336{from{opacity:1;transform:translateY(0) scale(.7)}to{opacity:0;transform:translateY(-150px) scale(1.6)}}
+`;
+  document.head.appendChild(style);
+}
+
+function spawnGachaParticles336(box, rarity){
+  const marks = rarity==="UR" ? ["✨","🌈","💎","👑","⚡","🔥","🌌"] :
+                rarity==="SSR" ? ["✨","💎","⭐","🔥"] :
+                rarity==="SR" ? ["✨","⭐","🔹"] : ["✨","・"];
+  const n = rarity==="UR"?34:rarity==="SSR"?22:rarity==="SR"?14:8;
+  for(let i=0;i<n;i++){
+    const p=document.createElement("div");
+    p.className="gachaParticle336";
+    p.textContent=marks[Math.floor(Math.random()*marks.length)];
+    p.style.left=(8+Math.random()*84)+"%";
+    p.style.top=(52+Math.random()*34)+"%";
+    p.style.animationDelay=(Math.random()*0.55)+"s";
+    box.appendChild(p);
+  }
+}
+
+function rarityColor336(rarity){
+  if(rarity==="UR")return "#ffd700";
+  if(rarity==="SSR")return "#ff5cff";
+  if(rarity==="SR")return "#66e7ff";
+  return "#ffffff";
+}
+
+drawGacha = function(){
+  if((playerData.coins||0)<10){
+    alert("コインが足りません");
+    return;
+  }
+  playerData.coins-=10;
+  const item=getGachaResultNoDuplicate();
+  if(!item){ alert("ガチャ称号をすべて入手済みです"); showGacha(); return; }
+
+  ensureGachaAnimStyle336();
+  const box=document.getElementById("panelArea");
+  box.innerHTML=`
+<h2>🎰 ガチャ演出中...</h2>
+<div id="gachaStage336" class="profileItem gachaStage336">
+<div class="gachaOrb336"></div>
+<div id="gachaRareText336" class="gachaRareText336">???</div>
+<p>称号を召喚中...</p>
+</div>
+`;
+  const stage=document.getElementById("gachaStage336");
+  const rareText=document.getElementById("gachaRareText336");
+  const sequence = item.rarity==="UR" ? ["R","SR","SSR","UR確定!!"] :
+                   item.rarity==="SSR" ? ["R","SR","SSR!!"] :
+                   item.rarity==="SR" ? ["R","SR!"] : ["R"];
+  let i=0;
+  const timer=setInterval(()=>{
+    const label=sequence[Math.min(i,sequence.length-1)];
+    rareText.textContent=label;
+    rareText.style.color=label.includes("UR") ? "#ffd700" : rarityColor336(label.replace(/!|確定/g,""));
+    spawnGachaParticles336(stage, item.rarity==="UR" && label.includes("UR") ? "UR" : item.rarity);
+    i++;
+    if(i>=sequence.length){
+      clearInterval(timer);
+      setTimeout(()=>{
+        unlockTitle(item.title);
+        if(!playerData.gachaTitles)playerData.gachaTitles=[];
+        if(!playerData.gachaTitles.includes(item.title))playerData.gachaTitles.push(item.title);
+        unlockAchievement("初ガチャ");
+        if(item.rarity==="UR"){
+          unlockAchievement("UR獲得");
+          document.body.classList.add("urFlash");
+          setTimeout(()=>document.body.classList.remove("urFlash"),1000);
+        }
+        saveAllData();
+        updateHomeStatus();
+        box.innerHTML=`
+<h2>🎰 ガチャ結果</h2>
+<div class="profileItem gachaStage336 ${item.rarity==="UR"?"gachaURStage336":""}">
+<div class="gachaRareText336" style="color:${rarityColor336(item.rarity)}">${item.rarity}</div>
+<div class="gachaResultBig336">${titleHTML(item.title)}</div>
+<p>所持コイン：${playerData.coins||0}</p>
+<button onclick="drawGacha()">もう一回引く</button>
+<button onclick="showGacha()">ガチャ画面へ</button>
+</div>
+`;
+        const resultStage=document.querySelector(".gachaStage336");
+        if(resultStage)spawnGachaParticles336(resultStage,item.rarity);
+      },650);
+    }
+  },620);
+};
+
+drawGacha10 = function(){
+  if((playerData.coins||0)<100){
+    alert("コインが足りません");
+    return;
+  }
+  playerData.coins-=100;
+  let results=[];
+  let hasUR=false;
+  for(let i=0;i<10;i++){
+    let item=getGachaResultNoDuplicate();
+    if(!item){ alert("ガチャ称号をすべて入手済みです"); showGacha(); return; }
+    results.push(item);
+    unlockTitle(item.title);
+    if(!playerData.gachaTitles)playerData.gachaTitles=[];
+    if(!playerData.gachaTitles.includes(item.title))playerData.gachaTitles.push(item.title);
+    if(item.rarity==="UR")hasUR=true;
+  }
+  unlockAchievement("初ガチャ");
+  if(hasUR){
+    unlockAchievement("UR獲得");
+    document.body.classList.add("urFlash");
+    setTimeout(()=>document.body.classList.remove("urFlash"),1000);
+  }
+  saveAllData();
+  updateHomeStatus();
+  ensureGachaAnimStyle336();
+  results.sort((a,b)=>({UR:0,SSR:1,SR:2,R:3}[a.rarity]-{UR:0,SSR:1,SR:2,R:3}[b.rarity]));
+  let html=`<h2>🎰 10連ガチャ結果</h2>
+<div class="profileItem gachaStage336 ${hasUR?"gachaURStage336":""}">
+<p>所持コイン：${playerData.coins||0}</p>
+<button onclick="drawGacha10()">もう一度10連</button>
+<button onclick="showGacha()">ガチャ画面へ</button>
+</div>`;
+  for(let item of results){
+    html+=`<div class="titleItem"><b style="color:${rarityColor336(item.rarity)}">${item.rarity}</b><br>${titleHTML(item.title)}</div>`;
+  }
+  document.getElementById("panelArea").innerHTML=html;
+  const resultStage=document.querySelector(".gachaStage336");
+  if(resultStage)spawnGachaParticles336(resultStage,hasUR?"UR":"SSR");
+};
+
+window.titleHTML=titleHTML;
+window.drawGacha=drawGacha;
+window.drawGacha10=drawGacha10;
+})();
