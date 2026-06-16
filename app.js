@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.3.6";
+const VERSION = "3.3.8";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -8850,4 +8850,386 @@ window.playTapBlackoutConfirm337 = function(label="解析開始"){
   }catch(e){}
   setTimeout(()=>div.remove(),760);
 };
+})();
+
+
+
+/* Ver3.3.8 gacha DX fix: duplicate allowed + longer fullscreen summon page */
+(function(){
+if(window.__gachaDX338)return;
+window.__gachaDX338=true;
+
+function ensureGachaDXStyle338(){
+  if(document.getElementById("gachaDXStyle338"))return;
+  const style=document.createElement("style");
+  style.id="gachaDXStyle338";
+  style.textContent=`
+.gachaFull338{
+  position:fixed;
+  inset:0;
+  z-index:99990;
+  background:
+    radial-gradient(circle at 50% 35%,rgba(0,255,204,.24),transparent 24%),
+    radial-gradient(circle at 50% 50%,rgba(124,58,237,.34),transparent 52%),
+    linear-gradient(180deg,#020617,#050014 55%,#000);
+  color:white;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+.gachaFull338::before{
+  content:"";
+  position:absolute;
+  inset:-30%;
+  background:conic-gradient(from 0deg,transparent,rgba(34,211,238,.22),transparent,rgba(255,0,255,.2),transparent);
+  animation:gachaBgSpin338 7s linear infinite;
+}
+@keyframes gachaBgSpin338{to{transform:rotate(360deg)}}
+.gachaFullInner338{position:relative;z-index:1;width:94%;max-width:820px;}
+.gachaGate338{
+  width:280px;height:280px;margin:10px auto 20px;border-radius:50%;
+  border:4px solid rgba(103,232,249,.95);
+  box-shadow:0 0 25px #67e8f9,0 0 70px #7c3aed,inset 0 0 42px rgba(255,255,255,.24);
+  position:relative;
+  animation:gachaGateSpin338 5.2s linear infinite, gachaGatePulse338 1.2s ease-in-out infinite alternate;
+}
+.gachaGate338::before{
+  content:"";position:absolute;inset:30px;border-radius:50%;
+  border:2px dashed rgba(255,255,255,.85);
+  animation:gachaGateSpinReverse338 3.4s linear infinite;
+}
+.gachaGate338::after{
+  content:"∫  Σ  π  √  ∞";
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:34px;font-weight:900;text-shadow:0 0 14px #fff,0 0 32px #22d3ee;
+}
+@keyframes gachaGateSpin338{to{transform:rotate(360deg)}}
+@keyframes gachaGateSpinReverse338{to{transform:rotate(-360deg)}}
+@keyframes gachaGatePulse338{from{filter:brightness(1);transform:scale(.96)}to{filter:brightness(1.55);transform:scale(1.05)}}
+.gachaTap338{
+  font-size:32px;font-weight:900;color:#fde68a;
+  text-shadow:0 0 12px #f59e0b,0 0 28px #fff;
+  animation:gachaTapBlink338 .9s ease-in-out infinite alternate;
+}
+@keyframes gachaTapBlink338{from{opacity:.55;transform:scale(.96)}to{opacity:1;transform:scale(1.07)}}
+.gachaMsg338{font-size:22px;opacity:.95;text-shadow:0 0 10px #38bdf8;margin:10px auto;}
+.gachaDarkFlash338{
+  position:fixed;inset:0;background:#000;z-index:100000;
+  display:flex;align-items:center;justify-content:center;
+  animation:gachaDarkFlash338 1.35s ease-out forwards;
+}
+.gachaDarkFlash338 span{
+  font-size:44px;font-weight:900;color:#fff;
+  text-shadow:0 0 14px #fff,0 0 34px #22d3ee,0 0 68px #7c3aed;
+  animation:gachaDarkText338 1.35s ease-out forwards;
+}
+@keyframes gachaDarkFlash338{
+  0%{opacity:0} 15%{opacity:1} 72%{opacity:1} 100%{opacity:0}
+}
+@keyframes gachaDarkText338{
+  0%{opacity:0;transform:scale(.35)}
+  20%{opacity:1;transform:scale(1.16)}
+  75%{opacity:1;transform:scale(1)}
+  100%{opacity:0;transform:scale(1.45)}
+}
+.gachaJudge338{
+  font-size:58px;font-weight:900;margin:22px auto;
+  text-shadow:0 0 18px currentColor,0 0 45px currentColor;
+  animation:gachaJudgePop338 .8s ease-out both;
+}
+@keyframes gachaJudgePop338{
+  from{opacity:0;transform:scale(.18) rotate(-10deg)}
+  65%{opacity:1;transform:scale(1.22) rotate(4deg)}
+  to{opacity:1;transform:scale(1) rotate(0)}
+}
+.gachaUpgrade338{
+  font-size:38px;font-weight:900;color:#fde68a;
+  text-shadow:0 0 14px #f59e0b,0 0 34px #fff;
+  animation:gachaUpgrade338 .7s ease-in-out both;
+}
+@keyframes gachaUpgrade338{
+  0%{transform:translateX(0) scale(.8);opacity:0}
+  20%{opacity:1;transform:translateX(-12px) scale(1.05)}
+  40%{transform:translateX(12px) scale(1.18)}
+  60%{transform:translateX(-8px) scale(1.08)}
+  100%{transform:translateX(0) scale(1)}
+}
+.gachaUR338{
+  animation:gachaURBg338 1.1s ease-in-out infinite alternate;
+}
+@keyframes gachaURBg338{
+  from{box-shadow:inset 0 0 40px rgba(255,255,255,.14),0 0 28px #22d3ee}
+  to{box-shadow:inset 0 0 110px rgba(255,255,255,.30),0 0 80px #ff00ff}
+}
+.gachaPi338{
+  font-size:125px;font-weight:900;color:#fff;
+  text-shadow:0 0 18px #fff,0 0 42px #ffd700,0 0 84px #ff00ff;
+  animation:gachaPiBreak338 1.25s ease-out both;
+}
+@keyframes gachaPiBreak338{
+  0%{opacity:0;transform:scale(.08) rotate(-16deg)}
+  40%{opacity:1;transform:scale(1.26) rotate(6deg)}
+  72%{opacity:1;transform:scale(.92) rotate(-3deg);filter:brightness(2.5)}
+  100%{opacity:0;transform:scale(2.6) rotate(22deg);filter:brightness(6)}
+}
+.gachaResult338{
+  font-size:42px;font-weight:900;margin:18px auto;
+  animation:gachaResult338 .9s ease-out both;
+}
+@keyframes gachaResult338{
+  from{opacity:0;transform:translateY(-40px) scale(.45)}
+  60%{opacity:1;transform:translateY(8px) scale(1.16)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+.gachaParticle338{
+  position:absolute;font-size:25px;pointer-events:none;
+  animation:gachaParticle338 1.6s ease-out forwards;
+}
+@keyframes gachaParticle338{
+  from{opacity:1;transform:translateY(0) scale(.75)}
+  to{opacity:0;transform:translateY(-220px) scale(1.8)}
+}
+.gachaSkip338{
+  position:fixed;right:12px;bottom:12px;z-index:100001;
+  font-size:16px;padding:8px 12px;background:rgba(255,255,255,.15);
+  color:#fff;border:1px solid rgba(255,255,255,.45);
+}
+`;
+  document.head.appendChild(style);
+}
+
+function sleep338(ms){return new Promise(r=>setTimeout(r,ms));}
+function rarityColor338(r){
+  if(r==="UR")return "#ffd700";
+  if(r==="SSR")return "#ff5cff";
+  if(r==="SR")return "#66e7ff";
+  return "#ffffff";
+}
+function raritySeq338(rarity){
+  if(rarity==="UR")return [
+    {label:"R", color:rarityColor338("R")},
+    {label:"SRへ昇格！", color:rarityColor338("SR"), up:true},
+    {label:"SSRへ昇格！！", color:rarityColor338("SSR"), up:true},
+    {label:"🌈 UR確定！！！ 🌈", color:rarityColor338("UR"), up:true, ur:true}
+  ];
+  if(rarity==="SSR")return [
+    {label:"R", color:rarityColor338("R")},
+    {label:"SRへ昇格！", color:rarityColor338("SR"), up:true},
+    {label:"SSR！！", color:rarityColor338("SSR"), up:true}
+  ];
+  if(rarity==="SR")return [
+    {label:"R", color:rarityColor338("R")},
+    {label:"SR！", color:rarityColor338("SR"), up:true}
+  ];
+  return [{label:"R", color:rarityColor338("R")}];
+}
+function pickAnyGacha338(){
+  const item = getGachaResult();
+  if(!item)return null;
+  const owned = playerData.gachaTitles || [];
+  return {item, duplicate: owned.includes(item.title)};
+}
+function giveGachaItem338(item){
+  const owned = playerData.gachaTitles || [];
+  if(!playerData.gachaTitles)playerData.gachaTitles=[];
+  const duplicate = owned.includes(item.title);
+  if(duplicate){
+    playerData.coins=(playerData.coins||0)+3;
+  }else{
+    unlockTitle(item.title);
+    playerData.gachaTitles.push(item.title);
+  }
+  unlockAchievement("初ガチャ");
+  if(item.rarity==="UR"){
+    unlockAchievement("UR獲得");
+    document.body.classList.add("urFlash");
+    setTimeout(()=>document.body.classList.remove("urFlash"),1000);
+  }
+  saveAllData();
+  updateHomeStatus();
+  return duplicate;
+}
+function makeStage338(title,msg){
+  ensureGachaDXStyle338();
+  let old=document.getElementById("gachaFull338");
+  if(old)old.remove();
+  const div=document.createElement("div");
+  div.id="gachaFull338";
+  div.className="gachaFull338";
+  div.innerHTML=`
+<button class="gachaSkip338" onclick="document.getElementById('gachaFull338')?.remove()">SKIP</button>
+<div class="gachaFullInner338">
+<h2>${title}</h2>
+<div class="gachaGate338"></div>
+<div class="gachaMsg338">${msg}</div>
+<div class="gachaTap338">画面をタップして解析開始</div>
+</div>`;
+  document.body.appendChild(div);
+  addFlying338(div);
+  return div;
+}
+function addFlying338(stage){
+  const symbols=["∫","Σ","π","∞","√","lim","dx","dy","log","sin","cos","tan","x²","e^x"];
+  for(let i=0;i<34;i++){
+    const s=document.createElement("div");
+    s.className="formulaSymbol337";
+    s.textContent=symbols[Math.floor(Math.random()*symbols.length)];
+    s.style.left=(Math.random()*94)+"%";
+    s.style.animationDuration=(3+Math.random()*5)+"s";
+    s.style.animationDelay=(-Math.random()*5)+"s";
+    s.style.fontSize=(22+Math.random()*26)+"px";
+    stage.appendChild(s);
+  }
+}
+function particles338(stage, rarity){
+  const marks = rarity==="UR" ? ["✨","🌈","💎","👑","⚡","🔥","🌌","π"] :
+                rarity==="SSR" ? ["✨","💎","⭐","🔥","Σ"] :
+                rarity==="SR" ? ["✨","⭐","√","∫"] : ["✨","∫","π"];
+  const n = rarity==="UR"?48:rarity==="SSR"?32:rarity==="SR"?22:12;
+  for(let i=0;i<n;i++){
+    const p=document.createElement("div");
+    p.className="gachaParticle338";
+    p.textContent=marks[Math.floor(Math.random()*marks.length)];
+    p.style.left=(8+Math.random()*84)+"%";
+    p.style.top=(50+Math.random()*32)+"%";
+    p.style.animationDelay=(Math.random()*0.75)+"s";
+    stage.appendChild(p);
+  }
+}
+function darkFlash338(label="解析開始"){
+  return new Promise(resolve=>{
+    const old=document.getElementById("gachaDarkFlash338");
+    if(old)old.remove();
+    const div=document.createElement("div");
+    div.id="gachaDarkFlash338";
+    div.className="gachaDarkFlash338";
+    div.innerHTML=`<span>${label}</span>`;
+    document.body.appendChild(div);
+    setTimeout(()=>{div.remove();resolve();},1380);
+  });
+}
+async function playSingleGachaDX338(item, duplicate, costText){
+  const full=makeStage338("🌌 数式召喚ゲート","数式解析中...");
+  let tapped=false;
+  await new Promise(resolve=>{
+    const start=async(e)=>{
+      if(e){e.preventDefault();}
+      if(tapped)return;
+      tapped=true;
+      await darkFlash338("解析開始");
+      resolve();
+    };
+    full.addEventListener("click",start);
+    full.addEventListener("touchstart",start,{passive:false});
+  });
+  const seq=raritySeq338(item.rarity);
+  for(let i=0;i<seq.length;i++){
+    const step=seq[i];
+    full.className="gachaFull338 "+(step.ur?"gachaUR338":"");
+    full.innerHTML=`<button class="gachaSkip338" onclick="document.getElementById('gachaFull338')?.remove()">SKIP</button>
+<div class="gachaFullInner338">
+<h2>⚡ レア度判定</h2>
+<div class="${step.up?'gachaUpgrade338':'gachaJudge338'}" style="color:${step.color}">${step.label}</div>
+<div class="gachaMsg338">${i+1} / ${seq.length}</div>
+</div>`;
+    addFlying338(full);
+    particles338(full, step.ur?"UR":item.rarity);
+    await sleep338(step.ur?1250:1050);
+  }
+  if(item.rarity==="UR"){
+    full.className="gachaFull338 gachaUR338";
+    full.innerHTML=`<div class="gachaFullInner338"><h2>🌌 数学宇宙モード</h2><div class="gachaPi338">π</div><div class="gachaMsg338">数式の核が解放される...</div></div>`;
+    addFlying338(full); particles338(full,"UR");
+    await sleep338(1350);
+  }
+  const dupText = duplicate ? `<p>かぶり：+3コイン返還</p>` : "";
+  full.className="gachaFull338 "+(item.rarity==="UR"?"gachaUR338":"");
+  full.innerHTML=`<div class="gachaFullInner338">
+<h2>🎰 ガチャ結果</h2>
+<div class="gachaJudge338" style="color:${rarityColor338(item.rarity)}">${item.rarity}</div>
+<div class="gachaResult338">${titleHTML(item.title)}</div>
+${dupText}
+<p>${costText}</p>
+<p>所持コイン：${playerData.coins||0}</p>
+<button onclick="document.getElementById('gachaFull338')?.remove();drawGacha()">もう一回引く</button>
+<button onclick="document.getElementById('gachaFull338')?.remove();showGacha()">ガチャ画面へ</button>
+</div>`;
+  addFlying338(full); particles338(full,item.rarity);
+}
+
+drawGacha = async function(){
+  if((playerData.coins||0)<10){ alert("コインが足りません"); return; }
+  playerData.coins-=10;
+  const picked=pickAnyGacha338();
+  if(!picked){ alert("ガチャ称号がありません"); showGacha(); return; }
+  const duplicate=giveGachaItem338(picked.item);
+  await playSingleGachaDX338(picked.item, duplicate, "1回：10コイン");
+};
+
+drawGacha10 = async function(){
+  if((playerData.coins||0)<100){ alert("コインが足りません"); return; }
+  playerData.coins-=100;
+  let results=[];
+  let hasUR=false;
+  for(let i=0;i<10;i++){
+    const picked=pickAnyGacha338();
+    if(!picked){ alert("ガチャ称号がありません"); showGacha(); return; }
+    const duplicate=giveGachaItem338(picked.item);
+    results.push({item:picked.item,duplicate});
+    if(picked.item.rarity==="UR")hasUR=true;
+  }
+  ensureGachaDXStyle338();
+  const full=makeStage338("🌌 10連数式召喚","10連解析中...");
+  await new Promise(resolve=>{
+    let tapped=false;
+    const start=async(e)=>{ if(e)e.preventDefault(); if(tapped)return; tapped=true; await darkFlash338(hasUR?"🌈 UR反応あり":"解析開始"); resolve(); };
+    full.addEventListener("click",start);
+    full.addEventListener("touchstart",start,{passive:false});
+  });
+  results.sort((a,b)=>({UR:0,SSR:1,SR:2,R:3}[a.item.rarity]-{UR:0,SSR:1,SR:2,R:3}[b.item.rarity]));
+  let html=`<div class="gachaFullInner338">
+<h2>🎰 10連ガチャ結果</h2>
+<p>所持コイン：${playerData.coins||0}</p>
+<button onclick="document.getElementById('gachaFull338')?.remove();drawGacha10()">もう一度10連</button>
+<button onclick="document.getElementById('gachaFull338')?.remove();showGacha()">ガチャ画面へ</button>
+</div>`;
+  full.className="gachaFull338 "+(hasUR?"gachaUR338":"");
+  full.innerHTML=html;
+  const inner=full.querySelector(".gachaFullInner338");
+  for(const r of results){
+    inner.insertAdjacentHTML("beforeend",`<div class="titleItem"><b style="color:${rarityColor338(r.item.rarity)}">${r.item.rarity}</b><br>${titleHTML(r.item.title)}${r.duplicate?"<br>かぶり：+3コイン":""}</div>`);
+  }
+  addFlying338(full); particles338(full,hasUR?"UR":"SSR");
+};
+
+const oldShowNewsPage338 = typeof showNewsPage==="function" ? showNewsPage : null;
+showNewsPage = function(){
+  let html=`
+<h2>📢 お知らせ</h2>
+<div class="newsCard">
+<h3>Ver 3.3.8 ガチャDXアップデート</h3>
+<p>数式召喚ゲートを全画面演出に強化しました。</p>
+<p>タップ時の暗転演出を長くしました。</p>
+<p>称号を全部持っていてもガチャを引けるようにし、かぶりは+3コイン返還されます。</p>
+<p>ランキング・ログイン・Firebase処理は変更していません。</p>
+</div>
+`;
+  if(oldShowNewsPage338){
+    try{
+      oldShowNewsPage338();
+      const panel=document.getElementById("panelArea");
+      if(panel)panel.innerHTML=html+panel.innerHTML;
+      return;
+    }catch(e){console.log(e);}
+  }
+  document.getElementById("panelArea").innerHTML=html;
+  if(typeof ensureHomeButton==="function")ensureHomeButton();
+};
+
+window.drawGacha=drawGacha;
+window.drawGacha10=drawGacha10;
+window.showNewsPage=showNewsPage;
 })();
