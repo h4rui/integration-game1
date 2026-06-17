@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.3.9";
+const VERSION = "3.3.10";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -9803,6 +9803,206 @@ const oldNews339=typeof showNewsPage==="function"?showNewsPage:null;
 showNewsPage=function(){
  let html=`<h2>📢 お知らせ</h2><div class="newsCard"><h3>Ver 3.3.9 ランダムガチャ演出</h3><p>カード開封・宝箱・数学コアの3種類の演出をランダム追加しました。</p><p>音、フェイント、虹演出、10連連続召喚を強化しました。</p><p>ランキング・ログイン・Firebase処理は変更していません。</p></div>`;
  if(oldNews339){try{oldNews339();const p=document.getElementById("panelArea");if(p)p.innerHTML=html+p.innerHTML;return;}catch(e){}}
+ document.getElementById("panelArea").innerHTML=html;
+ if(typeof ensureHomeButton==="function")ensureHomeButton();
+};
+window.drawGacha=drawGacha;window.drawGacha10=drawGacha10;window.showNewsPage=showNewsPage;
+})();
+
+
+
+/* Ver3.3.10 gacha quality up: longer auto sequence + home return */
+(function(){
+if(window.__gachaQuality3310)return;
+window.__gachaQuality3310=true;
+
+let q10AudioCtx=null;
+function q10Audio(){
+  try{
+    if(!q10AudioCtx)q10AudioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    if(q10AudioCtx.state==="suspended")q10AudioCtx.resume();
+    return q10AudioCtx;
+  }catch(e){return null;}
+}
+function q10Tone(freq=440,dur=.16,type="sine",gain=.045){
+  const ctx=q10Audio(); if(!ctx)return;
+  const o=ctx.createOscillator(), g=ctx.createGain();
+  o.type=type; o.frequency.setValueAtTime(freq,ctx.currentTime);
+  g.gain.setValueAtTime(gain,ctx.currentTime);
+  g.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+dur);
+  o.connect(g); g.connect(ctx.destination); o.start(); o.stop(ctx.currentTime+dur);
+}
+function q10Noise(dur=.32,gain=.08){
+  const ctx=q10Audio(); if(!ctx)return;
+  const b=ctx.createBuffer(1,Math.floor(ctx.sampleRate*dur),ctx.sampleRate);
+  const d=b.getChannelData(0);
+  for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*(1-i/d.length);
+  const s=ctx.createBufferSource(), g=ctx.createGain();
+  s.buffer=b; g.gain.value=gain; s.connect(g); g.connect(ctx.destination); s.start();
+}
+function q10Sound(k){
+  if(k==="tap"){q10Tone(220,.09,"sine",.045);setTimeout(()=>q10Tone(520,.14,"triangle",.045),70);}
+  if(k==="charge"){q10Tone(180,.28,"sawtooth",.028);setTimeout(()=>q10Tone(310,.28,"sawtooth",.032),170);setTimeout(()=>q10Tone(520,.34,"triangle",.04),360);}
+  if(k==="card"){q10Tone(390,.08,"triangle",.04);setTimeout(()=>q10Tone(780,.1,"sine",.04),70);}
+  if(k==="chest"){q10Noise(.22,.06);q10Tone(120,.18,"sawtooth",.055);}
+  if(k==="fake"){q10Noise(.18,.04);q10Tone(140,.14,"triangle",.035);}
+  if(k==="crack"){q10Noise(.38,.11);q10Tone(80,.22,"sawtooth",.065);}
+  if(k==="boom"){q10Noise(.65,.14);q10Tone(55,.34,"sawtooth",.08);}
+  if(k==="core"){q10Tone(110,.4,"sawtooth",.035);setTimeout(()=>q10Tone(220,.4,"sawtooth",.035),260);}
+  if(k==="ur"){q10Tone(523,.2,"triangle",.06);setTimeout(()=>q10Tone(659,.2,"triangle",.06),140);setTimeout(()=>q10Tone(784,.2,"triangle",.065),280);setTimeout(()=>q10Tone(1046,.45,"sine",.07),440);}
+  if(k==="result"){q10Tone(660,.13,"sine",.05);setTimeout(()=>q10Tone(880,.15,"sine",.05),120);setTimeout(()=>q10Tone(1320,.2,"sine",.04),250);}
+}
+function q10Sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+function q10Color(r){return r==="UR"?"#ffd700":r==="SSR"?"#ff4dff":r==="SR"?"#66e7ff":"#fff";}
+function q10Ensure(){
+ if(document.getElementById("q10Style"))return;
+ const st=document.createElement("style");
+ st.id="q10Style";
+ st.textContent=`
+.q10{position:fixed;inset:0;z-index:999999;background:#000;color:white;overflow:hidden;display:flex;align-items:center;justify-content:center;text-align:center;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
+.q10::before{content:"";position:absolute;inset:-55%;background:radial-gradient(circle at 50% 45%,rgba(255,255,255,.38),transparent 7%),conic-gradient(from 0deg,#00f5ff,#7c3aed,#ff00aa,#ffd700,#00ff99,#00f5ff);opacity:.42;filter:blur(10px);animation:q10spin 6s linear infinite}
+.q10::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,transparent 0 22%,rgba(0,0,0,.18) 32%,rgba(0,0,0,.86) 80%),repeating-radial-gradient(circle at 50% 50%,rgba(255,255,255,.055) 0 2px,transparent 2px 20px),repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 1px,transparent 1px 26px);}
+@keyframes q10spin{to{transform:rotate(360deg)}}
+.q10in{position:relative;z-index:3;width:96%;max-width:940px;}
+.q10btns{position:fixed;left:10px;top:10px;z-index:1000002;display:flex;gap:8px;flex-wrap:wrap}
+.q10btn{font-size:15px;padding:7px 11px;border-radius:10px;background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.45);}
+.q10title{font-size:38px;font-weight:1000;letter-spacing:2px;text-shadow:0 0 16px #22d3ee,0 0 38px #7c3aed,0 0 70px #fff;animation:q10pop .95s ease-out both}
+@keyframes q10pop{from{opacity:0;transform:translateY(-30px) scale(.72)}to{opacity:1;transform:translateY(0) scale(1)}}
+.q10tap{font-size:34px;font-weight:1000;color:#fde68a;text-shadow:0 0 16px #f59e0b,0 0 35px #fff;animation:q10tap .7s ease-in-out infinite alternate}@keyframes q10tap{from{opacity:.5;transform:scale(.93)}to{opacity:1;transform:scale(1.08)}}
+.q10sym{position:absolute;z-index:2;color:rgba(255,255,255,.94);font-weight:1000;text-shadow:0 0 12px #fff,0 0 28px #22d3ee;pointer-events:none;animation:q10fly linear infinite}@keyframes q10fly{from{transform:translateY(118vh) rotate(0deg) scale(.72);opacity:0}12%{opacity:1}80%{opacity:.95}to{transform:translateY(-20vh) rotate(620deg) scale(1.45);opacity:0}}
+.q10cut{position:fixed;inset:0;z-index:1000003;background:#000;display:flex;align-items:center;justify-content:center;color:#fff;font-size:56px;font-weight:1000;text-shadow:0 0 18px #fff,0 0 45px #22d3ee,0 0 90px #7c3aed;animation:q10cut 2.05s ease-out forwards}@keyframes q10cut{0%{opacity:0;transform:scale(1)}14%{opacity:1}78%{opacity:1;filter:brightness(1.35)}100%{opacity:0;transform:scale(1.25);filter:brightness(3)}}
+.q10particle{position:absolute;z-index:3;font-size:30px;pointer-events:none;animation:q10particle 2.3s ease-out forwards}@keyframes q10particle{from{opacity:1;transform:translateY(0) scale(.55) rotate(0)}to{opacity:0;transform:translateY(-310px) scale(2.1) rotate(440deg)}}
+.q10cardWrap{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;max-width:740px;margin:25px auto}
+.q10card{height:142px;border-radius:18px;background:linear-gradient(135deg,#111827,#312e81,#020617);border:2px solid rgba(255,255,255,.58);box-shadow:0 0 20px rgba(34,211,238,.48),inset 0 0 28px rgba(255,255,255,.09);display:flex;align-items:center;justify-content:center;font-size:44px;font-weight:1000;animation:q10cardIn .85s ease-out both}
+@keyframes q10cardIn{from{opacity:0;transform:translateY(35px) rotateY(80deg)}to{opacity:1;transform:translateY(0) rotateY(0)}}
+.q10card.open{animation:q10flip .9s ease-out both;background:linear-gradient(135deg,rgba(255,255,255,.25),rgba(124,58,237,.46),rgba(0,0,0,.56))}
+@keyframes q10flip{0%{transform:rotateY(0) scale(1)}50%{transform:rotateY(90deg) scale(1.16)}100%{transform:rotateY(0) scale(1.06)}}
+.q10chest{font-size:165px;filter:drop-shadow(0 0 32px #ffd700);animation:q10drop 1.05s ease-out both}
+@keyframes q10drop{0%{opacity:0;transform:translateY(-240px) scale(.55)}70%{opacity:1;transform:translateY(24px) scale(1.16)}100%{opacity:1;transform:translateY(0) scale(1)}}
+.q10shake{animation:q10shake .7s ease-in-out both}@keyframes q10shake{0%{transform:translateX(0)}20%{transform:translateX(-15px)}40%{transform:translateX(15px)}60%{transform:translateX(-10px)}80%{transform:translateX(10px)}100%{transform:translateX(0)}}
+.q10fake{font-size:36px;font-weight:1000;color:#fff;text-shadow:0 0 14px #fff,0 0 30px #22d3ee;animation:q10fake 1s ease-out both}@keyframes q10fake{0%{opacity:0;transform:scale(.5)}45%{opacity:1;transform:scale(1.15)}100%{opacity:0;transform:scale(1.35)}}
+.q10core{width:350px;height:350px;margin:28px auto;border-radius:50%;position:relative;background:radial-gradient(circle at center,rgba(255,255,255,.6) 0 7%,rgba(34,211,238,.28) 8% 18%,transparent 19%),conic-gradient(from 0deg,#22d3ee,#fff,#7c3aed,#ff00aa,#ffd700,#22c55e,#22d3ee);border:5px solid rgba(255,255,255,.96);box-shadow:0 0 28px #fff,0 0 65px #22d3ee,0 0 125px #7c3aed,inset 0 0 82px rgba(255,255,255,.30);animation:q10coreSpin 4.8s linear infinite,q10corePulse .95s ease-in-out infinite alternate}
+.q10core::before{content:"";position:absolute;inset:44px;border-radius:50%;border:3px dashed #fff;animation:q10coreRev 2.6s linear infinite}.q10core::after{content:"π";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:120px;font-weight:1000;text-shadow:0 0 22px #fff,0 0 60px #ffd700}
+@keyframes q10coreSpin{to{transform:rotate(360deg)}}@keyframes q10coreRev{to{transform:rotate(-360deg)}}@keyframes q10corePulse{from{transform:scale(.93);filter:brightness(1)}to{transform:scale(1.09);filter:brightness(1.9)}}
+.q10crack{position:absolute;inset:0;z-index:4;pointer-events:none;background:linear-gradient(30deg,transparent 48%,rgba(255,255,255,.95) 49%,transparent 51%),linear-gradient(120deg,transparent 46%,rgba(255,255,255,.9) 47%,transparent 49%),linear-gradient(75deg,transparent 58%,rgba(255,255,255,.85) 59%,transparent 61%);animation:q10crack .9s ease-out forwards}@keyframes q10crack{0%{opacity:0;filter:brightness(1)}35%{opacity:1;filter:brightness(5)}100%{opacity:0;filter:brightness(1)}}
+.q10result{font-size:50px;font-weight:1000;margin:16px auto 20px;animation:q10result 1.05s ease-out both}@keyframes q10result{0%{opacity:0;transform:translateY(-60px) scale(.3)}55%{opacity:1;transform:translateY(10px) scale(1.2)}100%{opacity:1;transform:translateY(0) scale(1)}}
+.q10rarity{font-size:76px;font-weight:1000;margin:18px auto;text-shadow:0 0 24px currentColor,0 0 60px currentColor;animation:q10result 1.05s ease-out both}
+.q10ur{animation:q10ur .85s ease-in-out infinite alternate}@keyframes q10ur{from{filter:hue-rotate(0deg) brightness(1.12)}to{filter:hue-rotate(100deg) brightness(1.6)}}
+`;
+ document.head.appendChild(st);
+}
+function q10Remove(){document.getElementById("q10")?.remove();}
+window.q10Back=function(){q10Remove(); if(typeof showGacha==="function")showGacha();};
+window.q10Home=function(){q10Remove(); if(typeof goHome==="function")goHome(); else if(typeof showHome==="function")showHome(); else location.reload();};
+function q10Base(title,msg,tap=true){
+ q10Ensure(); q10Remove();
+ const div=document.createElement("div"); div.id="q10"; div.className="q10";
+ div.innerHTML=`<div class="q10btns"><button class="q10btn" onclick="q10Back()">← ガチャへ戻る</button><button class="q10btn" onclick="q10Home()">🏠 ホーム</button><button class="q10btn" onclick="document.getElementById('q10')?.remove()">閉じる</button></div><div class="q10in"><div class="q10title">${title}</div><p>${msg}</p>${tap?'<div class="q10tap">画面をタップして開始</div>':''}</div>`;
+ document.body.appendChild(div); q10Symbols(div); return div;
+}
+function q10Symbols(stage){
+ const s=["∫","Σ","π","∞","√","lim","dx","log","sin","cos","tan","x²","e^x","∴"];
+ for(let i=0;i<56;i++){const e=document.createElement("div");e.className="q10sym";e.textContent=s[Math.floor(Math.random()*s.length)];e.style.left=(Math.random()*96)+"%";e.style.animationDuration=(3+Math.random()*6)+"s";e.style.animationDelay=(-Math.random()*6)+"s";e.style.fontSize=(20+Math.random()*35)+"px";stage.appendChild(e);}
+}
+function q10Particles(stage,r){
+ const m=r==="UR"?["✨","🌈","💎","👑","⚡","🔥","🌌","π","∞"]:r==="SSR"?["✨","💎","⭐","🔥","Σ"]:r==="SR"?["✨","⭐","√","∫"]:["✨","∫","π"];
+ const n=r==="UR"?88:r==="SSR"?58:r==="SR"?38:24;
+ for(let i=0;i<n;i++){const p=document.createElement("div");p.className="q10particle";p.textContent=m[Math.floor(Math.random()*m.length)];p.style.left=(5+Math.random()*90)+"%";p.style.top=(43+Math.random()*40)+"%";p.style.animationDelay=(Math.random()*1.0)+"s";stage.appendChild(p);}
+}
+function q10Cut(label,sound="charge"){return new Promise(resolve=>{q10Sound(sound);document.querySelector(".q10cut")?.remove();const d=document.createElement("div");d.className="q10cut";d.innerHTML=`<div>${label}</div>`;document.body.appendChild(d);setTimeout(()=>{d.remove();resolve();},2050);});}
+function q10Pick(){const item=getGachaResult();const owned=playerData.gachaTitles||[];return{item,duplicate:item?owned.includes(item.title):false};}
+function q10Give(item){
+ if(!playerData.gachaTitles)playerData.gachaTitles=[];
+ const dup=playerData.gachaTitles.includes(item.title);
+ if(dup){playerData.coins=(playerData.coins||0)+3;}else{unlockTitle(item.title);playerData.gachaTitles.push(item.title);}
+ unlockAchievement("初ガチャ");
+ if(item.rarity==="UR"){unlockAchievement("UR獲得");document.body.classList.add("urFlash");setTimeout(()=>document.body.classList.remove("urFlash"),1000);}
+ saveAllData(); updateHomeStatus(); return dup;
+}
+function q10Mode(){const r=Math.random()*100;return r<25?"card":r<60?"chest":"core";}
+async function q10WaitTap(stage,label){
+ await new Promise(resolve=>{let done=false;const start=async(e)=>{if(e)e.preventDefault();if(done)return;done=true;q10Sound("tap");await q10Cut(label||"解析開始","charge");resolve();};stage.addEventListener("click",start);stage.addEventListener("touchstart",start,{passive:false});});
+}
+async function q10Card(item,auto=false){
+ const stage=q10Base("🎴 数式カード開封","カード列を生成中...",!auto);
+ const wrap=document.createElement("div");wrap.className="q10cardWrap";stage.querySelector(".q10in").appendChild(wrap);
+ for(let i=0;i<10;i++){const c=document.createElement("div");c.className="q10card";c.textContent="∫";c.style.animationDelay=(i*.07)+"s";wrap.appendChild(c);}
+ if(!auto)await q10WaitTap(stage,"カード解析開始"); else await q10Cut("カード解析開始","charge");
+ const cards=[...wrap.children];
+ for(let i=0;i<cards.length;i++){q10Sound("card");cards[i].classList.add("open");cards[i].textContent=["√","Σ","π","∞"][Math.floor(Math.random()*4)];await q10Sleep(230);}
+ const last=cards[Math.floor(Math.random()*cards.length)];
+ last.style.color=q10Color(item.rarity); last.style.boxShadow=`0 0 38px ${q10Color(item.rarity)}`; last.textContent=item.rarity==="UR"?"🌈":item.rarity==="SSR"?"💎":item.rarity==="SR"?"⭐":"∫";
+ await q10Sleep(900);
+ if(item.rarity==="UR")await q10Cut("虹カード出現","ur");
+}
+async function q10Chest(item,auto=false){
+ const stage=q10Base("📦 数式宝箱","宝箱を召喚中...",!auto);
+ stage.querySelector(".q10in").insertAdjacentHTML("beforeend",`<div id="q10Chest" class="q10chest">📦</div>`);
+ if(!auto)await q10WaitTap(stage,"宝箱解析開始"); else await q10Cut("宝箱解析開始","charge");
+ const chest=document.getElementById("q10Chest");
+ q10Sound("chest"); chest.classList.add("q10shake"); let c=document.createElement("div");c.className="q10crack";stage.appendChild(c);
+ await q10Sleep(1200);
+ if(Math.random()<0.65){q10Sound("fake");stage.querySelector(".q10in").insertAdjacentHTML("beforeend",`<div class="q10fake">……まだ割れない</div>`);await q10Sleep(1300);}
+ q10Sound("boom"); chest.textContent=item.rarity==="UR"?"🌈":"💥"; c=document.createElement("div");c.className="q10crack";stage.appendChild(c);q10Particles(stage,item.rarity);
+ if(item.rarity==="UR")await q10Cut("虹爆発","ur"); else await q10Sleep(1300);
+}
+async function q10Core(item,auto=false){
+ const stage=q10Base("🌌 数学コア暴走","πコアにエネルギーを充填中...",!auto);
+ stage.querySelector(".q10in").insertAdjacentHTML("beforeend",`<div class="q10core"></div>`);
+ if(!auto)await q10WaitTap(stage,"コア起動"); else await q10Cut("コア起動","charge");
+ q10Sound("core"); await q10Cut("エネルギー充填","charge");
+ if(Math.random()<0.55&&item.rarity!=="R"){q10Sound("fake");stage.querySelector(".q10in").insertAdjacentHTML("beforeend",`<div class="q10fake">割れる……？</div>`);await q10Sleep(1100);}
+ q10Sound("crack");let c=document.createElement("div");c.className="q10crack";stage.appendChild(c);await q10Sleep(850);
+ if(item.rarity==="UR"){stage.classList.add("q10ur");await q10Cut("コア暴走","ur");}
+ q10Sound("boom");q10Particles(stage,item.rarity);await q10Sleep(1200);
+}
+function q10Result(stage,item,dup){
+ q10Sound("result");
+ const dupText=dup?`<p>かぶり：+3コイン返還</p>`:"";
+ stage.className="q10 "+(item.rarity==="UR"?"q10ur":"");
+ stage.innerHTML=`<div class="q10btns"><button class="q10btn" onclick="q10Back()">← ガチャへ戻る</button><button class="q10btn" onclick="q10Home()">🏠 ホーム</button><button class="q10btn" onclick="document.getElementById('q10')?.remove()">閉じる</button></div><div class="q10in"><div class="q10title">🎰 ガチャ結果</div><div class="q10rarity" style="color:${q10Color(item.rarity)}">${item.rarity}</div><div class="q10result">${titleHTML(item.title)}</div>${dupText}<p>所持コイン：${playerData.coins||0}</p><button onclick="document.getElementById('q10')?.remove();drawGacha()">もう一回引く</button><button onclick="q10Back()">ガチャへ戻る</button><button onclick="q10Home()">ホームへ戻る</button></div>`;
+ q10Symbols(stage); q10Particles(stage,item.rarity);
+}
+async function q10Play(item,dup,mode,auto=false){
+ const m=mode||q10Mode();
+ if(m==="card")await q10Card(item,auto);
+ else if(m==="chest")await q10Chest(item,auto);
+ else await q10Core(item,auto);
+ const st=document.getElementById("q10");
+ if(item.rarity==="UR")await q10Cut("UR解放","ur");
+ q10Result(st,item,dup);
+}
+drawGacha=async function(){
+ if((playerData.coins||0)<10){alert("コインが足りません");return;}
+ playerData.coins-=10;
+ const p=q10Pick(); if(!p.item){alert("ガチャ称号がありません");showGacha();return;}
+ const dup=q10Give(p.item);
+ await q10Play(p.item,dup);
+};
+drawGacha10=async function(){
+ if((playerData.coins||0)<100){alert("コインが足りません");return;}
+ playerData.coins-=100;
+ let results=[],hasUR=false;
+ for(let i=0;i<10;i++){const p=q10Pick();if(!p.item){alert("ガチャ称号がありません");showGacha();return;}const dup=q10Give(p.item);results.push({item:p.item,duplicate:dup});if(p.item.rarity==="UR")hasUR=true;}
+ const mode=q10Mode();
+ const start=q10Base(mode==="card"?"🎴 10連カード開封":mode==="chest"?"📦 10連宝箱召喚":"🌌 10連数学コア","最初だけタップ。以降は自動で連続召喚します。",true);
+ await q10WaitTap(start,hasUR?"🌈 UR反応あり":"10連解析開始");
+ for(let i=0;i<results.length;i++){
+   await q10Play(results[i].item,results[i].duplicate,mode,true);
+   await q10Sleep(900);
+ }
+ results.sort((a,b)=>({UR:0,SSR:1,SR:2,R:3}[a.item.rarity]-{UR:0,SSR:1,SR:2,R:3}[b.item.rarity]));
+ const final=q10Base("🎰 10連最終結果","召喚結果一覧",false);
+ final.className="q10 "+(hasUR?"q10ur":"");
+ final.innerHTML=`<div class="q10btns"><button class="q10btn" onclick="q10Back()">← ガチャへ戻る</button><button class="q10btn" onclick="q10Home()">🏠 ホーム</button><button class="q10btn" onclick="document.getElementById('q10')?.remove()">閉じる</button></div><div class="q10in"><div class="q10title">🎰 10連最終結果</div><p>所持コイン：${playerData.coins||0}</p><button onclick="document.getElementById('q10')?.remove();drawGacha10()">もう一度10連</button><button onclick="q10Back()">ガチャへ戻る</button><button onclick="q10Home()">ホームへ戻る</button></div>`;
+ const inner=final.querySelector(".q10in");
+ for(const r of results){inner.insertAdjacentHTML("beforeend",`<div class="titleItem"><b style="color:${q10Color(r.item.rarity)}">${r.item.rarity}</b><br>${titleHTML(r.item.title)}${r.duplicate?"<br>かぶり：+3コイン":""}</div>`);}
+ q10Symbols(final); q10Particles(final,hasUR?"UR":"SSR");
+};
+const oldNews3310=typeof showNewsPage==="function"?showNewsPage:null;
+showNewsPage=function(){
+ let html=`<h2>📢 お知らせ</h2><div class="newsCard"><h3>Ver 3.3.10 ガチャ演出強化</h3><p>ガチャ演出を長くし、音とフェイントを強化しました。</p><p>10連は最初の1タップ後、自動で連続召喚されます。</p><p>ガチャ結果からホームへ戻れるボタンを追加しました。</p><p>ランキング・ログイン・Firebase処理は変更していません。</p></div>`;
+ if(oldNews3310){try{oldNews3310();const p=document.getElementById("panelArea");if(p)p.innerHTML=html+p.innerHTML;return;}catch(e){}}
  document.getElementById("panelArea").innerHTML=html;
  if(typeof ensureHomeButton==="function")ensureHomeButton();
 };
