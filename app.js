@@ -9233,3 +9233,177 @@ window.drawGacha=drawGacha;
 window.drawGacha10=drawGacha10;
 window.showNewsPage=showNewsPage;
 })();
+
+
+
+/* Ver3.3.8 gacha DX PLUS: stronger summon animation only */
+(function(){
+if(window.__gachaDXPlus338)return;
+window.__gachaDXPlus338=true;
+function sleepDXP(ms){return new Promise(r=>setTimeout(r,ms));}
+function ensureGachaDXPlusStyle338(){
+ if(document.getElementById("gachaDXPlusStyle338"))return;
+ const style=document.createElement("style");
+ style.id="gachaDXPlusStyle338";
+ style.textContent=`
+.gachaPlus338{position:fixed;inset:0;z-index:999990;background:#000;color:white;overflow:hidden;display:flex;align-items:center;justify-content:center;text-align:center;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
+.gachaPlus338::before{content:"";position:absolute;inset:-35%;background:radial-gradient(circle at 50% 48%,rgba(255,255,255,.25),transparent 8%),conic-gradient(from 0deg,#06b6d4,#7c3aed,#ec4899,#f59e0b,#22c55e,#06b6d4);opacity:.34;filter:blur(10px);animation:plusBgSpin338 6s linear infinite;}
+.gachaPlus338::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,transparent 0 25%,rgba(0,0,0,.18) 33%,rgba(0,0,0,.78) 74%),repeating-radial-gradient(circle at 50% 50%,rgba(255,255,255,.08) 0 2px,transparent 2px 18px);animation:plusScan338 1.8s linear infinite;}
+@keyframes plusBgSpin338{to{transform:rotate(360deg)}}@keyframes plusScan338{to{filter:hue-rotate(360deg)}}
+.gachaPlusInner338{position:relative;z-index:2;width:96%;max-width:900px;}
+.gachaPlusTitle338{font-size:32px;font-weight:900;letter-spacing:1px;text-shadow:0 0 14px #22d3ee,0 0 32px #7c3aed;}
+.gachaPlusGate338{width:310px;height:310px;margin:22px auto;border-radius:50%;position:relative;background:radial-gradient(circle at center,rgba(255,255,255,.35) 0 8%,rgba(103,232,249,.2) 9% 18%,transparent 19%),conic-gradient(from 0deg,rgba(34,211,238,.15),rgba(255,255,255,.85),rgba(124,58,237,.25),rgba(255,215,0,.85),rgba(34,211,238,.15));border:4px solid rgba(255,255,255,.9);box-shadow:0 0 18px #fff,0 0 45px #22d3ee,0 0 90px #7c3aed,inset 0 0 55px rgba(255,255,255,.25);animation:plusGateSpin338 4.8s linear infinite,plusGatePulse338 .95s ease-in-out infinite alternate;}
+.gachaPlusGate338 .ring1,.gachaPlusGate338 .ring2,.gachaPlusGate338 .ring3{position:absolute;border-radius:50%;inset:20px;border:2px dashed rgba(255,255,255,.85);}
+.gachaPlusGate338 .ring1{animation:plusGateReverse338 3.2s linear infinite}.gachaPlusGate338 .ring2{inset:48px;border-style:solid;border-color:rgba(34,211,238,.95);animation:plusGateSpin338 2.1s linear infinite}.gachaPlusGate338 .ring3{inset:78px;border-color:rgba(255,215,0,.9);animation:plusGateReverse338 1.7s linear infinite}
+.gachaPlusGate338 .core{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:45px;font-weight:900;text-shadow:0 0 13px #fff,0 0 30px #22d3ee,0 0 60px #ffd700;}
+@keyframes plusGateSpin338{to{transform:rotate(360deg)}}@keyframes plusGateReverse338{to{transform:rotate(-360deg)}}@keyframes plusGatePulse338{from{transform:scale(.94);filter:brightness(1)}to{transform:scale(1.06);filter:brightness(1.7)}}
+.gachaPlusTap338{font-size:34px;color:#fde68a;font-weight:900;text-shadow:0 0 14px #f59e0b,0 0 34px #fff;animation:plusTap338 .75s ease-in-out infinite alternate;}@keyframes plusTap338{from{opacity:.5;transform:scale(.94)}to{opacity:1;transform:scale(1.08)}}
+.gachaPlusSymbol338{position:absolute;z-index:1;color:rgba(255,255,255,.92);font-weight:900;text-shadow:0 0 12px #fff,0 0 26px #22d3ee;pointer-events:none;animation:plusSymbolFly338 linear infinite;}@keyframes plusSymbolFly338{from{transform:translateY(115vh) rotate(0deg) scale(.75);opacity:0}12%{opacity:1}78%{opacity:.95}to{transform:translateY(-18vh) rotate(540deg) scale(1.35);opacity:0}}
+.gachaCutin338{position:fixed;inset:0;z-index:1000000;background:#000;display:flex;align-items:center;justify-content:center;color:#fff;font-size:50px;font-weight:900;text-shadow:0 0 18px #fff,0 0 45px #22d3ee,0 0 90px #7c3aed;animation:cutin338 1.75s ease-out forwards;}@keyframes cutin338{0%{opacity:0;transform:scale(1)}12%{opacity:1}72%{opacity:1;filter:brightness(1.2)}100%{opacity:0;transform:scale(1.2);filter:brightness(2.8)}}
+.gachaCrack338{position:absolute;inset:0;z-index:4;pointer-events:none;background:linear-gradient(30deg,transparent 48%,rgba(255,255,255,.95) 49%,transparent 51%),linear-gradient(120deg,transparent 46%,rgba(255,255,255,.9) 47%,transparent 49%),linear-gradient(75deg,transparent 58%,rgba(255,255,255,.8) 59%,transparent 61%);opacity:0;animation:crack338 .65s ease-out forwards;}@keyframes crack338{0%{opacity:0;filter:brightness(1)}35%{opacity:1;filter:brightness(4)}100%{opacity:0;filter:brightness(1)}}
+.gachaRarityCard338{position:relative;z-index:2;font-size:70px;font-weight:1000;margin:18px auto;text-shadow:0 0 22px currentColor,0 0 58px currentColor;animation:rarityCard338 .95s ease-out both;}@keyframes rarityCard338{0%{opacity:0;transform:scale(.15) rotate(-12deg)}54%{opacity:1;transform:scale(1.28) rotate(5deg)}78%{transform:scale(.94) rotate(-2deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
+.gachaUpgradeBanner338{position:relative;z-index:2;font-size:42px;font-weight:1000;color:#fde68a;padding:10px 18px;margin:18px auto;display:inline-block;border:2px solid rgba(255,255,255,.5);background:linear-gradient(90deg,rgba(255,255,255,.08),rgba(255,215,0,.22),rgba(255,255,255,.08));box-shadow:0 0 24px #f59e0b,inset 0 0 22px rgba(255,255,255,.18);text-shadow:0 0 12px #f59e0b,0 0 28px #fff;animation:upgradeBanner338 1s ease-out both;}@keyframes upgradeBanner338{0%{opacity:0;transform:translateX(-120%) skewX(-15deg)}55%{opacity:1;transform:translateX(8%) skewX(-7deg)}78%{transform:translateX(-3%) skewX(-4deg)}100%{opacity:1;transform:translateX(0) skewX(0)}}
+.gachaURFinal338{animation:urFinalBg338 .8s ease-in-out infinite alternate;}@keyframes urFinalBg338{from{filter:hue-rotate(0deg) brightness(1.05)}to{filter:hue-rotate(80deg) brightness(1.45)}}
+.bigPiPlus338{position:relative;z-index:2;font-size:150px;font-weight:1000;text-shadow:0 0 20px #fff,0 0 55px #ffd700,0 0 100px #ff00ff;animation:bigPiPlus338 1.45s ease-out both;}@keyframes bigPiPlus338{0%{opacity:0;transform:scale(.05) rotate(-25deg)}35%{opacity:1;transform:scale(1.35) rotate(8deg)}65%{opacity:1;transform:scale(.92) rotate(-4deg)}82%{opacity:1;transform:scale(1.08);filter:brightness(3)}100%{opacity:0;transform:scale(3) rotate(30deg);filter:brightness(7)}}
+.gachaResultPlus338{position:relative;z-index:2;font-size:46px;font-weight:1000;margin:16px auto 20px;animation:resultPlus338 .95s ease-out both;}@keyframes resultPlus338{0%{opacity:0;transform:translateY(-55px) scale(.35)}55%{opacity:1;transform:translateY(10px) scale(1.18)}100%{opacity:1;transform:translateY(0) scale(1)}}
+.gachaParticlePlus338{position:absolute;z-index:3;font-size:28px;pointer-events:none;animation:particlePlus338 1.9s ease-out forwards;}@keyframes particlePlus338{from{opacity:1;transform:translateY(0) scale(.6) rotate(0)}to{opacity:0;transform:translateY(-260px) scale(1.9) rotate(360deg)}}
+.skipPlus338{position:fixed;right:12px;bottom:12px;z-index:1000001;background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.45);font-size:16px;padding:8px 12px;border-radius:10px;}
+`;
+ document.head.appendChild(style);
+}
+function colorDXP338(r){return r==="UR"?"#ffd700":r==="SSR"?"#ff5cff":r==="SR"?"#66e7ff":"#ffffff";}
+function stageDXP338(title,msg){
+ ensureGachaDXPlusStyle338();document.getElementById("gachaPlus338")?.remove();
+ const div=document.createElement("div");div.id="gachaPlus338";div.className="gachaPlus338";
+ div.innerHTML=`<button class="skipPlus338" onclick="document.getElementById('gachaPlus338')?.remove()">SKIP</button><div class="gachaPlusInner338"><div class="gachaPlusTitle338">${title}</div><div class="gachaPlusGate338"><div class="ring1"></div><div class="ring2"></div><div class="ring3"></div><div class="core">∫Σπ</div></div><div class="gachaPlusTitle338" style="font-size:22px">${msg}</div><div class="gachaPlusTap338">画面をタップして解析開始</div></div>`;
+ document.body.appendChild(div);addSymbolsDXP338(div);return div;
+}
+function addSymbolsDXP338(stage){
+ const symbols=["∫","Σ","π","∞","√","lim","dx","dy","log","sin","cos","tan","x²","e^x","f'(x)"];
+ for(let i=0;i<46;i++){const s=document.createElement("div");s.className="gachaPlusSymbol338";s.textContent=symbols[Math.floor(Math.random()*symbols.length)];s.style.left=(Math.random()*96)+"%";s.style.animationDuration=(3.2+Math.random()*5.5)+"s";s.style.animationDelay=(-Math.random()*6)+"s";s.style.fontSize=(20+Math.random()*32)+"px";stage.appendChild(s);}
+}
+function particlesDXP338(stage,rarity){
+ const marks=rarity==="UR"?["✨","🌈","💎","👑","⚡","🔥","🌌","π","∞"]:rarity==="SSR"?["✨","💎","⭐","🔥","Σ"]:rarity==="SR"?["✨","⭐","√","∫"]:["✨","∫","π"];
+ const n=rarity==="UR"?70:rarity==="SSR"?46:rarity==="SR"?30:18;
+ for(let i=0;i<n;i++){const p=document.createElement("div");p.className="gachaParticlePlus338";p.textContent=marks[Math.floor(Math.random()*marks.length)];p.style.left=(5+Math.random()*90)+"%";p.style.top=(45+Math.random()*38)+"%";p.style.animationDelay=(Math.random()*0.9)+"s";stage.appendChild(p);}
+}
+function cutinDXP338(label){return new Promise(resolve=>{document.getElementById("gachaCutin338")?.remove();const div=document.createElement("div");div.className="gachaCutin338";div.innerHTML=`<div>${label}</div>`;document.body.appendChild(div);setTimeout(()=>{div.remove();resolve();},1780);});}
+function seqDXP338(rarity){if(rarity==="UR")return[{label:"R",r:"R"},{label:"SRへ昇格！",r:"SR",up:true},{label:"SSRへ昇格！！",r:"SSR",up:true},{label:"🌈 UR確定！！！",r:"UR",up:true,ur:true}];if(rarity==="SSR")return[{label:"R",r:"R"},{label:"SRへ昇格！",r:"SR",up:true},{label:"SSR！！",r:"SSR",up:true}];if(rarity==="SR")return[{label:"R",r:"R"},{label:"SR！",r:"SR",up:true}];return[{label:"R",r:"R"}];}
+function pickAnyDXP338(){const item=getGachaResult();const owned=playerData.gachaTitles||[];return{item,duplicate:item?owned.includes(item.title):false};}
+function giveDXP338(item){if(!playerData.gachaTitles)playerData.gachaTitles=[];const duplicate=playerData.gachaTitles.includes(item.title);if(duplicate){playerData.coins=(playerData.coins||0)+3;}else{unlockTitle(item.title);playerData.gachaTitles.push(item.title);}unlockAchievement("初ガチャ");if(item.rarity==="UR"){unlockAchievement("UR獲得");document.body.classList.add("urFlash");setTimeout(()=>document.body.classList.remove("urFlash"),1000);}saveAllData();updateHomeStatus();return duplicate;}
+async function judgeDXP338(stage,item){const seq=seqDXP338(item.rarity);for(let i=0;i<seq.length;i++){const step=seq[i];stage.className="gachaPlus338 "+(step.ur?"gachaURFinal338":"");stage.innerHTML=`<button class="skipPlus338" onclick="document.getElementById('gachaPlus338')?.remove()">SKIP</button><div class="gachaPlusInner338"><div class="gachaPlusTitle338">⚡ レア度判定</div><div class="${step.up?'gachaUpgradeBanner338':'gachaRarityCard338'}" style="color:${colorDXP338(step.r)}">${step.label}</div><div class="gachaPlusTitle338" style="font-size:20px">${i+1} / ${seq.length}</div></div>`;addSymbolsDXP338(stage);particlesDXP338(stage,step.ur?"UR":step.r);if(step.up){const crack=document.createElement("div");crack.className="gachaCrack338";stage.appendChild(crack);}await sleepDXP(step.ur?1450:1180);}}
+function showResultDXP338(stage,item,duplicate){const dupText=duplicate?`<p>かぶり：+3コイン返還</p>`:"";stage.className="gachaPlus338 "+(item.rarity==="UR"?"gachaURFinal338":"");stage.innerHTML=`<button class="skipPlus338" onclick="document.getElementById('gachaPlus338')?.remove()">閉じる</button><div class="gachaPlusInner338"><div class="gachaPlusTitle338">🎰 ガチャ結果</div><div class="gachaRarityCard338" style="color:${colorDXP338(item.rarity)}">${item.rarity}</div><div class="gachaResultPlus338">${titleHTML(item.title)}</div>${dupText}<p>所持コイン：${playerData.coins||0}</p><button onclick="document.getElementById('gachaPlus338')?.remove();drawGacha()">もう一回引く</button><button onclick="document.getElementById('gachaPlus338')?.remove();showGacha()">ガチャ画面へ</button></div>`;addSymbolsDXP338(stage);particlesDXP338(stage,item.rarity);}
+async function playDXP338(item,duplicate){const stage=stageDXP338("🌌 数式召喚ゲート","円陣生成中...");await new Promise(resolve=>{let done=false;const start=async(e)=>{if(e)e.preventDefault();if(done)return;done=true;await cutinDXP338("解析開始");resolve();};stage.addEventListener("click",start);stage.addEventListener("touchstart",start,{passive:false});});await cutinDXP338("数式解析中...");await judgeDXP338(stage,item);if(item.rarity==="UR"){stage.className="gachaPlus338 gachaURFinal338";stage.innerHTML=`<div class="gachaPlusInner338"><div class="gachaPlusTitle338">🌌 数学宇宙モード</div><div class="bigPiPlus338">π</div><div class="gachaPlusTitle338" style="font-size:22px">数式の核が崩壊する...</div></div>`;addSymbolsDXP338(stage);particlesDXP338(stage,"UR");await sleepDXP(1550);await cutinDXP338("UR解放");}showResultDXP338(stage,item,duplicate);}
+drawGacha=async function(){if((playerData.coins||0)<10){alert("コインが足りません");return;}playerData.coins-=10;const picked=pickAnyDXP338();if(!picked.item){alert("ガチャ称号がありません");showGacha();return;}const duplicate=giveDXP338(picked.item);await playDXP338(picked.item,duplicate);};
+drawGacha10=async function(){if((playerData.coins||0)<100){alert("コインが足りません");return;}playerData.coins-=100;let results=[],hasUR=false;for(let i=0;i<10;i++){const picked=pickAnyDXP338();if(!picked.item){alert("ガチャ称号がありません");showGacha();return;}const duplicate=giveDXP338(picked.item);results.push({item:picked.item,duplicate});if(picked.item.rarity==="UR")hasUR=true;}const stage=stageDXP338("🌌 10連数式召喚","10連円陣生成中...");await new Promise(resolve=>{let done=false;const start=async(e)=>{if(e)e.preventDefault();if(done)return;done=true;await cutinDXP338(hasUR?"🌈 UR反応あり":"解析開始");resolve();};stage.addEventListener("click",start);stage.addEventListener("touchstart",start,{passive:false});});results.sort((a,b)=>({UR:0,SSR:1,SR:2,R:3}[a.item.rarity]-{UR:0,SSR:1,SR:2,R:3}[b.item.rarity]));stage.className="gachaPlus338 "+(hasUR?"gachaURFinal338":"");stage.innerHTML=`<button class="skipPlus338" onclick="document.getElementById('gachaPlus338')?.remove()">閉じる</button><div class="gachaPlusInner338"><div class="gachaPlusTitle338">🎰 10連ガチャ結果</div><p>所持コイン：${playerData.coins||0}</p><button onclick="document.getElementById('gachaPlus338')?.remove();drawGacha10()">もう一度10連</button><button onclick="document.getElementById('gachaPlus338')?.remove();showGacha()">ガチャ画面へ</button></div>`;const inner=stage.querySelector(".gachaPlusInner338");for(const r of results){inner.insertAdjacentHTML("beforeend",`<div class="titleItem"><b style="color:${colorDXP338(r.item.rarity)}">${r.item.rarity}</b><br>${titleHTML(r.item.title)}${r.duplicate?"<br>かぶり：+3コイン":""}</div>`);}addSymbolsDXP338(stage);particlesDXP338(stage,hasUR?"UR":"SSR");};
+window.drawGacha=drawGacha;window.drawGacha10=drawGacha10;
+})();
+
+
+
+/* Ver3.3.8 gacha DX PLUS2: return buttons, reversal, 10-pull one-by-one, better opening */
+(function(){
+if(window.__gachaDXPlus2_338)return;
+window.__gachaDXPlus2_338=true;
+
+function sleepP2(ms){return new Promise(r=>setTimeout(r,ms));}
+function ensureDXP2Style(){
+  if(document.getElementById("gachaDXPlus2Style338"))return;
+  const style=document.createElement("style");
+  style.id="gachaDXPlus2Style338";
+  style.textContent=`
+.gachaP2{position:fixed;inset:0;z-index:999999;background:#000;color:white;overflow:hidden;display:flex;align-items:center;justify-content:center;text-align:center;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
+.gachaP2::before{content:"";position:absolute;inset:-45%;background:radial-gradient(circle at 50% 48%,rgba(255,255,255,.33),transparent 7%),conic-gradient(from 0deg,#00f5ff,#7c3aed,#ff00aa,#ffd700,#00ff99,#00f5ff);opacity:.42;filter:blur(8px);animation:p2BgSpin 5s linear infinite;}
+.gachaP2::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 48%,transparent 0 21%,rgba(0,0,0,.13) 28%,rgba(0,0,0,.82) 76%),repeating-linear-gradient(90deg,rgba(255,255,255,.045) 0 1px,transparent 1px 22px),repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 24px);animation:p2Hue 2s linear infinite;}
+@keyframes p2BgSpin{to{transform:rotate(360deg)}}@keyframes p2Hue{to{filter:hue-rotate(360deg)}}
+.p2Inner{position:relative;z-index:3;width:96%;max-width:920px;}
+.p2TopBtns{position:fixed;left:10px;top:10px;z-index:1000002;display:flex;gap:8px;flex-wrap:wrap}
+.p2SmallBtn{font-size:15px;padding:7px 11px;border-radius:10px;background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.45);}
+.p2StartTitle{font-size:36px;font-weight:1000;letter-spacing:2px;text-shadow:0 0 16px #22d3ee,0 0 38px #7c3aed,0 0 70px #fff;animation:p2TitleIn .9s ease-out both;}
+@keyframes p2TitleIn{from{opacity:0;transform:translateY(-25px) scale(.75)}to{opacity:1;transform:translateY(0) scale(1)}}
+.p2Gate{width:330px;height:330px;margin:24px auto;border-radius:50%;position:relative;background:radial-gradient(circle at center,rgba(255,255,255,.55) 0 7%,rgba(34,211,238,.26) 8% 18%,transparent 19%),conic-gradient(from 0deg,#22d3ee,#fff,#7c3aed,#ff00aa,#ffd700,#22c55e,#22d3ee);border:5px solid rgba(255,255,255,.96);box-shadow:0 0 24px #fff,0 0 58px #22d3ee,0 0 110px #7c3aed,inset 0 0 70px rgba(255,255,255,.28);animation:p2GateSpin 4.3s linear infinite,p2GatePulse .85s ease-in-out infinite alternate;}
+.p2Gate .r1,.p2Gate .r2,.p2Gate .r3,.p2Gate .r4{position:absolute;border-radius:50%;border:2px dashed rgba(255,255,255,.9);}
+.p2Gate .r1{inset:18px;animation:p2Reverse 2.8s linear infinite}.p2Gate .r2{inset:43px;border-style:solid;border-color:#67e8f9;animation:p2GateSpin 1.9s linear infinite}.p2Gate .r3{inset:72px;border-color:#ffd700;animation:p2Reverse 1.5s linear infinite}.p2Gate .r4{inset:103px;border-style:solid;border-color:#ff80ff;animation:p2GateSpin 1.05s linear infinite}
+.p2Gate .core{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:50px;font-weight:1000;text-shadow:0 0 16px #fff,0 0 35px #22d3ee,0 0 70px #ffd700;animation:p2CoreFlash .8s ease-in-out infinite alternate;}
+@keyframes p2GateSpin{to{transform:rotate(360deg)}}@keyframes p2Reverse{to{transform:rotate(-360deg)}}@keyframes p2GatePulse{from{transform:scale(.93);filter:brightness(1)}to{transform:scale(1.08);filter:brightness(1.85)}}@keyframes p2CoreFlash{from{filter:brightness(1)}to{filter:brightness(2.2)}}
+.p2Tap{font-size:36px;font-weight:1000;color:#fde68a;text-shadow:0 0 16px #f59e0b,0 0 35px #fff;animation:p2Tap .68s ease-in-out infinite alternate;}@keyframes p2Tap{from{opacity:.5;transform:scale(.93)}to{opacity:1;transform:scale(1.08)}}
+.p2Symbol{position:absolute;z-index:2;color:rgba(255,255,255,.94);font-weight:1000;text-shadow:0 0 12px #fff,0 0 28px #22d3ee;pointer-events:none;animation:p2SymbolFly linear infinite;}@keyframes p2SymbolFly{from{transform:translateY(118vh) rotate(0deg) scale(.72);opacity:0}12%{opacity:1}80%{opacity:.95}to{transform:translateY(-20vh) rotate(620deg) scale(1.45);opacity:0}}
+.p2Cutin{position:fixed;inset:0;z-index:1000003;background:#000;display:flex;align-items:center;justify-content:center;color:#fff;font-size:54px;font-weight:1000;text-shadow:0 0 18px #fff,0 0 45px #22d3ee,0 0 90px #7c3aed;animation:p2Cutin 1.7s ease-out forwards;}
+@keyframes p2Cutin{0%{opacity:0;transform:scale(1)}13%{opacity:1}72%{opacity:1;filter:brightness(1.25)}100%{opacity:0;transform:scale(1.2);filter:brightness(3)}}
+.p2Rarity{position:relative;z-index:3;font-size:72px;font-weight:1000;margin:18px auto;text-shadow:0 0 24px currentColor,0 0 60px currentColor;animation:p2Rarity .95s ease-out both;}@keyframes p2Rarity{0%{opacity:0;transform:scale(.12) rotate(-12deg)}55%{opacity:1;transform:scale(1.28) rotate(5deg)}80%{transform:scale(.94) rotate(-2deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
+.p2Upgrade{position:relative;z-index:3;font-size:44px;font-weight:1000;color:#fde68a;padding:12px 20px;margin:18px auto;display:inline-block;border:2px solid rgba(255,255,255,.6);background:linear-gradient(90deg,rgba(255,255,255,.08),rgba(255,215,0,.25),rgba(255,255,255,.08));box-shadow:0 0 28px #f59e0b,inset 0 0 24px rgba(255,255,255,.2);text-shadow:0 0 14px #f59e0b,0 0 30px #fff;animation:p2Upgrade .95s ease-out both;}@keyframes p2Upgrade{0%{opacity:0;transform:translateX(-120%) skewX(-15deg)}55%{opacity:1;transform:translateX(8%) skewX(-7deg)}78%{transform:translateX(-3%) skewX(-4deg)}100%{opacity:1;transform:translateX(0) skewX(0)}}
+.p2ReverseBanner{position:relative;z-index:4;font-size:48px;font-weight:1000;color:#fffb00;text-shadow:0 0 16px #fff,0 0 38px #ff8c00,0 0 90px #ff00ff;animation:p2ReverseBanner .95s ease-out both;}@keyframes p2ReverseBanner{0%{opacity:0;transform:scale(.1) rotate(-20deg)}55%{opacity:1;transform:scale(1.25) rotate(6deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
+.p2Crack{position:absolute;inset:0;z-index:4;pointer-events:none;background:linear-gradient(30deg,transparent 48%,rgba(255,255,255,.95) 49%,transparent 51%),linear-gradient(120deg,transparent 46%,rgba(255,255,255,.9) 47%,transparent 49%),linear-gradient(75deg,transparent 58%,rgba(255,255,255,.85) 59%,transparent 61%);animation:p2Crack .7s ease-out forwards;}@keyframes p2Crack{0%{opacity:0;filter:brightness(1)}35%{opacity:1;filter:brightness(5)}100%{opacity:0;filter:brightness(1)}}
+.p2UR{animation:p2URBg .75s ease-in-out infinite alternate;}@keyframes p2URBg{from{filter:hue-rotate(0deg) brightness(1.1)}to{filter:hue-rotate(90deg) brightness(1.55)}}
+.p2Pi{position:relative;z-index:3;font-size:155px;font-weight:1000;text-shadow:0 0 22px #fff,0 0 58px #ffd700,0 0 110px #ff00ff;animation:p2Pi 1.45s ease-out both;}@keyframes p2Pi{0%{opacity:0;transform:scale(.05) rotate(-25deg)}35%{opacity:1;transform:scale(1.35) rotate(8deg)}65%{opacity:1;transform:scale(.92) rotate(-4deg)}82%{opacity:1;transform:scale(1.08);filter:brightness(3)}100%{opacity:0;transform:scale(3) rotate(30deg);filter:brightness(7)}}
+.p2Result{position:relative;z-index:3;font-size:48px;font-weight:1000;margin:16px auto 20px;animation:p2Result .95s ease-out both;}@keyframes p2Result{0%{opacity:0;transform:translateY(-55px) scale(.35)}55%{opacity:1;transform:translateY(10px) scale(1.18)}100%{opacity:1;transform:translateY(0) scale(1)}}
+.p2Particle{position:absolute;z-index:3;font-size:29px;pointer-events:none;animation:p2Particle 1.9s ease-out forwards;}@keyframes p2Particle{from{opacity:1;transform:translateY(0) scale(.6) rotate(0)}to{opacity:0;transform:translateY(-270px) scale(1.95) rotate(380deg)}}
+`;
+  document.head.appendChild(style);
+}
+function p2Color(r){return r==="UR"?"#ffd700":r==="SSR"?"#ff5cff":r==="SR"?"#66e7ff":"#ffffff";}
+function p2Remove(){document.getElementById("gachaP2")?.remove();}
+function p2Stage(title,msg){
+  ensureDXP2Style();p2Remove();
+  const div=document.createElement("div");div.id="gachaP2";div.className="gachaP2";
+  div.innerHTML=`<div class="p2TopBtns"><button class="p2SmallBtn" onclick="p2BackToGacha338()">← ガチャへ戻る</button><button class="p2SmallBtn" onclick="document.getElementById('gachaP2')?.remove()">閉じる</button></div><div class="p2Inner"><div class="p2StartTitle">${title}</div><div class="p2Gate"><div class="r1"></div><div class="r2"></div><div class="r3"></div><div class="r4"></div><div class="core">∫Σπ</div></div><div class="p2StartTitle" style="font-size:22px">${msg}</div><div class="p2Tap">画面をタップして解析開始</div></div>`;
+  document.body.appendChild(div);p2Symbols(div);return div;
+}
+window.p2BackToGacha338=function(){p2Remove(); if(typeof showGacha==="function")showGacha();};
+function p2Symbols(stage){
+  const symbols=["∫","Σ","π","∞","√","lim","dx","dy","log","sin","cos","tan","x²","e^x","f'(x)","∴"];
+  for(let i=0;i<55;i++){const s=document.createElement("div");s.className="p2Symbol";s.textContent=symbols[Math.floor(Math.random()*symbols.length)];s.style.left=(Math.random()*96)+"%";s.style.animationDuration=(3+Math.random()*5.8)+"s";s.style.animationDelay=(-Math.random()*6)+"s";s.style.fontSize=(20+Math.random()*34)+"px";stage.appendChild(s);}
+}
+function p2Particles(stage,rarity){
+  const marks=rarity==="UR"?["✨","🌈","💎","👑","⚡","🔥","🌌","π","∞"]:rarity==="SSR"?["✨","💎","⭐","🔥","Σ"]:rarity==="SR"?["✨","⭐","√","∫"]:["✨","∫","π"];
+  const n=rarity==="UR"?78:rarity==="SSR"?50:rarity==="SR"?32:20;
+  for(let i=0;i<n;i++){const p=document.createElement("div");p.className="p2Particle";p.textContent=marks[Math.floor(Math.random()*marks.length)];p.style.left=(5+Math.random()*90)+"%";p.style.top=(44+Math.random()*39)+"%";p.style.animationDelay=(Math.random()*0.9)+"s";stage.appendChild(p);}
+}
+function p2Cut(label){return new Promise(resolve=>{document.querySelector(".p2Cutin")?.remove();const d=document.createElement("div");d.className="p2Cutin";d.innerHTML=`<div>${label}</div>`;document.body.appendChild(d);setTimeout(()=>{d.remove();resolve();},1750);});}
+function p2Seq(rarity){
+  if(rarity==="UR")return[{label:"R",r:"R"},{label:"SRへ昇格！",r:"SR",up:true},{label:"SSRへ昇格！！",r:"SSR",up:true},{label:"🌈 UR確定！！！",r:"UR",up:true,ur:true}];
+  if(rarity==="SSR")return[{label:"R",r:"R"},{label:"SRへ昇格！",r:"SR",up:true},{label:"SSR！！",r:"SSR",up:true}];
+  if(rarity==="SR")return[{label:"R",r:"R"},{label:"SR！",r:"SR",up:true}];
+  return[{label:"R",r:"R"}];
+}
+function p2Pick(){const item=getGachaResult();const owned=playerData.gachaTitles||[];return{item,duplicate:item?owned.includes(item.title):false};}
+function p2Give(item){if(!playerData.gachaTitles)playerData.gachaTitles=[];const dup=playerData.gachaTitles.includes(item.title);if(dup){playerData.coins=(playerData.coins||0)+3;}else{unlockTitle(item.title);playerData.gachaTitles.push(item.title);}unlockAchievement("初ガチャ");if(item.rarity==="UR"){unlockAchievement("UR獲得");document.body.classList.add("urFlash");setTimeout(()=>document.body.classList.remove("urFlash"),1000);}saveAllData();updateHomeStatus();return dup;}
+async function p2Judge(stage,item){
+  let seq=p2Seq(item.rarity);
+  const reversal = item.rarity==="UR" && Math.random()<0.55;
+  if(reversal){
+    seq=[{label:"R",r:"R"},{label:"SR！",r:"SR",up:true},{label:"SSR！！",r:"SSR",up:true},{label:"……",r:"SSR"},{label:"⚡逆転演出⚡",r:"UR",rev:true},{label:"🌈 UR確定！！！",r:"UR",up:true,ur:true}];
+  }
+  for(let i=0;i<seq.length;i++){
+    const st=seq[i];stage.className="gachaP2 "+(st.ur||st.rev?"p2UR":"");
+    stage.innerHTML=`<div class="p2TopBtns"><button class="p2SmallBtn" onclick="p2BackToGacha338()">← ガチャへ戻る</button><button class="p2SmallBtn" onclick="document.getElementById('gachaP2')?.remove()">閉じる</button></div><div class="p2Inner"><div class="p2StartTitle">⚡ レア度判定</div><div class="${st.rev?'p2ReverseBanner':st.up?'p2Upgrade':'p2Rarity'}" style="color:${p2Color(st.r)}">${st.label}</div><div class="p2StartTitle" style="font-size:20px">${i+1} / ${seq.length}</div></div>`;
+    p2Symbols(stage);p2Particles(stage,st.ur||st.rev?"UR":st.r);
+    if(st.up||st.rev){const c=document.createElement("div");c.className="p2Crack";stage.appendChild(c);}
+    await sleepP2(st.rev?1450:st.ur?1450:1100);
+  }
+}
+function p2Result(stage,item,dup){
+  const dupText=dup?`<p>かぶり：+3コイン返還</p>`:"";
+  stage.className="gachaP2 "+(item.rarity==="UR"?"p2UR":"");
+  stage.innerHTML=`<div class="p2TopBtns"><button class="p2SmallBtn" onclick="p2BackToGacha338()">← ガチャへ戻る</button><button class="p2SmallBtn" onclick="document.getElementById('gachaP2')?.remove()">閉じる</button></div><div class="p2Inner"><div class="p2StartTitle">🎰 ガチャ結果</div><div class="p2Rarity" style="color:${p2Color(item.rarity)}">${item.rarity}</div><div class="p2Result">${titleHTML(item.title)}</div>${dupText}<p>所持コイン：${playerData.coins||0}</p><button onclick="document.getElementById('gachaP2')?.remove();drawGacha()">もう一回引く</button><button onclick="p2BackToGacha338()">ガチャへ戻る</button></div>`;
+  p2Symbols(stage);p2Particles(stage,item.rarity);
+}
+async function p2Play(item,dup){
+  const stage=p2Stage("🌌 数式召喚ゲート","超解析円陣 起動中...");
+  await new Promise(resolve=>{let done=false;const start=async(e)=>{if(e)e.preventDefault();if(done)return;done=true;await p2Cut("解析開始");resolve();};stage.addEventListener("click",start);stage.addEventListener("touchstart",start,{passive:false});});
+  await p2Cut("数式解析中...");
+  await p2Judge(stage,item);
+  if(item.rarity==="UR"){stage.className="gachaP2 p2UR";stage.innerHTML=`<div class="p2Inner"><div class="p2StartTitle">🌌 数学宇宙モード</div><div class="p2Pi">π</div><div class="p2StartTitle" style="font-size:22px">数式の核が崩壊する...</div></div>`;p2Symbols(stage);p2Particles(stage,"UR");await sleepP2(1550);await p2Cut("UR解放");}
+  p2Result(stage,item,dup);
+}
+drawGacha=async function(){if((playerData.coins||0)<10){alert("コインが足りません");return;}playerData.coins-=10;const p=p2Pick();if(!p.item){alert("ガチャ称号がありません");showGacha();return;}const dup=p2Give(p.item);await p2Play(p.item,dup);};
+async function p2PlayOneInTen(item,dup,index,total,hasUR){
+  const stage=p2Stage(`🌌 10連召喚 ${index}/${total}`,`第${index}の円陣 起動中...`);
+  await new Promise(resolve=>{let done=false;const start=async(e)=>{if(e)e.preventDefault();if(done)return;done=true;await p2Cut(hasUR&&index===1?"🌈 UR反応あり":"解析開始");resolve();};stage.addEventListener("click",start);stage.addEventListener("touchstart",start,{passive:false});});
+  await p2Judge(stage,item);
+  p2Result(stage,item,dup);
+  await sleepP2(900);
+}
+drawGacha10=async function(){if((playerData.coins||0)<100){alert("コインが足りません");return;}playerData.coins-=100;let results=[],hasUR=false;for(let i=0;i<10;i++){const p=p2Pick();if(!p.item){alert("ガチャ称号がありません");showGacha();return;}const dup=p2Give(p.item);results.push({item:p.item,duplicate:dup});if(p.item.rarity==="UR")hasUR=true;}for(let i=0;i<results.length;i++){await p2PlayOneInTen(results[i].item,results[i].duplicate,i+1,10,hasUR);}const stage=p2Stage("🎰 10連最終結果","召喚結果一覧");results.sort((a,b)=>({UR:0,SSR:1,SR:2,R:3}[a.item.rarity]-{UR:0,SSR:1,SR:2,R:3}[b.item.rarity]));stage.innerHTML=`<div class="p2TopBtns"><button class="p2SmallBtn" onclick="p2BackToGacha338()">← ガチャへ戻る</button><button class="p2SmallBtn" onclick="document.getElementById('gachaP2')?.remove()">閉じる</button></div><div class="p2Inner"><div class="p2StartTitle">🎰 10連最終結果</div><p>所持コイン：${playerData.coins||0}</p><button onclick="document.getElementById('gachaP2')?.remove();drawGacha10()">もう一度10連</button><button onclick="p2BackToGacha338()">ガチャへ戻る</button></div>`;const inner=stage.querySelector(".p2Inner");for(const r of results){inner.insertAdjacentHTML("beforeend",`<div class="titleItem"><b style="color:${p2Color(r.item.rarity)}">${r.item.rarity}</b><br>${titleHTML(r.item.title)}${r.duplicate?"<br>かぶり：+3コイン":""}</div>`);}p2Symbols(stage);p2Particles(stage,hasUR?"UR":"SSR");};
+window.drawGacha=drawGacha;window.drawGacha10=drawGacha10;
+})();
