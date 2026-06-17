@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.3.8";
+const VERSION = "3.3.9";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -9604,4 +9604,207 @@ drawGacha10=async function(){
   p3Symbols(stage); p3Particles(stage,hasUR?"UR":"SSR");
 };
 window.drawGacha=drawGacha; window.drawGacha10=drawGacha10;
+})();
+
+
+
+/* Ver3.3.9 random B/C/D gacha演出: card / chest / math core */
+(function(){
+if(window.__randomBCDgacha339)return;
+window.__randomBCDgacha339=true;
+
+let g339AudioCtx=null;
+function g339Audio(){
+  try{
+    if(!g339AudioCtx)g339AudioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    if(g339AudioCtx.state==="suspended")g339AudioCtx.resume();
+    return g339AudioCtx;
+  }catch(e){return null;}
+}
+function g339Tone(freq=440,dur=.12,type="sine",gain=.05){
+  const ctx=g339Audio(); if(!ctx)return;
+  const o=ctx.createOscillator(), g=ctx.createGain();
+  o.type=type; o.frequency.setValueAtTime(freq,ctx.currentTime);
+  g.gain.setValueAtTime(gain,ctx.currentTime);
+  g.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+dur);
+  o.connect(g); g.connect(ctx.destination); o.start(); o.stop(ctx.currentTime+dur);
+}
+function g339Noise(dur=.25,gain=.08){
+  const ctx=g339Audio(); if(!ctx)return;
+  const b=ctx.createBuffer(1,Math.floor(ctx.sampleRate*dur),ctx.sampleRate);
+  const d=b.getChannelData(0);
+  for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*(1-i/d.length);
+  const s=ctx.createBufferSource(), g=ctx.createGain();
+  s.buffer=b; g.gain.value=gain; s.connect(g); g.connect(ctx.destination); s.start();
+}
+function g339Sound(k){
+  if(k==="tap"){g339Tone(260,.07,"sine",.04);g339Tone(520,.1,"triangle",.04);}
+  if(k==="flip"){g339Tone(420,.08,"triangle",.045);setTimeout(()=>g339Tone(680,.08,"sine",.04),80);}
+  if(k==="charge"){g339Tone(220,.18,"sawtooth",.035);setTimeout(()=>g339Tone(440,.2,"sawtooth",.035),120);}
+  if(k==="fake"){g339Noise(.16,.045);g339Tone(150,.12,"triangle",.035);}
+  if(k==="crack"){g339Noise(.32,.11);g339Tone(85,.2,"sawtooth",.06);}
+  if(k==="boom"){g339Noise(.5,.12);g339Tone(70,.28,"sawtooth",.07);}
+  if(k==="ur"){g339Tone(523,.18,"triangle",.06);setTimeout(()=>g339Tone(659,.18,"triangle",.06),120);setTimeout(()=>g339Tone(988,.38,"sine",.07),260);}
+  if(k==="result"){g339Tone(660,.12,"sine",.05);setTimeout(()=>g339Tone(880,.14,"sine",.05),110);}
+}
+function g339Sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+function g339Color(r){return r==="UR"?"#ffd700":r==="SSR"?"#ff4dff":r==="SR"?"#66e7ff":"#fff";}
+function g339Ensure(){
+ if(document.getElementById("g339Style"))return;
+ const st=document.createElement("style");
+ st.id="g339Style";
+ st.textContent=`
+.g339{position:fixed;inset:0;z-index:999999;background:#000;color:white;overflow:hidden;display:flex;align-items:center;justify-content:center;text-align:center;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
+.g339::before{content:"";position:absolute;inset:-45%;background:radial-gradient(circle at 50% 45%,rgba(255,255,255,.32),transparent 7%),conic-gradient(from 0deg,#00f5ff,#7c3aed,#ff00aa,#ffd700,#00ff99,#00f5ff);opacity:.35;filter:blur(9px);animation:g339spin 5.5s linear infinite}
+.g339::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,transparent 0 23%,rgba(0,0,0,.22) 32%,rgba(0,0,0,.84) 78%),repeating-radial-gradient(circle at 50% 50%,rgba(255,255,255,.055) 0 2px,transparent 2px 20px);}
+@keyframes g339spin{to{transform:rotate(360deg)}}
+.g339in{position:relative;z-index:3;width:96%;max-width:920px;}
+.g339btns{position:fixed;left:10px;top:10px;z-index:1000002;display:flex;gap:8px;flex-wrap:wrap}
+.g339btn{font-size:15px;padding:7px 11px;border-radius:10px;background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.45);}
+.g339title{font-size:36px;font-weight:1000;letter-spacing:2px;text-shadow:0 0 16px #22d3ee,0 0 38px #7c3aed,0 0 70px #fff;animation:g339pop .85s ease-out both}
+@keyframes g339pop{from{opacity:0;transform:translateY(-25px) scale(.75)}to{opacity:1;transform:translateY(0) scale(1)}}
+.g339tap{font-size:34px;font-weight:1000;color:#fde68a;text-shadow:0 0 16px #f59e0b,0 0 35px #fff;animation:g339tap .68s ease-in-out infinite alternate}@keyframes g339tap{from{opacity:.5;transform:scale(.93)}to{opacity:1;transform:scale(1.08)}}
+.g339sym{position:absolute;z-index:2;color:rgba(255,255,255,.94);font-weight:1000;text-shadow:0 0 12px #fff,0 0 28px #22d3ee;pointer-events:none;animation:g339fly linear infinite}@keyframes g339fly{from{transform:translateY(118vh) rotate(0deg) scale(.72);opacity:0}12%{opacity:1}80%{opacity:.95}to{transform:translateY(-20vh) rotate(620deg) scale(1.45);opacity:0}}
+.g339cut{position:fixed;inset:0;z-index:1000003;background:#000;display:flex;align-items:center;justify-content:center;color:#fff;font-size:54px;font-weight:1000;text-shadow:0 0 18px #fff,0 0 45px #22d3ee,0 0 90px #7c3aed;animation:g339cut 1.65s ease-out forwards}@keyframes g339cut{0%{opacity:0;transform:scale(1)}13%{opacity:1}72%{opacity:1;filter:brightness(1.25)}100%{opacity:0;transform:scale(1.2);filter:brightness(3)}}
+.g339particle{position:absolute;z-index:3;font-size:29px;pointer-events:none;animation:g339particle 1.9s ease-out forwards}@keyframes g339particle{from{opacity:1;transform:translateY(0) scale(.6) rotate(0)}to{opacity:0;transform:translateY(-270px) scale(1.95) rotate(380deg)}}
+.g339cardWrap{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;max-width:720px;margin:25px auto}
+.g339card{height:135px;border-radius:16px;background:linear-gradient(135deg,#111827,#312e81,#020617);border:2px solid rgba(255,255,255,.52);box-shadow:0 0 18px rgba(34,211,238,.45),inset 0 0 26px rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-size:42px;font-weight:1000;transform-style:preserve-3d;animation:g339cardIn .75s ease-out both}
+@keyframes g339cardIn{from{opacity:0;transform:translateY(30px) rotateY(80deg)}to{opacity:1;transform:translateY(0) rotateY(0)}}
+.g339card.open{animation:g339flip .72s ease-out both;background:linear-gradient(135deg,rgba(255,255,255,.24),rgba(124,58,237,.42),rgba(0,0,0,.55))}
+@keyframes g339flip{0%{transform:rotateY(0) scale(1)}50%{transform:rotateY(90deg) scale(1.12)}100%{transform:rotateY(0) scale(1.05)}}
+.g339chest{font-size:150px;filter:drop-shadow(0 0 28px #ffd700);animation:g339drop .9s ease-out both}
+@keyframes g339drop{0%{opacity:0;transform:translateY(-220px) scale(.6)}70%{opacity:1;transform:translateY(20px) scale(1.12)}100%{opacity:1;transform:translateY(0) scale(1)}}
+.g339shake{animation:g339shake .55s ease-in-out both}@keyframes g339shake{0%{transform:translateX(0)}20%{transform:translateX(-12px)}40%{transform:translateX(12px)}60%{transform:translateX(-8px)}80%{transform:translateX(8px)}100%{transform:translateX(0)}}
+.g339fake{font-size:34px;font-weight:1000;color:#fff;text-shadow:0 0 14px #fff,0 0 30px #22d3ee;animation:g339fake .75s ease-out both}@keyframes g339fake{0%{opacity:0;transform:scale(.5)}45%{opacity:1;transform:scale(1.15)}100%{opacity:0;transform:scale(1.35)}}
+.g339core{width:330px;height:330px;margin:24px auto;border-radius:50%;position:relative;background:radial-gradient(circle at center,rgba(255,255,255,.55) 0 7%,rgba(34,211,238,.26) 8% 18%,transparent 19%),conic-gradient(from 0deg,#22d3ee,#fff,#7c3aed,#ff00aa,#ffd700,#22c55e,#22d3ee);border:5px solid rgba(255,255,255,.96);box-shadow:0 0 24px #fff,0 0 58px #22d3ee,0 0 110px #7c3aed,inset 0 0 70px rgba(255,255,255,.28);animation:g339coreSpin 4.3s linear infinite,g339corePulse .85s ease-in-out infinite alternate}
+.g339core::before{content:"";position:absolute;inset:44px;border-radius:50%;border:3px dashed #fff;animation:g339coreRev 2.4s linear infinite}.g339core::after{content:"π";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:110px;font-weight:1000;text-shadow:0 0 22px #fff,0 0 60px #ffd700}
+@keyframes g339coreSpin{to{transform:rotate(360deg)}}@keyframes g339coreRev{to{transform:rotate(-360deg)}}@keyframes g339corePulse{from{transform:scale(.94);filter:brightness(1)}to{transform:scale(1.08);filter:brightness(1.8)}}
+.g339crack{position:absolute;inset:0;z-index:4;pointer-events:none;background:linear-gradient(30deg,transparent 48%,rgba(255,255,255,.95) 49%,transparent 51%),linear-gradient(120deg,transparent 46%,rgba(255,255,255,.9) 47%,transparent 49%),linear-gradient(75deg,transparent 58%,rgba(255,255,255,.85) 59%,transparent 61%);animation:g339crack .72s ease-out forwards}@keyframes g339crack{0%{opacity:0;filter:brightness(1)}35%{opacity:1;filter:brightness(5)}100%{opacity:0;filter:brightness(1)}}
+.g339result{font-size:48px;font-weight:1000;margin:16px auto 20px;animation:g339result .95s ease-out both}@keyframes g339result{0%{opacity:0;transform:translateY(-55px) scale(.35)}55%{opacity:1;transform:translateY(10px) scale(1.18)}100%{opacity:1;transform:translateY(0) scale(1)}}
+.g339rarity{font-size:72px;font-weight:1000;margin:18px auto;text-shadow:0 0 24px currentColor,0 0 60px currentColor;animation:g339result .95s ease-out both}
+.g339ur{animation:g339ur .75s ease-in-out infinite alternate}@keyframes g339ur{from{filter:hue-rotate(0deg) brightness(1.1)}to{filter:hue-rotate(90deg) brightness(1.55)}}
+`;
+ document.head.appendChild(st);
+}
+function g339Remove(){document.getElementById("g339")?.remove();}
+window.g339Back=function(){g339Remove(); if(typeof showGacha==="function")showGacha();};
+function g339Base(title,msg){
+ g339Ensure(); g339Remove();
+ const div=document.createElement("div"); div.id="g339"; div.className="g339";
+ div.innerHTML=`<div class="g339btns"><button class="g339btn" onclick="g339Back()">← ガチャへ戻る</button><button class="g339btn" onclick="document.getElementById('g339')?.remove()">閉じる</button></div><div class="g339in"><div class="g339title">${title}</div><p>${msg}</p><div class="g339tap">画面をタップして開始</div></div>`;
+ document.body.appendChild(div); g339Symbols(div); return div;
+}
+function g339Symbols(stage){
+ const s=["∫","Σ","π","∞","√","lim","dx","log","sin","cos","tan","x²","e^x","∴"];
+ for(let i=0;i<48;i++){const e=document.createElement("div");e.className="g339sym";e.textContent=s[Math.floor(Math.random()*s.length)];e.style.left=(Math.random()*96)+"%";e.style.animationDuration=(3+Math.random()*5.8)+"s";e.style.animationDelay=(-Math.random()*6)+"s";e.style.fontSize=(20+Math.random()*34)+"px";stage.appendChild(e);}
+}
+function g339Particles(stage,r){
+ const m=r==="UR"?["✨","🌈","💎","👑","⚡","🔥","🌌","π","∞"]:r==="SSR"?["✨","💎","⭐","🔥","Σ"]:r==="SR"?["✨","⭐","√","∫"]:["✨","∫","π"];
+ const n=r==="UR"?78:r==="SSR"?50:r==="SR"?32:20;
+ for(let i=0;i<n;i++){const p=document.createElement("div");p.className="g339particle";p.textContent=m[Math.floor(Math.random()*m.length)];p.style.left=(5+Math.random()*90)+"%";p.style.top=(44+Math.random()*39)+"%";p.style.animationDelay=(Math.random()*0.9)+"s";stage.appendChild(p);}
+}
+function g339Cut(label,sound="charge"){return new Promise(resolve=>{g339Sound(sound);document.querySelector(".g339cut")?.remove();const d=document.createElement("div");d.className="g339cut";d.innerHTML=`<div>${label}</div>`;document.body.appendChild(d);setTimeout(()=>{d.remove();resolve();},1650);});}
+function g339Pick(){const item=getGachaResult();const owned=playerData.gachaTitles||[];return{item,duplicate:item?owned.includes(item.title):false};}
+function g339Give(item){
+ if(!playerData.gachaTitles)playerData.gachaTitles=[];
+ const dup=playerData.gachaTitles.includes(item.title);
+ if(dup){playerData.coins=(playerData.coins||0)+3;}else{unlockTitle(item.title);playerData.gachaTitles.push(item.title);}
+ unlockAchievement("初ガチャ");
+ if(item.rarity==="UR"){unlockAchievement("UR獲得");document.body.classList.add("urFlash");setTimeout(()=>document.body.classList.remove("urFlash"),1000);}
+ saveAllData(); updateHomeStatus(); return dup;
+}
+function g339Mode(){const r=Math.random()*100; return r<25?"card":r<60?"chest":"core";}
+async function g339WaitTap(stage,label){
+ await new Promise(resolve=>{let done=false;const start=async(e)=>{if(e)e.preventDefault();if(done)return;done=true;g339Sound("tap");await g339Cut(label||"解析開始","charge");resolve();};stage.addEventListener("click",start);stage.addEventListener("touchstart",start,{passive:false});});
+}
+async function g339Card(item){
+ const stage=g339Base("🎴 数式カード開封","カードから称号を解析中...");
+ const wrap=document.createElement("div");wrap.className="g339cardWrap";stage.querySelector(".g339in").appendChild(wrap);
+ for(let i=0;i<10;i++){const c=document.createElement("div");c.className="g339card";c.textContent="∫";c.style.animationDelay=(i*.06)+"s";wrap.appendChild(c);}
+ await g339WaitTap(stage,"カード解析開始");
+ const cards=[...wrap.children];
+ for(let i=0;i<cards.length;i++){g339Sound("flip");cards[i].classList.add("open");cards[i].textContent=["√","Σ","π","∞"][Math.floor(Math.random()*4)];await g339Sleep(150);}
+ const last=cards[Math.floor(Math.random()*cards.length)];
+ last.style.color=g339Color(item.rarity); last.style.boxShadow=`0 0 35px ${g339Color(item.rarity)}`; last.textContent=item.rarity==="UR"?"🌈":item.rarity==="SSR"?"💎":item.rarity==="SR"?"⭐":"∫";
+ if(item.rarity==="UR"){await g339Cut("虹カード出現","ur");}
+}
+async function g339Chest(item){
+ const stage=g339Base("📦 数式宝箱","宝箱から称号を召喚中...");
+ stage.querySelector(".g339in").insertAdjacentHTML("beforeend",`<div id="g339Chest" class="g339chest">📦</div>`);
+ await g339WaitTap(stage,"宝箱解析開始");
+ const chest=document.getElementById("g339Chest");
+ g339Sound("crack"); chest.classList.add("g339shake");
+ let c=document.createElement("div");c.className="g339crack";stage.appendChild(c);
+ await g339Sleep(800);
+ if(Math.random()<0.55){g339Sound("fake");stage.querySelector(".g339in").insertAdjacentHTML("beforeend",`<div class="g339fake">……まだ割れない</div>`);await g339Sleep(900);}
+ g339Sound("boom"); chest.textContent=item.rarity==="UR"?"🌈":"💥"; c=document.createElement("div");c.className="g339crack";stage.appendChild(c);g339Particles(stage,item.rarity);
+ if(item.rarity==="UR"){await g339Cut("虹爆発","ur");}else{await g339Sleep(900);}
+}
+async function g339Core(item){
+ const stage=g339Base("🌌 数学コア暴走","πコアにエネルギーを充填中...");
+ stage.querySelector(".g339in").insertAdjacentHTML("beforeend",`<div class="g339core"></div>`);
+ await g339WaitTap(stage,"コア起動");
+ await g339Cut("エネルギー充填","charge");
+ if(Math.random()<0.45&&item.rarity!=="R"){g339Sound("fake");stage.querySelector(".g339in").insertAdjacentHTML("beforeend",`<div class="g339fake">割れる……？</div>`);await g339Sleep(800);}
+ g339Sound("crack");let c=document.createElement("div");c.className="g339crack";stage.appendChild(c);await g339Sleep(600);
+ if(item.rarity==="UR"){stage.classList.add("g339ur");await g339Cut("コア暴走","ur");}
+ g339Sound("boom");g339Particles(stage,item.rarity);await g339Sleep(900);
+}
+function g339Result(stage,item,dup){
+ g339Sound("result");
+ const dupText=dup?`<p>かぶり：+3コイン返還</p>`:"";
+ stage.className="g339 "+(item.rarity==="UR"?"g339ur":"");
+ stage.innerHTML=`<div class="g339btns"><button class="g339btn" onclick="g339Back()">← ガチャへ戻る</button><button class="g339btn" onclick="document.getElementById('g339')?.remove()">閉じる</button></div><div class="g339in"><div class="g339title">🎰 ガチャ結果</div><div class="g339rarity" style="color:${g339Color(item.rarity)}">${item.rarity}</div><div class="g339result">${titleHTML(item.title)}</div>${dupText}<p>所持コイン：${playerData.coins||0}</p><button onclick="document.getElementById('g339')?.remove();drawGacha()">もう一回引く</button><button onclick="g339Back()">ガチャへ戻る</button></div>`;
+ g339Symbols(stage); g339Particles(stage,item.rarity);
+}
+async function g339Play(item,dup,mode){
+ const chosen=mode||g339Mode();
+ if(chosen==="card")await g339Card(item);
+ else if(chosen==="chest")await g339Chest(item);
+ else await g339Core(item);
+ const stage=document.getElementById("g339");
+ if(item.rarity==="UR")await g339Cut("UR解放","ur");
+ g339Result(stage,item,dup);
+}
+drawGacha=async function(){
+ if((playerData.coins||0)<10){alert("コインが足りません");return;}
+ playerData.coins-=10;
+ const p=g339Pick(); if(!p.item){alert("ガチャ称号がありません");showGacha();return;}
+ const dup=g339Give(p.item);
+ await g339Play(p.item,dup);
+};
+drawGacha10=async function(){
+ if((playerData.coins||0)<100){alert("コインが足りません");return;}
+ playerData.coins-=100;
+ let results=[],hasUR=false;
+ for(let i=0;i<10;i++){const p=g339Pick();if(!p.item){alert("ガチャ称号がありません");showGacha();return;}const dup=g339Give(p.item);results.push({item:p.item,duplicate:dup});if(p.item.rarity==="UR")hasUR=true;}
+ const mode=g339Mode();
+ const stage=g339Base(mode==="card"?"🎴 10連カード開封":mode==="chest"?"📦 10連宝箱召喚":"🌌 10連数学コア", "10連演出を開始します");
+ await g339WaitTap(stage,hasUR?"🌈 UR反応あり":"解析開始");
+ for(let i=0;i<results.length;i++){
+   const r=results[i];
+   document.getElementById("g339")?.remove();
+   if(mode==="card")await g339Card(r.item);
+   else if(mode==="chest")await g339Chest(r.item);
+   else await g339Core(r.item);
+   const st=document.getElementById("g339");
+   g339Result(st,r.item,r.duplicate);
+   await g339Sleep(650);
+ }
+ results.sort((a,b)=>({UR:0,SSR:1,SR:2,R:3}[a.item.rarity]-{UR:0,SSR:1,SR:2,R:3}[b.item.rarity]));
+ const final=g339Base("🎰 10連最終結果","召喚結果一覧");
+ final.className="g339 "+(hasUR?"g339ur":"");
+ final.innerHTML=`<div class="g339btns"><button class="g339btn" onclick="g339Back()">← ガチャへ戻る</button><button class="g339btn" onclick="document.getElementById('g339')?.remove()">閉じる</button></div><div class="g339in"><div class="g339title">🎰 10連最終結果</div><p>所持コイン：${playerData.coins||0}</p><button onclick="document.getElementById('g339')?.remove();drawGacha10()">もう一度10連</button><button onclick="g339Back()">ガチャへ戻る</button></div>`;
+ const inner=final.querySelector(".g339in");
+ for(const r of results){inner.insertAdjacentHTML("beforeend",`<div class="titleItem"><b style="color:${g339Color(r.item.rarity)}">${r.item.rarity}</b><br>${titleHTML(r.item.title)}${r.duplicate?"<br>かぶり：+3コイン":""}</div>`);}
+ g339Symbols(final); g339Particles(final,hasUR?"UR":"SSR");
+};
+const oldNews339=typeof showNewsPage==="function"?showNewsPage:null;
+showNewsPage=function(){
+ let html=`<h2>📢 お知らせ</h2><div class="newsCard"><h3>Ver 3.3.9 ランダムガチャ演出</h3><p>カード開封・宝箱・数学コアの3種類の演出をランダム追加しました。</p><p>音、フェイント、虹演出、10連連続召喚を強化しました。</p><p>ランキング・ログイン・Firebase処理は変更していません。</p></div>`;
+ if(oldNews339){try{oldNews339();const p=document.getElementById("panelArea");if(p)p.innerHTML=html+p.innerHTML;return;}catch(e){}}
+ document.getElementById("panelArea").innerHTML=html;
+ if(typeof ensureHomeButton==="function")ensureHomeButton();
+};
+window.drawGacha=drawGacha;window.drawGacha10=drawGacha10;window.showNewsPage=showNewsPage;
 })();
