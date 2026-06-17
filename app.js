@@ -9407,3 +9407,201 @@ async function p2PlayOneInTen(item,dup,index,total,hasUR){
 drawGacha10=async function(){if((playerData.coins||0)<100){alert("コインが足りません");return;}playerData.coins-=100;let results=[],hasUR=false;for(let i=0;i<10;i++){const p=p2Pick();if(!p.item){alert("ガチャ称号がありません");showGacha();return;}const dup=p2Give(p.item);results.push({item:p.item,duplicate:dup});if(p.item.rarity==="UR")hasUR=true;}for(let i=0;i<results.length;i++){await p2PlayOneInTen(results[i].item,results[i].duplicate,i+1,10,hasUR);}const stage=p2Stage("🎰 10連最終結果","召喚結果一覧");results.sort((a,b)=>({UR:0,SSR:1,SR:2,R:3}[a.item.rarity]-{UR:0,SSR:1,SR:2,R:3}[b.item.rarity]));stage.innerHTML=`<div class="p2TopBtns"><button class="p2SmallBtn" onclick="p2BackToGacha338()">← ガチャへ戻る</button><button class="p2SmallBtn" onclick="document.getElementById('gachaP2')?.remove()">閉じる</button></div><div class="p2Inner"><div class="p2StartTitle">🎰 10連最終結果</div><p>所持コイン：${playerData.coins||0}</p><button onclick="document.getElementById('gachaP2')?.remove();drawGacha10()">もう一度10連</button><button onclick="p2BackToGacha338()">ガチャへ戻る</button></div>`;const inner=stage.querySelector(".p2Inner");for(const r of results){inner.insertAdjacentHTML("beforeend",`<div class="titleItem"><b style="color:${p2Color(r.item.rarity)}">${r.item.rarity}</b><br>${titleHTML(r.item.title)}${r.duplicate?"<br>かぶり：+3コイン":""}</div>`);}p2Symbols(stage);p2Particles(stage,hasUR?"UR":"SSR");};
 window.drawGacha=drawGacha;window.drawGacha10=drawGacha10;
 })();
+
+
+
+/* Ver3.3.8 gacha DX PLUS3: one tap 10-pull, sound, hidden progress, fake crack */
+(function(){
+if(window.__gachaDXPlus3_338)return;
+window.__gachaDXPlus3_338=true;
+
+let p3AudioCtx=null;
+function p3Audio(){
+  try{
+    if(!p3AudioCtx)p3AudioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    if(p3AudioCtx.state==="suspended")p3AudioCtx.resume();
+    return p3AudioCtx;
+  }catch(e){return null;}
+}
+function p3Tone(freq,dur,type,gain){
+  const ctx=p3Audio(); if(!ctx)return;
+  const o=ctx.createOscillator(), g=ctx.createGain();
+  o.type=type||"sine"; o.frequency.setValueAtTime(freq,ctx.currentTime);
+  g.gain.setValueAtTime(gain||0.05,ctx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.0001,ctx.currentTime+dur);
+  o.connect(g); g.connect(ctx.destination); o.start(); o.stop(ctx.currentTime+dur);
+}
+function p3Noise(dur,gain){
+  const ctx=p3Audio(); if(!ctx)return;
+  const b=ctx.createBuffer(1,Math.floor(ctx.sampleRate*dur),ctx.sampleRate);
+  const d=b.getChannelData(0);
+  for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*(1-i/d.length);
+  const s=ctx.createBufferSource(), g=ctx.createGain();
+  s.buffer=b; g.gain.value=gain||0.08; s.connect(g); g.connect(ctx.destination); s.start();
+}
+function p3Sound(k){
+  if(k==="tap"){p3Tone(220,.08,"sine",.04);p3Tone(440,.12,"triangle",.045);}
+  if(k==="charge"){p3Tone(330,.18,"sawtooth",.035);setTimeout(()=>p3Tone(495,.18,"sawtooth",.035),90);}
+  if(k==="upgrade"){p3Tone(523,.12,"square",.045);setTimeout(()=>p3Tone(784,.16,"square",.045),100);}
+  if(k==="crack"){p3Noise(.32,.11);p3Tone(90,.18,"sawtooth",.06);}
+  if(k==="fake"){p3Noise(.16,.045);p3Tone(160,.11,"triangle",.035);}
+  if(k==="ur"){p3Tone(523,.18,"triangle",.06);setTimeout(()=>p3Tone(659,.18,"triangle",.06),120);setTimeout(()=>p3Tone(988,.35,"sine",.07),260);}
+  if(k==="result"){p3Tone(660,.12,"sine",.05);setTimeout(()=>p3Tone(880,.14,"sine",.05),110);}
+}
+function p3Sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+function p3Color(r){return r==="UR"?"#ffd700":r==="SSR"?"#ff5cff":r==="SR"?"#66e7ff":"#ffffff";}
+function p3EnsureStyle(){
+  if(document.getElementById("gachaDXPlus3Style338"))return;
+  const st=document.createElement("style");
+  st.id="gachaDXPlus3Style338";
+  st.textContent=`
+.p3SoundNote{font-size:14px;opacity:.72;margin-top:6px}
+.p3FakeCrackText{position:relative;z-index:5;font-size:36px;font-weight:1000;color:#fff;text-shadow:0 0 14px #fff,0 0 30px #22d3ee;animation:p3FakeText .75s ease-out both}
+@keyframes p3FakeText{0%{opacity:0;transform:scale(.5)}45%{opacity:1;transform:scale(1.15)}100%{opacity:0;transform:scale(1.35)}}
+`;
+  document.head.appendChild(st);
+}
+function p3Remove(){document.getElementById("gachaP2")?.remove();}
+window.p2BackToGacha338=function(){p3Remove(); if(typeof showGacha==="function")showGacha();};
+function p3Stage(title,msg){
+  p3EnsureStyle();
+  p3Remove();
+  const div=document.createElement("div");
+  div.id="gachaP2"; div.className="gachaP2";
+  div.innerHTML=`<div class="p2TopBtns"><button class="p2SmallBtn" onclick="p2BackToGacha338()">← ガチャへ戻る</button><button class="p2SmallBtn" onclick="document.getElementById('gachaP2')?.remove()">閉じる</button></div><div class="p2Inner"><div class="p2StartTitle">${title}</div><div class="p2Gate"><div class="r1"></div><div class="r2"></div><div class="r3"></div><div class="r4"></div><div class="core">∫Σπ</div></div><div class="p2StartTitle" style="font-size:22px">${msg}</div><div class="p2Tap">画面をタップして解析開始</div><div class="p3SoundNote">※音が出ます</div></div>`;
+  document.body.appendChild(div); p3Symbols(div); return div;
+}
+function p3Symbols(stage){
+  const symbols=["∫","Σ","π","∞","√","lim","dx","dy","log","sin","cos","tan","x²","e^x","f'(x)","∴"];
+  for(let i=0;i<55;i++){
+    const s=document.createElement("div"); s.className="p2Symbol";
+    s.textContent=symbols[Math.floor(Math.random()*symbols.length)];
+    s.style.left=(Math.random()*96)+"%"; s.style.animationDuration=(3+Math.random()*5.8)+"s";
+    s.style.animationDelay=(-Math.random()*6)+"s"; s.style.fontSize=(20+Math.random()*34)+"px";
+    stage.appendChild(s);
+  }
+}
+function p3Particles(stage,rarity){
+  const marks=rarity==="UR"?["✨","🌈","💎","👑","⚡","🔥","🌌","π","∞"]:rarity==="SSR"?["✨","💎","⭐","🔥","Σ"]:rarity==="SR"?["✨","⭐","√","∫"]:["✨","∫","π"];
+  const n=rarity==="UR"?78:rarity==="SSR"?50:rarity==="SR"?32:20;
+  for(let i=0;i<n;i++){
+    const p=document.createElement("div"); p.className="p2Particle";
+    p.textContent=marks[Math.floor(Math.random()*marks.length)];
+    p.style.left=(5+Math.random()*90)+"%"; p.style.top=(44+Math.random()*39)+"%";
+    p.style.animationDelay=(Math.random()*0.9)+"s"; stage.appendChild(p);
+  }
+}
+function p3Cut(label,sound){
+  return new Promise(resolve=>{
+    p3Sound(sound||"charge");
+    document.querySelector(".p2Cutin")?.remove();
+    const d=document.createElement("div"); d.className="p2Cutin"; d.innerHTML=`<div>${label}</div>`;
+    document.body.appendChild(d);
+    setTimeout(()=>{d.remove();resolve();},1750);
+  });
+}
+function p3Seq(r){
+  if(r==="UR")return[{label:"R",r:"R"},{label:"SRへ昇格！",r:"SR",up:true},{label:"SSRへ昇格！！",r:"SSR",up:true},{label:"🌈 UR確定！！！",r:"UR",up:true,ur:true}];
+  if(r==="SSR")return[{label:"R",r:"R"},{label:"SRへ昇格！",r:"SR",up:true},{label:"SSR！！",r:"SSR",up:true}];
+  if(r==="SR")return[{label:"R",r:"R"},{label:"SR！",r:"SR",up:true}];
+  return[{label:"R",r:"R"}];
+}
+function p3Pick(){const item=getGachaResult();const owned=playerData.gachaTitles||[];return{item,duplicate:item?owned.includes(item.title):false};}
+function p3Give(item){
+  if(!playerData.gachaTitles)playerData.gachaTitles=[];
+  const dup=playerData.gachaTitles.includes(item.title);
+  if(dup){playerData.coins=(playerData.coins||0)+3;}else{unlockTitle(item.title);playerData.gachaTitles.push(item.title);}
+  unlockAchievement("初ガチャ");
+  if(item.rarity==="UR"){unlockAchievement("UR獲得");document.body.classList.add("urFlash");setTimeout(()=>document.body.classList.remove("urFlash"),1000);}
+  saveAllData(); updateHomeStatus(); return dup;
+}
+async function p3FakeCrack(stage){
+  p3Sound("fake");
+  const c=document.createElement("div"); c.className="p2Crack"; stage.appendChild(c);
+  const t=document.createElement("div"); t.className="p3FakeCrackText"; t.textContent="……まだ割れない";
+  stage.querySelector(".p2Inner")?.appendChild(t);
+  await p3Sleep(900);
+}
+async function p3Judge(stage,item){
+  let seq=p3Seq(item.rarity);
+  const reversal=item.rarity==="UR"&&Math.random()<0.55;
+  const fakeCrack=item.rarity!=="R"&&Math.random()<0.45;
+  if(reversal){
+    seq=[{label:"R",r:"R"},{label:"SR！",r:"SR",up:true},{label:"SSR！！",r:"SSR",up:true},{label:"……",r:"SSR",fake:true},{label:"⚡逆転演出⚡",r:"UR",rev:true},{label:"🌈 UR確定！！！",r:"UR",up:true,ur:true}];
+  }
+  for(let i=0;i<seq.length;i++){
+    const st=seq[i]; stage.className="gachaP2 "+(st.ur||st.rev?"p2UR":"");
+    stage.innerHTML=`<div class="p2TopBtns"><button class="p2SmallBtn" onclick="p2BackToGacha338()">← ガチャへ戻る</button><button class="p2SmallBtn" onclick="document.getElementById('gachaP2')?.remove()">閉じる</button></div><div class="p2Inner"><div class="p2StartTitle">⚡ レア度判定</div><div class="${st.rev?'p2ReverseBanner':st.up?'p2Upgrade':'p2Rarity'}" style="color:${p3Color(st.r)}">${st.label}</div></div>`;
+    p3Symbols(stage); p3Particles(stage,st.ur||st.rev?"UR":st.r);
+    if(st.fake)await p3FakeCrack(stage);
+    if(fakeCrack && i===0)await p3FakeCrack(stage);
+    if(st.up||st.rev){
+      p3Sound(st.ur?"ur":"upgrade");
+      const c=document.createElement("div"); c.className="p2Crack"; stage.appendChild(c);
+      p3Sound("crack");
+    }
+    await p3Sleep(st.rev?1450:st.ur?1450:1100);
+  }
+}
+function p3Result(stage,item,dup){
+  p3Sound("result");
+  const dupText=dup?`<p>かぶり：+3コイン返還</p>`:"";
+  stage.className="gachaP2 "+(item.rarity==="UR"?"p2UR":"");
+  stage.innerHTML=`<div class="p2TopBtns"><button class="p2SmallBtn" onclick="p2BackToGacha338()">← ガチャへ戻る</button><button class="p2SmallBtn" onclick="document.getElementById('gachaP2')?.remove()">閉じる</button></div><div class="p2Inner"><div class="p2StartTitle">🎰 ガチャ結果</div><div class="p2Rarity" style="color:${p3Color(item.rarity)}">${item.rarity}</div><div class="p2Result">${titleHTML(item.title)}</div>${dupText}<p>所持コイン：${playerData.coins||0}</p><button onclick="document.getElementById('gachaP2')?.remove();drawGacha()">もう一回引く</button><button onclick="p2BackToGacha338()">ガチャへ戻る</button></div>`;
+  p3Symbols(stage); p3Particles(stage,item.rarity);
+}
+async function p3Play(item,dup){
+  const stage=p3Stage("🌌 数式召喚ゲート","超解析円陣 起動中...");
+  await new Promise(resolve=>{
+    let done=false;
+    const start=async(e)=>{if(e)e.preventDefault();if(done)return;done=true;p3Sound("tap");await p3Cut("解析開始","charge");resolve();};
+    stage.addEventListener("click",start); stage.addEventListener("touchstart",start,{passive:false});
+  });
+  await p3Cut("数式解析中...","charge");
+  await p3Judge(stage,item);
+  if(item.rarity==="UR"){
+    stage.className="gachaP2 p2UR";
+    stage.innerHTML=`<div class="p2Inner"><div class="p2StartTitle">🌌 数学宇宙モード</div><div class="p2Pi">π</div><div class="p2StartTitle" style="font-size:22px">数式の核が崩壊する...</div></div>`;
+    p3Symbols(stage); p3Particles(stage,"UR"); p3Sound("crack"); await p3Sleep(1550); await p3Cut("UR解放","ur");
+  }
+  p3Result(stage,item,dup);
+}
+drawGacha=async function(){
+  if((playerData.coins||0)<10){alert("コインが足りません");return;}
+  playerData.coins-=10;
+  const p=p3Pick(); if(!p.item){alert("ガチャ称号がありません");showGacha();return;}
+  const dup=p3Give(p.item); await p3Play(p.item,dup);
+};
+drawGacha10=async function(){
+  if((playerData.coins||0)<100){alert("コインが足りません");return;}
+  playerData.coins-=100;
+  let results=[],hasUR=false;
+  for(let i=0;i<10;i++){
+    const p=p3Pick(); if(!p.item){alert("ガチャ称号がありません");showGacha();return;}
+    const dup=p3Give(p.item); results.push({item:p.item,duplicate:dup}); if(p.item.rarity==="UR")hasUR=true;
+  }
+  const stage=p3Stage("🌌 10連数式召喚","10連円陣 起動中...");
+  await new Promise(resolve=>{
+    let done=false;
+    const start=async(e)=>{if(e)e.preventDefault();if(done)return;done=true;p3Sound("tap");await p3Cut(hasUR?"🌈 UR反応あり":"解析開始",hasUR?"ur":"charge");resolve();};
+    stage.addEventListener("click",start); stage.addEventListener("touchstart",start,{passive:false});
+  });
+  for(let i=0;i<results.length;i++){
+    stage.className="gachaP2 "+(results[i].item.rarity==="UR"?"p2UR":"");
+    stage.innerHTML=`<div class="p2TopBtns"><button class="p2SmallBtn" onclick="p2BackToGacha338()">← ガチャへ戻る</button><button class="p2SmallBtn" onclick="document.getElementById('gachaP2')?.remove()">閉じる</button></div><div class="p2Inner"><div class="p2StartTitle">🌌 10連召喚 ${i+1}/10</div><div class="p2StartTitle" style="font-size:22px">第${i+1}の円陣を解析中...</div></div>`;
+    p3Symbols(stage); p3Particles(stage,results[i].item.rarity); await p3Sleep(650);
+    await p3Judge(stage,results[i].item);
+    p3Result(stage,results[i].item,results[i].duplicate);
+    await p3Sleep(800);
+  }
+  results.sort((a,b)=>({UR:0,SSR:1,SR:2,R:3}[a.item.rarity]-{UR:0,SSR:1,SR:2,R:3}[b.item.rarity]));
+  stage.className="gachaP2 "+(hasUR?"p2UR":"");
+  stage.innerHTML=`<div class="p2TopBtns"><button class="p2SmallBtn" onclick="p2BackToGacha338()">← ガチャへ戻る</button><button class="p2SmallBtn" onclick="document.getElementById('gachaP2')?.remove()">閉じる</button></div><div class="p2Inner"><div class="p2StartTitle">🎰 10連最終結果</div><p>所持コイン：${playerData.coins||0}</p><button onclick="document.getElementById('gachaP2')?.remove();drawGacha10()">もう一度10連</button><button onclick="p2BackToGacha338()">ガチャへ戻る</button></div>`;
+  const inner=stage.querySelector(".p2Inner");
+  for(const r of results){
+    inner.insertAdjacentHTML("beforeend",`<div class="titleItem"><b style="color:${p3Color(r.item.rarity)}">${r.item.rarity}</b><br>${titleHTML(r.item.title)}${r.duplicate?"<br>かぶり：+3コイン":""}</div>`);
+  }
+  p3Symbols(stage); p3Particles(stage,hasUR?"UR":"SSR");
+};
+window.drawGacha=drawGacha; window.drawGacha10=drawGacha10;
+})();
