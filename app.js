@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.3.22";
+const VERSION = "3.3.23";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -10922,4 +10922,133 @@ function best(results){return results.slice().sort((a,b)=>rank(b.item.rarity)-ra
 drawGacha=async function(){if((playerData.coins||0)<10){alert('コインが足りません');return}playerData.coins-=10;const p=pick();if(!p.item){alert('ガチャ称号がありません');showGacha();return}const dup=give(p.item);const st=await anim(p.item);result(st,p.item,dup)}
 drawGacha10=async function(){if((playerData.coins||0)<100){alert('コインが足りません');return}playerData.coins-=100;let results=[];for(let i=0;i<10;i++){const p=pick();if(!p.item){alert('ガチャ称号がありません');showGacha();return}const dup=give(p.item);results.push({item:p.item,duplicate:dup})}const b=best(results);const st=await anim(b.item,{multi:true});results.sort((a,b)=>rank(b.item.rarity)-rank(a.item.rarity));st.className='tg '+(b.item.rarity==='UR'?'tgur':'');st.innerHTML=`<div class="tgbtns"><button class="tgbtn" onclick="tgBack()">← ガチャへ戻る</button><button class="tgbtn" onclick="tgHome()">🏠 ホーム</button><button class="tgbtn" onclick="document.getElementById('tg')?.remove()">閉じる</button></div><div class="tgin"><div class="tgtitle">10連結果</div><p>一番良い結果：<b style="color:${col(b.item.rarity)}">${b.item.rarity}</b></p><p>所持コイン：${playerData.coins||0}</p><div class="tglist"></div><button onclick="document.getElementById('tg')?.remove();drawGacha10()">もう一度10連</button><button onclick="tgBack()">ガチャへ戻る</button><button onclick="tgHome()">ホームへ戻る</button></div>`;const list=st.querySelector('.tglist');for(const r of results){list.insertAdjacentHTML('beforeend',`<div class="tgitem"><b style="color:${col(r.item.rarity)}">${r.item.rarity}</b><br>${titleHTML(r.item.title)}${r.duplicate?'<br>かぶり：+3コイン':''}</div>`)}S('result')}
 const oldNews=typeof showNewsPage==='function'?showNewsPage:null;showNewsPage=function(){let html=`<h2>📢 お知らせ</h2><div class="newsCard"><h3>Ver 3.3.22 神殿秘宝ガチャ</h3><p>ガチャ演出を神殿の門から宝箱へ進む演出に作り直しました。</p><p>宝箱は白・青・金・虹の4色にしました。</p><p>金箱から虹箱へ進化する演出を追加しました。</p><p>ランキング・ログイン・Firebase処理は変更していません。</p></div>`;if(oldNews){try{oldNews();const p=document.getElementById('panelArea');if(p)p.innerHTML=html+p.innerHTML;return}catch(e){}}document.getElementById('panelArea').innerHTML=html;if(typeof ensureHomeButton==='function')ensureHomeButton()};window.drawGacha=drawGacha;window.drawGacha10=drawGacha10;window.showNewsPage=showNewsPage;
+})();
+
+
+
+/* Ver3.3.23 High Quality Treasure Gacha: image-like temple/chest redesign */
+(function(){
+if(window.__hqTreasureGacha3323)return;
+window.__hqTreasureGacha3323=true;
+
+let hqCtx=null;
+function hqA(){try{if(!hqCtx)hqCtx=new (window.AudioContext||window.webkitAudioContext)();if(hqCtx.state==="suspended")hqCtx.resume();return hqCtx;}catch(e){return null;}}
+function hqT(f=440,d=.14,t="sine",gain=.045,delay=0){
+ const c=hqA(); if(!c)return;
+ const o=c.createOscillator(), g=c.createGain();
+ o.type=t; o.frequency.setValueAtTime(f,c.currentTime+delay);
+ g.gain.setValueAtTime(gain,c.currentTime+delay);
+ g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+delay+d);
+ o.connect(g); g.connect(c.destination); o.start(c.currentTime+delay); o.stop(c.currentTime+delay+d);
+}
+function hqN(d=.3,gain=.08,delay=0){
+ const c=hqA(); if(!c)return;
+ const b=c.createBuffer(1,Math.floor(c.sampleRate*d),c.sampleRate),x=b.getChannelData(0);
+ for(let i=0;i<x.length;i++)x[i]=(Math.random()*2-1)*(1-i/x.length);
+ const s=c.createBufferSource(),g=c.createGain();
+ s.buffer=b; g.gain.value=gain; s.connect(g); g.connect(c.destination); s.start(c.currentTime+delay);
+}
+function hqS(k){
+ if(k==="tap"){hqT(220,.06,"sine",.06);hqT(440,.1,"triangle",.052,.05);hqT(880,.13,"sine",.045,.12)}
+ if(k==="gate"){hqT(55,1.35,"sawtooth",.040);hqT(110,1.25,"sawtooth",.034,.25);hqN(.95,.04,.05)}
+ if(k==="push"){hqT(70,.9,"sawtooth",.036);hqT(140,.9,"sawtooth",.032,.20);hqT(280,.9,"triangle",.035,.45);hqN(.65,.032,.10)}
+ if(k==="shake"){hqN(.20,.075);hqT(95,.15,"sawtooth",.060)}
+ if(k==="lock"){hqN(.18,.09);hqT(140,.10,"square",.040);hqT(60,.18,"sawtooth",.055,.08)}
+ if(k==="spark"){hqT(420,.09,"square",.052);hqT(840,.11,"triangle",.046,.08)}
+ if(k==="boom"){hqN(.75,.18);hqT(48,.55,"sawtooth",.11);hqT(95,.40,"sawtooth",.07,.08);hqT(760,.22,"triangle",.055,.25)}
+ if(k==="white"){hqT(1046,.22,"sine",.070);hqT(1568,.30,"sine",.060,.14)}
+ if(k==="rankup"){hqT(392,.13,"square",.055);hqT(659,.18,"triangle",.060,.12);hqT(988,.24,"sine",.052,.28)}
+ if(k==="ur"){hqT(523,.18,"triangle",.080);hqT(659,.18,"triangle",.080,.13);hqT(784,.20,"triangle",.085,.26);hqT(1046,.44,"sine",.090,.45);hqT(1568,.62,"sine",.075,.68);hqT(2093,.75,"sine",.055,.96);hqN(.45,.055,.16)}
+ if(k==="result"){hqT(660,.12,"sine",.055);hqT(880,.15,"sine",.055,.12);hqT(1320,.24,"sine",.050,.26);hqT(1760,.28,"sine",.040,.44)}
+}
+function hqSleep(ms){return new Promise(r=>setTimeout(r,ms));}
+function hqRank(r){return {UR:4,SSR:3,SR:2,R:1}[r]||0}
+function hqColor(r){return r==="UR"?"#ffd700":r==="SSR"?"#ff3cff":r==="SR"?"#38e8ff":"#fff"}
+function hqSeq(r){return r==="UR"?["R","SR","SSR","UR"]:r==="SSR"?["R","SR","SSR"]:r==="SR"?["R","SR"]:["R"]}
+function hqChestClass(r){return r==="UR"?"hqRainbow":r==="SSR"?"hqGold":r==="SR"?"hqBlue":"hqWhite"}
+
+function hqEnsure(){
+ if(document.getElementById("hqStyle3323"))return;
+ const st=document.createElement("style");
+ st.id="hqStyle3323";
+ st.textContent=`
+.hq{position:fixed;inset:0;z-index:999999;background:#080b12;color:#fff;overflow:hidden;display:flex;align-items:center;justify-content:center;text-align:center;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.hq:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#131827 0%,#233047 24%,#1b1f2d 46%,#070911 100%);z-index:0}
+.hq:after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 15%,rgba(255,255,230,.38),transparent 20%),radial-gradient(ellipse at center,transparent 0 48%,rgba(0,0,0,.86) 92%),linear-gradient(180deg,rgba(255,255,255,.08),transparent 36%,rgba(0,0,0,.55));z-index:1;pointer-events:none}
+.hqin{position:relative;z-index:5;width:100%;max-width:1120px;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:56px 10px 24px;box-sizing:border-box}
+.hqbtns{position:fixed;left:10px;top:10px;z-index:1000002;display:flex;gap:8px;flex-wrap:wrap}.hqbtn{font-size:15px;padding:7px 11px;border-radius:10px;background:rgba(0,0,0,.35);color:#fff;border:1px solid rgba(255,255,255,.48);backdrop-filter:blur(6px)}
+.hqtitle{font-size:clamp(26px,7vw,42px);font-weight:1000;letter-spacing:1px;text-shadow:0 0 16px #fff,0 0 44px #f59e0b,0 0 95px #7c3aed;margin:0}
+.hqsub{font-size:clamp(14px,4vw,20px);opacity:.92;margin:3px 0 6px}
+.hqtap{font-size:clamp(24px,7vw,34px);font-weight:1000;color:#fde68a;text-shadow:0 0 18px #f59e0b,0 0 42px #fff;animation:hqtap .58s ease-in-out infinite alternate;margin-top:2px}@keyframes hqtap{from{opacity:.45;transform:scale(.92)}to{opacity:1;transform:scale(1.09)}}
+.hqstage{position:relative;width:min(96vw,740px);height:min(60vh,540px);min-height:430px;margin:2px auto;perspective:1900px;transform-style:preserve-3d;overflow:hidden;border-radius:28px;background:linear-gradient(180deg,#1e293b,#0f172a 55%,#050816);box-shadow:0 0 45px rgba(255,215,0,.16),inset 0 0 80px rgba(255,255,255,.06)}
+.hqbackWall{position:absolute;left:8%;right:8%;top:5%;height:54%;border-radius:18px;background:linear-gradient(180deg,#334155,#1e293b);box-shadow:inset 0 0 45px rgba(255,255,255,.08)}
+.hqblock{position:absolute;border:1px solid rgba(255,255,255,.09);background:linear-gradient(135deg,rgba(255,255,255,.10),rgba(0,0,0,.08))}
+.hqblock.b1{left:9%;top:7%;width:13%;height:11%}.hqblock.b2{left:23%;top:7%;width:16%;height:11%}.hqblock.b3{left:41%;top:7%;width:18%;height:11%}.hqblock.b4{left:61%;top:7%;width:15%;height:11%}.hqblock.b5{left:78%;top:7%;width:13%;height:11%}
+.hqblock.b6{left:10%;top:20%;width:18%;height:13%}.hqblock.b7{left:30%;top:20%;width:15%;height:13%}.hqblock.b8{left:47%;top:20%;width:20%;height:13%}.hqblock.b9{left:69%;top:20%;width:20%;height:13%}
+.hqfloor{position:absolute;left:50%;bottom:-4%;width:105%;height:46%;transform:translateX(-50%) rotateX(69deg);transform-origin:bottom;background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.03)),repeating-linear-gradient(90deg,rgba(255,255,255,.20) 0 2px,transparent 2px 58px),repeating-linear-gradient(0deg,rgba(255,255,255,.16) 0 2px,transparent 2px 58px);opacity:.65}
+.hqlight{position:absolute;left:50%;top:-18%;width:40%;height:72%;transform:translateX(-50%);background:radial-gradient(ellipse at center,rgba(255,255,220,.55),rgba(255,235,160,.18),transparent 68%);filter:blur(12px);opacity:.85;animation:hqLight 2.3s ease-in-out infinite alternate}@keyframes hqLight{from{opacity:.58;transform:translateX(-50%) scale(.96)}to{opacity:.96;transform:translateX(-50%) scale(1.06)}}
+.hqpillar{position:absolute;bottom:12%;width:8.5%;height:72%;border-radius:14px;background:linear-gradient(90deg,#1e293b,#caa86a,#fff0b8,#7c5a22,#111827);box-shadow:0 0 26px rgba(255,215,0,.32),inset 0 0 25px rgba(0,0,0,.35)}
+.hqpillar:before{content:"";position:absolute;left:-16%;right:-16%;top:-6%;height:9%;border-radius:10px;background:linear-gradient(90deg,#111827,#e6c77c,#fff1b7,#805b20);box-shadow:0 0 14px rgba(255,215,0,.28)}
+.hqpillar:after{content:"";position:absolute;left:-18%;right:-18%;bottom:-5%;height:10%;border-radius:10px;background:linear-gradient(90deg,#111827,#d9b86b,#fff1b7,#805b20)}
+.hqpillar.l1{left:5%;transform:scale(.62);opacity:.30}.hqpillar.l2{left:15%;transform:scale(.80);opacity:.55}.hqpillar.l3{left:26%;transform:scale(.98);opacity:.85}.hqpillar.r1{right:5%;transform:scale(.62);opacity:.30}.hqpillar.r2{right:15%;transform:scale(.80);opacity:.55}.hqpillar.r3{right:26%;transform:scale(.98);opacity:.85}
+.hqgate{position:absolute;left:50%;top:13%;width:min(60vw,410px);height:min(45vh,400px);transform:translateX(-50%);perspective:1400px;transition:transform 1s ease,opacity 1s ease;z-index:4}
+.hqgateFrame{position:absolute;inset:0;border-radius:28px 28px 12px 12px;border:12px solid #b8934a;box-shadow:0 0 40px rgba(255,215,0,.65),inset 0 0 40px rgba(0,0,0,.35);background:linear-gradient(180deg,#6f5425,#1f2937 45%,#0b1020)}
+.hqgateFrame:before{content:"SECRET TEMPLE";position:absolute;left:50%;top:-48px;transform:translateX(-50%);font-size:clamp(18px,5vw,28px);font-weight:1000;color:#fde68a;text-shadow:0 0 12px #fff,0 0 30px #facc15;white-space:nowrap}
+.hqgateL,.hqgateR{position:absolute;top:26px;bottom:18px;width:50%;background:linear-gradient(135deg,#5b3d15,#9c6b21,#27180a);border:4px solid #d6b15f;box-shadow:inset 0 0 45px rgba(0,0,0,.48),0 0 20px rgba(255,215,0,.25);transition:transform 1.65s cubic-bezier(.16,.86,.28,1),filter 1s ease;transform-style:preserve-3d}
+.hqgateL{left:24px;transform-origin:left center;border-radius:18px 0 0 8px}.hqgateR{right:24px;transform-origin:right center;border-radius:0 18px 8px 0}
+.hqgateL:before,.hqgateR:before{content:"";position:absolute;inset:22px;border:2px solid rgba(255,236,160,.35);border-radius:10px;box-shadow:inset 0 0 18px rgba(0,0,0,.4)}
+.hqgateOpen .hqgateL{transform:rotateY(-91deg);filter:brightness(2.15)}.hqgateOpen .hqgateR{transform:rotateY(91deg);filter:brightness(2.15)}
+.hqgateLight{position:absolute;inset:50px;border-radius:24px;background:radial-gradient(circle,rgba(255,255,255,.75),rgba(255,215,0,.33),transparent 65%);opacity:0;transition:opacity 1s ease;filter:blur(10px)}
+.hqgateOpen .hqgateLight{opacity:1}
+.hqpush{animation:hqpush 2s cubic-bezier(.16,.86,.28,1) both}@keyframes hqpush{0%{transform:translateX(-50%) scale(1);opacity:1;filter:blur(0)}55%{transform:translateX(-50%) scale(1.7);opacity:.75;filter:blur(1px)}100%{transform:translateX(-50%) scale(3.1);opacity:0;filter:blur(6px)}}
+.hqaltar{position:absolute;left:50%;bottom:12%;width:min(58vw,360px);height:90px;transform:translateX(-50%) rotateX(60deg);background:linear-gradient(180deg,#9c6b21,#4a2e0b);border-radius:24px;box-shadow:0 0 50px rgba(255,215,0,.35),inset 0 0 25px rgba(255,255,255,.18);opacity:0}
+.hqaltar.show{opacity:1;animation:hqAltar .9s ease-out both}@keyframes hqAltar{from{transform:translateX(-50%) rotateX(60deg) scale(.65);opacity:0}to{transform:translateX(-50%) rotateX(60deg) scale(1);opacity:1}}
+.hqchest{position:absolute;left:50%;bottom:16%;width:min(54vw,290px);height:min(38vw,220px);max-height:220px;transform:translateX(-50%) scale(.15);opacity:0;transition:transform 1.2s cubic-bezier(.16,.86,.28,1),opacity .8s ease;z-index:10;filter:drop-shadow(0 22px 30px rgba(0,0,0,.72))}
+.hqchest.arrive{transform:translateX(-50%) scale(1);opacity:1}
+.hqchestBase{position:absolute;left:2%;right:2%;bottom:0;height:55%;border-radius:12% 12% 14% 14%;background:linear-gradient(135deg,#f3f4f6,#fff,#94a3b8);border:6px solid #c99a38;box-shadow:inset 0 0 24px rgba(0,0,0,.34),0 0 38px rgba(255,255,255,.34)}
+.hqchestLid{position:absolute;left:0;right:0;top:0;height:58%;border-radius:50% 50% 8% 8%/90% 90% 10% 10%;background:linear-gradient(135deg,#f8fafc,#fff,#94a3b8);border:6px solid #c99a38;box-shadow:inset 0 0 24px rgba(0,0,0,.28),0 0 38px rgba(255,255,255,.32);transform-origin:bottom center;transition:transform 1s cubic-bezier(.16,.86,.28,1),filter .5s ease}
+.hqstrap{position:absolute;top:4%;bottom:2%;width:10%;border-radius:10px;background:linear-gradient(90deg,#7c4a03,#ffd700,#8a5a10);box-shadow:0 0 14px #ffd700;z-index:2}
+.hqstrap.s1{left:17%}.hqstrap.s2{left:45%}.hqstrap.s3{right:17%}
+.hqfrontPlate{position:absolute;left:50%;top:42%;width:26%;height:34%;transform:translateX(-50%);background:radial-gradient(circle at 50% 28%,#fff2b3,#d6a31c 38%,#7c4a03 80%);clip-path:polygon(50% 0,90% 24%,78% 82%,50% 100%,22% 82%,10% 24%);box-shadow:0 0 24px #ffd700;z-index:4}
+.hqlock{position:absolute;left:50%;top:58%;width:18%;height:24%;transform:translateX(-50%);border-radius:10px;background:linear-gradient(180deg,#ffd700,#8a5a10);box-shadow:0 0 20px #ffd700;z-index:5}
+.hqkeyhole{position:absolute;left:50%;top:66%;width:6%;height:10%;transform:translateX(-50%);border-radius:50% 50% 35% 35%;background:#3b2406;z-index:6}
+.hqWhite .hqchestBase,.hqWhite .hqchestLid{background:linear-gradient(135deg,#e5e7eb,#ffffff,#9ca3af)}
+.hqBlue .hqchestBase,.hqBlue .hqchestLid{background:linear-gradient(135deg,#0f3c68,#0ea5e9,#0f172a);box-shadow:inset 0 0 25px rgba(0,0,0,.25),0 0 52px #38e8ff}
+.hqGold .hqchestBase,.hqGold .hqchestLid{background:linear-gradient(135deg,#7c5200,#ffd700,#fff0a4,#7c2d12);box-shadow:inset 0 0 28px rgba(0,0,0,.22),0 0 62px #ffd700}
+.hqRainbow .hqchestBase,.hqRainbow .hqchestLid{background:linear-gradient(135deg,#ff0080,#ffd700,#00eaff,#8b5cf6,#ff0080);box-shadow:inset 0 0 30px rgba(255,255,255,.30),0 0 80px #fff,0 0 140px #ff00ff;animation:hqRainbow 1s linear infinite}@keyframes hqRainbow{to{filter:hue-rotate(360deg) brightness(1.35)}}
+.hqchest.open .hqchestLid{transform:rotateX(-68deg) translateY(-12px);filter:brightness(1.8)}
+.hqchest.shake{animation:hqChestShake .62s ease-in-out both}@keyframes hqChestShake{0%{margin-left:0}16%{margin-left:-15px}32%{margin-left:15px}48%{margin-left:-10px}64%{margin-left:10px}100%{margin-left:0}}
+.hqchest.float{animation:hqFloat 1s ease-in-out infinite alternate}@keyframes hqFloat{from{transform:translateX(-50%) scale(1) translateY(0)}to{transform:translateX(-50%) scale(1.04) translateY(-12px)}}
+.hqflash{position:fixed;inset:0;z-index:1000005;background:#fff;opacity:0;pointer-events:none;animation:hqflash .65s ease-out forwards}@keyframes hqflash{0%{opacity:0}25%{opacity:1}100%{opacity:0}}
+.hqdark{position:fixed;inset:0;z-index:1000004;background:#000;display:flex;align-items:center;justify-content:center;color:#fff;font-size:58px;font-weight:1000;text-shadow:0 0 20px #fff,0 0 60px #ffd700;animation:hqdark 1.4s ease-out forwards}@keyframes hqdark{0%{opacity:0}18%{opacity:1}75%{opacity:1}100%{opacity:0}}
+.hqmsg{font-size:clamp(20px,6vw,30px);font-weight:1000;text-shadow:0 0 16px #fff,0 0 34px #f59e0b;min-height:40px}
+.hqrank{font-size:88px;font-weight:1000;margin:10px auto;text-shadow:0 0 30px currentColor,0 0 86px currentColor;animation:hqrank .95s ease-out both}@keyframes hqrank{0%{opacity:0;transform:scale(.2) rotate(-8deg)}60%{opacity:1;transform:scale(1.25) rotate(3deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
+.hqparticle{position:absolute;z-index:20;font-size:31px;pointer-events:none;animation:hqparticle 2.5s ease-out forwards}@keyframes hqparticle{from{opacity:1;transform:translateY(0) scale(.55) rotate(0)}to{opacity:0;transform:translateY(-350px) scale(2.3) rotate(480deg)}}
+.hqresult{font-size:56px;font-weight:1000;margin:16px auto;animation:hqrank 1.05s ease-out both}
+.hqlist{max-height:48vh;overflow:auto;margin-top:12px}.hqitem{padding:10px;margin:7px;border-radius:12px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2)}
+.hqur{animation:hqur .75s ease-in-out infinite alternate}@keyframes hqur{from{filter:hue-rotate(0deg) brightness(1.15)}to{filter:hue-rotate(100deg) brightness(1.7)}}
+@media(max-width:520px){.hqin{padding-top:42px}.hqstage{height:58vh;min-height:410px}.hqgate{width:82vw;height:42vh;top:13%}.hqtitle{font-size:30px}.hqsub{font-size:16px}.hqbtn{font-size:13px;padding:6px 9px}.hqbtns{gap:5px}}
+`;document.head.appendChild(st)}
+function hqRemove(){document.getElementById("hq")?.remove()}
+window.hqBack=function(){hqRemove();if(typeof showGacha==="function")showGacha()}
+window.hqHome=function(){hqRemove();if(typeof showHome==="function")showHome();else if(typeof goHome==="function")goHome();else location.reload()}
+function hqBase(title,sub){hqEnsure();hqRemove();const d=document.createElement("div");d.id="hq";d.className="hq";d.innerHTML=`<div class="hqbtns"><button class="hqbtn" onclick="hqBack()">← ガチャへ戻る</button><button class="hqbtn" onclick="hqHome()">🏠 ホーム</button><button class="hqbtn" onclick="document.getElementById('hq')?.remove()">閉じる</button></div><div class="hqin"><h1 class="hqtitle">${title}</h1><p class="hqsub">${sub}</p><div class="hqstage"><div class="hqbackWall"></div><div class="hqblock b1"></div><div class="hqblock b2"></div><div class="hqblock b3"></div><div class="hqblock b4"></div><div class="hqblock b5"></div><div class="hqblock b6"></div><div class="hqblock b7"></div><div class="hqblock b8"></div><div class="hqblock b9"></div><div class="hqlight"></div><div class="hqfog"></div><div class="hqfloor"></div><div class="hqpillar l1"></div><div class="hqpillar l2"></div><div class="hqpillar l3"></div><div class="hqpillar r1"></div><div class="hqpillar r2"></div><div class="hqpillar r3"></div><div id="hqGate" class="hqgate"><div class="hqgateFrame"></div><div class="hqgateLight"></div><div class="hqgateL"></div><div class="hqgateR"></div></div><div id="hqAltar" class="hqaltar"></div><div id="hqChest" class="hqchest hqWhite"><div class="hqchestLid"></div><div class="hqchestBase"></div><div class="hqstrap s1"></div><div class="hqstrap s2"></div><div class="hqstrap s3"></div><div class="hqfrontPlate"></div><div class="hqlock"></div><div class="hqkeyhole"></div></div></div><div id="hqMsg" class="hqmsg">失われた神殿を発見</div><div class="hqtap">タップして開始</div></div>`;document.body.appendChild(d);return d}
+async function hqWait(stage){await new Promise(resolve=>{let done=false;const start=e=>{if(e)e.preventDefault();if(done)return;done=true;hqS("tap");resolve()};stage.addEventListener("click",start);stage.addEventListener("touchstart",start,{passive:false})})}
+function hqFlash(){const d=document.createElement("div");d.className="hqflash";document.body.appendChild(d);setTimeout(()=>d.remove(),700)}
+function hqDark(label){return new Promise(resolve=>{const d=document.createElement("div");d.className="hqdark";d.innerHTML=`<div>${label}</div>`;document.body.appendChild(d);setTimeout(()=>{d.remove();resolve()},1450)})}
+function hqParticles(stage,r){const m=r==="UR"?["✨","🌈","💎","👑","⚡","🔥","🌌"]:r==="SSR"?["✨","💎","⭐","🔥"]:r==="SR"?["✨","⭐","💧"]:["✨","◇"];const n=r==="UR"?140:r==="SSR"?90:r==="SR"?60:40;for(let i=0;i<n;i++){const p=document.createElement("div");p.className="hqparticle";p.textContent=m[Math.floor(Math.random()*m.length)];p.style.left=(5+Math.random()*90)+"%";p.style.top=(36+Math.random()*48)+"%";p.style.animationDelay=(Math.random()*1)+"s";stage.appendChild(p)}}
+function hqPick(){const item=getGachaResult();const owned=playerData.gachaTitles||[];return{item,duplicate:item?owned.includes(item.title):false}}
+function hqGive(item){if(!playerData.gachaTitles)playerData.gachaTitles=[];const dup=playerData.gachaTitles.includes(item.title);if(dup){playerData.coins=(playerData.coins||0)+3}else{unlockTitle(item.title);playerData.gachaTitles.push(item.title)}unlockAchievement("初ガチャ");if(item.rarity==="UR"){unlockAchievement("UR獲得");document.body.classList.add("urFlash");setTimeout(()=>document.body.classList.remove("urFlash"),1000)}saveAllData();updateHomeStatus();return dup}
+function hqSetChest(r){const c=document.getElementById("hqChest");c.className=`hqchest arrive ${hqChestClass(r)}`}
+async function hqEnterTemple(stage){const gate=document.getElementById("hqGate"),msg=document.getElementById("hqMsg");msg.textContent="神殿の門が開く";hqS("gate");await hqSleep(900);gate.classList.add("hqgateOpen");await hqSleep(1300);msg.textContent="神殿内部へ進入";hqS("push");gate.classList.add("hqpush");await hqSleep(1900);document.getElementById("hqAltar").classList.add("show");document.getElementById("hqChest").classList.add("arrive");msg.textContent="祭壇の宝箱を発見";await hqSleep(1000)}
+async function hqChestTry(stage,rarity,final=false){const chest=document.getElementById("hqChest"),msg=document.getElementById("hqMsg");hqSetChest(rarity);chest.classList.add("float");msg.textContent=final?"宝箱が最大まで輝く":"宝箱の色が変化";await hqSleep(700);for(let i=0;i<2;i++){chest.classList.add("shake");hqS("shake");await hqSleep(520);chest.classList.remove("shake");hqS("lock");msg.textContent=i===0?"封印が反応している":"光が漏れ出す";await hqSleep(650)}if(final){chest.classList.add("open");hqS(rarity==="UR"?"ur":"boom");hqParticles(stage,rarity);if(rarity==="UR")stage.classList.add("hqur");hqFlash();await hqSleep(1300)}else{hqS("spark");hqParticles(stage,rarity);await hqSleep(900)}}
+async function hqGoldToRainbow(stage){const chest=document.getElementById("hqChest"),msg=document.getElementById("hqMsg");msg.textContent="金箱が限界まで震える";hqSetChest("SSR");for(let i=0;i<3;i++){chest.classList.add("shake");hqS("shake");await hqSleep(420);chest.classList.remove("shake");await hqSleep(260)}msg.textContent="神殿が静まり返る";await hqDark("");hqS("boom");hqFlash();await hqSleep(500);hqSetChest("UR");msg.textContent="虹箱へ進化";hqS("ur");hqParticles(stage,"UR");await hqSleep(1100)}
+async function hqRankUp(stage,rarity,final=false){const msg=document.getElementById("hqMsg");msg.textContent=final?"最終判定":"昇格判定";hqS(final&&rarity==="UR"?"ur":"rankup");stage.querySelector(".hqin").insertAdjacentHTML("beforeend",`<div class="hqrank" style="color:${hqColor(rarity)}">${rarity}</div>`);hqParticles(stage,rarity);if(rarity==="UR")stage.classList.add("hqur");await hqSleep(rarity==="UR"?1300:900)}
+async function hqAnim(bestItem,opts={}){const stage=hqBase(opts.multi?"10連 神殿秘宝ガチャ":"神殿秘宝ガチャ",opts.multi?"10連の一番良い結果に合わせて演出します":"神殿の奥にある宝箱を開封します");await hqWait(stage);await hqEnterTemple(stage);const seq=hqSeq(bestItem.rarity);for(let i=0;i<seq.length;i++){await hqChestTry(stage,seq[i],i===seq.length-1)}if(bestItem.rarity==="UR" && Math.random()<0.30){await hqGoldToRainbow(stage)}await hqDark("秘宝解放");hqFlash();for(let i=0;i<seq.length;i++)await hqRankUp(stage,seq[i],i===seq.length-1);return stage}
+function hqResult(stage,item,dup){hqS("result");const dupText=dup?`<p>かぶり：+3コイン返還</p>`:"";stage.className="hq "+(item.rarity==="UR"?"hqur":"");stage.innerHTML=`<div class="hqbtns"><button class="hqbtn" onclick="hqBack()">← ガチャへ戻る</button><button class="hqbtn" onclick="hqHome()">🏠 ホーム</button><button class="hqbtn" onclick="document.getElementById('hq')?.remove()">閉じる</button></div><div class="hqin"><h1 class="hqtitle">開封結果</h1><div class="hqrank" style="color:${hqColor(item.rarity)}">${item.rarity}</div><div class="hqresult">${titleHTML(item.title)}</div>${dupText}<p>所持コイン：${playerData.coins||0}</p><button onclick="document.getElementById('hq')?.remove();drawGacha()">もう一回引く</button><button onclick="hqBack()">ガチャへ戻る</button><button onclick="hqHome()">ホームへ戻る</button></div>`}
+function hqBest(results){return results.slice().sort((a,b)=>hqRank(b.item.rarity)-hqRank(a.item.rarity))[0]}
+drawGacha=async function(){if((playerData.coins||0)<10){alert("コインが足りません");return}playerData.coins-=10;const p=hqPick();if(!p.item){alert("ガチャ称号がありません");showGacha();return}const dup=hqGive(p.item);const stage=await hqAnim(p.item);hqResult(stage,p.item,dup)}
+drawGacha10=async function(){if((playerData.coins||0)<100){alert("コインが足りません");return}playerData.coins-=100;let results=[];for(let i=0;i<10;i++){const p=hqPick();if(!p.item){alert("ガチャ称号がありません");showGacha();return}const dup=hqGive(p.item);results.push({item:p.item,duplicate:dup})}const best=hqBest(results);const stage=await hqAnim(best.item,{multi:true});results.sort((a,b)=>hqRank(b.item.rarity)-hqRank(a.item.rarity));stage.className="hq "+(best.item.rarity==="UR"?"hqur":"");stage.innerHTML=`<div class="hqbtns"><button class="hqbtn" onclick="hqBack()">← ガチャへ戻る</button><button class="hqbtn" onclick="hqHome()">🏠 ホーム</button><button class="hqbtn" onclick="document.getElementById('hq')?.remove()">閉じる</button></div><div class="hqin"><h1 class="hqtitle">10連結果</h1><p>一番良い結果：<b style="color:${hqColor(best.item.rarity)}">${best.item.rarity}</b></p><p>所持コイン：${playerData.coins||0}</p><div class="hqlist"></div><button onclick="document.getElementById('hq')?.remove();drawGacha10()">もう一度10連</button><button onclick="hqBack()">ガチャへ戻る</button><button onclick="hqHome()">ホームへ戻る</button></div>`;const list=stage.querySelector(".hqlist");for(const r of results){list.insertAdjacentHTML("beforeend",`<div class="hqitem"><b style="color:${hqColor(r.item.rarity)}">${r.item.rarity}</b><br>${titleHTML(r.item.title)}${r.duplicate?"<br>かぶり：+3コイン":""}</div>`)}hqS("result")}
+const oldNews3323=typeof showNewsPage==="function"?showNewsPage:null;showNewsPage=function(){let html=`<h2>📢 お知らせ</h2><div class="newsCard"><h3>Ver 3.3.23 高品質神殿秘宝ガチャ</h3><p>神殿背景と宝箱デザインを画像風に作り直しました。</p><p>門→神殿内部→祭壇→宝箱の流れを分かりやすくしました。</p><p>宝箱は白・青・金・虹の4色です。</p><p>ランキング・ログイン・Firebase処理は変更していません。</p></div>`;if(oldNews3323){try{oldNews3323();const p=document.getElementById("panelArea");if(p)p.innerHTML=html+p.innerHTML;return}catch(e){}}document.getElementById("panelArea").innerHTML=html;if(typeof ensureHomeButton==="function")ensureHomeButton()}
+window.drawGacha=drawGacha;window.drawGacha10=drawGacha10;window.showNewsPage=showNewsPage;
 })();
