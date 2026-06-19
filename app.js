@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.3.19";
+const VERSION = "3.3.21";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -10668,4 +10668,226 @@ showNewsPage=function(){
  if(typeof ensureHomeButton==="function")ensureHomeButton();
 };
 window.showNewsPage=showNewsPage;
+})();
+
+
+
+/* Ver3.3.20 Real Door Gacha: cinematic 3D lighting, camera push, pressure animation */
+(function(){
+if(window.__realDoorGacha3320)return;
+window.__realDoorGacha3320=true;
+
+let rdCtx=null;
+function rdA(){try{if(!rdCtx)rdCtx=new (window.AudioContext||window.webkitAudioContext)();if(rdCtx.state==="suspended")rdCtx.resume();return rdCtx;}catch(e){return null;}}
+function rdT(f=440,d=.14,t="sine",gain=.045,delay=0){
+ const c=rdA(); if(!c)return;
+ const o=c.createOscillator(), g=c.createGain();
+ o.type=t; o.frequency.setValueAtTime(f,c.currentTime+delay);
+ g.gain.setValueAtTime(gain,c.currentTime+delay);
+ g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+delay+d);
+ o.connect(g); g.connect(c.destination); o.start(c.currentTime+delay); o.stop(c.currentTime+delay+d);
+}
+function rdN(d=.3,gain=.08,delay=0){
+ const c=rdA(); if(!c)return;
+ const b=c.createBuffer(1,Math.floor(c.sampleRate*d),c.sampleRate),x=b.getChannelData(0);
+ for(let i=0;i<x.length;i++)x[i]=(Math.random()*2-1)*(1-i/x.length);
+ const s=c.createBufferSource(),g=c.createGain();
+ s.buffer=b; g.gain.value=gain; s.connect(g); g.connect(c.destination); s.start(c.currentTime+delay);
+}
+function rdS(k){
+ if(k==="tap"){rdT(220,.06,"sine",.055);rdT(440,.09,"triangle",.05,.05);rdT(880,.13,"sine",.045,.12)}
+ if(k==="start"){rdT(88,.55,"sawtooth",.038);rdT(176,.55,"sawtooth",.035,.18);rdT(352,.55,"triangle",.04,.38);rdT(704,.48,"sine",.036,.70);rdN(.45,.026,.05)}
+ if(k==="pressure"){rdT(70,.36,"sawtooth",.04);rdT(140,.34,"sawtooth",.032,.18);rdN(.22,.045,.08)}
+ if(k==="near"){rdT(330,.11,"square",.05);rdT(660,.14,"triangle",.045,.11);rdT(990,.18,"sine",.035,.24)}
+ if(k==="impact"){rdN(.38,.15);rdT(48,.35,"sawtooth",.095);rdT(92,.25,"sawtooth",.06,.07)}
+ if(k==="open"){rdN(.48,.15);rdT(55,.42,"sawtooth",.095);rdT(330,.18,"triangle",.05,.18);rdT(880,.22,"sine",.052,.34)}
+ if(k==="rush"){rdT(72,.95,"sawtooth",.038);rdT(144,.95,"sawtooth",.034,.18);rdT(288,.95,"triangle",.034,.40);rdN(.72,.035,.05)}
+ if(k==="hot"){rdT(392,.15,"triangle",.068);rdT(523,.16,"triangle",.07,.13);rdT(784,.24,"sine",.076,.30);rdT(1174,.42,"sine",.066,.54);rdT(1568,.56,"sine",.05,.82)}
+ if(k==="ur"){rdT(523,.18,"triangle",.075);rdT(659,.18,"triangle",.075,.13);rdT(784,.22,"triangle",.082,.26);rdT(1046,.44,"sine",.085,.45);rdT(1568,.62,"sine",.068,.68);rdT(2093,.75,"sine",.05,.96);rdN(.45,.05,.16)}
+ if(k==="result"){rdT(660,.12,"sine",.055);rdT(880,.15,"sine",.055,.12);rdT(1320,.24,"sine",.05,.26);rdT(1760,.28,"sine",.04,.44)}
+}
+function rdSleep(ms){return new Promise(r=>setTimeout(r,ms));}
+function rdRank(r){return {UR:4,SSR:3,SR:2,R:1}[r]||0}
+function rdColor(r){return r==="UR"?"#ffd700":r==="SSR"?"#ff3cff":r==="SR"?"#38e8ff":"#fff"}
+function rdClass(r){return r==="UR"?"rdUR":r==="SSR"?"rdSSR":r==="SR"?"rdSR":"rdR"}
+function rdSeq(r){return r==="UR"?["R","SR","SSR","UR"]:r==="SSR"?["R","SR","SSR"]:r==="SR"?["R","SR"]:["R"]}
+
+function rdEnsure(){
+ if(document.getElementById("rdStyle3320"))return;
+ const st=document.createElement("style");
+ st.id="rdStyle3320";
+ st.textContent=`
+.rd{position:fixed;inset:0;z-index:999999;background:#01030a;color:#fff;overflow:hidden;display:flex;align-items:center;justify-content:center;text-align:center;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.rd:before{content:"";position:absolute;inset:-55%;background:radial-gradient(circle at 50% 40%,rgba(255,245,180,.32),transparent 7%),radial-gradient(circle at 50% 61%,rgba(56,189,248,.16),transparent 22%),conic-gradient(from 0deg,#01030a,#111827,#172554,#4c1d95,#7c2d12,#ca8a04,#111827,#01030a);opacity:.70;filter:blur(9px);animation:rdspin 13s linear infinite}
+.rd:after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 0 16%,rgba(0,0,0,.30) 38%,rgba(0,0,0,.95) 88%),linear-gradient(180deg,rgba(255,255,255,.08),transparent 22%,rgba(0,0,0,.55)),repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0 1px,transparent 1px 18px)}
+@keyframes rdspin{to{transform:rotate(360deg)}}
+.rdin{position:relative;z-index:3;width:96%;max-width:1120px}
+.rdbtns{position:fixed;left:10px;top:10px;z-index:1000002;display:flex;gap:8px;flex-wrap:wrap}.rdbtn{font-size:15px;padding:7px 11px;border-radius:10px;background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.45)}
+.rdtitle{font-size:42px;font-weight:1000;letter-spacing:1px;text-shadow:0 0 16px #fff,0 0 44px #38bdf8,0 0 90px #7c3aed}.rdsub{font-size:20px;opacity:.92}.rdtap{font-size:34px;font-weight:1000;color:#fde68a;text-shadow:0 0 18px #f59e0b,0 0 40px #fff;animation:rdtap .62s ease-in-out infinite alternate}@keyframes rdtap{from{opacity:.48;transform:scale(.93)}to{opacity:1;transform:scale(1.08)}}
+.rdscene{position:relative;width:620px;height:530px;margin:6px auto 4px;perspective:1900px;transform-style:preserve-3d;animation:rdCameraIdle 3.4s ease-in-out infinite alternate}
+@keyframes rdCameraIdle{from{transform:translateY(0) scale(1)}to{transform:translateY(-8px) scale(1.012)}}
+.rdfloor{position:absolute;left:50%;bottom:10px;width:640px;height:290px;transform:translateX(-50%) rotateX(72deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent),repeating-linear-gradient(90deg,rgba(255,255,255,.14) 0 2px,transparent 2px 44px),repeating-linear-gradient(0deg,rgba(255,255,255,.10) 0 2px,transparent 2px 44px);opacity:.52;filter:blur(.25px)}
+.rdwall{position:absolute;left:50%;top:20px;width:520px;height:390px;transform:translateX(-50%);border-radius:36px;background:radial-gradient(ellipse at center,rgba(255,255,255,.16),transparent 55%),linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.02));box-shadow:inset 0 0 70px rgba(255,255,255,.08),0 0 120px rgba(250,204,21,.12)}
+.rdpillar{position:absolute;top:25px;width:52px;height:415px;border-radius:20px;background:linear-gradient(90deg,#020617,#7a520d,#ffe8a3,#9a650a,#020617);box-shadow:0 0 34px rgba(255,215,0,.50),inset 0 0 25px rgba(255,255,255,.25)}
+.rdpillar.l1{left:26px;transform:scale(.62);opacity:.26}.rdpillar.l2{left:82px;transform:scale(.78);opacity:.46}.rdpillar.l3{left:142px;transform:scale(.95);opacity:.78}.rdpillar.r1{right:26px;transform:scale(.62);opacity:.26}.rdpillar.r2{right:82px;transform:scale(.78);opacity:.46}.rdpillar.r3{right:142px;transform:scale(.95);opacity:.78}
+.rdportal{position:absolute;inset:38px 86px;border-radius:44px;background:radial-gradient(ellipse at center,rgba(255,255,255,.26),transparent 44%),repeating-radial-gradient(ellipse at center,rgba(255,215,0,.13) 0 4px,transparent 4px 30px);box-shadow:inset 0 0 90px rgba(255,255,255,.16),0 0 105px rgba(255,215,0,.28);opacity:.80;animation:rdPortal 1.6s ease-in-out infinite alternate}
+@keyframes rdPortal{from{filter:brightness(1);transform:scale(.98)}to{filter:brightness(1.45);transform:scale(1.02)}}
+.rddoorWrap{width:370px;height:450px;margin:0 auto;position:relative;perspective:1300px;transition:transform 1s ease,opacity 1s ease;transform-style:preserve-3d}
+.rdzoom{animation:rdzoom 1.65s cubic-bezier(.16,.86,.28,1) both}@keyframes rdzoom{0%{transform:scale(1) translateZ(0);filter:blur(0);opacity:1}40%{transform:scale(1.55) translateZ(230px);filter:blur(1px);opacity:.82}72%{transform:scale(2.5) translateZ(420px);filter:blur(5px);opacity:.15}100%{transform:scale(.74) translateZ(-250px);filter:blur(0);opacity:1}}
+.rdpressure{animation:rdpressure .68s ease-in-out both}@keyframes rdpressure{0%{transform:scale(1)}22%{transform:scale(1.035)}45%{transform:scale(.99)}68%{transform:scale(1.055)}100%{transform:scale(1)}}
+.rddoorFrame{position:absolute;inset:0;border-radius:30px;border:10px solid rgba(255,255,255,.88);box-shadow:0 0 46px #facc15,0 0 110px #7c3aed,inset 0 0 65px rgba(255,255,255,.26);background:linear-gradient(180deg,#2a1b04,#111827 42%,#020617)}
+.rddoorFrame:before{content:"";position:absolute;inset:15px;border-radius:20px;border:3px solid rgba(255,236,160,.54);box-shadow:inset 0 0 32px rgba(255,255,255,.22),0 0 24px rgba(255,215,0,.30)}
+.rddoorFrame:after{content:"∞";position:absolute;top:-52px;left:50%;transform:translateX(-50%);font-size:54px;font-weight:1000;color:#ffd700;text-shadow:0 0 18px #fff,0 0 48px #ffd700,0 0 100px #ff00ff}
+.rdcrest{position:absolute;top:25px;left:50%;transform:translateX(-50%);z-index:3;font-size:31px;font-weight:1000;color:#fff;text-shadow:0 0 14px #fff,0 0 36px #ffd700}
+.rddoorL,.rddoorR{position:absolute;top:22px;bottom:22px;width:50%;background:linear-gradient(135deg,#2d1a04,#775316,#171717);border:4px solid rgba(255,236,160,.74);box-shadow:inset 0 0 52px rgba(255,255,255,.18),0 0 24px rgba(255,215,0,.16);transition:transform 1.1s cubic-bezier(.16,.86,.28,1),filter 1s ease,background .5s ease;transform-style:preserve-3d}
+.rddoorL{left:22px;transform-origin:left center;border-radius:20px 0 0 20px}.rddoorR{right:22px;transform-origin:right center;border-radius:0 20px 20px 0}
+.rddoorL:before,.rddoorR:before{content:"";position:absolute;inset:24px;border-radius:12px;border:3px solid rgba(255,255,255,.22);box-shadow:inset 0 0 28px rgba(0,0,0,.56)}
+.rddoorL:after,.rddoorR:after{content:"";position:absolute;top:45%;width:15px;height:15px;border-radius:50%;background:#ffe8a3;box-shadow:0 0 20px #ffd700}.rddoorL:after{right:17px}.rddoorR:after{left:17px}
+.rdR .rddoorL,.rdR .rddoorR{background:linear-gradient(135deg,#2f3445,#7b8495,#141827)}
+.rdSR .rddoorL,.rdSR .rddoorR{background:linear-gradient(135deg,#04324d,#0891b2,#082f49);box-shadow:inset 0 0 48px rgba(56,232,255,.44),0 0 36px #38e8ff}
+.rdSSR .rddoorL,.rdSSR .rddoorR{background:linear-gradient(135deg,#3b0764,#c026d3,#21002f);box-shadow:inset 0 0 50px rgba(255,60,255,.54),0 0 48px #ff3cff}
+.rdUR .rddoorL,.rdUR .rddoorR{background:linear-gradient(135deg,#7c5200,#ffd700,#fff7bd,#ff26bd);box-shadow:inset 0 0 60px rgba(255,255,255,.70),0 0 64px #ffd700,0 0 120px #ff00ff}
+.rdopen .rddoorL{transform:rotateY(-90deg);filter:brightness(2.55)}.rdopen .rddoorR{transform:rotateY(90deg);filter:brightness(2.55)}
+.rdpeek .rddoorL{transform:rotateY(-34deg);filter:brightness(1.85)}.rdpeek .rddoorR{transform:rotateY(34deg);filter:brightness(1.85)}
+.rdshake{animation:rdshake .72s ease-in-out both}@keyframes rdshake{0%{transform:translateX(0)}16%{transform:translateX(-15px)}32%{transform:translateX(15px)}48%{transform:translateX(-10px)}64%{transform:translateX(10px)}100%{transform:translateX(0)}}
+.rddoorCore{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:72px;font-weight:1000;text-shadow:0 0 24px #fff,0 0 70px #ffd700;z-index:2;pointer-events:none}
+.rddoorGlow{position:absolute;inset:32px;border-radius:20px;background:radial-gradient(circle,rgba(255,255,255,.44),transparent 55%);opacity:.34;animation:rdglow .7s ease-in-out infinite alternate}@keyframes rdglow{from{opacity:.26;transform:scale(.93)}to{opacity:.98;transform:scale(1.11)}}
+.rdmsg{font-size:29px;font-weight:1000;text-shadow:0 0 16px #fff,0 0 34px #22d3ee;min-height:38px}
+.rdhot{position:fixed;inset:0;z-index:1000003;background:#000;display:flex;align-items:center;justify-content:center;color:#ffd700;font-size:74px;font-weight:1000;text-shadow:0 0 22px #fff,0 0 54px #ffd700,0 0 115px #ff00ff;animation:rdhot 1.75s ease-out forwards}@keyframes rdhot{0%{opacity:0;transform:scale(.5)}18%{opacity:1;transform:scale(1.15)}75%{opacity:1;filter:brightness(1.95)}100%{opacity:0;transform:scale(1.58);filter:brightness(4.7)}}
+.rdparticle{position:absolute;z-index:3;font-size:32px;pointer-events:none;animation:rdparticle 2.5s ease-out forwards}@keyframes rdparticle{from{opacity:1;transform:translateY(0) scale(.55) rotate(0)}to{opacity:0;transform:translateY(-350px) scale(2.3) rotate(480deg)}}
+.rdresult{font-size:56px;font-weight:1000;margin:16px auto;animation:rdresult 1.05s ease-out both}@keyframes rdresult{from{opacity:0;transform:translateY(-55px) scale(.3)}60%{opacity:1;transform:translateY(8px) scale(1.2)}to{opacity:1;transform:translateY(0) scale(1)}}
+.rdrarity{font-size:92px;font-weight:1000;margin:8px auto;text-shadow:0 0 32px currentColor,0 0 86px currentColor;animation:rdresult 1.05s ease-out both}
+.rdur{animation:rdur .75s ease-in-out infinite alternate}@keyframes rdur{from{filter:hue-rotate(0deg) brightness(1.15)}to{filter:hue-rotate(100deg) brightness(1.7)}}
+.rdlist{max-height:48vh;overflow:auto;margin-top:12px}.rditem{padding:10px;margin:7px;border-radius:12px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2)}
+`;document.head.appendChild(st)}
+function rdRemove(){document.getElementById("rd")?.remove()}
+window.rdBack=function(){rdRemove();if(typeof showGacha==="function")showGacha()}
+window.rdHome=function(){rdRemove();if(typeof showHome==="function")showHome();else if(typeof goHome==="function")goHome();else location.reload()}
+function rdBase(title,sub,tap=true){rdEnsure();rdRemove();const d=document.createElement("div");d.id="rd";d.className="rd";d.innerHTML=`<div class="rdbtns"><button class="rdbtn" onclick="rdBack()">← ガチャへ戻る</button><button class="rdbtn" onclick="rdHome()">🏠 ホーム</button><button class="rdbtn" onclick="document.getElementById('rd')?.remove()">閉じる</button></div><div class="rdin"><div class="rdtitle">${title}</div><p class="rdsub">${sub}</p><div class="rdscene"><div class="rdfloor"></div><div class="rdwall"></div><div class="rdpillar l1"></div><div class="rdpillar l2"></div><div class="rdpillar l3"></div><div class="rdpillar r1"></div><div class="rdpillar r2"></div><div class="rdpillar r3"></div><div class="rdportal"></div><div class="rddoorWrap rdR" id="rdDoor"><div class="rddoorFrame"></div><div class="rddoorGlow"></div><div class="rdcrest">MATH MASTER</div><div class="rddoorL"></div><div class="rddoorR"></div><div class="rddoorCore">∫</div></div></div><div id="rdMsg" class="rdmsg">扉の力が高まっている…</div>${tap?'<div class="rdtap">タップして開始</div>':''}</div>`;document.body.appendChild(d);return d}
+async function rdWait(stage){await new Promise(resolve=>{let done=false;const start=e=>{if(e)e.preventDefault();if(done)return;done=true;rdS("tap");resolve()};stage.addEventListener("click",start);stage.addEventListener("touchstart",start,{passive:false})})}
+function rdParticles(stage,r){const m=r==="UR"?["✨","🌈","💎","👑","⚡","🔥","🌌","π","∞"]:r==="SSR"?["✨","💎","⭐","🔥","Σ"]:r==="SR"?["✨","⭐","√","∫"]:["✨","∫","π"];const n=r==="UR"?140:r==="SSR"?92:r==="SR"?62:42;for(let i=0;i<n;i++){const p=document.createElement("div");p.className="rdparticle";p.textContent=m[Math.floor(Math.random()*m.length)];p.style.left=(5+Math.random()*90)+"%";p.style.top=(36+Math.random()*48)+"%";p.style.animationDelay=(Math.random()*1)+"s";stage.appendChild(p)}}
+function rdHot(label){return new Promise(resolve=>{rdS("hot");const d=document.createElement("div");d.className="rdhot";d.innerHTML=`<div>${label}</div>`;document.body.appendChild(d);setTimeout(()=>{d.remove();resolve()},1800)})}
+function rdPick(){const item=getGachaResult();const owned=playerData.gachaTitles||[];return{item,duplicate:item?owned.includes(item.title):false}}
+function rdGive(item){if(!playerData.gachaTitles)playerData.gachaTitles=[];const dup=playerData.gachaTitles.includes(item.title);if(dup){playerData.coins=(playerData.coins||0)+3}else{unlockTitle(item.title);playerData.gachaTitles.push(item.title)}unlockAchievement("初ガチャ");if(item.rarity==="UR"){unlockAchievement("UR獲得");document.body.classList.add("urFlash");setTimeout(()=>document.body.classList.remove("urFlash"),1000)}saveAllData();updateHomeStatus();return dup}
+async function rdMove(stage){const door=document.getElementById("rdDoor"),msg=document.getElementById("rdMsg");msg.textContent="奥の扉へ吸い込まれる…";rdS("rush");door.classList.add("rdzoom");await rdSleep(1650);door.classList.remove("rdzoom","rdopen","rdpeek")}
+async function rdHold(stage){const door=document.getElementById("rdDoor"),msg=document.getElementById("rdMsg");for(let i=0;i<3;i++){door.classList.add("rdpressure");msg.textContent=i===0?"扉に圧が集まる…":i===1?"光が裂け目から漏れる…":"空間が歪み始める…";rdS(i===2?"near":"pressure");await rdSleep(700);door.classList.remove("rdpressure");door.classList.add("rdpeek");await rdSleep(520);door.classList.remove("rdpeek");if(i<2){door.classList.add("rdshake");rdS("impact");await rdSleep(520);door.classList.remove("rdshake")}}}
+async function rdOpenStage(stage,r,next=false){const door=document.getElementById("rdDoor"),msg=document.getElementById("rdMsg");door.className=`rddoorWrap ${rdClass(r)}`;door.querySelector(".rddoorCore").textContent=r==="UR"?"🌈":r==="SSR"?"💎":r==="SR"?"⭐":"∫";msg.textContent=next?"次の扉が反応している…":"最後の扉が反応している…";await rdHold(stage);rdS("open");door.classList.add("rdopen");rdParticles(stage,r);if(next){msg.textContent="扉の奥へ進む";rdS("rush");await rdSleep(950);await rdMove(stage)}else{msg.textContent="扉が完全開放";if(r==="UR"){stage.classList.add("rdur");rdS("ur")}await rdSleep(1550)}}
+async function rdAnim(bestItem,opts={}){const stage=rdBase(opts.multi?"10連 リアル奥扉RUSH":"リアル奥扉RUSH",opts.multi?"10連の一番良い結果に合わせて進みます":"重い扉の奥へ進みます",true);await rdWait(stage);rdS("start");const seq=rdSeq(bestItem.rarity);const silentUR=(bestItem.rarity==="UR"&&Math.random()<.45);if(!silentUR&&(bestItem.rarity==="UR"||bestItem.rarity==="SSR"))await rdHot(bestItem.rarity==="UR"?"激アツRUSH！！":"チャンス到来！！");for(let i=0;i<seq.length;i++)await rdOpenStage(stage,seq[i],i<seq.length-1);if(silentUR){document.getElementById("rdMsg").textContent="音が消えた…";rdS("revive");await rdSleep(900);await rdHot("突然UR！！")}return stage}
+function rdResult(stage,item,dup){rdS("result");const dupText=dup?`<p>かぶり：+3コイン返還</p>`:"";stage.className="rd "+(item.rarity==="UR"?"rdur":"");stage.innerHTML=`<div class="rdbtns"><button class="rdbtn" onclick="rdBack()">← ガチャへ戻る</button><button class="rdbtn" onclick="rdHome()">🏠 ホーム</button><button class="rdbtn" onclick="document.getElementById('rd')?.remove()">閉じる</button></div><div class="rdin"><div class="rdtitle">開封結果</div><div class="rdrarity" style="color:${rdColor(item.rarity)}">${item.rarity}</div><div class="rdresult">${titleHTML(item.title)}</div>${dupText}<p>所持コイン：${playerData.coins||0}</p><button onclick="document.getElementById('rd')?.remove();drawGacha()">もう一回引く</button><button onclick="rdBack()">ガチャへ戻る</button><button onclick="rdHome()">ホームへ戻る</button></div>`}
+function rdBest(results){return results.slice().sort((a,b)=>rdRank(b.item.rarity)-rdRank(a.item.rarity))[0]}
+drawGacha=async function(){if((playerData.coins||0)<10){alert("コインが足りません");return}playerData.coins-=10;const p=rdPick();if(!p.item){alert("ガチャ称号がありません");showGacha();return}const dup=rdGive(p.item);const stage=await rdAnim(p.item);rdResult(stage,p.item,dup)}
+drawGacha10=async function(){if((playerData.coins||0)<100){alert("コインが足りません");return}playerData.coins-=100;let results=[];for(let i=0;i<10;i++){const p=rdPick();if(!p.item){alert("ガチャ称号がありません");showGacha();return}const dup=rdGive(p.item);results.push({item:p.item,duplicate:dup})}const best=rdBest(results);const stage=await rdAnim(best.item,{multi:true});results.sort((a,b)=>rdRank(b.item.rarity)-rdRank(a.item.rarity));stage.className="rd "+(best.item.rarity==="UR"?"rdur":"");stage.innerHTML=`<div class="rdbtns"><button class="rdbtn" onclick="rdBack()">← ガチャへ戻る</button><button class="rdbtn" onclick="rdHome()">🏠 ホーム</button><button class="rdbtn" onclick="document.getElementById('rd')?.remove()">閉じる</button></div><div class="rdin"><div class="rdtitle">10連結果</div><p>一番良い結果：<b style="color:${rdColor(best.item.rarity)}">${best.item.rarity}</b></p><p>所持コイン：${playerData.coins||0}</p><div class="rdlist"></div><button onclick="document.getElementById('rd')?.remove();drawGacha10()">もう一度10連</button><button onclick="rdBack()">ガチャへ戻る</button><button onclick="rdHome()">ホームへ戻る</button></div>`;const list=stage.querySelector(".rdlist");for(const r of results){list.insertAdjacentHTML("beforeend",`<div class="rditem"><b style="color:${rdColor(r.item.rarity)}">${r.item.rarity}</b><br>${titleHTML(r.item.title)}${r.duplicate?"<br>かぶり：+3コイン":""}</div>`)}rdS("result")}
+const oldNews3320=typeof showNewsPage==="function"?showNewsPage:null;showNewsPage=function(){let html=`<h2>📢 お知らせ</h2><div class="newsCard"><h3>Ver 3.3.20 リアル奥扉RUSH</h3><p>扉・背景・奥行き・光の演出をさらに強化しました。</p><p>開く前の圧、カメラ移動、奥へ吸い込まれる演出を追加しました。</p><p>ランキング・ログイン・Firebase処理は変更していません。</p></div>`;if(oldNews3320){try{oldNews3320();const p=document.getElementById("panelArea");if(p)p.innerHTML=html+p.innerHTML;return}catch(e){}}document.getElementById("panelArea").innerHTML=html;if(typeof ensureHomeButton==="function")ensureHomeButton()}
+window.drawGacha=drawGacha;window.drawGacha10=drawGacha10;window.showNewsPage=showNewsPage;
+})();
+
+
+
+/* Ver3.3.21 Rebuilt Gacha Engine: flame, cracks, fail, thunder, explosion, rank-up */
+(function(){
+if(window.__rebuiltGacha3321)return;
+window.__rebuiltGacha3321=true;
+
+let gxCtx=null;
+function gxA(){try{if(!gxCtx)gxCtx=new (window.AudioContext||window.webkitAudioContext)();if(gxCtx.state==="suspended")gxCtx.resume();return gxCtx;}catch(e){return null;}}
+function gxT(f=440,d=.14,t="sine",gain=.045,delay=0){
+ const c=gxA(); if(!c)return;
+ const o=c.createOscillator(), g=c.createGain();
+ o.type=t; o.frequency.setValueAtTime(f,c.currentTime+delay);
+ g.gain.setValueAtTime(gain,c.currentTime+delay);
+ g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+delay+d);
+ o.connect(g); g.connect(c.destination); o.start(c.currentTime+delay); o.stop(c.currentTime+delay+d);
+}
+function gxN(d=.3,gain=.08,delay=0){
+ const c=gxA(); if(!c)return;
+ const b=c.createBuffer(1,Math.floor(c.sampleRate*d),c.sampleRate),x=b.getChannelData(0);
+ for(let i=0;i<x.length;i++)x[i]=(Math.random()*2-1)*(1-i/x.length);
+ const s=c.createBufferSource(),g=c.createGain();
+ s.buffer=b; g.gain.value=gain; s.connect(g); g.connect(c.destination); s.start(c.currentTime+delay);
+}
+function gxS(k){
+ if(k==="tap"){gxT(220,.06,"sine",.06);gxT(440,.1,"triangle",.052,.05);gxT(880,.13,"sine",.045,.12)}
+ if(k==="rumble"){gxT(55,1.2,"sawtooth",.035);gxT(110,1.2,"sawtooth",.030,.24);gxN(.9,.035,.1)}
+ if(k==="crack"){gxN(.32,.12);gxT(80,.18,"sawtooth",.08);gxT(180,.1,"square",.035,.08)}
+ if(k==="fail"){gxN(.20,.07);gxT(95,.14,"sawtooth",.055);gxT(55,.22,"sawtooth",.05,.10)}
+ if(k==="thunder"){gxN(.55,.16);gxT(70,.35,"sawtooth",.08);gxT(340,.18,"square",.04,.12)}
+ if(k==="boom"){gxN(.75,.18);gxT(48,.55,"sawtooth",.11);gxT(95,.40,"sawtooth",.07,.08);gxT(760,.22,"triangle",.055,.25)}
+ if(k==="flash"){gxT(1046,.22,"sine",.065);gxT(1568,.28,"sine",.055,.14)}
+ if(k==="rankup"){gxT(392,.13,"square",.055);gxT(659,.18,"triangle",.06,.12);gxT(988,.24,"sine",.05,.28)}
+ if(k==="ur"){gxT(523,.18,"triangle",.08);gxT(659,.18,"triangle",.08,.13);gxT(784,.20,"triangle",.085,.26);gxT(1046,.44,"sine",.09,.45);gxT(1568,.62,"sine",.075,.68);gxT(2093,.75,"sine",.055,.96);gxN(.45,.055,.16)}
+ if(k==="result"){gxT(660,.12,"sine",.055);gxT(880,.15,"sine",.055,.12);gxT(1320,.24,"sine",.05,.26);gxT(1760,.28,"sine",.04,.44)}
+}
+function gxSleep(ms){return new Promise(r=>setTimeout(r,ms));}
+function gxRank(r){return {UR:4,SSR:3,SR:2,R:1}[r]||0}
+function gxColor(r){return r==="UR"?"#ffd700":r==="SSR"?"#ff3cff":r==="SR"?"#38e8ff":"#fff"}
+function gxSeq(r){return r==="UR"?["R","SR","SSR","UR"]:r==="SSR"?["R","SR","SSR"]:r==="SR"?["R","SR"]:["R"]}
+
+function gxEnsure(){
+ if(document.getElementById("gxStyle3321"))return;
+ const st=document.createElement("style");
+ st.id="gxStyle3321";
+ st.textContent=`
+.gx{position:fixed;inset:0;z-index:999999;background:#050100;color:#fff;overflow:hidden;display:flex;align-items:center;justify-content:center;text-align:center;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.gx:before{content:"";position:absolute;inset:-40%;background:radial-gradient(circle at 50% 45%,rgba(255,255,255,.35),transparent 8%),radial-gradient(circle at 50% 65%,rgba(255,80,0,.45),transparent 22%),conic-gradient(from 0deg,#150000,#4a0202,#ff4d00,#ffd700,#7c0000,#150000);opacity:.55;filter:blur(12px);animation:gxspin 8s linear infinite}
+.gx:after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 0 22%,rgba(0,0,0,.28) 38%,rgba(0,0,0,.94) 88%),linear-gradient(180deg,rgba(255,255,255,.08),transparent 24%,rgba(0,0,0,.62))}
+@keyframes gxspin{to{transform:rotate(360deg)}}
+.gxin{position:relative;z-index:5;width:96%;max-width:1120px}
+.gxbtns{position:fixed;left:10px;top:10px;z-index:1000002;display:flex;gap:8px;flex-wrap:wrap}
+.gxbtn{font-size:15px;padding:7px 11px;border-radius:10px;background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.45)}
+.gxtitle{font-size:42px;font-weight:1000;letter-spacing:1px;text-shadow:0 0 18px #fff,0 0 42px #ff7300,0 0 95px #ff0000}
+.gxsub{font-size:20px;opacity:.92}
+.gxtap{font-size:34px;font-weight:1000;color:#fde68a;text-shadow:0 0 18px #f59e0b,0 0 42px #fff;animation:gxtap .58s ease-in-out infinite alternate}@keyframes gxtap{from{opacity:.45;transform:scale(.92)}to{opacity:1;transform:scale(1.09)}}
+.gxstage{position:relative;width:620px;height:530px;margin:6px auto 4px;perspective:1800px;transform-style:preserve-3d}
+.gxfire{position:absolute;inset:-15% -10% -8%;z-index:1;pointer-events:none;background:radial-gradient(ellipse at 50% 90%,rgba(255,196,0,.95),transparent 18%),radial-gradient(ellipse at 40% 88%,rgba(255,68,0,.8),transparent 22%),radial-gradient(ellipse at 60% 86%,rgba(255,0,0,.7),transparent 25%);filter:blur(8px);animation:gxfire 1.1s ease-in-out infinite alternate}
+@keyframes gxfire{from{transform:scale(1) translateY(12px);opacity:.75}to{transform:scale(1.06) translateY(-6px);opacity:1}}
+.gxscene{position:absolute;inset:0;z-index:2;transform-style:preserve-3d;animation:gxcamera 3.3s ease-in-out infinite alternate}@keyframes gxcamera{from{transform:translateY(0) scale(1)}to{transform:translateY(-8px) scale(1.015)}}
+.gxfloor{position:absolute;left:50%;bottom:8px;width:640px;height:290px;transform:translateX(-50%) rotateX(72deg);background:repeating-linear-gradient(90deg,rgba(255,255,255,.14) 0 2px,transparent 2px 44px),repeating-linear-gradient(0deg,rgba(255,255,255,.10) 0 2px,transparent 2px 44px);opacity:.50}
+.gxportal{position:absolute;inset:38px 90px;border-radius:44px;background:radial-gradient(ellipse at center,rgba(255,255,255,.25),transparent 44%),repeating-radial-gradient(ellipse at center,rgba(255,215,0,.13) 0 4px,transparent 4px 30px);box-shadow:inset 0 0 90px rgba(255,255,255,.16),0 0 110px rgba(255,80,0,.36);opacity:.85;animation:gxportal 1.1s ease-in-out infinite alternate}
+@keyframes gxportal{from{filter:brightness(1);transform:scale(.98)}to{filter:brightness(1.6);transform:scale(1.03)}}
+.gxdoor{width:370px;height:450px;margin:0 auto;position:relative;perspective:1300px;transition:transform 1s ease,opacity 1s ease;transform-style:preserve-3d;z-index:3}
+.gxdoorFrame{position:absolute;inset:0;border-radius:30px;border:10px solid rgba(255,235,180,.92);box-shadow:0 0 48px #facc15,0 0 110px #ff4d00,inset 0 0 65px rgba(255,255,255,.26);background:linear-gradient(180deg,#2a1204,#111827 42%,#020617)}
+.gxdoorFrame:before{content:"";position:absolute;inset:15px;border-radius:20px;border:3px solid rgba(255,236,160,.54);box-shadow:inset 0 0 32px rgba(255,255,255,.22),0 0 24px rgba(255,215,0,.30)}
+.gxdoorFrame:after{content:"∞";position:absolute;top:-52px;left:50%;transform:translateX(-50%);font-size:54px;font-weight:1000;color:#ffd700;text-shadow:0 0 18px #fff,0 0 48px #ffd700,0 0 100px #ff00ff}
+.gxdoorL,.gxdoorR{position:absolute;top:22px;bottom:22px;width:50%;background:linear-gradient(135deg,#3a1703,#8a4f10,#171717);border:4px solid rgba(255,236,160,.76);box-shadow:inset 0 0 55px rgba(255,255,255,.18),0 0 24px rgba(255,215,0,.16);transition:transform 1.1s cubic-bezier(.16,.86,.28,1),filter 1s ease,background .5s ease;transform-style:preserve-3d}
+.gxdoorL{left:22px;transform-origin:left center;border-radius:20px 0 0 20px}.gxdoorR{right:22px;transform-origin:right center;border-radius:0 20px 20px 0}
+.gxdoorL:before,.gxdoorR:before{content:"";position:absolute;inset:24px;border-radius:12px;border:3px solid rgba(255,255,255,.22);box-shadow:inset 0 0 28px rgba(0,0,0,.56)}
+.gxdoorCore{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:72px;font-weight:1000;text-shadow:0 0 24px #fff,0 0 70px #ffd700;z-index:4;pointer-events:none}
+.gxpeek .gxdoorL{transform:rotateY(-34deg);filter:brightness(1.85)}.gxpeek .gxdoorR{transform:rotateY(34deg);filter:brightness(1.85)}
+.gxopen .gxdoorL{transform:rotateY(-90deg);filter:brightness(2.55)}.gxopen .gxdoorR{transform:rotateY(90deg);filter:brightness(2.55)}
+.gxshake{animation:gxshake .72s ease-in-out both}@keyframes gxshake{0%{transform:translateX(0)}16%{transform:translateX(-18px)}32%{transform:translateX(18px)}48%{transform:translateX(-12px)}64%{transform:translateX(12px)}100%{transform:translateX(0)}}
+.gxzoom{animation:gxzoom 1.55s cubic-bezier(.16,.86,.28,1) both}@keyframes gxzoom{0%{transform:scale(1) translateZ(0);filter:blur(0);opacity:1}45%{transform:scale(1.55) translateZ(230px);filter:blur(1px);opacity:.82}75%{transform:scale(2.5) translateZ(420px);filter:blur(5px);opacity:.15}100%{transform:scale(.74) translateZ(-250px);filter:blur(0);opacity:1}}
+.gxcrack1:after,.gxcrack2:after,.gxcrack3:after{content:"";position:absolute;inset:0;z-index:7;pointer-events:none;background:linear-gradient(35deg,transparent 45%,rgba(255,255,255,.95) 46%,transparent 48%),linear-gradient(118deg,transparent 54%,rgba(255,255,255,.85) 55%,transparent 57%);animation:gxcrack .7s ease-out forwards}
+.gxcrack2:after{background:linear-gradient(25deg,transparent 42%,rgba(255,255,255,.95) 43%,transparent 45%),linear-gradient(75deg,transparent 60%,rgba(255,255,255,.9) 61%,transparent 63%),linear-gradient(125deg,transparent 50%,rgba(255,255,255,.85) 51%,transparent 53%)}
+.gxcrack3:after{background:linear-gradient(20deg,transparent 38%,rgba(255,255,255,1) 39%,transparent 41%),linear-gradient(60deg,transparent 55%,rgba(255,255,255,.95) 56%,transparent 58%),linear-gradient(110deg,transparent 44%,rgba(255,255,255,.9) 45%,transparent 47%),linear-gradient(145deg,transparent 62%,rgba(255,255,255,.85) 63%,transparent 65%)}
+@keyframes gxcrack{0%{opacity:0;filter:brightness(1)}35%{opacity:1;filter:brightness(4)}100%{opacity:0;filter:brightness(1)}}
+.gxred{animation:gxred .8s ease-in-out both}@keyframes gxred{0%{background:#050100}50%{background:#5c0000}100%{background:#050100}}
+.gxflash{position:fixed;inset:0;z-index:1000005;background:#fff;opacity:0;pointer-events:none;animation:gxflash .55s ease-out forwards}@keyframes gxflash{0%{opacity:0}25%{opacity:1}100%{opacity:0}}
+.gxdark{position:fixed;inset:0;z-index:1000004;background:#000;display:flex;align-items:center;justify-content:center;color:#fff;font-size:58px;font-weight:1000;text-shadow:0 0 20px #fff,0 0 60px #ff0000;animation:gxdark 1.4s ease-out forwards}@keyframes gxdark{0%{opacity:0}18%{opacity:1}75%{opacity:1}100%{opacity:0}}
+.gxrank{font-size:88px;font-weight:1000;margin:10px auto;text-shadow:0 0 30px currentColor,0 0 86px currentColor;animation:gxrank .95s ease-out both}@keyframes gxrank{0%{opacity:0;transform:scale(.2) rotate(-8deg)}60%{opacity:1;transform:scale(1.25) rotate(3deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
+.gxmsg{font-size:30px;font-weight:1000;text-shadow:0 0 16px #fff,0 0 34px #ff7300;min-height:40px}
+.gxparticle{position:absolute;z-index:8;font-size:31px;pointer-events:none;animation:gxparticle 2.5s ease-out forwards}@keyframes gxparticle{from{opacity:1;transform:translateY(0) scale(.55) rotate(0)}to{opacity:0;transform:translateY(-350px) scale(2.3) rotate(480deg)}}
+.gxresult{font-size:56px;font-weight:1000;margin:16px auto;animation:gxrank 1.05s ease-out both}
+.gxlist{max-height:48vh;overflow:auto;margin-top:12px}.gxitem{padding:10px;margin:7px;border-radius:12px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2)}
+.gxur{animation:gxur .75s ease-in-out infinite alternate}@keyframes gxur{from{filter:hue-rotate(0deg) brightness(1.15)}to{filter:hue-rotate(100deg) brightness(1.7)}}
+`;document.head.appendChild(st)}
+function gxRemove(){document.getElementById("gx")?.remove()}
+window.gxBack=function(){gxRemove();if(typeof showGacha==="function")showGacha()}
+window.gxHome=function(){gxRemove();if(typeof showHome==="function")showHome();else if(typeof goHome==="function")goHome();else location.reload()}
+function gxBase(title,sub){gxEnsure();gxRemove();const d=document.createElement("div");d.id="gx";d.className="gx";d.innerHTML=`<div class="gxbtns"><button class="gxbtn" onclick="gxBack()">← ガチャへ戻る</button><button class="gxbtn" onclick="gxHome()">🏠 ホーム</button><button class="gxbtn" onclick="document.getElementById('gx')?.remove()">閉じる</button></div><div class="gxin"><div class="gxtitle">${title}</div><p class="gxsub">${sub}</p><div class="gxstage"><div class="gxfire"></div><div class="gxscene"><div class="gxfloor"></div><div class="gxportal"></div><div id="gxDoor" class="gxdoor"><div class="gxdoorFrame"></div><div class="gxdoorL"></div><div class="gxdoorR"></div><div class="gxdoorCore">∫</div></div></div></div><div id="gxMsg" class="gxmsg">炎が集まっている…</div><div class="gxtap">タップして開始</div></div>`;document.body.appendChild(d);return d}
+async function gxWait(stage){await new Promise(resolve=>{let done=false;const start=e=>{if(e)e.preventDefault();if(done)return;done=true;gxS("tap");resolve()};stage.addEventListener("click",start);stage.addEventListener("touchstart",start,{passive:false})})}
+function gxParticles(stage,r){const m=r==="UR"?["✨","🌈","💎","👑","⚡","🔥","🌌","π","∞"]:r==="SSR"?["✨","💎","⭐","🔥","Σ"]:r==="SR"?["✨","⭐","√","∫"]:["✨","∫","π"];const n=r==="UR"?140:r==="SSR"?92:r==="SR"?62:42;for(let i=0;i<n;i++){const p=document.createElement("div");p.className="gxparticle";p.textContent=m[Math.floor(Math.random()*m.length)];p.style.left=(5+Math.random()*90)+"%";p.style.top=(36+Math.random()*48)+"%";p.style.animationDelay=(Math.random()*1)+"s";stage.appendChild(p)}}
+function gxFlash(){const d=document.createElement("div");d.className="gxflash";document.body.appendChild(d);setTimeout(()=>d.remove(),600)}
+function gxDark(label){return new Promise(resolve=>{const d=document.createElement("div");d.className="gxdark";d.innerHTML=`<div>${label}</div>`;document.body.appendChild(d);setTimeout(()=>{d.remove();resolve()},1450)})}
+function gxPick(){const item=getGachaResult();const owned=playerData.gachaTitles||[];return{item,duplicate:item?owned.includes(item.title):false}}
+function gxGive(item){if(!playerData.gachaTitles)playerData.gachaTitles=[];const dup=playerData.gachaTitles.includes(item.title);if(dup){playerData.coins=(playerData.coins||0)+3}else{unlockTitle(item.title);playerData.gachaTitles.push(item.title)}unlockAchievement("初ガチャ");if(item.rarity==="UR"){unlockAchievement("UR獲得");document.body.classList.add("urFlash");setTimeout(()=>document.body.classList.remove("urFlash"),1000)}saveAllData();updateHomeStatus();return dup}
+async function gxFailCrack(stage,n){const door=document.getElementById("gxDoor"),msg=document.getElementById("gxMsg");msg.textContent=n===1?"扉にヒビが入る…":n===2?"ヒビが広がる…":"限界まで割れかけている…";door.classList.add("gxpeek",`gxcrack${n}`);gxS("crack");await gxSleep(700);door.classList.remove("gxpeek",`gxcrack${n}`);door.classList.add("gxshake");gxS("fail");msg.textContent="まだ開かない";await gxSleep(720);door.classList.remove("gxshake")}
+async function gxBreakDoor(stage){const door=document.getElementById("gxDoor"),msg=document.getElementById("gxMsg");msg.textContent="雷が落ちる…";stage.classList.add("gxred");gxS("thunder");await gxSleep(780);msg.textContent="扉が崩壊する";gxS("boom");door.classList.add("gxopen");gxParticles(stage,"SSR");gxFlash();await gxSleep(950);await gxDark("暗転");gxS("flash");gxFlash();await gxSleep(400)}
+async function gxRankUp(stage,rarity,final=false){const msg=document.getElementById("gxMsg");msg.textContent=final?"最終判定":"昇格判定";gxS(final&&rarity==="UR"?"ur":"rankup");stage.querySelector(".gxin").insertAdjacentHTML("beforeend",`<div class="gxrank" style="color:${gxColor(rarity)}">${rarity}</div>`);gxParticles(stage,rarity);if(rarity==="UR")stage.classList.add("gxur");await gxSleep(rarity==="UR"?1350:950)}
+async function gxAnim(bestItem,opts={}){const stage=gxBase(opts.multi?"10連 炎扉RUSH":"炎扉RUSH",opts.multi?"10連の一番良い結果に合わせて演出します":"炎・ヒビ・爆発・昇格で判定します");await gxWait(stage);gxS("rumble");await gxSleep(700);for(let i=1;i<=3;i++)await gxFailCrack(stage,i);await gxBreakDoor(stage);const seq=gxSeq(bestItem.rarity);for(let i=0;i<seq.length;i++)await gxRankUp(stage,seq[i],i===seq.length-1);return stage}
+function gxResult(stage,item,dup){gxS("result");const dupText=dup?`<p>かぶり：+3コイン返還</p>`:"";stage.className="gx "+(item.rarity==="UR"?"gxur":"");stage.innerHTML=`<div class="gxbtns"><button class="gxbtn" onclick="gxBack()">← ガチャへ戻る</button><button class="gxbtn" onclick="gxHome()">🏠 ホーム</button><button class="gxbtn" onclick="document.getElementById('gx')?.remove()">閉じる</button></div><div class="gxin"><div class="gxtitle">開封結果</div><div class="gxrank" style="color:${gxColor(item.rarity)}">${item.rarity}</div><div class="gxresult">${titleHTML(item.title)}</div>${dupText}<p>所持コイン：${playerData.coins||0}</p><button onclick="document.getElementById('gx')?.remove();drawGacha()">もう一回引く</button><button onclick="gxBack()">ガチャへ戻る</button><button onclick="gxHome()">ホームへ戻る</button></div>`}
+function gxBest(results){return results.slice().sort((a,b)=>gxRank(b.item.rarity)-gxRank(a.item.rarity))[0]}
+drawGacha=async function(){if((playerData.coins||0)<10){alert("コインが足りません");return}playerData.coins-=10;const p=gxPick();if(!p.item){alert("ガチャ称号がありません");showGacha();return}const dup=gxGive(p.item);const stage=await gxAnim(p.item);gxResult(stage,p.item,dup)}
+drawGacha10=async function(){if((playerData.coins||0)<100){alert("コインが足りません");return}playerData.coins-=100;let results=[];for(let i=0;i<10;i++){const p=gxPick();if(!p.item){alert("ガチャ称号がありません");showGacha();return}const dup=gxGive(p.item);results.push({item:p.item,duplicate:dup})}const best=gxBest(results);const stage=await gxAnim(best.item,{multi:true});results.sort((a,b)=>gxRank(b.item.rarity)-gxRank(a.item.rarity));stage.className="gx "+(best.item.rarity==="UR"?"gxur":"");stage.innerHTML=`<div class="gxbtns"><button class="gxbtn" onclick="gxBack()">← ガチャへ戻る</button><button class="gxbtn" onclick="gxHome()">🏠 ホーム</button><button class="gxbtn" onclick="document.getElementById('gx')?.remove()">閉じる</button></div><div class="gxin"><div class="gxtitle">10連結果</div><p>一番良い結果：<b style="color:${gxColor(best.item.rarity)}">${best.item.rarity}</b></p><p>所持コイン：${playerData.coins||0}</p><div class="gxlist"></div><button onclick="document.getElementById('gx')?.remove();drawGacha10()">もう一度10連</button><button onclick="gxBack()">ガチャへ戻る</button><button onclick="gxHome()">ホームへ戻る</button></div>`;const list=stage.querySelector(".gxlist");for(const r of results){list.insertAdjacentHTML("beforeend",`<div class="gxitem"><b style="color:${gxColor(r.item.rarity)}">${r.item.rarity}</b><br>${titleHTML(r.item.title)}${r.duplicate?"<br>かぶり：+3コイン":""}</div>`)}gxS("result")}
+const oldNews3321=typeof showNewsPage==="function"?showNewsPage:null;showNewsPage=function(){let html=`<h2>📢 お知らせ</h2><div class="newsCard"><h3>Ver 3.3.21 ガチャ演出完全刷新</h3><p>ガチャ演出部分を作り直しました。</p><p>炎、ヒビ、失敗、雷、爆発、暗転、白フラッシュ、昇格演出を追加しました。</p><p>10連は一番良い結果に合わせた演出を1回だけ流し、最後に全結果を表示します。</p><p>ランキング・ログイン・Firebase処理は変更していません。</p></div>`;if(oldNews3321){try{oldNews3321();const p=document.getElementById("panelArea");if(p)p.innerHTML=html+p.innerHTML;return}catch(e){}}document.getElementById("panelArea").innerHTML=html;if(typeof ensureHomeButton==="function")ensureHomeButton()}
+window.drawGacha=drawGacha;window.drawGacha10=drawGacha10;window.showNewsPage=showNewsPage;
 })();
