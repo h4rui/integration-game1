@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.3.16";
+const VERSION = "3.3.17";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -10340,5 +10340,113 @@ function pkBest(results){return results.slice().sort((a,b)=>pkRank(b.item.rarity
 drawGacha=async function(){if((playerData.coins||0)<10){alert("コインが足りません");return}playerData.coins-=10;const p=pkPick();if(!p.item){alert("ガチャ称号がありません");showGacha();return}const dup=pkGive(p.item);const stage=await pkAnim(p.item);pkResult(stage,p.item,dup)}
 drawGacha10=async function(){if((playerData.coins||0)<100){alert("コインが足りません");return}playerData.coins-=100;let results=[];for(let i=0;i<10;i++){const p=pkPick();if(!p.item){alert("ガチャ称号がありません");showGacha();return}const dup=pkGive(p.item);results.push({item:p.item,duplicate:dup})}const best=pkBest(results);const stage=await pkAnim(best.item,{multi:true});results.sort((a,b)=>pkRank(b.item.rarity)-pkRank(a.item.rarity));stage.className="pk "+(best.item.rarity==="UR"?"pkur":"");stage.innerHTML=`<div class="pkbtns"><button class="pkbtn" onclick="pkBack()">← ガチャへ戻る</button><button class="pkbtn" onclick="pkHome()">🏠 ホーム</button><button class="pkbtn" onclick="document.getElementById('pk')?.remove()">閉じる</button></div><div class="pkin"><div class="pktitle">10連結果</div><p>一番良い結果：<b style="color:${pkColor(best.item.rarity)}">${best.item.rarity}</b></p><p>所持コイン：${playerData.coins||0}</p><div class="pklist"></div><button onclick="document.getElementById('pk')?.remove();drawGacha10()">もう一度10連</button><button onclick="pkBack()">ガチャへ戻る</button><button onclick="pkHome()">ホームへ戻る</button></div>`;const list=stage.querySelector(".pklist");for(const r of results){list.insertAdjacentHTML("beforeend",`<div class="pkitem"><b style="color:${pkColor(r.item.rarity)}">${r.item.rarity}</b><br>${titleHTML(r.item.title)}${r.duplicate?"<br>かぶり：+3コイン":""}</div>`)}pkS("result")}
 const oldNews3316=typeof showNewsPage==="function"?showNewsPage:null;showNewsPage=function(){let html=`<h2>📢 お知らせ</h2><div class="newsCard"><h3>Ver 3.3.16 奥扉RUSH演出</h3><p>音と間を強化し、より脳汁感のある扉演出にしました。</p><p>カウントダウン、突入音、奥へ進むトンネル演出を追加しました。</p><p>ランキング・ログイン・Firebase処理は変更していません。</p></div>`;if(oldNews3316){try{oldNews3316();const p=document.getElementById("panelArea");if(p)p.innerHTML=html+p.innerHTML;return}catch(e){}}document.getElementById("panelArea").innerHTML=html;if(typeof ensureHomeButton==="function")ensureHomeButton()}
+window.drawGacha=drawGacha;window.drawGacha10=drawGacha10;window.showNewsPage=showNewsPage;
+})();
+
+
+
+/* Ver3.3.17 luxury door gacha: no countdown, richer door, suspense, reveal only final */
+(function(){
+if(window.__luxuryDoorGacha3317)return;
+window.__luxuryDoorGacha3317=true;
+
+let lxCtx=null;
+function lxA(){try{if(!lxCtx)lxCtx=new (window.AudioContext||window.webkitAudioContext)();if(lxCtx.state==="suspended")lxCtx.resume();return lxCtx;}catch(e){return null;}}
+function lxT(f=440,d=.14,t="sine",gain=.045,delay=0){
+ const c=lxA(); if(!c)return;
+ const o=c.createOscillator(), g=c.createGain();
+ o.type=t; o.frequency.setValueAtTime(f,c.currentTime+delay);
+ g.gain.setValueAtTime(gain,c.currentTime+delay);
+ g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+delay+d);
+ o.connect(g); g.connect(c.destination); o.start(c.currentTime+delay); o.stop(c.currentTime+delay+d);
+}
+function lxN(d=.3,gain=.08,delay=0){
+ const c=lxA(); if(!c)return;
+ const b=c.createBuffer(1,Math.floor(c.sampleRate*d),c.sampleRate),x=b.getChannelData(0);
+ for(let i=0;i<x.length;i++)x[i]=(Math.random()*2-1)*(1-i/x.length);
+ const s=c.createBufferSource(),g=c.createGain();
+ s.buffer=b; g.gain.value=gain; s.connect(g); g.connect(c.destination); s.start(c.currentTime+delay);
+}
+function lxS(k){
+ if(k==="tap"){lxT(220,.07,"sine",.05);lxT(440,.1,"triangle",.045,.06);lxT(880,.12,"sine",.035,.13)}
+ if(k==="start"){lxT(196,.25,"sawtooth",.035);lxT(392,.25,"sawtooth",.04,.18);lxT(784,.34,"triangle",.045,.42)}
+ if(k==="tunnel"){lxT(75,.7,"sawtooth",.035);lxT(150,.7,"sawtooth",.03,.2);lxT(300,.7,"triangle",.035,.42);lxN(.45,.035,.08)}
+ if(k==="rattle"){lxN(.18,.055);lxT(110,.12,"sawtooth",.045)}
+ if(k==="heavy"){lxN(.32,.12);lxT(55,.26,"sawtooth",.08)}
+ if(k==="near"){lxT(330,.18,"square",.05);lxT(660,.18,"triangle",.045,.14)}
+ if(k==="open"){lxN(.35,.11);lxT(95,.28,"sawtooth",.075);lxT(760,.18,"triangle",.05,.18)}
+ if(k==="fake"){lxN(.20,.055);lxT(135,.16,"triangle",.04)}
+ if(k==="hot"){lxT(392,.16,"triangle",.06);lxT(523,.16,"triangle",.065,.14);lxT(784,.24,"sine",.07,.31);lxT(1174,.4,"sine",.06,.56)}
+ if(k==="revive"){lxN(.42,.09);lxT(330,.16,"square",.05,.08);lxT(660,.22,"square",.06,.26);lxT(1320,.35,"sine",.055,.48)}
+ if(k==="ur"){lxT(523,.2,"triangle",.065);lxT(659,.2,"triangle",.065,.13);lxT(784,.2,"triangle",.07,.26);lxT(1046,.45,"sine",.08,.44);lxT(1568,.6,"sine",.065,.64)}
+ if(k==="result"){lxT(660,.12,"sine",.05);lxT(880,.15,"sine",.05,.12);lxT(1320,.24,"sine",.045,.26)}
+}
+function lxSleep(ms){return new Promise(r=>setTimeout(r,ms));}
+function lxRank(r){return {UR:4,SSR:3,SR:2,R:1}[r]||0}
+function lxColor(r){return r==="UR"?"#ffd700":r==="SSR"?"#ff3cff":r==="SR"?"#38e8ff":"#fff"}
+function lxClass(r){return r==="UR"?"lxUR":r==="SSR"?"lxSSR":r==="SR"?"lxSR":"lxR"}
+function lxSeq(r){return r==="UR"?["R","SR","SSR","UR"]:r==="SSR"?["R","SR","SSR"]:r==="SR"?["R","SR"]:["R"]}
+
+function lxEnsure(){
+ if(document.getElementById("lxStyle3317"))return;
+ const st=document.createElement("style");
+ st.id="lxStyle3317";
+ st.textContent=`
+.lx{position:fixed;inset:0;z-index:999999;background:#02020a;color:#fff;overflow:hidden;display:flex;align-items:center;justify-content:center;text-align:center;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.lx:before{content:"";position:absolute;inset:-70%;background:radial-gradient(circle at 50% 45%,rgba(255,255,255,.42),transparent 8%),conic-gradient(from 0deg,#00eaff,#6345ff,#ff26bd,#ffd700,#16ff9a,#00eaff);opacity:.45;filter:blur(12px);animation:lxspin 5.5s linear infinite}
+.lx:after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,transparent 0 18%,rgba(0,0,0,.24) 32%,rgba(0,0,0,.91) 84%),repeating-radial-gradient(circle at 50% 50%,rgba(255,255,255,.055) 0 2px,transparent 2px 20px)}
+@keyframes lxspin{to{transform:rotate(360deg)}}
+.lxin{position:relative;z-index:3;width:96%;max-width:1020px}
+.lxbtns{position:fixed;left:10px;top:10px;z-index:1000002;display:flex;gap:8px;flex-wrap:wrap}.lxbtn{font-size:15px;padding:7px 11px;border-radius:10px;background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.45)}
+.lxtitle{font-size:40px;font-weight:1000;letter-spacing:1px;text-shadow:0 0 20px #22d3ee,0 0 48px #7c3aed,0 0 90px #fff}.lxsub{font-size:20px;opacity:.9}
+.lxtap{font-size:34px;font-weight:1000;color:#fde68a;text-shadow:0 0 18px #f59e0b,0 0 40px #fff;animation:lxtap .62s ease-in-out infinite alternate}@keyframes lxtap{from{opacity:.48;transform:scale(.93)}to{opacity:1;transform:scale(1.08)}}
+.lxcorridor{position:relative;width:440px;height:475px;margin:18px auto 8px;perspective:1500px;transform-style:preserve-3d}
+.lxtunnel{position:absolute;inset:0;border-radius:32px;background:repeating-radial-gradient(ellipse at center,rgba(255,255,255,.13) 0 3px,transparent 3px 27px);opacity:.58;filter:blur(.2px)}
+.lxdepth{position:absolute;border-radius:24px;border:2px solid rgba(255,255,255,.22);box-shadow:0 0 38px rgba(255,255,255,.18),inset 0 0 35px rgba(255,255,255,.06)}
+.lxdepth.d1{inset:34px 60px;transform:scale(.78);opacity:.62}.lxdepth.d2{inset:62px 88px;transform:scale(.58);opacity:.42}.lxdepth.d3{inset:92px 118px;transform:scale(.40);opacity:.26}.lxdepth.d4{inset:122px 148px;transform:scale(.26);opacity:.18}
+.lxdoorWrap{width:330px;height:410px;margin:0 auto;position:relative;perspective:1100px;transition:transform .95s ease,opacity .95s ease;transform-style:preserve-3d}
+.lxadvance{animation:lxadvance 1.35s cubic-bezier(.16,.86,.28,1) both}@keyframes lxadvance{0%{transform:scale(1) translateZ(0);filter:blur(0);opacity:1}45%{transform:scale(1.5) translateZ(190px);filter:blur(1px);opacity:.8}75%{transform:scale(2.25) translateZ(340px);filter:blur(4px);opacity:.18}100%{transform:scale(.72) translateZ(-210px);filter:blur(0);opacity:1}}
+.lxdoorFrame{position:absolute;inset:0;border-radius:20px;border:7px solid rgba(255,255,255,.86);box-shadow:0 0 34px #22d3ee,0 0 92px #7c3aed,inset 0 0 45px rgba(255,255,255,.22);background:linear-gradient(180deg,#172052,#060717)}
+.lxdoorFrame:before{content:"";position:absolute;inset:12px;border-radius:14px;border:2px solid rgba(255,255,255,.35);box-shadow:inset 0 0 26px rgba(255,255,255,.18)}
+.lxdoorFrame:after{content:"∞";position:absolute;top:-38px;left:50%;transform:translateX(-50%);font-size:42px;font-weight:1000;color:#ffd700;text-shadow:0 0 18px #fff,0 0 40px #ffd700}
+.lxdoorL,.lxdoorR{position:absolute;top:16px;bottom:16px;width:50%;background:linear-gradient(135deg,#151b3f,#2e2a6f,#070814);border:3px solid rgba(255,255,255,.66);box-shadow:inset 0 0 34px rgba(255,255,255,.16),0 0 14px rgba(255,255,255,.14);transition:transform 1.05s cubic-bezier(.16,.86,.28,1),filter 1s ease,background .5s ease;transform-style:preserve-3d}
+.lxdoorL{left:16px;transform-origin:left center;border-radius:16px 0 0 16px}.lxdoorR{right:16px;transform-origin:right center;border-radius:0 16px 16px 0}
+.lxdoorL:after,.lxdoorR:after{content:"";position:absolute;inset:18px;border-radius:10px;border:2px solid rgba(255,255,255,.25);box-shadow:inset 0 0 20px rgba(255,255,255,.12)}
+.lxR .lxdoorL,.lxR .lxdoorR{background:linear-gradient(135deg,#30354d,#69738a,#151827)}
+.lxSR .lxdoorL,.lxSR .lxdoorR{background:linear-gradient(135deg,#063b5e,#0891b2,#0f172a);box-shadow:inset 0 0 35px rgba(56,232,255,.42),0 0 26px #38e8ff}
+.lxSSR .lxdoorL,.lxSSR .lxdoorR{background:linear-gradient(135deg,#47126b,#c026d3,#1e0633);box-shadow:inset 0 0 35px rgba(255,60,255,.48),0 0 34px #ff3cff}
+.lxUR .lxdoorL,.lxUR .lxdoorR{background:linear-gradient(135deg,#7c5200,#ffd700,#fff5a8,#ff26bd);box-shadow:inset 0 0 40px rgba(255,255,255,.62),0 0 45px #ffd700,0 0 88px #ff00ff}
+.lxopen .lxdoorL{transform:rotateY(-88deg);filter:brightness(2.25)}.lxopen .lxdoorR{transform:rotateY(88deg);filter:brightness(2.25)}
+.lxpeek .lxdoorL{transform:rotateY(-30deg);filter:brightness(1.65)}.lxpeek .lxdoorR{transform:rotateY(30deg);filter:brightness(1.65)}
+.lxshake{animation:lxshake .72s ease-in-out both}@keyframes lxshake{0%{transform:translateX(0)}16%{transform:translateX(-12px)}32%{transform:translateX(12px)}48%{transform:translateX(-9px)}64%{transform:translateX(9px)}100%{transform:translateX(0)}}
+.lxdoorCore{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:66px;font-weight:1000;text-shadow:0 0 22px #fff,0 0 58px #ffd700;z-index:2;pointer-events:none}
+.lxdoorGlow{position:absolute;inset:30px;border-radius:14px;background:radial-gradient(circle,rgba(255,255,255,.42),transparent 55%);opacity:.28;animation:lxglow .78s ease-in-out infinite alternate}@keyframes lxglow{from{opacity:.24;transform:scale(.94)}to{opacity:.92;transform:scale(1.1)}}
+.lxmsg{font-size:29px;font-weight:1000;text-shadow:0 0 16px #fff,0 0 34px #22d3ee}
+.lxhot{position:fixed;inset:0;z-index:1000003;background:#000;display:flex;align-items:center;justify-content:center;color:#ffd700;font-size:70px;font-weight:1000;text-shadow:0 0 22px #fff,0 0 50px #ffd700,0 0 105px #ff00ff;animation:lxhot 1.75s ease-out forwards}@keyframes lxhot{0%{opacity:0;transform:scale(.5)}18%{opacity:1;transform:scale(1.15)}75%{opacity:1;filter:brightness(1.9)}100%{opacity:0;transform:scale(1.55);filter:brightness(4.5)}}
+.lxfake{font-size:36px;font-weight:1000;text-shadow:0 0 16px #fff,0 0 34px #22d3ee;animation:lxfake 1.1s ease-out both}@keyframes lxfake{0%{opacity:0;transform:scale(.5)}45%{opacity:1;transform:scale(1.18)}100%{opacity:0;transform:scale(1.42)}}
+.lxparticle{position:absolute;z-index:3;font-size:31px;pointer-events:none;animation:lxparticle 2.4s ease-out forwards}@keyframes lxparticle{from{opacity:1;transform:translateY(0) scale(.55) rotate(0)}to{opacity:0;transform:translateY(-330px) scale(2.2) rotate(460deg)}}
+.lxresult{font-size:54px;font-weight:1000;margin:16px auto;animation:lxresult 1.05s ease-out both}@keyframes lxresult{from{opacity:0;transform:translateY(-55px) scale(.3)}60%{opacity:1;transform:translateY(8px) scale(1.2)}to{opacity:1;transform:translateY(0) scale(1)}}
+.lxrarity{font-size:88px;font-weight:1000;margin:8px auto;text-shadow:0 0 30px currentColor,0 0 80px currentColor;animation:lxresult 1.05s ease-out both}
+.lxur{animation:lxur .75s ease-in-out infinite alternate}@keyframes lxur{from{filter:hue-rotate(0deg) brightness(1.15)}to{filter:hue-rotate(100deg) brightness(1.7)}}
+.lxlist{max-height:48vh;overflow:auto;margin-top:12px}.lxitem{padding:10px;margin:7px;border-radius:12px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2)}
+`;document.head.appendChild(st)}
+function lxRemove(){document.getElementById("lx")?.remove()}
+window.lxBack=function(){lxRemove();if(typeof showGacha==="function")showGacha()}
+window.lxHome=function(){lxRemove();if(typeof goHome==="function")goHome();else if(typeof showHome==="function")showHome();else location.reload()}
+function lxBase(title,sub,tap=true){lxEnsure();lxRemove();const d=document.createElement("div");d.id="lx";d.className="lx";d.innerHTML=`<div class="lxbtns"><button class="lxbtn" onclick="lxBack()">← ガチャへ戻る</button><button class="lxbtn" onclick="lxHome()">🏠 ホーム</button><button class="lxbtn" onclick="document.getElementById('lx')?.remove()">閉じる</button></div><div class="lxin"><div class="lxtitle">${title}</div><p class="lxsub">${sub}</p><div class="lxcorridor"><div class="lxtunnel"></div><div class="lxdepth d1"></div><div class="lxdepth d2"></div><div class="lxdepth d3"></div><div class="lxdepth d4"></div><div class="lxdoorWrap lxR" id="lxDoor"><div class="lxdoorFrame"></div><div class="lxdoorGlow"></div><div class="lxdoorL"></div><div class="lxdoorR"></div><div class="lxdoorCore">∫</div></div></div><div id="lxMsg" class="lxmsg">豪華扉を解析中...</div>${tap?'<div class="lxtap">タップして開始</div>':''}</div>`;document.body.appendChild(d);return d}
+async function lxWait(stage){await new Promise(resolve=>{let done=false;const start=e=>{if(e)e.preventDefault();if(done)return;done=true;lxS("tap");resolve()};stage.addEventListener("click",start);stage.addEventListener("touchstart",start,{passive:false})})}
+function lxParticles(stage,r){const m=r==="UR"?["✨","🌈","💎","👑","⚡","🔥","🌌","π","∞"]:r==="SSR"?["✨","💎","⭐","🔥","Σ"]:r==="SR"?["✨","⭐","√","∫"]:["✨","∫","π"];const n=r==="UR"?120:r==="SSR"?78:r==="SR"?52:36;for(let i=0;i<n;i++){const p=document.createElement("div");p.className="lxparticle";p.textContent=m[Math.floor(Math.random()*m.length)];p.style.left=(5+Math.random()*90)+"%";p.style.top=(40+Math.random()*44)+"%";p.style.animationDelay=(Math.random()*1)+"s";stage.appendChild(p)}}
+function lxHot(label){return new Promise(resolve=>{lxS("hot");const d=document.createElement("div");d.className="lxhot";d.innerHTML=`<div>${label}</div>`;document.body.appendChild(d);setTimeout(()=>{d.remove();resolve()},1800)})}
+function lxPick(){const item=getGachaResult();const owned=playerData.gachaTitles||[];return{item,duplicate:item?owned.includes(item.title):false}}
+function lxGive(item){if(!playerData.gachaTitles)playerData.gachaTitles=[];const dup=playerData.gachaTitles.includes(item.title);if(dup){playerData.coins=(playerData.coins||0)+3}else{unlockTitle(item.title);playerData.gachaTitles.push(item.title)}unlockAchievement("初ガチャ");if(item.rarity==="UR"){unlockAchievement("UR獲得");document.body.classList.add("urFlash");setTimeout(()=>document.body.classList.remove("urFlash"),1000)}saveAllData();updateHomeStatus();return dup}
+async function lxMove(stage){const door=document.getElementById("lxDoor"),msg=document.getElementById("lxMsg");msg.textContent="奥の豪華扉へ突入…";lxS("tunnel");door.classList.add("lxadvance");await lxSleep(1350);door.classList.remove("lxadvance","lxopen","lxpeek")}
+async function lxTease(stage){const door=document.getElementById("lxDoor"),msg=document.getElementById("lxMsg");for(let i=0;i<2;i++){door.classList.add("lxpeek");msg.textContent=i===0?"開く……！？":"今度こそ……！？";lxS("rattle");await lxSleep(650);door.classList.remove("lxpeek");door.classList.add("lxshake");lxS("heavy");msg.insertAdjacentHTML("afterend",`<div class="lxfake">${i===0?"ガシャン！まだ開かない！":"耐えた！さらに焦らし！"}</div>`);await lxSleep(850);door.classList.remove("lxshake")}}
+async function lxOpenStage(stage,r,next=false,final=false){const door=document.getElementById("lxDoor"),msg=document.getElementById("lxMsg");door.className=`lxdoorWrap ${lxClass(r)}`;door.querySelector(".lxdoorCore").textContent=r==="UR"?"🌈":r==="SSR"?"💎":r==="SR"?"⭐":"∫";msg.textContent=next?`${r}色の扉を突破できるか…`:`最後の扉が反応中…`;await lxTease(stage);lxS("open");door.classList.add("lxopen");lxParticles(stage,r);if(next){msg.textContent=`突破！さらに奥へ`;lxS("up");await lxSleep(900);await lxMove(stage)}else{msg.textContent=`扉が完全開放！`;if(r==="UR"){stage.classList.add("lxur");lxS("ur")}await lxSleep(1500)}}
+async function lxAnim(bestItem,opts={}){const stage=lxBase(opts.multi?"10連 豪華奥扉RUSH":"豪華奥扉RUSH",opts.multi?"10連の中で一番良い結果に合わせて進みます":"最後まで結果を見せず、奥へ進みます",true);await lxWait(stage);lxS("start");const seq=lxSeq(bestItem.rarity);const silentUR=(bestItem.rarity==="UR"&&Math.random()<.45);if(!silentUR&&(bestItem.rarity==="UR"||bestItem.rarity==="SSR"))await lxHot(bestItem.rarity==="UR"?"激アツRUSH！！":"チャンス到来！！");for(let i=0;i<seq.length;i++){await lxOpenStage(stage,seq[i],i<seq.length-1,i===seq.length-1)}if(silentUR){document.getElementById("lxMsg").textContent="無演出からの違和感……";lxS("revive");await lxSleep(900);await lxHot("突然UR！！")}else if(bestItem.rarity!=="R"&&Math.random()<.5){document.getElementById("lxMsg").insertAdjacentHTML("afterend",`<div class="lxfake">さらに奥の気配……</div>`);lxS("fake");await lxSleep(900)}return stage}
+function lxResult(stage,item,dup){lxS("result");const dupText=dup?`<p>かぶり：+3コイン返還</p>`:"";stage.className="lx "+(item.rarity==="UR"?"lxur":"");stage.innerHTML=`<div class="lxbtns"><button class="lxbtn" onclick="lxBack()">← ガチャへ戻る</button><button class="lxbtn" onclick="lxHome()">🏠 ホーム</button><button class="lxbtn" onclick="document.getElementById('lx')?.remove()">閉じる</button></div><div class="lxin"><div class="lxtitle">開封結果</div><div class="lxrarity" style="color:${lxColor(item.rarity)}">${item.rarity}</div><div class="lxresult">${titleHTML(item.title)}</div>${dupText}<p>所持コイン：${playerData.coins||0}</p><button onclick="document.getElementById('lx')?.remove();drawGacha()">もう一回引く</button><button onclick="lxBack()">ガチャへ戻る</button><button onclick="lxHome()">ホームへ戻る</button></div>`}
+function lxBest(results){return results.slice().sort((a,b)=>lxRank(b.item.rarity)-lxRank(a.item.rarity))[0]}
+drawGacha=async function(){if((playerData.coins||0)<10){alert("コインが足りません");return}playerData.coins-=10;const p=lxPick();if(!p.item){alert("ガチャ称号がありません");showGacha();return}const dup=lxGive(p.item);const stage=await lxAnim(p.item);lxResult(stage,p.item,dup)}
+drawGacha10=async function(){if((playerData.coins||0)<100){alert("コインが足りません");return}playerData.coins-=100;let results=[];for(let i=0;i<10;i++){const p=lxPick();if(!p.item){alert("ガチャ称号がありません");showGacha();return}const dup=lxGive(p.item);results.push({item:p.item,duplicate:dup})}const best=lxBest(results);const stage=await lxAnim(best.item,{multi:true});results.sort((a,b)=>lxRank(b.item.rarity)-lxRank(a.item.rarity));stage.className="lx "+(best.item.rarity==="UR"?"lxur":"");stage.innerHTML=`<div class="lxbtns"><button class="lxbtn" onclick="lxBack()">← ガチャへ戻る</button><button class="lxbtn" onclick="lxHome()">🏠 ホーム</button><button class="lxbtn" onclick="document.getElementById('lx')?.remove()">閉じる</button></div><div class="lxin"><div class="lxtitle">10連結果</div><p>一番良い結果：<b style="color:${lxColor(best.item.rarity)}">${best.item.rarity}</b></p><p>所持コイン：${playerData.coins||0}</p><div class="lxlist"></div><button onclick="document.getElementById('lx')?.remove();drawGacha10()">もう一度10連</button><button onclick="lxBack()">ガチャへ戻る</button><button onclick="lxHome()">ホームへ戻る</button></div>`;const list=stage.querySelector(".lxlist");for(const r of results){list.insertAdjacentHTML("beforeend",`<div class="lxitem"><b style="color:${lxColor(r.item.rarity)}">${r.item.rarity}</b><br>${titleHTML(r.item.title)}${r.duplicate?"<br>かぶり：+3コイン":""}</div>`)}lxS("result")}
+const oldNews3317=typeof showNewsPage==="function"?showNewsPage:null;showNewsPage=function(){let html=`<h2>📢 お知らせ</h2><div class="newsCard"><h3>Ver 3.3.17 豪華奥扉RUSH</h3><p>扉を豪華にし、最後までレア度を見せない演出に変更しました。</p><p>開きそうで開かない焦らしを強化し、カウントダウンを削除しました。</p><p>チャンス演出なしでもURが出る違和感パターンを追加しました。</p><p>ランキング・ログイン・Firebase処理は変更していません。</p></div>`;if(oldNews3317){try{oldNews3317();const p=document.getElementById("panelArea");if(p)p.innerHTML=html+p.innerHTML;return}catch(e){}}document.getElementById("panelArea").innerHTML=html;if(typeof ensureHomeButton==="function")ensureHomeButton()}
 window.drawGacha=drawGacha;window.drawGacha10=drawGacha10;window.showNewsPage=showNewsPage;
 })();
