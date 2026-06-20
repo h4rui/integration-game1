@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.3.23";
+const VERSION = "3.3.26";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -11051,4 +11051,604 @@ drawGacha=async function(){if((playerData.coins||0)<10){alert("コインが足�
 drawGacha10=async function(){if((playerData.coins||0)<100){alert("コインが足りません");return}playerData.coins-=100;let results=[];for(let i=0;i<10;i++){const p=hqPick();if(!p.item){alert("ガチャ称号がありません");showGacha();return}const dup=hqGive(p.item);results.push({item:p.item,duplicate:dup})}const best=hqBest(results);const stage=await hqAnim(best.item,{multi:true});results.sort((a,b)=>hqRank(b.item.rarity)-hqRank(a.item.rarity));stage.className="hq "+(best.item.rarity==="UR"?"hqur":"");stage.innerHTML=`<div class="hqbtns"><button class="hqbtn" onclick="hqBack()">← ガチャへ戻る</button><button class="hqbtn" onclick="hqHome()">🏠 ホーム</button><button class="hqbtn" onclick="document.getElementById('hq')?.remove()">閉じる</button></div><div class="hqin"><h1 class="hqtitle">10連結果</h1><p>一番良い結果：<b style="color:${hqColor(best.item.rarity)}">${best.item.rarity}</b></p><p>所持コイン：${playerData.coins||0}</p><div class="hqlist"></div><button onclick="document.getElementById('hq')?.remove();drawGacha10()">もう一度10連</button><button onclick="hqBack()">ガチャへ戻る</button><button onclick="hqHome()">ホームへ戻る</button></div>`;const list=stage.querySelector(".hqlist");for(const r of results){list.insertAdjacentHTML("beforeend",`<div class="hqitem"><b style="color:${hqColor(r.item.rarity)}">${r.item.rarity}</b><br>${titleHTML(r.item.title)}${r.duplicate?"<br>かぶり：+3コイン":""}</div>`)}hqS("result")}
 const oldNews3323=typeof showNewsPage==="function"?showNewsPage:null;showNewsPage=function(){let html=`<h2>📢 お知らせ</h2><div class="newsCard"><h3>Ver 3.3.23 高品質神殿秘宝ガチャ</h3><p>神殿背景と宝箱デザインを画像風に作り直しました。</p><p>門→神殿内部→祭壇→宝箱の流れを分かりやすくしました。</p><p>宝箱は白・青・金・虹の4色です。</p><p>ランキング・ログイン・Firebase処理は変更していません。</p></div>`;if(oldNews3323){try{oldNews3323();const p=document.getElementById("panelArea");if(p)p.innerHTML=html+p.innerHTML;return}catch(e){}}document.getElementById("panelArea").innerHTML=html;if(typeof ensureHomeButton==="function")ensureHomeButton()}
 window.drawGacha=drawGacha;window.drawGacha10=drawGacha10;window.showNewsPage=showNewsPage;
+})();
+
+
+
+/* Ver3.3.24 Brutal Chest Upgrade */
+(function(){
+if(window.__brutalChest3324)return;window.__brutalChest3324=true;
+function bcEnsure(){if(document.getElementById("bcStyle3324"))return;const st=document.createElement("style");st.id="bcStyle3324";st.textContent=`
+.hqchest{width:min(74vw,390px)!important;height:min(50vw,285px)!important;max-height:285px!important;bottom:10%!important;filter:drop-shadow(0 34px 38px rgba(0,0,0,.9)) drop-shadow(0 0 40px rgba(255,215,0,.35))!important}
+.hqchestBase{height:58%!important;border-radius:7% 7% 13% 13%!important;border:10px solid #a96b0b!important;box-shadow:inset 0 0 52px rgba(0,0,0,.6),inset 0 18px 30px rgba(255,255,255,.16),0 0 58px rgba(255,215,0,.48)!important}
+.hqchestLid{height:64%!important;border-radius:50% 50% 8% 8%/96% 96% 12% 12%!important;border:10px solid #a96b0b!important;box-shadow:inset 0 0 52px rgba(0,0,0,.46),inset 0 16px 26px rgba(255,255,255,.20),0 0 60px rgba(255,215,0,.48)!important}
+.hqstrap{width:13%!important;border-radius:16px!important;background:linear-gradient(90deg,#321600,#a96b0b,#ffe58a,#a96b0b,#321600)!important;box-shadow:0 0 26px #ffd700,inset 0 0 16px rgba(0,0,0,.55)!important}.hqstrap:before{content:"";position:absolute;left:18%;right:18%;top:5%;bottom:5%;background:radial-gradient(circle,#2b1600 0 18%,transparent 20%) 50% 0/100% 16% repeat-y;opacity:.75}
+.hqfrontPlate{width:38%!important;height:46%!important;top:33%!important;clip-path:polygon(50% 0,96% 18%,88% 83%,50% 100%,12% 83%,4% 18%)!important;background:radial-gradient(circle at 50% 28%,#fff7c2,#ffd700 35%,#a16207 72%,#3b2406 100%)!important;box-shadow:0 0 40px #ffd700,inset 0 0 22px rgba(0,0,0,.5)!important}.hqfrontPlate:before{content:"";position:absolute;inset:18%;border-radius:50%;border:5px solid rgba(255,255,255,.62);box-shadow:0 0 18px #fff}
+.hqlock{width:26%!important;height:30%!important;top:54%!important;border:5px solid #4a2600!important;background:linear-gradient(180deg,#fff0a6,#ffd700,#7c4a03)!important;box-shadow:0 0 30px #ffd700,inset 0 0 18px rgba(0,0,0,.42)!important}
+.hqchestBase:before{content:"";position:absolute;left:4%;right:4%;top:10%;height:20%;border-radius:14px;background:linear-gradient(90deg,#321600,#ffd700,#321600);box-shadow:0 0 18px rgba(255,215,0,.7)}.hqchestBase:after{content:"";position:absolute;left:6%;right:6%;bottom:12%;height:20%;background:radial-gradient(circle,#321600 0 16%,transparent 18%) 0 50%/9% 100% repeat-x;opacity:.78}
+.hqWhite .hqchestBase,.hqWhite .hqchestLid{background:linear-gradient(135deg,#cbd5e1,#ffffff,#64748b)!important}.hqBlue .hqchestBase,.hqBlue .hqchestLid{background:linear-gradient(135deg,#061a38,#0ea5e9,#1d4ed8,#020617)!important;box-shadow:inset 0 0 48px rgba(0,0,0,.45),0 0 78px #38e8ff!important}.hqGold .hqchestBase,.hqGold .hqchestLid{background:linear-gradient(135deg,#4a2600,#d97706,#ffd700,#fff0a4,#7c2d12)!important;box-shadow:inset 0 0 52px rgba(0,0,0,.38),0 0 95px #ffd700!important}.hqRainbow .hqchestBase,.hqRainbow .hqchestLid{background:linear-gradient(135deg,#ff0080,#ffd700,#00eaff,#8b5cf6,#ff0080)!important;box-shadow:inset 0 0 56px rgba(255,255,255,.35),0 0 100px #fff,0 0 170px #ff00ff!important}
+.hqchest.bcVibrate{animation:bcVibrate .72s cubic-bezier(.25,.8,.25,1) both!important}.hqchest.bcMegaVibrate{animation:bcMegaVibrate 1.15s cubic-bezier(.25,.8,.25,1) both!important}
+@keyframes bcVibrate{0%{transform:translateX(-50%) scale(1) rotate(0)}10%{transform:translateX(calc(-50% - 10px)) scale(1.03) rotate(-2deg)}20%{transform:translateX(calc(-50% + 12px)) scale(1.04) rotate(2deg)}35%{transform:translateX(calc(-50% - 8px)) scale(1.06) rotate(-1deg)}50%{transform:translateX(calc(-50% + 9px)) scale(1.04) rotate(1deg)}70%{transform:translateX(calc(-50% - 4px)) scale(1.02) rotate(-.5deg)}100%{transform:translateX(-50%) scale(1) rotate(0)}}
+@keyframes bcMegaVibrate{0%{transform:translateX(-50%) scale(1) rotate(0)}12%{transform:translateX(calc(-50% - 20px)) scale(1.09) rotate(-3deg)}24%{transform:translateX(calc(-50% + 22px)) scale(1.11) rotate(3deg)}36%{transform:translateX(calc(-50% - 16px)) scale(1.13) rotate(-2deg)}50%{transform:translateX(calc(-50% + 17px)) scale(1.11) rotate(2deg);filter:drop-shadow(0 0 65px rgba(255,215,0,.85))}68%{transform:translateX(calc(-50% - 9px)) scale(1.06) rotate(-1deg)}84%{transform:translateX(calc(-50% + 6px)) scale(1.03) rotate(.8deg)}100%{transform:translateX(-50%) scale(1) rotate(0)}}
+.hqmsg.bcPulse{animation:bcMsgPulse .55s ease-in-out both}@keyframes bcMsgPulse{0%{transform:scale(1);filter:brightness(1)}50%{transform:scale(1.08);filter:brightness(1.8)}100%{transform:scale(1);filter:brightness(1)}}
+@media(max-width:520px){.hqchest{width:min(82vw,360px)!important;height:min(56vw,260px)!important;bottom:11%!important}.hqstage{height:60vh!important}}
+`;document.head.appendChild(st)}
+function bcTone(){try{const c=window.__mmAudioCtx3319||new (window.AudioContext||window.webkitAudioContext)();window.__mmAudioCtx3319=c;if(c.state==="suspended")c.resume();const o=c.createOscillator(),g=c.createGain();o.type="sawtooth";o.frequency.setValueAtTime(72,c.currentTime);g.gain.setValueAtTime(.07,c.currentTime);g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+.35);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+.35)}catch(e){}}
+function bcWatch(){const chest=document.getElementById("hqChest");if(!chest||chest.__bcWatched)return;chest.__bcWatched=true;let prev=chest.className;new MutationObserver(()=>{const now=chest.className;if(now===prev)return;const color=/hqWhite|hqBlue|hqGold|hqRainbow/.test(now)&&now!==prev;prev=now;chest.classList.remove("bcVibrate","bcMegaVibrate");void chest.offsetWidth;chest.classList.add(/hqGold|hqRainbow/.test(now)?"bcMegaVibrate":"bcVibrate");const msg=document.getElementById("hqMsg");msg&&msg.classList.add("bcPulse");setTimeout(()=>msg&&msg.classList.remove("bcPulse"),650);if(color)bcTone()}).observe(chest,{attributes:true,attributeFilter:["class"]})}
+const t=setInterval(bcWatch,250);setTimeout(()=>clearInterval(t),120000);document.addEventListener("click",()=>setTimeout(bcWatch,300),true);
+const oldNews3324=typeof showNewsPage==="function"?showNewsPage:null;showNewsPage=function(){let html=`<h2>📢 お知らせ</h2><div class="newsCard"><h3>Ver 3.3.24 宝箱デザイン強化</h3><p>宝箱をより重厚でいかついデザインに強化しました。</p><p>色変化や開封前のタイミングで宝箱が大きく振動するようにしました。</p><p>ランキング・ログイン・Firebase処理は変更していません。</p></div>`;if(oldNews3324){try{oldNews3324();const p=document.getElementById("panelArea");if(p)p.innerHTML=html+p.innerHTML;return}catch(e){}}document.getElementById("panelArea").innerHTML=html;if(typeof ensureHomeButton==="function")ensureHomeButton()};window.showNewsPage=showNewsPage;bcEnsure();
+})();
+
+
+
+/* Ver3.3.25 Anime Chest + Button Fix */
+(function(){
+if(window.__animeChestButtonFix3325)return;
+window.__animeChestButtonFix3325=true;
+
+function acEnsure(){
+ if(document.getElementById("acStyle3325"))return;
+ const st=document.createElement("style");
+ st.id="acStyle3325";
+ st.textContent=`
+.hqchest{
+  width:min(78vw,410px)!important;
+  height:min(52vw,310px)!important;
+  max-height:310px!important;
+  bottom:9%!important;
+  filter:
+    drop-shadow(0 34px 38px rgba(0,0,0,.9))
+    drop-shadow(0 0 42px rgba(255,215,0,.34))!important;
+}
+.hqchestBase{
+  height:56%!important;
+  border-radius:10% 10% 18% 18%!important;
+  border:10px solid #8a4d08!important;
+  background:linear-gradient(135deg,#cbd5e1,#ffffff,#64748b)!important;
+  box-shadow:
+    inset 0 0 58px rgba(0,0,0,.55),
+    inset 0 20px 40px rgba(255,255,255,.20),
+    0 0 54px rgba(255,215,0,.45)!important;
+}
+.hqchestLid{
+  height:64%!important;
+  border-radius:50% 50% 10% 10%/96% 96% 12% 12%!important;
+  border:10px solid #8a4d08!important;
+  background:linear-gradient(135deg,#eef2ff,#ffffff,#94a3b8)!important;
+  box-shadow:
+    inset 0 0 55px rgba(0,0,0,.43),
+    inset 0 20px 34px rgba(255,255,255,.24),
+    0 0 54px rgba(255,215,0,.42)!important;
+}
+.hqchestBase:before{
+  content:"";
+  position:absolute;
+  left:2%;
+  right:2%;
+  top:7%;
+  height:22%;
+  border-radius:16px;
+  background:linear-gradient(90deg,#2b1600,#9f5b08,#ffd700,#fff1a8,#ffd700,#9f5b08,#2b1600);
+  box-shadow:0 0 22px rgba(255,215,0,.85),inset 0 0 15px rgba(0,0,0,.45);
+}
+.hqchestBase:after{
+  content:"";
+  position:absolute;
+  left:5%;
+  right:5%;
+  bottom:10%;
+  height:25%;
+  background:
+    radial-gradient(circle,#3b2406 0 15%,transparent 17%) 0 50%/8.5% 100% repeat-x,
+    linear-gradient(90deg,transparent,rgba(255,255,255,.20),transparent);
+  opacity:.86;
+}
+.hqchestLid:before{
+  content:"";
+  position:absolute;
+  left:8%;
+  right:8%;
+  top:11%;
+  height:20%;
+  border-radius:999px;
+  background:
+    radial-gradient(circle,#3b2406 0 14%,transparent 16%) 0 50%/12% 100% repeat-x,
+    linear-gradient(90deg,#4a2600,#ffd700,#fff1a8,#ffd700,#4a2600);
+  box-shadow:0 0 18px rgba(255,215,0,.75);
+}
+.hqchestLid:after{
+  content:"";
+  position:absolute;
+  left:9%;
+  right:9%;
+  top:36%;
+  height:18%;
+  border-radius:999px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);
+  filter:blur(1px);
+}
+.hqstrap{
+  width:12.5%!important;
+  border-radius:16px!important;
+  background:linear-gradient(90deg,#2b1600,#8a4d08,#ffd700,#fff0a4,#8a4d08,#2b1600)!important;
+  box-shadow:0 0 24px #ffd700,inset 0 0 18px rgba(0,0,0,.55)!important;
+}
+.hqstrap:before{
+  content:"";
+  position:absolute;
+  inset:8% 24%;
+  background:
+    radial-gradient(circle,#1f1304 0 17%,transparent 19%) 50% 0/100% 15% repeat-y;
+  opacity:.75;
+}
+.hqstrap:after{
+  content:"";
+  position:absolute;
+  left:-18%;
+  right:-18%;
+  top:46%;
+  height:10%;
+  border-radius:999px;
+  background:linear-gradient(90deg,#2b1600,#fff1a8,#2b1600);
+  box-shadow:0 0 14px rgba(255,255,255,.65);
+}
+.hqfrontPlate{
+  width:38%!important;
+  height:47%!important;
+  top:32%!important;
+  clip-path:polygon(50% 0,96% 18%,88% 78%,50% 100%,12% 78%,4% 18%)!important;
+  background:radial-gradient(circle at 50% 28%,#fffbe0,#ffd700 28%,#b45309 66%,#2b1600 100%)!important;
+  box-shadow:0 0 42px #ffd700, inset 0 0 25px rgba(0,0,0,.48)!important;
+}
+.hqfrontPlate:before{
+  content:"";
+  position:absolute;
+  inset:15%;
+  border-radius:50%;
+  border:5px solid rgba(255,255,255,.70);
+  box-shadow:0 0 22px #fff,inset 0 0 14px rgba(0,0,0,.35);
+}
+.hqfrontPlate:after{
+  content:"◆";
+  position:absolute;
+  left:50%;
+  top:43%;
+  transform:translate(-50%,-50%);
+  font-size:34px;
+  color:#ef4444;
+  text-shadow:0 0 18px #fff,0 0 28px #ef4444;
+}
+.hqlock{
+  width:27%!important;
+  height:30%!important;
+  top:54%!important;
+  border:5px solid #4a2600!important;
+  background:linear-gradient(180deg,#fff4b8,#ffd700,#a16207,#5a3000)!important;
+  box-shadow:0 0 30px #ffd700,inset 0 0 20px rgba(0,0,0,.45)!important;
+}
+.hqkeyhole{
+  width:8%!important;
+  height:13%!important;
+  top:65%!important;
+  background:#1f1304!important;
+}
+.hqchest:before{
+  content:"";
+  position:absolute;
+  z-index:4;
+  left:-7%;
+  top:38%;
+  width:18%;
+  height:25%;
+  background:linear-gradient(135deg,#2b1600,#ffd700,#fff1a8,#8a4d08);
+  clip-path:polygon(0 50%,100% 0,78% 50%,100% 100%);
+  filter:drop-shadow(0 0 14px #ffd700);
+}
+.hqchest:after{
+  content:"";
+  position:absolute;
+  z-index:4;
+  right:-7%;
+  top:38%;
+  width:18%;
+  height:25%;
+  background:linear-gradient(225deg,#2b1600,#ffd700,#fff1a8,#8a4d08);
+  clip-path:polygon(100% 50%,0 0,22% 50%,0 100%);
+  filter:drop-shadow(0 0 14px #ffd700);
+}
+.hqWhite .hqchestBase,.hqWhite .hqchestLid{
+  background:linear-gradient(135deg,#cbd5e1,#ffffff,#64748b)!important;
+}
+.hqBlue .hqchestBase,.hqBlue .hqchestLid{
+  background:linear-gradient(135deg,#031633,#0ea5e9,#1d4ed8,#020617)!important;
+  box-shadow:inset 0 0 55px rgba(0,0,0,.48),0 0 80px #38e8ff!important;
+}
+.hqBlue .hqfrontPlate:after{color:#38e8ff;text-shadow:0 0 18px #fff,0 0 30px #38e8ff}
+.hqGold .hqchestBase,.hqGold .hqchestLid{
+  background:linear-gradient(135deg,#3b1d00,#b45309,#ffd700,#fff0a4,#7c2d12)!important;
+  box-shadow:inset 0 0 58px rgba(0,0,0,.40),0 0 100px #ffd700!important;
+}
+.hqGold .hqfrontPlate:after{color:#ef4444;text-shadow:0 0 18px #fff,0 0 32px #ef4444}
+.hqRainbow .hqchestBase,.hqRainbow .hqchestLid{
+  background:linear-gradient(135deg,#ff0080,#ffd700,#00eaff,#8b5cf6,#ff0080)!important;
+  box-shadow:inset 0 0 64px rgba(255,255,255,.34),0 0 100px #fff,0 0 170px #ff00ff!important;
+}
+.hqRainbow .hqfrontPlate:after{content:"✦";color:#fff;text-shadow:0 0 18px #fff,0 0 40px #ff00ff}
+.hqchest.bcVibrate{animation:acVibrate .78s cubic-bezier(.25,.8,.25,1) both!important}
+.hqchest.bcMegaVibrate{animation:acMegaVibrate 1.18s cubic-bezier(.25,.8,.25,1) both!important}
+@keyframes acVibrate{
+  0%{transform:translateX(-50%) scale(1) rotate(0)}
+  10%{transform:translateX(calc(-50% - 11px)) scale(1.035) rotate(-2deg)}
+  20%{transform:translateX(calc(-50% + 13px)) scale(1.045) rotate(2deg)}
+  35%{transform:translateX(calc(-50% - 8px)) scale(1.06) rotate(-1deg)}
+  50%{transform:translateX(calc(-50% + 10px)) scale(1.045) rotate(1deg)}
+  70%{transform:translateX(calc(-50% - 4px)) scale(1.02) rotate(-.5deg)}
+  100%{transform:translateX(-50%) scale(1) rotate(0)}
+}
+@keyframes acMegaVibrate{
+  0%{transform:translateX(-50%) scale(1) rotate(0)}
+  12%{transform:translateX(calc(-50% - 22px)) scale(1.10) rotate(-3deg)}
+  24%{transform:translateX(calc(-50% + 23px)) scale(1.12) rotate(3deg)}
+  36%{transform:translateX(calc(-50% - 18px)) scale(1.14) rotate(-2deg)}
+  50%{transform:translateX(calc(-50% + 18px)) scale(1.12) rotate(2deg);filter:drop-shadow(0 0 70px rgba(255,215,0,.85))}
+  68%{transform:translateX(calc(-50% - 10px)) scale(1.07) rotate(-1deg)}
+  84%{transform:translateX(calc(-50% + 7px)) scale(1.03) rotate(.8deg)}
+  100%{transform:translateX(-50%) scale(1) rotate(0)}
+}
+@media(max-width:520px){
+  .hqchest{
+    width:min(82vw,370px)!important;
+    height:min(56vw,275px)!important;
+    bottom:10%!important;
+  }
+}`;
+ document.head.appendChild(st);
+}
+function acWatch(){
+ const chest=document.getElementById("hqChest");
+ if(!chest || chest.__acWatched)return;
+ chest.__acWatched=true;
+ let prev=chest.className;
+ const obs=new MutationObserver(()=>{
+   const now=chest.className;
+   if(now===prev)return;
+   prev=now;
+   chest.classList.remove("bcVibrate","bcMegaVibrate");
+   void chest.offsetWidth;
+   chest.classList.add(/hqGold|hqRainbow|open/.test(now) ? "bcMegaVibrate" : "bcVibrate");
+ });
+ obs.observe(chest,{attributes:true,attributeFilter:["class"]});
+}
+setInterval(acWatch,300);
+document.addEventListener("click",()=>setTimeout(acWatch,300),true);
+
+window.mmGachaClose3325=function(){
+ ["hq","tg","gx","rd","pr","lx","pk","dd","dg","c12"].forEach(id=>document.getElementById(id)?.remove());
+};
+window.mmGachaBack3325=function(){
+ mmGachaClose3325();
+ if(typeof showGacha==="function")showGacha();
+};
+window.mmGachaHome3325=function(){
+ mmGachaClose3325();
+ if(typeof showHome==="function")showHome();
+ else if(typeof goHome==="function")goHome();
+ else location.reload();
+};
+window.mmGachaAgain3325=function(kind){
+ mmGachaClose3325();
+ setTimeout(()=>{kind==="ten"?drawGacha10():drawGacha()},50);
+};
+document.addEventListener("click",function(e){
+ const b=e.target.closest&&e.target.closest("button");
+ if(!b)return;
+ const root=b.closest("#hq,#tg,#gx,#rd,#pr,#lx,#pk,#dd,#dg,#c12");
+ if(!root)return;
+ const t=(b.textContent||"").trim();
+ if(t.includes("もう一回")){e.preventDefault();e.stopPropagation();mmGachaAgain3325("one")}
+ else if(t.includes("もう一度10連")){e.preventDefault();e.stopPropagation();mmGachaAgain3325("ten")}
+ else if(t.includes("ガチャへ戻る")){e.preventDefault();e.stopPropagation();mmGachaBack3325()}
+ else if(t.includes("ホーム")){e.preventDefault();e.stopPropagation();mmGachaHome3325()}
+ else if(t.includes("閉じる")){e.preventDefault();e.stopPropagation();mmGachaClose3325()}
+},true);
+
+const oldNews3325=typeof showNewsPage==="function"?showNewsPage:null;
+showNewsPage=function(){
+ let html=`<h2>📢 お知らせ</h2><div class="newsCard"><h3>Ver 3.3.25 アニメ宝箱・ボタン修正</h3><p>宝箱をアニメ/ソシャゲ風にさらに豪華化しました。</p><p>色変化や開封前の振動を強化しました。</p><p>ガチャ終了後のボタン反応を修正しました。</p><p>ランキング・ログイン・Firebase処理は変更していません。</p></div>`;
+ if(oldNews3325){try{oldNews3325();const p=document.getElementById("panelArea");if(p)p.innerHTML=html+p.innerHTML;return}catch(e){}}
+ document.getElementById("panelArea").innerHTML=html;
+ if(typeof ensureHomeButton==="function")ensureHomeButton();
+};
+window.showNewsPage=showNewsPage;
+acEnsure();
+})();
+
+
+
+/* Ver3.3.26 Unique Chest Shapes: rarity changes chest model, not just color */
+(function(){
+if(window.__uniqueChest3326)return;
+window.__uniqueChest3326=true;
+
+function ucEnsure(){
+ if(document.getElementById("ucStyle3326"))return;
+ const st=document.createElement("style");
+ st.id="ucStyle3326";
+ st.textContent=`
+/* base stronger proportions */
+.hqchest{
+  transition:transform 1.2s cubic-bezier(.16,.86,.28,1), opacity .8s ease, filter .6s ease!important;
+}
+
+/* clear all model ornaments first */
+.hqchest .ucCrown,.hqchest .ucWingL,.hqchest .ucWingR,.hqchest .ucAura,.hqchest .ucOrbL,.hqchest .ucOrbR,.hqchest .ucHorns{
+  display:none;
+}
+
+/* R / White: sealed silver chest, simpler, boxier */
+.hqchest.hqWhite{
+  width:min(70vw,340px)!important;
+  height:min(46vw,255px)!important;
+  max-height:255px!important;
+  filter:drop-shadow(0 24px 28px rgba(0,0,0,.82)) drop-shadow(0 0 24px rgba(220,235,255,.28))!important;
+}
+.hqWhite .hqchestBase{
+  height:53%!important;
+  border-radius:8% 8% 12% 12%!important;
+  border:8px solid #a3aab8!important;
+  background:linear-gradient(135deg,#cbd5e1,#ffffff,#7f8da3)!important;
+  box-shadow:inset 0 0 42px rgba(0,0,0,.48),0 0 42px rgba(220,235,255,.38)!important;
+}
+.hqWhite .hqchestLid{
+  height:57%!important;
+  border-radius:42% 42% 8% 8%/82% 82% 12% 12%!important;
+  border:8px solid #a3aab8!important;
+  background:linear-gradient(135deg,#e2e8f0,#ffffff,#8a99ad)!important;
+}
+.hqWhite .hqstrap.s1,.hqWhite .hqstrap.s3{display:none!important}
+.hqWhite .hqstrap.s2{
+  width:13%!important;
+  background:linear-gradient(90deg,#596273,#f8fafc,#596273)!important;
+  box-shadow:0 0 12px rgba(255,255,255,.55)!important;
+}
+.hqWhite .hqfrontPlate{
+  width:28%!important;
+  height:36%!important;
+  top:40%!important;
+  background:radial-gradient(circle at 50% 30%,#fff,#cbd5e1 48%,#64748b 100%)!important;
+  box-shadow:0 0 22px rgba(255,255,255,.75)!important;
+}
+.hqWhite:before,.hqWhite:after{display:none!important}
+
+/* SR / Blue: magic chest, wider, glowing blue orbs */
+.hqchest.hqBlue{
+  width:min(76vw,390px)!important;
+  height:min(50vw,290px)!important;
+  max-height:290px!important;
+  filter:drop-shadow(0 30px 34px rgba(0,0,0,.86)) drop-shadow(0 0 55px rgba(56,232,255,.6))!important;
+}
+.hqBlue .hqchestBase{
+  height:57%!important;
+  border-radius:14% 14% 16% 16%!important;
+  border:9px solid #075985!important;
+  background:linear-gradient(135deg,#031633,#0ea5e9,#1d4ed8,#020617)!important;
+  box-shadow:inset 0 0 55px rgba(0,0,0,.48),0 0 78px #38e8ff!important;
+}
+.hqBlue .hqchestLid{
+  height:64%!important;
+  border-radius:55% 55% 10% 10%/98% 98% 12% 12%!important;
+  border:9px solid #075985!important;
+  background:linear-gradient(135deg,#082f49,#0ea5e9,#93c5fd,#0f172a)!important;
+}
+.hqBlue .hqstrap{
+  background:linear-gradient(90deg,#021627,#0ea5e9,#e0f2fe,#0ea5e9,#021627)!important;
+  box-shadow:0 0 28px #38e8ff!important;
+}
+.hqBlue .hqfrontPlate{
+  clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)!important;
+  background:radial-gradient(circle,#e0f2fe,#38e8ff 35%,#075985 78%)!important;
+  box-shadow:0 0 40px #38e8ff!important;
+}
+.hqBlue:before,.hqBlue:after{
+  display:block!important;
+  background:linear-gradient(135deg,#021627,#38e8ff,#e0f2fe,#075985)!important;
+  filter:drop-shadow(0 0 18px #38e8ff)!important;
+}
+
+/* SSR / Gold: royal crown chest, huge lock, red jewel */
+.hqchest.hqGold{
+  width:min(82vw,430px)!important;
+  height:min(54vw,320px)!important;
+  max-height:320px!important;
+  filter:drop-shadow(0 36px 42px rgba(0,0,0,.9)) drop-shadow(0 0 70px rgba(255,215,0,.85))!important;
+}
+.hqGold .hqchestBase{
+  height:59%!important;
+  border-radius:10% 10% 18% 18%!important;
+  border:11px solid #7c3f00!important;
+  background:linear-gradient(135deg,#3b1d00,#b45309,#ffd700,#fff0a4,#7c2d12)!important;
+  box-shadow:inset 0 0 65px rgba(0,0,0,.43),0 0 105px #ffd700!important;
+}
+.hqGold .hqchestLid{
+  height:66%!important;
+  border-radius:58% 58% 10% 10%/100% 100% 12% 12%!important;
+  border:11px solid #7c3f00!important;
+  background:linear-gradient(135deg,#5a2600,#d97706,#fff0a4,#ffd700,#7c2d12)!important;
+}
+.hqGold .hqfrontPlate{
+  width:42%!important;
+  height:50%!important;
+  top:31%!important;
+  background:radial-gradient(circle at 50% 26%,#fff7c2,#ffd700 28%,#b45309 66%,#2b1600 100%)!important;
+  box-shadow:0 0 50px #ffd700,inset 0 0 28px rgba(0,0,0,.48)!important;
+}
+.hqGold .hqfrontPlate:after{
+  content:"◆"!important;
+  color:#ef4444!important;
+  font-size:42px!important;
+  text-shadow:0 0 20px #fff,0 0 36px #ef4444!important;
+}
+.hqGold .hqlock{
+  width:30%!important;
+  height:32%!important;
+  border-radius:14px!important;
+}
+.hqGold:before,.hqGold:after{
+  display:block!important;
+  width:20%!important;
+  height:28%!important;
+  background:linear-gradient(135deg,#3b1d00,#ffd700,#fff4b8,#7c2d12)!important;
+  filter:drop-shadow(0 0 22px #ffd700)!important;
+}
+
+/* UR / Rainbow: mythic winged floating chest */
+.hqchest.hqRainbow{
+  width:min(88vw,470px)!important;
+  height:min(58vw,350px)!important;
+  max-height:350px!important;
+  filter:drop-shadow(0 42px 46px rgba(0,0,0,.92)) drop-shadow(0 0 90px rgba(255,255,255,.95)) drop-shadow(0 0 145px rgba(255,0,255,.85))!important;
+  animation:ucMythicFloat 1.05s ease-in-out infinite alternate!important;
+}
+@keyframes ucMythicFloat{
+  from{transform:translateX(-50%) scale(1) translateY(0) rotate(-1deg)}
+  to{transform:translateX(-50%) scale(1.05) translateY(-18px) rotate(1deg)}
+}
+.hqRainbow .hqchestBase{
+  height:60%!important;
+  border-radius:13% 13% 22% 22%!important;
+  border:12px solid #fff2a8!important;
+  background:linear-gradient(135deg,#ff0080,#ffd700,#00eaff,#8b5cf6,#ff0080)!important;
+  box-shadow:inset 0 0 74px rgba(255,255,255,.38),0 0 110px #fff,0 0 180px #ff00ff!important;
+}
+.hqRainbow .hqchestLid{
+  height:68%!important;
+  border-radius:62% 62% 10% 10%/100% 100% 12% 12%!important;
+  border:12px solid #fff2a8!important;
+  background:linear-gradient(135deg,#ff0080,#ffd700,#00eaff,#8b5cf6,#ff0080)!important;
+  box-shadow:inset 0 0 74px rgba(255,255,255,.42),0 0 120px #fff,0 0 190px #ff00ff!important;
+}
+.hqRainbow .hqstrap{
+  background:linear-gradient(90deg,#fff,#ff00cc,#ffd700,#00eaff,#fff)!important;
+  box-shadow:0 0 36px #fff,0 0 66px #ff00ff!important;
+}
+.hqRainbow .hqfrontPlate{
+  width:46%!important;
+  height:54%!important;
+  top:28%!important;
+  background:radial-gradient(circle,#fff,#ffd700 22%,#ff00ff 58%,#4c1d95 100%)!important;
+  box-shadow:0 0 70px #fff,0 0 120px #ff00ff!important;
+}
+.hqRainbow .hqfrontPlate:after{
+  content:"✦"!important;
+  color:#fff!important;
+  font-size:52px!important;
+  text-shadow:0 0 20px #fff,0 0 44px #ff00ff!important;
+}
+.hqRainbow:before,.hqRainbow:after{
+  display:block!important;
+  width:26%!important;
+  height:36%!important;
+  background:linear-gradient(135deg,#fff,#ffd700,#00eaff,#ff00ff)!important;
+  filter:drop-shadow(0 0 34px #fff) drop-shadow(0 0 58px #ff00ff)!important;
+}
+
+/* add real extra ornaments using pseudo inserted nodes */
+.ucCrown,.ucWingL,.ucWingR,.ucAura,.ucOrbL,.ucOrbR,.ucHorns{
+  position:absolute;
+  pointer-events:none;
+  z-index:6;
+}
+.ucCrown{
+  display:none;
+  left:50%;
+  top:-18%;
+  width:40%;
+  height:30%;
+  transform:translateX(-50%);
+  background:linear-gradient(180deg,#fff4b8,#ffd700,#a16207);
+  clip-path:polygon(0 100%,10% 38%,26% 72%,40% 18%,50% 68%,60% 18%,74% 72%,90% 38%,100% 100%);
+  filter:drop-shadow(0 0 24px #ffd700);
+}
+.hqGold .ucCrown,.hqRainbow .ucCrown{display:block}
+.ucWingL,.ucWingR{
+  display:none;
+  top:16%;
+  width:28%;
+  height:46%;
+  background:linear-gradient(135deg,#fff,#ffd700,#00eaff,#ff00ff);
+  opacity:.92;
+  filter:drop-shadow(0 0 24px #fff);
+}
+.ucWingL{left:-22%;clip-path:polygon(100% 40%,0 0,20% 32%,0 50%,28% 62%,8% 82%,100% 60%)}
+.ucWingR{right:-22%;clip-path:polygon(0 40%,100% 0,80% 32%,100% 50%,72% 62%,92% 82%,0 60%)}
+.hqRainbow .ucWingL,.hqRainbow .ucWingR{display:block}
+.ucAura{
+  display:none;
+  inset:-24%;
+  border-radius:50%;
+  background:conic-gradient(from 0deg,#ff0080,#ffd700,#00eaff,#8b5cf6,#ff0080);
+  opacity:.30;
+  filter:blur(16px);
+  animation:ucAuraSpin 2.2s linear infinite;
+  z-index:-1;
+}
+@keyframes ucAuraSpin{to{transform:rotate(360deg)}}
+.hqRainbow .ucAura{display:block}
+.ucOrbL,.ucOrbR{
+  display:none;
+  top:48%;
+  width:13%;
+  height:18%;
+  border-radius:50%;
+  background:radial-gradient(circle,#fff,#38e8ff,#075985);
+  box-shadow:0 0 28px #38e8ff;
+}
+.ucOrbL{left:-2%}.ucOrbR{right:-2%}
+.hqBlue .ucOrbL,.hqBlue .ucOrbR{display:block}
+.ucHorns{
+  display:none;
+  left:50%;
+  top:-6%;
+  width:70%;
+  height:24%;
+  transform:translateX(-50%);
+}
+.ucHorns:before,.ucHorns:after{
+  content:"";
+  position:absolute;
+  top:0;
+  width:32%;
+  height:100%;
+  background:linear-gradient(135deg,#3b1d00,#ffd700,#fff4b8);
+  filter:drop-shadow(0 0 18px #ffd700);
+}
+.ucHorns:before{left:0;clip-path:polygon(100% 100%,0 0,34% 100%)}
+.ucHorns:after{right:0;clip-path:polygon(0 100%,100% 0,66% 100%)}
+.hqGold .ucHorns{display:block}
+`;
+ document.head.appendChild(st);
+}
+
+function ucDecorate(){
+ const chest=document.getElementById("hqChest");
+ if(!chest || chest.__ucDecorated)return;
+ chest.__ucDecorated=true;
+ ["ucAura","ucWingL","ucWingR","ucCrown","ucOrbL","ucOrbR","ucHorns"].forEach(cls=>{
+   const d=document.createElement("div");
+   d.className=cls;
+   chest.appendChild(d);
+ });
+}
+setInterval(ucDecorate,300);
+document.addEventListener("click",()=>setTimeout(ucDecorate,300),true);
+
+const oldNews3326=typeof showNewsPage==="function"?showNewsPage:null;
+showNewsPage=function(){
+ let html=`<h2>📢 お知らせ</h2><div class="newsCard"><h3>Ver 3.3.26 レア度別宝箱モデル</h3><p>白・青・金・虹で宝箱の形と装飾が変わるようにしました。</p><p>青箱は魔法宝箱、金箱は王冠付き、虹箱は翼付き神宝箱になります。</p><p>ランキング・ログイン・Firebase処理は変更していません。</p></div>`;
+ if(oldNews3326){try{oldNews3326();const p=document.getElementById("panelArea");if(p)p.innerHTML=html+p.innerHTML;return}catch(e){}}
+ document.getElementById("panelArea").innerHTML=html;
+ if(typeof ensureHomeButton==="function")ensureHomeButton();
+};
+window.showNewsPage=showNewsPage;
+ucEnsure();
 })();
