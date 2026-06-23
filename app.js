@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.3.38";
+const VERSION = "3.3.39";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -12199,254 +12199,45 @@ window.showNewsPage=function(){let html="<h2>📢 お知らせ</h2><div class='n
 
 
 
-/* Ver3.3.33 Profile equipped-title hide + instant nav buttons */
+
+
+
+/* Ver3.3.39 Nav Only Clean Rebuild */
 (function(){
-if(window.__profileNavFix3333)return;
-window.__profileNavFix3333=true;
+if(window.__navOnlyClean3339)return;
+window.__navOnlyClean3339=true;
 
-function pnStyle3333(){
- if(document.getElementById("pnStyle3333"))return;
+const NAV_ID_3339="navOnlyClean3339";
+let navStack3339=[];
+let lastSig3339="";
+
+function navStyle3339(){
+ if(document.getElementById("navStyle3339"))return;
  const st=document.createElement("style");
- st.id="pnStyle3333";
+ st.id="navStyle3339";
  st.textContent=`
-#instantNav3333{
-  display:flex;
-  justify-content:center;
-  gap:18px;
-  flex-wrap:wrap;
-  margin:18px auto 16px;
-  width:100%;
-  z-index:20;
-}
-#instantNav3333 button{
-  border:2px solid #22f5d1;
-  border-radius:12px;
-  background:#222;
-  color:#fff;
-  padding:12px 22px;
-  font-size:20px;
-  font-weight:900;
-  box-shadow:0 0 12px rgba(34,245,209,.35);
-}
-.profileEquippedHide3333{
-  display:none!important;
-}
-`;
- document.head.appendChild(st);
-}
-
-function isProfile3333(){
- const txt=(document.getElementById("panelArea")?.innerText||document.body.innerText||"").slice(0,4000);
- return txt.includes("プロフィール") || txt.includes("プロフィール編集") || txt.includes("装備中の称号") || txt.includes("画像を選ぶ");
-}
-
-function removeEquipped3333(){
- if(!isProfile3333())return;
- const panel=document.getElementById("panelArea")||document.body;
- const nodes=[...panel.querySelectorAll("h1,h2,h3,h4,div,section,p")];
- for(const n of nodes){
-   const t=(n.innerText||"").trim();
-   if(!t.includes("装備中の称号"))continue;
-   let target=n;
-   for(let i=0;i<4;i++){
-     if(!target.parentElement || target.parentElement===panel)break;
-     const pt=(target.parentElement.innerText||"");
-     if(pt.includes("プロフィール編集") || pt.includes("画像を選ぶ"))break;
-     target=target.parentElement;
-   }
-   target.classList.add("profileEquippedHide3333");
- }
-}
-
-function ensureInstantNav3333(){
- pnStyle3333();
- const panel=document.getElementById("panelArea");
- if(!panel)return;
- if(document.getElementById("instantNav3333"))return;
- const nav=document.createElement("div");
- nav.id="instantNav3333";
- nav.innerHTML=`<button type="button" id="instantBack3333">← 戻る</button><button type="button" id="instantHome3333">🏠 ホームへ</button>`;
- const first=panel.firstElementChild;
- if(first) panel.insertBefore(nav, first);
- else panel.appendChild(nav);
- document.getElementById("instantBack3333").onclick=function(){
-   if(typeof goBack==="function")goBack();
-   else if(typeof showHome==="function")showHome();
-   else history.back();
- };
- document.getElementById("instantHome3333").onclick=function(){
-   if(typeof showHome==="function")showHome();
-   else if(typeof goHome==="function")goHome();
-   else location.reload();
- };
-}
-
-function tick3333(){
- ensureInstantNav3333();
- removeEquipped3333();
-}
-setInterval(tick3333,500);
-setTimeout(tick3333,100);
-
-const oldNews3333=typeof showNewsPage==="function"?showNewsPage:null;
-showNewsPage=function(){
- let html=`<h2>📢 お知らせ</h2><div class="newsCard"><h3>Ver 3.3.33 プロフィール・戻るボタン修正</h3><p>プロフィールの「装備中の称号」欄を非表示にしました。</p><p>戻る/ホームボタンが遅れて表示される問題を修正し、最初から配置するようにしました。</p><p>ランキング・ログイン・Firebase処理は変更していません。</p></div>`;
- if(oldNews3333){try{oldNews3333();const p=document.getElementById("panelArea");if(p)p.innerHTML=html+p.innerHTML;return}catch(e){}}
- const p=document.getElementById("panelArea");
- if(p)p.innerHTML=html;
- if(typeof ensureHomeButton==="function")ensureHomeButton();
-};
-window.showNewsPage=showNewsPage;
-})();
-
-
-
-/* Ver3.3.34 remove enemy beta + nav dedupe */
-(function(){
-if(window.__removeEnemyNavDedupe3334)return;
-window.__removeEnemyNavDedupe3334=true;
-
-function rmStyle3334(){
- if(document.getElementById("rmStyle3334"))return;
- const st=document.createElement("style");
- st.id="rmStyle3334";
- st.textContent=`
-#enemyStage3330,#enemyStage3331,#enemyStage3332{
+/* 古い戻る/ホーム生成物は完全に消す */
+#instantNav3333,
+#mainNav3335,
+#fixedNav3336,
+#nav3337,
+.navDuplicateHide3334{
   display:none!important;
   visibility:hidden!important;
   pointer-events:none!important;
 }
-.navDuplicateHide3334{
-  display:none!important;
-}
-`;
- document.head.appendChild(st);
-}
 
-function removeEnemies3334(){
- rmStyle3334();
- document.body.classList.remove("enemyProblemActive3332");
- ["enemyStage3330","enemyStage3331","enemyStage3332"].forEach(id=>document.getElementById(id)?.remove());
-}
-
-function dedupeNav3334(){
- const buttons=[...document.querySelectorAll("button")];
- const backs=buttons.filter(b=>(b.textContent||"").trim().includes("戻る"));
- const homes=buttons.filter(b=>(b.textContent||"").trim().includes("ホーム"));
- // 最初の1個だけ残す
- backs.forEach((b,i)=>{ if(i>0)b.classList.add("navDuplicateHide3334"); else b.classList.remove("navDuplicateHide3334"); });
- homes.forEach((b,i)=>{ if(i>0)b.classList.add("navDuplicateHide3334"); else b.classList.remove("navDuplicateHide3334"); });
- // instantNavが重複していたら1個だけ
- const navs=[...document.querySelectorAll("#instantNav3333")];
- navs.forEach((n,i)=>{ if(i>0)n.remove(); });
-}
-
-function tick3334(){
- removeEnemies3334();
- dedupeNav3334();
-}
-setInterval(tick3334,400);
-setTimeout(tick3334,50);
-
-// 旧敵関数は何もしないように上書き
-window.enemyHit3330=function(){};
-window.enemyAttack3330=function(){};
-window.enemyHit3331=function(){};
-window.enemyAttack3331=function(){};
-window.enemyHit3332=function(){};
-window.enemyAttack3332=function(){};
-
-const oldNews3334=typeof showNewsPage==="function"?showNewsPage:null;
-showNewsPage=function(){
- let html=`<h2>📢 お知らせ</h2><div class="newsCard"><h3>Ver 3.3.34 敵β削除・ボタン重複修正</h3><p>敵画像関連の試作表示を一旦削除しました。</p><p>戻る/ホームボタンが二重表示される問題を修正しました。</p><p>ランキング・ログイン・Firebase処理は変更していません。</p></div>`;
- if(oldNews3334){try{oldNews3334();const p=document.getElementById("panelArea");if(p)p.innerHTML=html+p.innerHTML;return}catch(e){}}
- const p=document.getElementById("panelArea");
- if(p)p.innerHTML=html;
- if(typeof ensureHomeButton==="function")ensureHomeButton();
-};
-window.showNewsPage=showNewsPage;
-})();
-
-
-
-/* Ver3.3.35 name prompt once + proper back/home nav */
-(function(){
-if(window.__nameNavFix3335)return;
-window.__nameNavFix3335=true;
-
-const NAME_KEYS_3335=["playerName","mathMaster_playerName","userName","nickname","name"];
-const NAV_STACK_KEY_3335="mathMaster_navStack_3335";
-
-function nfGetName3335(){
-  for(const k of NAME_KEYS_3335){
-    const v=localStorage.getItem(k);
-    if(v && v.trim())return v.trim();
-  }
-  try{
-    if(window.playerData && playerData.name && String(playerData.name).trim())return String(playerData.name).trim();
-    if(window.playerData && playerData.playerName && String(playerData.playerName).trim())return String(playerData.playerName).trim();
-  }catch(e){}
-  return "";
-}
-function nfSaveName3335(name){
-  if(!name || !String(name).trim())return;
-  name=String(name).trim();
-  NAME_KEYS_3335.forEach(k=>localStorage.setItem(k,name));
-  localStorage.setItem("namePromptDone3335","1");
-  try{
-    if(window.playerData){
-      playerData.name=name;
-      playerData.playerName=name;
-      if(typeof saveAllData==="function")saveAllData();
-    }
-  }catch(e){}
-}
-function nfNamePatch3335(){
-  if(window.__namePromptPatched3335)return;
-  window.__namePromptPatched3335=true;
-  const oldPrompt=window.prompt;
-  window.prompt=function(msg,def){
-    const m=String(msg||"");
-    if(m.includes("プレイヤー名を決めてください")){
-      const saved=nfGetName3335();
-      if(saved)return saved;
-      const v=oldPrompt.call(window,msg,def||"");
-      if(v && String(v).trim())nfSaveName3335(v);
-      return v;
-    }
-    return oldPrompt.call(window,msg,def);
-  };
-}
-nfNamePatch3335();
-
-function nfEnsureName3335(){
-  const saved=nfGetName3335();
-  if(saved){
-    nfSaveName3335(saved);
-    return;
-  }
-  // まだ名前がない時だけ、本体の処理に任せる
-}
-setTimeout(nfEnsureName3335,300);
-setInterval(nfEnsureName3335,3000);
-
-function nfStyle3335(){
- if(document.getElementById("nfStyle3335"))return;
- const st=document.createElement("style");
- st.id="nfStyle3335";
- st.textContent=`
-#instantNav3333{display:none!important}
-.navDuplicateHide3334{display:none!important}
-#mainNav3335{
+#navOnlyClean3339{
   display:flex;
   justify-content:center;
   gap:18px;
   flex-wrap:wrap;
-  margin:18px auto 16px;
+  margin:14px auto 14px;
   width:100%;
-  z-index:20;
+  z-index:30;
 }
-#mainNav3335 button{
+
+#navOnlyClean3339 button{
   border:2px solid #22f5d1;
   border-radius:12px;
   background:#222;
@@ -12456,211 +12247,142 @@ function nfStyle3335(){
   font-weight:900;
   box-shadow:0 0 12px rgba(34,245,209,.35);
 }
+
+body.isHome3339 #backBtn3339{
+  display:none!important;
+}
 `;
  document.head.appendChild(st);
 }
 
-function nfPanel3335(){return document.getElementById("panelArea")||document.body;}
-
-function nfPageSignature3335(){
- const p=nfPanel3335();
- const txt=(p.innerText||"").trim().slice(0,160);
- return txt || location.hash || "page";
+function panel3339(){
+ return document.getElementById("panelArea");
 }
-let nfLastSig3335="";
-function nfPushPage3335(){
- const sig=nfPageSignature3335();
- if(!sig || sig===nfLastSig3335)return;
- nfLastSig3335=sig;
- let stack=[];
- try{stack=JSON.parse(sessionStorage.getItem(NAV_STACK_KEY_3335)||"[]")}catch(e){}
- if(stack[stack.length-1]!==sig){
-   stack.push(sig);
-   if(stack.length>30)stack=stack.slice(-30);
-   sessionStorage.setItem(NAV_STACK_KEY_3335,JSON.stringify(stack));
+
+function text3339(){
+ const p=panel3339();
+ return (p ? p.innerText : document.body.innerText || "").trim();
+}
+
+function isHome3339(){
+ const t=text3339().slice(0,3000);
+ return (
+   t.includes("学習") &&
+   t.includes("ランキング") &&
+   t.includes("ガチャ") &&
+   t.includes("プロフィール") &&
+   t.includes("成績")
+ );
+}
+
+function sig3339(){
+ return text3339().replace(/\s+/g," ").slice(0,180) || "home";
+}
+
+function pushStack3339(){
+ const s=sig3339();
+ if(!s || s===lastSig3339)return;
+ lastSig3339=s;
+ if(navStack3339[navStack3339.length-1]!==s){
+   navStack3339.push(s);
+   if(navStack3339.length>30)navStack3339=navStack3339.slice(-30);
  }
 }
 
-function nfBack3335(){
- let stack=[];
- try{stack=JSON.parse(sessionStorage.getItem(NAV_STACK_KEY_3335)||"[]")}catch(e){}
- stack.pop();
- sessionStorage.setItem(NAV_STACK_KEY_3335,JSON.stringify(stack));
- if(window.history && history.length>1){
-   history.back();
-   setTimeout(()=>{
-     // 戻れなかった時だけホーム
-     const now=nfPageSignature3335();
-     if(stack.length===0 && now===nfLastSig3335 && typeof showHome==="function")showHome();
-   },450);
- }else if(typeof showHome==="function")showHome();
-}
-function nfHome3335(){
- try{sessionStorage.setItem(NAV_STACK_KEY_3335,JSON.stringify([]));}catch(e){}
+function goHome3339(){
+ navStack3339=[];
+ lastSig3339="";
  if(typeof showHome==="function")showHome();
  else if(typeof goHome==="function")goHome();
  else location.reload();
+ setTimeout(updateNav3339,30);
 }
 
-window.goBack3335=nfBack3335;
-window.goHome3335=nfHome3335;
+function goBack3339(){
+ if(isHome3339())return;
 
-function nfRemoveDuplicateNav3335(){
- document.querySelectorAll("#instantNav3333").forEach(n=>n.remove());
- const all=[...document.querySelectorAll("button")];
- const navTexts=["戻る","ホーム"];
- for(const word of navTexts){
-   const btns=all.filter(b=>(b.textContent||"").includes(word) && !b.closest("#mainNav3335"));
-   btns.forEach(b=>b.classList.add("navDuplicateHide3334"));
+ if(window.history && history.length>1){
+   history.back();
+   setTimeout(updateNav3339,80);
+   return;
  }
+
+ goHome3339();
 }
 
-function nfEnsureNav3335(){
- nfStyle3335();
- const panel=document.getElementById("panelArea");
- if(!panel)return;
- nfRemoveDuplicateNav3335();
- let nav=document.getElementById("mainNav3335");
- if(!nav){
-   nav=document.createElement("div");
-   nav.id="mainNav3335";
-   nav.innerHTML=`<button type="button" id="mainBack3335">← 戻る</button><button type="button" id="mainHome3335">🏠 ホームへ</button>`;
-   const first=panel.firstElementChild;
-   if(first)panel.insertBefore(nav, first);
-   else panel.appendChild(nav);
-   document.getElementById("mainBack3335").onclick=nfBack3335;
-   document.getElementById("mainHome3335").onclick=nfHome3335;
- }
+window.goHome3339=goHome3339;
+window.goBack3339=goBack3339;
+
+function removeOldNav3339(){
+ ["instantNav3333","mainNav3335","fixedNav3336","nav3337"].forEach(id=>{
+   document.getElementById(id)?.remove();
+ });
 }
 
-function nfTick3335(){
- nfEnsureNav3335();
- nfPushPage3335();
-}
-setInterval(nfTick3335,500);
-setTimeout(nfTick3335,50);
+function updateNav3339(){
+ navStyle3339();
+ removeOldNav3339();
 
-const oldNews3335=typeof showNewsPage==="function"?showNewsPage:null;
-showNewsPage=function(){
- let html=`<h2>📢 お知らせ</h2><div class="newsCard"><h3>Ver 3.3.35 名前入力・戻るボタン修正</h3><p>ホームに戻るたびプレイヤー名入力が出る問題を修正しました。</p><p>戻る/ホームボタンの二重表示を修正しました。</p><p>戻るは1つ前の画面へ、ホームはホームへ戻るように修正しました。</p><p>ランキング・ログイン・Firebase処理は変更していません。</p></div>`;
- if(oldNews3335){try{oldNews3335();const p=document.getElementById("panelArea");if(p)p.innerHTML=html+p.innerHTML;return}catch(e){}}
- const p=document.getElementById("panelArea");
- if(p)p.innerHTML=html;
- if(typeof ensureHomeButton==="function")ensureHomeButton();
-};
-window.showNewsPage=showNewsPage;
-})();
-
-
-
-/* Ver3.3.38 revert nav base + clean news jump */
-(function(){
-if(window.__revertNavNewsJump3338)return;
-window.__revertNavNewsJump3338=true;
-
-function newsStyle3338(){
- if(document.getElementById("newsStyle3338"))return;
- const st=document.createElement("style");
- st.id="newsStyle3338";
- st.textContent=`
-.newsTop3338{
-  text-align:center;
-  margin:12px 0 18px;
-}
-.newsJump3338{
-  display:flex;
-  justify-content:center;
-  gap:10px;
-  flex-wrap:wrap;
-  margin:12px 0 18px;
-}
-.newsJump3338 button{
-  border:none;
-  border-radius:999px;
-  padding:10px 14px;
-  font-weight:900;
-  color:#fff;
-  background:linear-gradient(135deg,#2563eb,#7c3aed);
-}
-.newsCard3338{
-  background:rgba(255,255,255,.10);
-  border:1px solid rgba(255,255,255,.15);
-  border-radius:18px;
-  padding:18px;
-  margin:16px 0;
-  line-height:1.75;
-}
-.newsCard3338 h3{
-  color:#ffe97a;
-  margin-top:0;
-}
-.newsHistory3338{
-  margin-top:28px;
-}
-.newsSmall3338{
-  opacity:.85;
-  font-size:.95em;
-}
-`;
- document.head.appendChild(st);
-}
-
-window.showNewsPage=function(){
- newsStyle3338();
- const p=document.getElementById("panelArea");
+ const p=panel3339();
  if(!p)return;
 
+ let nav=document.getElementById(NAV_ID_3339);
+ if(!nav){
+   nav=document.createElement("div");
+   nav.id=NAV_ID_3339;
+   nav.innerHTML='<button id="backBtn3339" type="button">← 戻る</button><button id="homeBtn3339" type="button">🏠 ホームへ</button>';
+   const first=p.firstElementChild;
+   if(first)p.insertBefore(nav, first);
+   else p.appendChild(nav);
+
+   document.getElementById("backBtn3339").onclick=goBack3339;
+   document.getElementById("homeBtn3339").onclick=goHome3339;
+ }else if(nav.parentElement!==p){
+   nav.remove();
+   updateNav3339();
+   return;
+ }
+
+ document.body.classList.toggle("isHome3339", isHome3339());
+ pushStack3339();
+}
+
+/* 画面が変わった時だけ更新。点滅防止のため高速setIntervalは使わない */
+let obs3339=null;
+function startObserver3339(){
+ const p=panel3339();
+ if(!p)return;
+ if(obs3339)obs3339.disconnect();
+ obs3339=new MutationObserver(()=>{
+   clearTimeout(window.__nav3339Timer);
+   window.__nav3339Timer=setTimeout(updateNav3339,60);
+ });
+ obs3339.observe(p,{childList:true,subtree:false});
+ updateNav3339();
+}
+setTimeout(startObserver3339,50);
+setTimeout(updateNav3339,200);
+document.addEventListener("click",()=>{
+ setTimeout(()=>{
+   if(panel3339() && (!obs3339 || obs3339.takeRecords))startObserver3339();
+   updateNav3339();
+ },120);
+},true);
+
+const oldNews3339=typeof showNewsPage==="function"?showNewsPage:null;
+showNewsPage=function(){
+ const p=panel3339();
+ if(!p)return;
  p.innerHTML=`
-  <div class="newsTop3338">
-    <h2>📢 お知らせ</h2>
-    <div class="newsJump3338">
-      <button onclick="document.getElementById('latestNews3338')?.scrollIntoView({behavior:'smooth'})">最新へ</button>
-      <button onclick="document.getElementById('historyNews3338')?.scrollIntoView({behavior:'smooth'})">履歴へ</button>
-      <button onclick="showHome&&showHome()">ホームへ</button>
-    </div>
-  </div>
-
-  <div id="latestNews3338" class="newsCard3338">
-    <h3>🔴 最新アップデート Ver3.3.38</h3>
-    <p>・戻る/ホームは前の安定版の挙動に戻しました。</p>
-    <p>・お知らせが何重にも増える問題を修正しました。</p>
-    <p>・お知らせ内のボタンから最新/履歴へ飛べるようにしました。</p>
-    <p>・ランキング・ログイン・Firebase処理は変更していません。</p>
-  </div>
-
-  <div id="historyNews3338" class="newsHistory3338">
-    <h2>📝 アップデート履歴</h2>
-
-    <div class="newsCard3338">
-      <h3>Ver3.3.36</h3>
-      <p>・名前入力ポップアップを出にくくしました。</p>
-      <p>・ガチャ結果の宝箱画像を変更しました。</p>
-      <p>・戻る/ホームの調整を行いました。</p>
-    </div>
-
-    <div class="newsCard3338">
-      <h3>Ver3.3.35</h3>
-      <p>・ホームに戻るたびプレイヤー名入力が出る問題を修正しました。</p>
-      <p>・戻る/ホームボタンの二重表示を修正しました。</p>
-      <p>・戻るは1つ前の画面へ、ホームはホームへ戻るように調整しました。</p>
-    </div>
-
-    <div class="newsCard3338">
-      <h3>Ver3.3.34</h3>
-      <p>・敵画像関連の試作表示を一旦削除しました。</p>
-      <p>・戻る/ホームボタンが二重表示される問題を修正しました。</p>
-    </div>
-
-    <div class="newsCard3338">
-      <h3>Ver3.3.33</h3>
-      <p>・プロフィールの表示を調整しました。</p>
-      <p>・戻る/ホームボタンの表示タイミングを調整しました。</p>
-    </div>
-
-    <p class="newsSmall3338">※ 3.3.37の点滅修正パッチは破棄し、安定版ベースに戻しています。</p>
-  </div>
+   <h2>📢 お知らせ</h2>
+   <div style="background:rgba(255,255,255,.1);border-radius:16px;padding:16px;margin:14px 0;">
+     <h3>Ver3.3.39</h3>
+     <p>・戻る/ホーム部分だけを1から作り直しました。</p>
+     <p>・古い戻る/ホームの重複コードを削除しました。</p>
+     <p>・ホーム画面では戻るボタンを非表示にしました。</p>
+     <p>・ランキング・ログイン・Firebase処理は変更していません。</p>
+   </div>
  `;
-
- if(typeof ensureHomeButton==="function")ensureHomeButton();
+ updateNav3339();
 };
 })();
