@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.3.36";
+const VERSION = "3.3.37";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -12737,4 +12737,190 @@ showNewsPage=function(){
  if(typeof ensureHomeButton==="function")ensureHomeButton();
 };
 window.showNewsPage=showNewsPage;
+})();
+
+
+
+/* Ver3.3.37 No flicker nav + clean news */
+(function(){
+if(window.__noFlickerNews3337)return;
+window.__noFlickerNews3337=true;
+
+const DEFAULT_NAME_3337="名無しの数学者";
+
+function nfSetName3337(){
+  try{
+    const name =
+      localStorage.getItem("playerName") ||
+      localStorage.getItem("mathMaster_playerName") ||
+      localStorage.getItem("userName") ||
+      DEFAULT_NAME_3337;
+
+    ["playerName","mathMaster_playerName","userName","nickname","name"].forEach(k=>{
+      if(!localStorage.getItem(k))localStorage.setItem(k,name);
+    });
+
+    if(window.playerData){
+      if(!playerData.name)playerData.name=name;
+      if(!playerData.playerName)playerData.playerName=name;
+    }
+
+    localStorage.setItem("namePromptDone3335","1");
+    localStorage.setItem("namePromptDisabled3336","1");
+    localStorage.setItem("namePromptDisabled3337","1");
+  }catch(e){}
+}
+nfSetName3337();
+
+if(!window.__promptKilled3337){
+  window.__promptKilled3337=true;
+  const oldPrompt=window.prompt;
+  window.prompt=function(msg,def){
+    const m=String(msg||"");
+    if(m.includes("プレイヤー名") || m.includes("名前") || m.includes("ニックネーム")){
+      nfSetName3337();
+      return localStorage.getItem("playerName") || DEFAULT_NAME_3337;
+    }
+    return oldPrompt.call(window,msg,def);
+  };
+}
+
+function nfStyle3337(){
+ if(document.getElementById("nfStyle3337"))return;
+ const st=document.createElement("style");
+ st.id="nfStyle3337";
+ st.textContent=`
+/* 古いナビは全部消す。点滅の原因なので表示切替しない */
+#instantNav3333,
+#mainNav3335,
+#fixedNav3336,
+.navDuplicateHide3334{
+  display:none!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+}
+
+/* Ver3.3.37のナビだけ使う */
+#nav3337{
+  display:flex;
+  justify-content:center;
+  gap:18px;
+  flex-wrap:wrap;
+  margin:14px auto 14px;
+  width:100%;
+  z-index:50;
+}
+#nav3337 button{
+  border:2px solid #22f5d1;
+  border-radius:12px;
+  background:#222;
+  color:#fff;
+  padding:12px 22px;
+  font-size:20px;
+  font-weight:900;
+  box-shadow:0 0 12px rgba(34,245,209,.35);
+}
+body.home3337 #navBack3337{
+  display:none!important;
+}
+.newsCard3337{
+  background:rgba(255,255,255,.10);
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:18px;
+  padding:18px;
+  margin:16px 0;
+  line-height:1.7;
+}
+.newsCard3337 h3{
+  color:#ffe97a;
+  margin-top:0;
+}
+`;
+ document.head.appendChild(st);
+}
+
+function nfPanel3337(){
+ return document.getElementById("panelArea") || document.body;
+}
+
+function nfIsHome3337(){
+ const txt=(nfPanel3337().innerText||"").slice(0,3000);
+ return txt.includes("学習") && txt.includes("ランキング") && txt.includes("ガチャ") && txt.includes("プロフィール") && txt.includes("成績");
+}
+
+let lastPanel3337=null;
+function nfEnsureNav3337(){
+ nfStyle3337();
+ const panel=document.getElementById("panelArea");
+ if(!panel)return;
+
+ // 画面が再描画された時だけ作る。常時消したり足したりしない＝点滅防止
+ let nav=document.getElementById("nav3337");
+ if(!nav || nav.parentElement!==panel){
+   if(nav)nav.remove();
+   nav=document.createElement("div");
+   nav.id="nav3337";
+   nav.innerHTML='<button id="navBack3337" type="button">← 戻る</button><button id="navHome3337" type="button">🏠 ホームへ</button>';
+   const first=panel.firstElementChild;
+   if(first)panel.insertBefore(nav, first);
+   else panel.appendChild(nav);
+   document.getElementById("navBack3337").onclick=function(){
+     if(history.length>1)history.back();
+     else if(typeof showHome==="function")showHome();
+   };
+   document.getElementById("navHome3337").onclick=function(){
+     if(typeof showHome==="function")showHome();
+     else if(typeof goHome==="function")goHome();
+     else location.reload();
+   };
+ }
+ document.body.classList.toggle("home3337", nfIsHome3337());
+ lastPanel3337=panel;
+}
+
+// 旧バージョンのsetIntervalが動いても、これで最終状態を安定化
+setTimeout(nfEnsureNav3337,50);
+setInterval(nfEnsureNav3337,1500);
+
+function cleanNews3337(){
+ const p=document.getElementById("panelArea");
+ if(!p)return false;
+ p.innerHTML = `
+   <h2>📢 お知らせ</h2>
+
+   <div class="newsCard3337">
+     <h3>🔴 最新アップデート Ver3.3.37</h3>
+     <p>・戻る/ホームボタンが点滅する問題を修正しました。</p>
+     <p>・戻る/ホームボタンを1セットだけ表示するようにしました。</p>
+     <p>・お知らせが何重にも増える問題を修正しました。</p>
+     <p>・名前入力ポップアップを出ないようにしました。</p>
+     <p>・ランキング・ログイン・Firebase処理は変更していません。</p>
+   </div>
+
+   <div class="newsCard3337">
+     <h3>📝 アップデート履歴</h3>
+     <p><b>Ver3.3.36</b><br>名前入力削除 / 戻る・ホーム修正 / ガチャ宝箱画像変更</p>
+     <p><b>Ver3.3.35</b><br>名前入力・戻るボタン修正</p>
+     <p><b>Ver3.3.34</b><br>敵β削除 / ボタン重複修正</p>
+     <p><b>Ver3.3.33</b><br>プロフィール表示調整 / ナビ修正</p>
+   </div>
+ `;
+ nfEnsureNav3337();
+ return true;
+}
+
+window.showNewsPage=function(){
+ nfStyle3337();
+ cleanNews3337();
+};
+
+const oldShowHome3337 = typeof showHome==="function" ? showHome : null;
+if(oldShowHome3337 && !oldShowHome3337.__nfPatched3337){
+  window.showHome=function(){
+    oldShowHome3337.apply(this,arguments);
+    setTimeout(nfEnsureNav3337,30);
+  };
+  window.showHome.__nfPatched3337=true;
+}
+
 })();
