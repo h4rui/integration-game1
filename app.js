@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.3.33";
+const VERSION = "3.3.34";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -12292,6 +12292,74 @@ const oldNews3333=typeof showNewsPage==="function"?showNewsPage:null;
 showNewsPage=function(){
  let html=`<h2>📢 お知らせ</h2><div class="newsCard"><h3>Ver 3.3.33 プロフィール・戻るボタン修正</h3><p>プロフィールの「装備中の称号」欄を非表示にしました。</p><p>戻る/ホームボタンが遅れて表示される問題を修正し、最初から配置するようにしました。</p><p>ランキング・ログイン・Firebase処理は変更していません。</p></div>`;
  if(oldNews3333){try{oldNews3333();const p=document.getElementById("panelArea");if(p)p.innerHTML=html+p.innerHTML;return}catch(e){}}
+ const p=document.getElementById("panelArea");
+ if(p)p.innerHTML=html;
+ if(typeof ensureHomeButton==="function")ensureHomeButton();
+};
+window.showNewsPage=showNewsPage;
+})();
+
+
+
+/* Ver3.3.34 remove enemy beta + nav dedupe */
+(function(){
+if(window.__removeEnemyNavDedupe3334)return;
+window.__removeEnemyNavDedupe3334=true;
+
+function rmStyle3334(){
+ if(document.getElementById("rmStyle3334"))return;
+ const st=document.createElement("style");
+ st.id="rmStyle3334";
+ st.textContent=`
+#enemyStage3330,#enemyStage3331,#enemyStage3332{
+  display:none!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+}
+.navDuplicateHide3334{
+  display:none!important;
+}
+`;
+ document.head.appendChild(st);
+}
+
+function removeEnemies3334(){
+ rmStyle3334();
+ document.body.classList.remove("enemyProblemActive3332");
+ ["enemyStage3330","enemyStage3331","enemyStage3332"].forEach(id=>document.getElementById(id)?.remove());
+}
+
+function dedupeNav3334(){
+ const buttons=[...document.querySelectorAll("button")];
+ const backs=buttons.filter(b=>(b.textContent||"").trim().includes("戻る"));
+ const homes=buttons.filter(b=>(b.textContent||"").trim().includes("ホーム"));
+ // 最初の1個だけ残す
+ backs.forEach((b,i)=>{ if(i>0)b.classList.add("navDuplicateHide3334"); else b.classList.remove("navDuplicateHide3334"); });
+ homes.forEach((b,i)=>{ if(i>0)b.classList.add("navDuplicateHide3334"); else b.classList.remove("navDuplicateHide3334"); });
+ // instantNavが重複していたら1個だけ
+ const navs=[...document.querySelectorAll("#instantNav3333")];
+ navs.forEach((n,i)=>{ if(i>0)n.remove(); });
+}
+
+function tick3334(){
+ removeEnemies3334();
+ dedupeNav3334();
+}
+setInterval(tick3334,400);
+setTimeout(tick3334,50);
+
+// 旧敵関数は何もしないように上書き
+window.enemyHit3330=function(){};
+window.enemyAttack3330=function(){};
+window.enemyHit3331=function(){};
+window.enemyAttack3331=function(){};
+window.enemyHit3332=function(){};
+window.enemyAttack3332=function(){};
+
+const oldNews3334=typeof showNewsPage==="function"?showNewsPage:null;
+showNewsPage=function(){
+ let html=`<h2>📢 お知らせ</h2><div class="newsCard"><h3>Ver 3.3.34 敵β削除・ボタン重複修正</h3><p>敵画像関連の試作表示を一旦削除しました。</p><p>戻る/ホームボタンが二重表示される問題を修正しました。</p><p>ランキング・ログイン・Firebase処理は変更していません。</p></div>`;
+ if(oldNews3334){try{oldNews3334();const p=document.getElementById("panelArea");if(p)p.innerHTML=html+p.innerHTML;return}catch(e){}}
  const p=document.getElementById("panelArea");
  if(p)p.innerHTML=html;
  if(typeof ensureHomeButton==="function")ensureHomeButton();
