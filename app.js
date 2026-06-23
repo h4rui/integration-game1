@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.3.27";
+const VERSION = "3.3.30";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -11655,216 +11655,373 @@ ucEnsure();
 
 
 
-/* Ver3.3.27 Calculation Memo Beta */
+
+
+
+/* Ver3.3.28 Quality Review Favorite */
 (function(){
-if(window.__calcMemoBeta3327)return;
-window.__calcMemoBeta3327=true;
+if(window.__qrf3328)return;window.__qrf3328=true;
+const FAV_KEY="mathMaster_favoriteProblems_v1";
+function isReview(){try{const t=((window.currentMode||"")+" "+(window.mode||"")+" "+(document.body.innerText||"").slice(0,900)).toLowerCase();return t.includes("review")||t.includes("復習")||t.includes("wrong")||t.includes("mistake")}catch(e){return false}}
+function norm(s){s=String(s??"").trim().replace(/\s+/g,"").replace(/[！-～]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0));s=s.replace(/π/g,"pi").replace(/√/g,"sqrt").replace(/−|－/g,"-").replace(/×|・/g,"*").replace(/÷/g,"/").replace(/ln/g,"log");s=s.replace(/sin\(([^()]*)\)/g,"sin$1").replace(/cos\(([^()]*)\)/g,"cos$1").replace(/tan\(([^()]*)\)/g,"tan$1").replace(/log\(([^()]*)\)/g,"log$1");s=s.replace(/sin([a-z0-9]+)/g,"sin($1)").replace(/cos([a-z0-9]+)/g,"cos($1)").replace(/tan([a-z0-9]+)/g,"tan($1)").replace(/log([a-z0-9]+)/g,"log($1)");return s.toLowerCase()}
+function sortFactors(s){try{return (s.match(/\([^()]+\)|[a-z0-9+\-*/^]+/g)||[s]).sort().join("*")}catch(e){return s}}
+function loose(a,b){const A=norm(a),B=norm(b);if(A===B||sortFactors(A)===sortFactors(B))return true;try{if(typeof math!=="undefined"){let sa=norm(math.simplify(A).toString()),sb=norm(math.simplify(B).toString());if(sa===sb)return true;let v={x:1.7,y:2.3,t:.8,a:1.2,b:2.1,n:3};let ea=math.evaluate(A,v),eb=math.evaluate(B,v);if(Number.isFinite(ea)&&Number.isFinite(eb)&&Math.abs(ea-eb)<1e-7)return true}}catch(e){}return false}
+window.qualityLooseEqual3328=loose;
+function patchCheckers(){["isCorrectAnswer","checkAnswerLoose","compareAnswer","sameAnswer","isEquivalent","answersMatch"].forEach(n=>{if(typeof window[n]==="function"&&!window[n].__qrf){const old=window[n];window[n]=function(u,a,...r){try{if(loose(u,a))return true}catch(e){}return old.apply(this,[u,a,...r])};window[n].__qrf=true}})}
+function patchRewards(){["addXP","gainXP","addExp","gainExp","addCoin","addCoins","gainCoin","gainCoins","unlockAchievement","addCorrectCount","incrementCorrect","updateCorrectStats"].forEach(n=>{if(typeof window[n]==="function"&&!window[n].__qrf){const old=window[n];window[n]=function(...args){if(isReview()){console.log("[review] no reward:",n);return false}return old.apply(this,args)};window[n].__qrf=true}})}
+setInterval(()=>{patchCheckers();patchRewards()},1200);patchCheckers();patchRewards();
+function problem(){for(const s of["#problemText","#questionText",".problem",".question","#problemArea","#questionArea"]){let e=document.querySelector(s);if(e?.innerText?.trim())return e.innerText.trim()}return ((document.getElementById("panelArea")?.innerText||"").split("\n").filter(Boolean).slice(0,6).join(" / "))}
+function ans(){return String(window.currentAnswer||window.answer||window.correctAnswer||"")}
+function favs(){try{return JSON.parse(localStorage.getItem(FAV_KEY)||"[]")}catch(e){return[]}}
+function save(a){localStorage.setItem(FAV_KEY,JSON.stringify(a.slice(0,300)))}
+function pid(){let raw=problem()+"||"+ans(),h=0;for(let i=0;i<raw.length;i++)h=((h<<5)-h)+raw.charCodeAt(i)|0;return String(h)}
+function toast(t){let d=document.createElement("div");d.textContent=t;d.style.cssText="position:fixed;left:50%;bottom:86px;transform:translateX(-50%);z-index:999999;background:#000c;color:#fff;padding:10px 14px;border-radius:999px;font-weight:900";document.body.appendChild(d);setTimeout(()=>d.remove(),1200)}
+function updateFavBtn(){let b=document.getElementById("qrfFavBtn");if(b)b.textContent=favs().some(x=>x.id===pid())?"★ お気に入り中":"☆ お気に入り"}
+function toggleFav(){let a=favs(),id=pid(),i=a.findIndex(x=>x.id===id);if(i>=0){a.splice(i,1);toast("お気に入り解除")}else{a.unshift({id,problem:problem(),answer:ans(),time:Date.now()});toast("お気に入り追加")}save(a);updateFavBtn()}
+window.showFavoriteProblems=function(){let a=favs(),p=document.getElementById("panelArea")||document.body;p.innerHTML="<h2>⭐ お気に入り問題</h2><p>保存数："+a.length+"</p>"+(a.length?a.map((x,i)=>`<div class='card' style='margin:10px 0;padding:12px;border-radius:12px;background:rgba(255,255,255,.08)'><b>${i+1}. ${x.problem||"問題"}</b><br><small>答え：${x.answer||"未取得"}</small></div>`).join(""):"<p>まだありません。</p>")+"<button onclick='showHome&&showHome()'>ホームへ戻る</button>"}
+function explain(){document.body.insertAdjacentHTML("beforeend",`<div id="qrfExplain" style="position:fixed;inset:8%;z-index:999999;background:rgba(8,12,24,.97);color:#fff;border:1px solid #fff4;border-radius:18px;padding:16px;overflow:auto;box-shadow:0 20px 70px #000"><button onclick="qrfExplain.remove()" style="float:right">閉じる</button><h2>AI解説+ β</h2><p><b>問題：</b>${problem()||"取得中"}</p><p><b>答え：</b>${ans()||"未取得"}</p><hr><h3>見るポイント</h3><ol><li>まず形を見る。</li><li>置換なら中身の微分が外にあるか確認。</li><li>積なら部分積分で簡単になるか確認。</li><li>符号・係数・積分定数・表記ゆれを確認。</li></ol></div>`)}
+function buttons(){if(document.getElementById("qrfFavBtn"))return;let box=document.createElement("div");box.style.cssText="position:fixed;left:10px;bottom:16px;z-index:99988;display:flex;gap:7px;flex-wrap:wrap";box.innerHTML=`<button id="qrfFavBtn" style="border:none;border-radius:999px;padding:10px 12px;font-weight:900;color:#fff;background:linear-gradient(135deg,#f59e0b,#ef4444)">☆ お気に入り</button><button id="qrfExplainBtn" style="border:none;border-radius:999px;padding:10px 12px;font-weight:900;color:#fff;background:linear-gradient(135deg,#2563eb,#7c3aed)">AI解説+</button>`;document.body.appendChild(box);qrfFavBtn.onclick=toggleFav;qrfExplainBtn.onclick=explain}
+setInterval(()=>{buttons();updateFavBtn()},1600);setTimeout(buttons,500);
+const oldHome=typeof showHome==="function"?showHome:null;if(oldHome&&!oldHome.__qrf){window.showHome=function(){oldHome.apply(this,arguments);let p=document.getElementById("panelArea");if(p&&!document.getElementById("favHomeBtn3328"))p.insertAdjacentHTML("beforeend","<button id='favHomeBtn3328' onclick='showFavoriteProblems()'>⭐ お気に入り問題</button>")};showHome.__qrf=true}
+const oldNews=typeof showNewsPage==="function"?showNewsPage:null;window.showNewsPage=function(){let html="<h2>📢 お知らせ</h2><div class='newsCard'><h3>Ver 3.3.28 問題品質強化</h3><p>復習ではXP・コイン・実績進行が増えないようにしました。</p><p>AI解説+ βとお気に入り問題を追加しました。</p><p>sinx/sin(x)、log/ln、π、因数の順番などの表記ゆれ判定を強化しました。</p><p>計算メモβは削除しました。</p><p>ランキング・ログイン・Firebase処理は変更していません。</p></div>";if(oldNews){try{oldNews();let p=document.getElementById("panelArea");if(p)p.innerHTML=html+p.innerHTML;return}catch(e){}}let p=document.getElementById("panelArea");if(p)p.innerHTML=html;if(typeof ensureHomeButton==="function")ensureHomeButton()}
+})();
 
-const MEMO_KEY="mathMaster_calcMemo_beta_v1";
-let mmMemoOpen=false;
 
-function cmEnsureStyle(){
- if(document.getElementById("cmStyle3327"))return;
+
+/* Ver3.3.29 notation boost + simple first gacha */
+(function(){
+if(window.__notationSimpleGacha3329)return;
+window.__notationSimpleGacha3329=true;
+
+/* ===== 表記強化：ルート・指数・分数 ===== */
+function nsEscape(s){
+  return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+}
+function nsFormatMath(raw){
+  let s=nsEscape(raw);
+  s=s.replace(/\s+/g," ");
+  s=s.replace(/sqrt\(([^()]+)\)/gi,'<span class="nsRoot"><span class="nsRad">$1</span></span>');
+  s=s.replace(/√\(([^()]+)\)/g,'<span class="nsRoot"><span class="nsRad">$1</span></span>');
+  s=s.replace(/√([a-zA-Z0-9π]+(?:\^[0-9]+)?)/g,'<span class="nsRoot"><span class="nsRad">$1</span></span>');
+  s=s.replace(/\(([^()\/]+)\)\/\(([^()\/]+)\)/g,'<span class="nsFrac"><span>$1</span><span>$2</span></span>');
+  s=s.replace(/([a-zA-Z0-9π]+)\/([a-zA-Z0-9π]+)/g,'<span class="nsFrac"><span>$1</span><span>$2</span></span>');
+  s=s.replace(/\^(\{[^{}]+\}|[a-zA-Z0-9+\-\/]+)/g,(m,p)=>'<sup>'+p.replace(/[{}]/g,"")+'</sup>');
+  s=s.replace(/([a-zA-Z])_([0-9]+)/g,'$1<sub>$2</sub>');
+  return s;
+}
+function nsStyle(){
+ if(document.getElementById("nsStyle3329"))return;
  const st=document.createElement("style");
- st.id="cmStyle3327";
+ st.id="nsStyle3329";
  st.textContent=`
-#calcMemoBtn3327{
- position:fixed;
- right:14px;
- bottom:18px;
- z-index:99990;
- border:none;
- border-radius:999px;
- padding:12px 15px;
- font-size:16px;
- font-weight:900;
- color:#fff;
- background:linear-gradient(135deg,#2563eb,#7c3aed);
- box-shadow:0 8px 22px rgba(0,0,0,.35),0 0 18px rgba(124,58,237,.45);
+.nsMath, .problem, .question, #problemText, #questionText, #problemArea, #questionArea{
+  line-height:1.9!important;
 }
-#calcMemoPanel3327{
- position:fixed;
- right:10px;
- bottom:72px;
- width:min(92vw,420px);
- height:min(62vh,520px);
- z-index:99991;
- background:rgba(12,18,32,.96);
- color:#fff;
- border:1px solid rgba(255,255,255,.22);
- border-radius:18px;
- box-shadow:0 18px 55px rgba(0,0,0,.55),0 0 22px rgba(96,165,250,.25);
- display:none;
- overflow:hidden;
- backdrop-filter:blur(10px);
+.nsRoot{
+  display:inline-flex;
+  align-items:flex-start;
+  position:relative;
+  padding-left:.72em;
+  margin:0 .08em;
+  vertical-align:middle;
 }
-#calcMemoPanel3327.show{display:flex;flex-direction:column}
-.cmHeader3327{
- display:flex;
- align-items:center;
- justify-content:space-between;
- gap:8px;
- padding:10px 12px;
- background:linear-gradient(135deg,rgba(37,99,235,.35),rgba(124,58,237,.35));
- border-bottom:1px solid rgba(255,255,255,.15);
- font-weight:1000;
+.nsRoot:before{
+  content:"√";
+  position:absolute;
+  left:0;
+  top:.05em;
+  font-weight:900;
+  font-size:1.08em;
 }
-.cmHeader3327 small{
- display:block;
- opacity:.75;
- font-weight:700;
- font-size:11px;
+.nsRad{
+  display:inline-block;
+  border-top:2.4px solid currentColor;
+  padding:.09em .16em 0 .14em;
+  min-height:1.05em;
+  transform:translateY(.08em);
 }
-.cmTools3327{
- display:flex;
- gap:6px;
- flex-wrap:wrap;
- padding:8px 10px;
- border-bottom:1px solid rgba(255,255,255,.12);
- background:rgba(255,255,255,.04);
+.nsFrac{
+  display:inline-flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  vertical-align:middle;
+  line-height:1.05;
+  margin:0 .12em;
 }
-.cmTools3327 button,.cmHeader3327 button{
- border:1px solid rgba(255,255,255,.25);
- background:rgba(255,255,255,.10);
- color:#fff;
- border-radius:9px;
- padding:6px 9px;
- font-weight:800;
- font-size:13px;
+.nsFrac>span:first-child{
+  border-bottom:2px solid currentColor;
+  padding:0 .24em .08em;
 }
-#calcMemoText3327{
- flex:1;
- width:100%;
- resize:none;
- border:none;
- outline:none;
- padding:12px;
- box-sizing:border-box;
- font-size:17px;
- line-height:1.55;
- color:#fff;
- background:
-   linear-gradient(rgba(255,255,255,.055) 1px, transparent 1px) 0 0/100% 31px,
-   rgba(0,0,0,.16);
- font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+.nsFrac>span:last-child{
+  padding:.08em .24em 0;
 }
-#calcMemoText3327::placeholder{color:rgba(255,255,255,.45)}
-.cmFooter3327{
- padding:7px 10px;
- font-size:12px;
- opacity:.76;
- border-top:1px solid rgba(255,255,255,.12);
+sup{
+  font-size:.72em!important;
+  vertical-align:super!important;
+  line-height:0!important;
+  margin-left:.03em;
 }
-@media(max-width:520px){
- #calcMemoBtn3327{right:10px;bottom:12px;padding:11px 13px;font-size:15px}
- #calcMemoPanel3327{
-   left:8px;
-   right:8px;
-   bottom:62px;
-   width:auto;
-   height:58vh;
- }
- #calcMemoText3327{font-size:16px}
+sub{
+  font-size:.72em!important;
+  vertical-align:sub!important;
+  line-height:0!important;
+}
+#answerPreview, .answerPreview, #inputPreview, .inputPreview{
+  line-height:1.9!important;
 }
 `;
  document.head.appendChild(st);
 }
-
-function cmCreate(){
- cmEnsureStyle();
- if(!document.getElementById("calcMemoBtn3327")){
-   const btn=document.createElement("button");
-   btn.id="calcMemoBtn3327";
-   btn.type="button";
-   btn.textContent="📝 計算メモβ";
-   btn.onclick=()=>cmToggle();
-   document.body.appendChild(btn);
- }
- if(!document.getElementById("calcMemoPanel3327")){
-   const panel=document.createElement("div");
-   panel.id="calcMemoPanel3327";
-   panel.innerHTML=`
-     <div class="cmHeader3327">
-       <div>📝 計算メモβ<small>計算用紙代わり / 自動保存</small></div>
-       <button type="button" id="cmClose3327">閉じる</button>
-     </div>
-     <div class="cmTools3327">
-       <button type="button" data-ins="√">√</button>
-       <button type="button" data-ins="π">π</button>
-       <button type="button" data-ins="^2">^2</button>
-       <button type="button" data-ins="^3">^3</button>
-       <button type="button" data-ins="sin">sin</button>
-       <button type="button" data-ins="cos">cos</button>
-       <button type="button" data-ins="tan">tan</button>
-       <button type="button" data-ins="log">log</button>
-       <button type="button" data-ins="∫">∫</button>
-       <button type="button" id="cmClear3327">全消し</button>
-       <button type="button" id="cmCopy3327">コピー</button>
-     </div>
-     <textarea id="calcMemoText3327" placeholder="ここに途中式や計算を書く&#10;例）(x+1)^2 = x^2+2x+1"></textarea>
-     <div class="cmFooter3327">問題を変えてもメモは残る。消したい時は「全消し」。</div>
-   `;
-   document.body.appendChild(panel);
-   const ta=panel.querySelector("#calcMemoText3327");
-   ta.value=localStorage.getItem(MEMO_KEY)||"";
-   ta.addEventListener("input",()=>localStorage.setItem(MEMO_KEY,ta.value));
-   panel.querySelector("#cmClose3327").onclick=()=>cmClose();
-   panel.querySelector("#cmClear3327").onclick=()=>{
-     if(confirm("計算メモを全部消す？")){
-       ta.value="";
-       localStorage.setItem(MEMO_KEY,"");
-       ta.focus();
-     }
-   };
-   panel.querySelector("#cmCopy3327").onclick=async()=>{
-     try{
-       await navigator.clipboard.writeText(ta.value);
-       panel.querySelector("#cmCopy3327").textContent="コピー済";
-       setTimeout(()=>panel.querySelector("#cmCopy3327").textContent="コピー",900);
-     }catch(e){
-       alert("コピーできませんでした");
-     }
-   };
-   panel.querySelectorAll("[data-ins]").forEach(b=>{
-     b.onclick=()=>{
-       const s=b.getAttribute("data-ins");
-       const start=ta.selectionStart ?? ta.value.length;
-       const end=ta.selectionEnd ?? ta.value.length;
-       ta.value=ta.value.slice(0,start)+s+ta.value.slice(end);
-       ta.selectionStart=ta.selectionEnd=start+s.length;
-       localStorage.setItem(MEMO_KEY,ta.value);
-       ta.focus();
-     };
+function nsApply(){
+ nsStyle();
+ const selectors=["#problemText","#questionText","#problemArea","#questionArea",".problem",".question","#answerPreview",".answerPreview","#inputPreview",".inputPreview"];
+ selectors.forEach(sel=>{
+   document.querySelectorAll(sel).forEach(el=>{
+     if(!el || el.__nsFormatting)return;
+     const txt=el.textContent||"";
+     if(!/[√^/]|sqrt/i.test(txt))return;
+     el.__nsFormatting=true;
+     el.classList.add("nsMath");
+     el.innerHTML=nsFormatMath(txt);
    });
+ });
+}
+setInterval(nsApply,700);
+setTimeout(nsApply,300);
+window.formatMathDisplay3329=nsFormatMath;
+
+/* 入力欄プレビューがある場合にも使える補助 */
+window.updatePrettyPreview3329=function(input, target){
+ const t=typeof target==="string"?document.querySelector(target):target;
+ if(t)t.innerHTML=nsFormatMath(input);
+};
+
+/* ===== ガチャを一番最初のシンプル版へ ===== */
+function sgRarityColor(r){
+ return r==="UR"?"#ffd700":r==="SSR"?"#ff4df8":r==="SR"?"#38bdf8":"#fff";
+}
+function sgClose(){
+ ["hq","tg","gx","rd","pr","lx","pk","dd","dg","c12","sgSimpleGacha3329"].forEach(id=>document.getElementById(id)?.remove());
+}
+window.sgBack3329=function(){sgClose();if(typeof showGacha==="function")showGacha()};
+window.sgHome3329=function(){sgClose();if(typeof showHome==="function")showHome();else if(typeof goHome==="function")goHome();else location.reload()};
+function sgEnsureStyle(){
+ if(document.getElementById("sgStyle3329"))return;
+ const st=document.createElement("style");
+ st.id="sgStyle3329";
+ st.textContent=`
+#sgSimpleGacha3329{
+ position:fixed;
+ inset:0;
+ z-index:999999;
+ background:linear-gradient(180deg,#101827,#050816);
+ color:#fff;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ text-align:center;
+ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+.sgBox{
+ width:min(92vw,520px);
+ border-radius:22px;
+ padding:24px 16px;
+ background:rgba(255,255,255,.08);
+ border:1px solid rgba(255,255,255,.20);
+ box-shadow:0 18px 60px rgba(0,0,0,.55);
+}
+.sgChest{
+ width:150px;
+ height:110px;
+ margin:18px auto;
+ position:relative;
+ filter:drop-shadow(0 18px 22px rgba(0,0,0,.5));
+}
+.sgChest:before{
+ content:"";
+ position:absolute;
+ left:8px;
+ right:8px;
+ bottom:0;
+ height:62px;
+ border-radius:12px;
+ background:linear-gradient(135deg,#7c5200,#ffd700,#9a3412);
+ border:4px solid #fff3b0;
+}
+.sgChest:after{
+ content:"";
+ position:absolute;
+ left:0;
+ right:0;
+ top:0;
+ height:62px;
+ border-radius:80px 80px 12px 12px;
+ background:linear-gradient(135deg,#7c5200,#ffd700,#fff3b0,#9a3412);
+ border:4px solid #fff3b0;
+}
+.sgLock{
+ position:absolute;
+ left:50%;
+ top:52px;
+ transform:translateX(-50%);
+ width:34px;
+ height:34px;
+ border-radius:8px;
+ background:linear-gradient(#fff3b0,#d97706);
+ z-index:2;
+}
+.sgRarity{
+ font-size:64px;
+ font-weight:1000;
+ text-shadow:0 0 24px currentColor,0 0 55px currentColor;
+ margin:8px 0;
+}
+.sgTitle{
+ font-size:36px;
+ font-weight:1000;
+ margin:12px 0;
+}
+.sgBtns{
+ display:flex;
+ gap:8px;
+ justify-content:center;
+ flex-wrap:wrap;
+ margin-top:14px;
+}
+.sgBtns button{
+ border:none;
+ border-radius:12px;
+ padding:10px 13px;
+ font-weight:900;
+ color:#fff;
+ background:linear-gradient(135deg,#2563eb,#7c3aed);
+}
+`;
+ document.head.appendChild(st);
+}
+function sgGet(){
+ const item=(typeof getGachaResult==="function")?getGachaResult():null;
+ return item;
+}
+function sgGive(item){
+ if(!item)return false;
+ if(!playerData.gachaTitles)playerData.gachaTitles=[];
+ const dup=playerData.gachaTitles.includes(item.title);
+ if(dup){playerData.coins=(playerData.coins||0)+3}
+ else{
+   if(typeof unlockTitle==="function")unlockTitle(item.title);
+   playerData.gachaTitles.push(item.title);
  }
+ if(typeof unlockAchievement==="function")unlockAchievement("初ガチャ");
+ if(item.rarity==="UR" && typeof unlockAchievement==="function")unlockAchievement("UR獲得");
+ if(typeof saveAllData==="function")saveAllData();
+ if(typeof updateHomeStatus==="function")updateHomeStatus();
+ return dup;
 }
-
-function cmOpen(){
- cmCreate();
- mmMemoOpen=true;
- document.getElementById("calcMemoPanel3327")?.classList.add("show");
- setTimeout(()=>document.getElementById("calcMemoText3327")?.focus(),50);
+function sgTitleHTML(t){
+ try{return typeof titleHTML==="function"?titleHTML(t):nsEscape(t)}
+ catch(e){return nsEscape(t)}
 }
-function cmClose(){
- mmMemoOpen=false;
- document.getElementById("calcMemoPanel3327")?.classList.remove("show");
+function sgResult(items, ten=false){
+ sgEnsureStyle();
+ sgClose();
+ const best=items.slice().sort((a,b)=>({UR:4,SSR:3,SR:2,R:1}[b.item.rarity]||0)-({UR:4,SSR:3,SR:2,R:1}[a.item.rarity]||0))[0];
+ const div=document.createElement("div");
+ div.id="sgSimpleGacha3329";
+ if(ten){
+   div.innerHTML=`<div class="sgBox"><h2>10連結果</h2><div class="sgChest"><div class="sgLock"></div></div><p>一番良い結果：<b style="color:${sgRarityColor(best.item.rarity)}">${best.item.rarity}</b></p><div style="max-height:45vh;overflow:auto">${items.map(x=>`<div style="margin:7px;padding:8px;border-radius:10px;background:rgba(255,255,255,.10)"><b style="color:${sgRarityColor(x.item.rarity)}">${x.item.rarity}</b><br>${sgTitleHTML(x.item.title)}${x.dup?"<br>かぶり：+3コイン":""}</div>`).join("")}</div><p>所持コイン：${playerData.coins||0}</p><div class="sgBtns"><button onclick="drawGacha10()">もう一度10連</button><button onclick="sgBack3329()">ガチャへ戻る</button><button onclick="sgHome3329()">ホーム</button><button onclick="document.getElementById('sgSimpleGacha3329').remove()">閉じる</button></div></div>`;
+ }else{
+   const x=items[0];
+   div.innerHTML=`<div class="sgBox"><h2>ガチャ結果</h2><div class="sgChest"><div class="sgLock"></div></div><div class="sgRarity" style="color:${sgRarityColor(x.item.rarity)}">${x.item.rarity}</div><div class="sgTitle">${sgTitleHTML(x.item.title)}</div>${x.dup?"<p>かぶり：+3コイン返還</p>":""}<p>所持コイン：${playerData.coins||0}</p><div class="sgBtns"><button onclick="drawGacha()">もう一回</button><button onclick="sgBack3329()">ガチャへ戻る</button><button onclick="sgHome3329()">ホーム</button><button onclick="document.getElementById('sgSimpleGacha3329').remove()">閉じる</button></div></div>`;
+ }
+ document.body.appendChild(div);
 }
-function cmToggle(){mmMemoOpen?cmClose():cmOpen();}
+window.drawGacha=function(){
+ if((playerData.coins||0)<10){alert("コインが足りません");return}
+ playerData.coins-=10;
+ const item=sgGet();
+ if(!item){alert("ガチャ称号がありません");if(typeof showGacha==="function")showGacha();return}
+ const dup=sgGive(item);
+ sgResult([{item,dup}],false);
+};
+window.drawGacha10=function(){
+ if((playerData.coins||0)<100){alert("コインが足りません");return}
+ playerData.coins-=100;
+ let arr=[];
+ for(let i=0;i<10;i++){
+   const item=sgGet();
+   if(!item){alert("ガチャ称号がありません");if(typeof showGacha==="function")showGacha();return}
+   arr.push({item,dup:sgGive(item)});
+ }
+ sgResult(arr,true);
+};
 
-window.showCalcMemoBeta=cmOpen;
-window.hideCalcMemoBeta=cmClose;
-
-document.addEventListener("DOMContentLoaded",cmCreate);
-setTimeout(cmCreate,500);
-setInterval(cmCreate,2500);
-
-const oldNews3327=typeof showNewsPage==="function"?showNewsPage:null;
+const oldNews3329=typeof showNewsPage==="function"?showNewsPage:null;
 showNewsPage=function(){
- let html=`<h2>📢 お知らせ</h2><div class="newsCard"><h3>Ver 3.3.27 計算メモβ</h3><p>問題を解く時の計算用紙代わりとして、計算メモβを追加しました。</p><p>途中式を書けて、自動保存・全消し・コピー・数学記号入力に対応しています。</p><p>ランキング・ログイン・Firebase処理は変更していません。</p></div>`;
- if(oldNews3327){try{oldNews3327();const p=document.getElementById("panelArea");if(p)p.innerHTML=html+p.innerHTML;return}catch(e){}}
+ let html=`<h2>📢 お知らせ</h2><div class="newsCard"><h3>Ver 3.3.29 表記強化・シンプルガチャ</h3><p>ルート・指数・分数の表示を強化しました。</p><p>ルートの棒がずれにくいよう、√と上線を重ねる表示にしました。</p><p>ガチャ演出を一番最初のシンプル版に戻しました。</p><p>ランキング・ログイン・Firebase処理は変更していません。</p></div>`;
+ if(oldNews3329){try{oldNews3329();const p=document.getElementById("panelArea");if(p)p.innerHTML=html+p.innerHTML;return}catch(e){}}
  const p=document.getElementById("panelArea");
  if(p)p.innerHTML=html;
  if(typeof ensureHomeButton==="function")ensureHomeButton();
 };
 window.showNewsPage=showNewsPage;
+})();
+
+
+
+/* Ver3.3.30 Enemy Display Beta */
+(function(){
+if(window.__enemyBeta3330)return; window.__enemyBeta3330=true;
+const E3330={
+ "初級":{name:"ぷるんスライム",img:"assets/enemies/enemy_slime.png"},
+ "中級":{name:"森のゴブリン",img:"assets/enemies/enemy_goblin.png"},
+ "上級":{name:"角オーガ",img:"assets/enemies/enemy_ogre.png"},
+ "難問":{name:"炎帝ドラゴン",img:"assets/enemies/enemy_dragon.png"}
+};
+function st3330(){
+ if(document.getElementById("enemyStyle3330"))return;
+ const s=document.createElement("style");s.id="enemyStyle3330";
+ s.textContent=`
+#enemyStage3330{width:min(92vw,620px);margin:10px auto 12px;padding:10px;border-radius:18px;background:linear-gradient(180deg,rgba(15,23,42,.94),rgba(2,6,23,.97));border:1px solid rgba(255,255,255,.18);box-shadow:0 10px 32px rgba(0,0,0,.35);text-align:center;color:#fff;overflow:hidden}
+.enemyName3330{font-weight:1000;font-size:18px;text-shadow:0 0 12px rgba(255,255,255,.45);margin-bottom:4px}
+.enemyField3330{position:relative;height:170px;display:flex;align-items:flex-end;justify-content:center;background:radial-gradient(ellipse at center bottom,rgba(255,255,255,.18),transparent 45%),linear-gradient(180deg,rgba(30,41,59,.35),rgba(15,23,42,.12));border-radius:14px}
+.enemyField3330:after{content:"";position:absolute;left:16%;right:16%;bottom:9px;height:18px;border-radius:50%;background:radial-gradient(ellipse at center,rgba(0,0,0,.55),transparent 70%);filter:blur(2px)}
+#enemyImg3330{position:relative;z-index:2;max-width:86%;max-height:158px;object-fit:contain;filter:drop-shadow(0 10px 7px rgba(0,0,0,.55));transform-origin:center bottom;animation:enemyIdle3330 1.8s ease-in-out infinite alternate}
+@keyframes enemyIdle3330{from{transform:translateY(0) scale(1)}to{transform:translateY(-5px) scale(1.015)}}
+#enemyStage3330.enemyAttack #enemyImg3330{animation:enemyAttack3330 .48s cubic-bezier(.2,.9,.25,1) both!important}
+@keyframes enemyAttack3330{0%{transform:translateX(0) scale(1)}35%{transform:translateX(-18px) scale(1.06)}65%{transform:translateX(26px) scale(1.12)}100%{transform:translateX(0) scale(1)}}
+#enemyStage3330.enemyHit #enemyImg3330{animation:enemyHit3330 .46s ease-in-out both!important;filter:drop-shadow(0 10px 7px rgba(0,0,0,.55)) brightness(1.9) saturate(1.4)}
+@keyframes enemyHit3330{0%{transform:translateX(0) scale(1)}15%{transform:translateX(-12px) scale(.98)}30%{transform:translateX(12px) scale(1.02)}45%{transform:translateX(-10px) scale(.98)}60%{transform:translateX(8px) scale(1.02)}100%{transform:translateX(0) scale(1)}}
+.enemySlash3330{position:absolute;z-index:4;width:120px;height:120px;pointer-events:none;opacity:0;background:linear-gradient(135deg,transparent 42%,rgba(255,255,255,.95) 48%,rgba(255,230,130,.95) 52%,transparent 58%);filter:drop-shadow(0 0 14px #fff)}
+#enemyStage3330.enemyHit .enemySlash3330{animation:slash3330 .42s ease-out both}
+@keyframes slash3330{0%{opacity:0;transform:translateX(-70px) translateY(10px) rotate(-15deg) scale(.6)}30%{opacity:1}100%{opacity:0;transform:translateX(70px) translateY(-20px) rotate(-15deg) scale(1.2)}}
+@media(max-width:520px){.enemyField3330{height:145px}#enemyImg3330{max-height:136px}.enemyName3330{font-size:16px}}
+`;document.head.appendChild(s);
+}
+function diff3330(){
+ const txt=((window.currentDifficulty||window.difficulty||window.selectedDifficulty||"")+" "+(document.getElementById("panelArea")?.innerText||document.body.innerText||"")).slice(0,2000);
+ if(txt.includes("難問"))return "難問"; if(txt.includes("上級"))return "上級"; if(txt.includes("中級"))return "中級"; return "初級";
+}
+function render3330(){
+ st3330(); const d=diff3330(), data=E3330[d]||E3330["初級"];
+ const host=document.querySelector("#problemArea,#questionArea,#panelArea")||document.body;
+ if(!host)return;
+ let stage=document.getElementById("enemyStage3330");
+ if(!stage){stage=document.createElement("div");stage.id="enemyStage3330";stage.innerHTML='<div class="enemyName3330"></div><div class="enemyField3330"><img id="enemyImg3330" alt="enemy"><div class="enemySlash3330"></div></div>';host.prepend(stage)}
+ stage.querySelector(".enemyName3330").textContent=d+"："+data.name;
+ stage.querySelector("#enemyImg3330").src=data.img;
+}
+function hit3330(){let s=document.getElementById("enemyStage3330"); if(!s)return; s.classList.remove("enemyHit","enemyAttack"); void s.offsetWidth; s.classList.add("enemyHit"); setTimeout(()=>s.classList.remove("enemyHit"),540)}
+function atk3330(){let s=document.getElementById("enemyStage3330"); if(!s)return; s.classList.remove("enemyHit","enemyAttack"); void s.offsetWidth; s.classList.add("enemyAttack"); setTimeout(()=>s.classList.remove("enemyAttack"),540)}
+window.enemyHit3330=hit3330; window.enemyAttack3330=atk3330;
+document.addEventListener("click",function(e){
+ const t=((e.target?.textContent||"")+" "+(e.target?.id||"")+" "+(e.target?.className||""));
+ if(/決定|回答|答える|submit|answer|check/i.test(t)){
+   setTimeout(()=>{const b=(document.body.innerText||"").slice(-1200); if(/正解|Correct|〇|○/.test(b))hit3330(); else if(/不正解|Incorrect|×|✕|違/.test(b))atk3330();},180);
+ }
+},true);
+setInterval(render3330,1200); setTimeout(render3330,500);
+const oldNews=typeof showNewsPage==="function"?showNewsPage:null;
+window.showNewsPage=function(){let html="<h2>📢 お知らせ</h2><div class='newsCard'><h3>Ver 3.3.30 敵表示β</h3><p>難易度ごとに敵を追加しました。</p><p>初級：スライム / 中級：ゴブリン / 上級：オーガ / 難問：炎帝ドラゴン</p><p>正解時は敵が被弾風に動き、不正解時は敵が攻撃風に動きます。</p><p>HP・ダメージ量・報酬は変更していません。</p><p>ランキング・ログイン・Firebase処理は変更していません。</p></div>";if(oldNews){try{oldNews();let p=document.getElementById("panelArea");if(p)p.innerHTML=html+p.innerHTML;return}catch(e){}}let p=document.getElementById("panelArea");if(p)p.innerHTML=html;if(typeof ensureHomeButton==="function")ensureHomeButton()}
 })();
