@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.3.31";
+const VERSION = "3.3.33";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -12118,4 +12118,183 @@ window.showNewsPage=function(){
  if(oldNews){try{oldNews();let p=document.getElementById("panelArea");if(p)p.innerHTML=html+p.innerHTML;return}catch(e){}}
  let p=document.getElementById("panelArea");if(p)p.innerHTML=html;if(typeof ensureHomeButton==="function")ensureHomeButton();
 };
+})();
+
+
+
+/* Ver3.3.32 Enemy problem-screen only fix */
+(function(){
+if(window.__enemyProblemOnly3332)return;window.__enemyProblemOnly3332=true;
+function style3332(){
+ if(document.getElementById("enemyStyle3332"))return;
+ const st=document.createElement("style");st.id="enemyStyle3332";
+ st.textContent=`
+#enemyStage3330,#enemyStage3331{display:none!important}
+body:not(.enemyProblemActive3332) #enemyStage3332{display:none!important}
+#enemyStage3332{width:min(92vw,560px);margin:8px auto 10px;padding:8px;border-radius:16px;background:linear-gradient(180deg,rgba(15,23,42,.94),rgba(2,6,23,.97));border:1px solid rgba(255,255,255,.18);box-shadow:0 8px 26px rgba(0,0,0,.35);text-align:center;color:#fff;overflow:hidden}
+.enemyName3332{font-weight:1000;font-size:16px;text-shadow:0 0 12px rgba(255,255,255,.45);margin-bottom:3px}
+.enemyField3332{position:relative;height:128px;display:flex;align-items:flex-end;justify-content:center;background:radial-gradient(ellipse at center bottom,rgba(255,255,255,.18),transparent 45%),linear-gradient(180deg,rgba(30,41,59,.25),rgba(15,23,42,.10));border-radius:13px}
+.enemyField3332:after{content:"";position:absolute;left:20%;right:20%;bottom:8px;height:14px;border-radius:50%;background:radial-gradient(ellipse at center,rgba(0,0,0,.55),transparent 70%);filter:blur(2px)}
+#enemyImg3332{position:relative;z-index:2;max-width:86%;max-height:118px;object-fit:contain;filter:drop-shadow(0 9px 6px rgba(0,0,0,.55));transform-origin:center bottom;animation:enemyIdle3332 1.8s ease-in-out infinite alternate}
+@keyframes enemyIdle3332{from{transform:translateY(0) scale(1)}to{transform:translateY(-4px) scale(1.015)}}
+#enemyStage3332.enemyAttack #enemyImg3332{animation:enemyAttack3332 .48s cubic-bezier(.2,.9,.25,1) both!important}
+@keyframes enemyAttack3332{0%{transform:translateX(0) scale(1)}35%{transform:translateX(-15px) scale(1.05)}65%{transform:translateX(22px) scale(1.10)}100%{transform:translateX(0) scale(1)}}
+#enemyStage3332.enemyHit #enemyImg3332{animation:enemyHit3332 .46s ease-in-out both!important;filter:drop-shadow(0 9px 6px rgba(0,0,0,.55)) brightness(1.9) saturate(1.4)}
+@keyframes enemyHit3332{0%{transform:translateX(0) scale(1)}15%{transform:translateX(-10px) scale(.98)}30%{transform:translateX(10px) scale(1.02)}45%{transform:translateX(-8px) scale(.98)}60%{transform:translateX(7px) scale(1.02)}100%{transform:translateX(0) scale(1)}}
+.enemySlash3332{position:absolute;z-index:4;width:110px;height:110px;pointer-events:none;opacity:0;background:linear-gradient(135deg,transparent 42%,rgba(255,255,255,.95) 48%,rgba(255,230,130,.95) 52%,transparent 58%);filter:drop-shadow(0 0 14px #fff)}
+#enemyStage3332.enemyHit .enemySlash3332{animation:slash3332 .42s ease-out both}
+@keyframes slash3332{0%{opacity:0;transform:translateX(-65px) translateY(8px) rotate(-15deg) scale(.6)}30%{opacity:1}100%{opacity:0;transform:translateX(65px) translateY(-18px) rotate(-15deg) scale(1.2)}}
+@media(max-width:520px){.enemyField3332{height:112px}#enemyImg3332{max-height:104px}.enemyName3332{font-size:15px}}
+`;
+ document.head.appendChild(st);
+}
+function removeOld(){document.getElementById("enemyStage3330")?.remove();document.getElementById("enemyStage3331")?.remove();}
+function imgFor(diff){
+ const src=document.querySelector("#enemyImg3331")?.src;
+ const map={
+  "初級":{name:"ぷるんスライム",img:"assets/enemies/enemy_slime.png"},
+  "中級":{name:"森のゴブリン",img:"assets/enemies/enemy_goblin.png"},
+  "上級":{name:"角オーガ",img:"assets/enemies/enemy_ogre.png"},
+  "難問":{name:"炎帝ドラゴン",img:"assets/enemies/enemy_dragon.png"}
+ };
+ return map[diff]||map["初級"];
+}
+function isMenu(){
+ const txt=(document.getElementById("panelArea")?.innerText||document.body.innerText||"").slice(0,4000);
+ if(txt.includes("プロフィール")&&txt.includes("成績")&&txt.includes("掲示板")&&txt.includes("その他"))return true;
+ if(txt.includes("学習モード")&&txt.includes("積分")&&txt.includes("微分")&&txt.includes("因数分解"))return true;
+ if(txt.includes("ガチャを引いて")&&txt.includes("称号を集めよう"))return true;
+ return false;
+}
+function isProblem(){
+ if(isMenu())return false;
+ const txt=(document.getElementById("panelArea")?.innerText||document.body.innerText||"").slice(0,4000);
+ const hasInput=!!document.querySelector("#answerInput,#userAnswer,input[name='answer'],input.answerInput,.answerInput,textarea");
+ const hasSubmit=[...document.querySelectorAll("button")].some(b=>/決定|回答|答える|判定|submit|check/i.test((b.textContent||"")+" "+b.id+" "+b.className));
+ const hasProblem=/問題|∫|dx|微分せよ|因数分解せよ|展開せよ|素因数分解|= \?/.test(txt);
+ return (hasInput||hasSubmit) && hasProblem;
+}
+function diff(){
+ const txt=((window.currentDifficulty||window.difficulty||window.selectedDifficulty||"")+" "+(document.getElementById("panelArea")?.innerText||document.body.innerText||"")).slice(0,4000);
+ if(txt.includes("難問"))return "難問"; if(txt.includes("上級"))return "上級"; if(txt.includes("中級"))return "中級"; return "初級";
+}
+function render(){
+ style3332(); removeOld();
+ if(!isProblem()){document.body.classList.remove("enemyProblemActive3332");document.getElementById("enemyStage3332")?.remove();return;}
+ const d=diff(), data=imgFor(d), host=document.querySelector("#problemArea,#questionArea,#panelArea")||document.body;
+ let st=document.getElementById("enemyStage3332");
+ if(!st){st=document.createElement("div");st.id="enemyStage3332";st.innerHTML='<div class="enemyName3332"></div><div class="enemyField3332"><img id="enemyImg3332" alt="enemy"><div class="enemySlash3332"></div></div>';host.prepend(st);}
+ document.body.classList.add("enemyProblemActive3332");
+ st.querySelector(".enemyName3332").textContent=d+"："+data.name;
+ st.querySelector("#enemyImg3332").src=data.img;
+}
+function hit(){let s=document.getElementById("enemyStage3332");if(!s)return;s.classList.remove("enemyHit","enemyAttack");void s.offsetWidth;s.classList.add("enemyHit");setTimeout(()=>s.classList.remove("enemyHit"),540);}
+function atk(){let s=document.getElementById("enemyStage3332");if(!s)return;s.classList.remove("enemyHit","enemyAttack");void s.offsetWidth;s.classList.add("enemyAttack");setTimeout(()=>s.classList.remove("enemyAttack"),540);}
+window.enemyHit3332=hit;window.enemyAttack3332=atk;window.enemyHit3331=hit;window.enemyAttack3331=atk;
+document.addEventListener("click",function(e){const t=((e.target?.textContent||"")+" "+(e.target?.id||"")+" "+(e.target?.className||""));if(/決定|回答|答える|submit|answer|check|判定/i.test(t)){setTimeout(()=>{const b=(document.body.innerText||"").slice(-1400);if(/正解|Correct|〇|○/.test(b))hit();else if(/不正解|Incorrect|×|✕|違/.test(b))atk();},200);}},true);
+setInterval(render,700);setTimeout(render,500);
+const oldNews=typeof showNewsPage==="function"?showNewsPage:null;
+window.showNewsPage=function(){let html="<h2>📢 お知らせ</h2><div class='newsCard'><h3>Ver 3.3.32 敵表示を問題画面限定に修正</h3><p>敵が学習モード選択画面やプロフィール画面に表示される問題を修正しました。</p><p>敵は初級・中級・上級・難問の問題画面だけに表示されます。</p><p>敵表示サイズを少し小さくしました。</p><p>HP・ダメージ量・報酬は変更していません。</p><p>ランキング・ログイン・Firebase処理は変更していません。</p></div>";if(oldNews){try{oldNews();let p=document.getElementById('panelArea');if(p)p.innerHTML=html+p.innerHTML;return}catch(e){}}let p=document.getElementById('panelArea');if(p)p.innerHTML=html;if(typeof ensureHomeButton==='function')ensureHomeButton();}
+})();
+
+
+
+/* Ver3.3.33 Profile equipped-title hide + instant nav buttons */
+(function(){
+if(window.__profileNavFix3333)return;
+window.__profileNavFix3333=true;
+
+function pnStyle3333(){
+ if(document.getElementById("pnStyle3333"))return;
+ const st=document.createElement("style");
+ st.id="pnStyle3333";
+ st.textContent=`
+#instantNav3333{
+  display:flex;
+  justify-content:center;
+  gap:18px;
+  flex-wrap:wrap;
+  margin:18px auto 16px;
+  width:100%;
+  z-index:20;
+}
+#instantNav3333 button{
+  border:2px solid #22f5d1;
+  border-radius:12px;
+  background:#222;
+  color:#fff;
+  padding:12px 22px;
+  font-size:20px;
+  font-weight:900;
+  box-shadow:0 0 12px rgba(34,245,209,.35);
+}
+.profileEquippedHide3333{
+  display:none!important;
+}
+`;
+ document.head.appendChild(st);
+}
+
+function isProfile3333(){
+ const txt=(document.getElementById("panelArea")?.innerText||document.body.innerText||"").slice(0,4000);
+ return txt.includes("プロフィール") || txt.includes("プロフィール編集") || txt.includes("装備中の称号") || txt.includes("画像を選ぶ");
+}
+
+function removeEquipped3333(){
+ if(!isProfile3333())return;
+ const panel=document.getElementById("panelArea")||document.body;
+ const nodes=[...panel.querySelectorAll("h1,h2,h3,h4,div,section,p")];
+ for(const n of nodes){
+   const t=(n.innerText||"").trim();
+   if(!t.includes("装備中の称号"))continue;
+   let target=n;
+   for(let i=0;i<4;i++){
+     if(!target.parentElement || target.parentElement===panel)break;
+     const pt=(target.parentElement.innerText||"");
+     if(pt.includes("プロフィール編集") || pt.includes("画像を選ぶ"))break;
+     target=target.parentElement;
+   }
+   target.classList.add("profileEquippedHide3333");
+ }
+}
+
+function ensureInstantNav3333(){
+ pnStyle3333();
+ const panel=document.getElementById("panelArea");
+ if(!panel)return;
+ if(document.getElementById("instantNav3333"))return;
+ const nav=document.createElement("div");
+ nav.id="instantNav3333";
+ nav.innerHTML=`<button type="button" id="instantBack3333">← 戻る</button><button type="button" id="instantHome3333">🏠 ホームへ</button>`;
+ const first=panel.firstElementChild;
+ if(first) panel.insertBefore(nav, first);
+ else panel.appendChild(nav);
+ document.getElementById("instantBack3333").onclick=function(){
+   if(typeof goBack==="function")goBack();
+   else if(typeof showHome==="function")showHome();
+   else history.back();
+ };
+ document.getElementById("instantHome3333").onclick=function(){
+   if(typeof showHome==="function")showHome();
+   else if(typeof goHome==="function")goHome();
+   else location.reload();
+ };
+}
+
+function tick3333(){
+ ensureInstantNav3333();
+ removeEquipped3333();
+}
+setInterval(tick3333,500);
+setTimeout(tick3333,100);
+
+const oldNews3333=typeof showNewsPage==="function"?showNewsPage:null;
+showNewsPage=function(){
+ let html=`<h2>📢 お知らせ</h2><div class="newsCard"><h3>Ver 3.3.33 プロフィール・戻るボタン修正</h3><p>プロフィールの「装備中の称号」欄を非表示にしました。</p><p>戻る/ホームボタンが遅れて表示される問題を修正し、最初から配置するようにしました。</p><p>ランキング・ログイン・Firebase処理は変更していません。</p></div>`;
+ if(oldNews3333){try{oldNews3333();const p=document.getElementById("panelArea");if(p)p.innerHTML=html+p.innerHTML;return}catch(e){}}
+ const p=document.getElementById("panelArea");
+ if(p)p.innerHTML=html;
+ if(typeof ensureHomeButton==="function")ensureHomeButton();
+};
+window.showNewsPage=showNewsPage;
 })();
