@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.3.26";
+const VERSION = "3.3.27";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -11651,4 +11651,220 @@ showNewsPage=function(){
 };
 window.showNewsPage=showNewsPage;
 ucEnsure();
+})();
+
+
+
+/* Ver3.3.27 Calculation Memo Beta */
+(function(){
+if(window.__calcMemoBeta3327)return;
+window.__calcMemoBeta3327=true;
+
+const MEMO_KEY="mathMaster_calcMemo_beta_v1";
+let mmMemoOpen=false;
+
+function cmEnsureStyle(){
+ if(document.getElementById("cmStyle3327"))return;
+ const st=document.createElement("style");
+ st.id="cmStyle3327";
+ st.textContent=`
+#calcMemoBtn3327{
+ position:fixed;
+ right:14px;
+ bottom:18px;
+ z-index:99990;
+ border:none;
+ border-radius:999px;
+ padding:12px 15px;
+ font-size:16px;
+ font-weight:900;
+ color:#fff;
+ background:linear-gradient(135deg,#2563eb,#7c3aed);
+ box-shadow:0 8px 22px rgba(0,0,0,.35),0 0 18px rgba(124,58,237,.45);
+}
+#calcMemoPanel3327{
+ position:fixed;
+ right:10px;
+ bottom:72px;
+ width:min(92vw,420px);
+ height:min(62vh,520px);
+ z-index:99991;
+ background:rgba(12,18,32,.96);
+ color:#fff;
+ border:1px solid rgba(255,255,255,.22);
+ border-radius:18px;
+ box-shadow:0 18px 55px rgba(0,0,0,.55),0 0 22px rgba(96,165,250,.25);
+ display:none;
+ overflow:hidden;
+ backdrop-filter:blur(10px);
+}
+#calcMemoPanel3327.show{display:flex;flex-direction:column}
+.cmHeader3327{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:8px;
+ padding:10px 12px;
+ background:linear-gradient(135deg,rgba(37,99,235,.35),rgba(124,58,237,.35));
+ border-bottom:1px solid rgba(255,255,255,.15);
+ font-weight:1000;
+}
+.cmHeader3327 small{
+ display:block;
+ opacity:.75;
+ font-weight:700;
+ font-size:11px;
+}
+.cmTools3327{
+ display:flex;
+ gap:6px;
+ flex-wrap:wrap;
+ padding:8px 10px;
+ border-bottom:1px solid rgba(255,255,255,.12);
+ background:rgba(255,255,255,.04);
+}
+.cmTools3327 button,.cmHeader3327 button{
+ border:1px solid rgba(255,255,255,.25);
+ background:rgba(255,255,255,.10);
+ color:#fff;
+ border-radius:9px;
+ padding:6px 9px;
+ font-weight:800;
+ font-size:13px;
+}
+#calcMemoText3327{
+ flex:1;
+ width:100%;
+ resize:none;
+ border:none;
+ outline:none;
+ padding:12px;
+ box-sizing:border-box;
+ font-size:17px;
+ line-height:1.55;
+ color:#fff;
+ background:
+   linear-gradient(rgba(255,255,255,.055) 1px, transparent 1px) 0 0/100% 31px,
+   rgba(0,0,0,.16);
+ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+#calcMemoText3327::placeholder{color:rgba(255,255,255,.45)}
+.cmFooter3327{
+ padding:7px 10px;
+ font-size:12px;
+ opacity:.76;
+ border-top:1px solid rgba(255,255,255,.12);
+}
+@media(max-width:520px){
+ #calcMemoBtn3327{right:10px;bottom:12px;padding:11px 13px;font-size:15px}
+ #calcMemoPanel3327{
+   left:8px;
+   right:8px;
+   bottom:62px;
+   width:auto;
+   height:58vh;
+ }
+ #calcMemoText3327{font-size:16px}
+}
+`;
+ document.head.appendChild(st);
+}
+
+function cmCreate(){
+ cmEnsureStyle();
+ if(!document.getElementById("calcMemoBtn3327")){
+   const btn=document.createElement("button");
+   btn.id="calcMemoBtn3327";
+   btn.type="button";
+   btn.textContent="📝 計算メモβ";
+   btn.onclick=()=>cmToggle();
+   document.body.appendChild(btn);
+ }
+ if(!document.getElementById("calcMemoPanel3327")){
+   const panel=document.createElement("div");
+   panel.id="calcMemoPanel3327";
+   panel.innerHTML=`
+     <div class="cmHeader3327">
+       <div>📝 計算メモβ<small>計算用紙代わり / 自動保存</small></div>
+       <button type="button" id="cmClose3327">閉じる</button>
+     </div>
+     <div class="cmTools3327">
+       <button type="button" data-ins="√">√</button>
+       <button type="button" data-ins="π">π</button>
+       <button type="button" data-ins="^2">^2</button>
+       <button type="button" data-ins="^3">^3</button>
+       <button type="button" data-ins="sin">sin</button>
+       <button type="button" data-ins="cos">cos</button>
+       <button type="button" data-ins="tan">tan</button>
+       <button type="button" data-ins="log">log</button>
+       <button type="button" data-ins="∫">∫</button>
+       <button type="button" id="cmClear3327">全消し</button>
+       <button type="button" id="cmCopy3327">コピー</button>
+     </div>
+     <textarea id="calcMemoText3327" placeholder="ここに途中式や計算を書く&#10;例）(x+1)^2 = x^2+2x+1"></textarea>
+     <div class="cmFooter3327">問題を変えてもメモは残る。消したい時は「全消し」。</div>
+   `;
+   document.body.appendChild(panel);
+   const ta=panel.querySelector("#calcMemoText3327");
+   ta.value=localStorage.getItem(MEMO_KEY)||"";
+   ta.addEventListener("input",()=>localStorage.setItem(MEMO_KEY,ta.value));
+   panel.querySelector("#cmClose3327").onclick=()=>cmClose();
+   panel.querySelector("#cmClear3327").onclick=()=>{
+     if(confirm("計算メモを全部消す？")){
+       ta.value="";
+       localStorage.setItem(MEMO_KEY,"");
+       ta.focus();
+     }
+   };
+   panel.querySelector("#cmCopy3327").onclick=async()=>{
+     try{
+       await navigator.clipboard.writeText(ta.value);
+       panel.querySelector("#cmCopy3327").textContent="コピー済";
+       setTimeout(()=>panel.querySelector("#cmCopy3327").textContent="コピー",900);
+     }catch(e){
+       alert("コピーできませんでした");
+     }
+   };
+   panel.querySelectorAll("[data-ins]").forEach(b=>{
+     b.onclick=()=>{
+       const s=b.getAttribute("data-ins");
+       const start=ta.selectionStart ?? ta.value.length;
+       const end=ta.selectionEnd ?? ta.value.length;
+       ta.value=ta.value.slice(0,start)+s+ta.value.slice(end);
+       ta.selectionStart=ta.selectionEnd=start+s.length;
+       localStorage.setItem(MEMO_KEY,ta.value);
+       ta.focus();
+     };
+   });
+ }
+}
+
+function cmOpen(){
+ cmCreate();
+ mmMemoOpen=true;
+ document.getElementById("calcMemoPanel3327")?.classList.add("show");
+ setTimeout(()=>document.getElementById("calcMemoText3327")?.focus(),50);
+}
+function cmClose(){
+ mmMemoOpen=false;
+ document.getElementById("calcMemoPanel3327")?.classList.remove("show");
+}
+function cmToggle(){mmMemoOpen?cmClose():cmOpen();}
+
+window.showCalcMemoBeta=cmOpen;
+window.hideCalcMemoBeta=cmClose;
+
+document.addEventListener("DOMContentLoaded",cmCreate);
+setTimeout(cmCreate,500);
+setInterval(cmCreate,2500);
+
+const oldNews3327=typeof showNewsPage==="function"?showNewsPage:null;
+showNewsPage=function(){
+ let html=`<h2>📢 お知らせ</h2><div class="newsCard"><h3>Ver 3.3.27 計算メモβ</h3><p>問題を解く時の計算用紙代わりとして、計算メモβを追加しました。</p><p>途中式を書けて、自動保存・全消し・コピー・数学記号入力に対応しています。</p><p>ランキング・ログイン・Firebase処理は変更していません。</p></div>`;
+ if(oldNews3327){try{oldNews3327();const p=document.getElementById("panelArea");if(p)p.innerHTML=html+p.innerHTML;return}catch(e){}}
+ const p=document.getElementById("panelArea");
+ if(p)p.innerHTML=html;
+ if(typeof ensureHomeButton==="function")ensureHomeButton();
+};
+window.showNewsPage=showNewsPage;
 })();
