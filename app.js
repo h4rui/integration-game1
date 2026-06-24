@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.3.50";
+const VERSION = "3.3.51";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -12882,6 +12882,283 @@ window.showNewsPage=function(){
     <p>・音量は保存され、次回起動時も反映されます。</p>
   </div>
  `;
+ if(typeof addNav3347==="function")addNav3347();
+};
+})();
+
+
+
+/* Ver3.3.51 Other start + exact size + home bgm user gesture fix */
+(function(){
+if(window.__otherStartHomeBgmFix3351)return;
+window.__otherStartHomeBgmFix3351=true;
+
+function p3351(){return document.getElementById("panelArea")||document.body;}
+function bgmVol3351(){
+ const v=localStorage.getItem("mathMaster_bgmVolume");
+ return v===null?0.45:Math.max(0,Math.min(1,Number(v)));
+}
+function ensureHomeAudio3351(){
+ let a=document.getElementById("homeBgm3350")||document.getElementById("homeBgm3351");
+ if(!a){
+   a=document.createElement("audio");
+   a.id="homeBgm3351";
+   a.src="assets/audio/home_bgm.mp3";
+   a.loop=true;
+   a.preload="auto";
+   document.body.appendChild(a);
+ }
+ a.volume=bgmVol3351();
+ return a;
+}
+function ensureOtherAudio3351(){
+ let a=document.getElementById("otherBgm3349")||document.getElementById("otherBgm3350")||document.getElementById("otherBgm3351");
+ if(!a){
+   a=document.createElement("audio");
+   a.id="otherBgm3351";
+   a.src="assets/audio/other_bgm.mp3";
+   a.loop=true;
+   a.preload="auto";
+   document.body.appendChild(a);
+ }
+ a.volume=bgmVol3351();
+ return a;
+}
+function pauseOtherBgm3351(){
+ ["otherBgm3349","otherBgm3350","otherBgm3351"].forEach(id=>{try{document.getElementById(id)?.pause();}catch(e){}});
+}
+function pauseHomeBgm3351(){
+ ["homeBgm3350","homeBgm3351"].forEach(id=>{try{document.getElementById(id)?.pause();}catch(e){}});
+}
+window.playHomeBgmForce3351=function(){
+ pauseOtherBgm3351();
+ const a=ensureHomeAudio3351();
+ a.volume=bgmVol3351();
+ a.play().catch(()=>{});
+};
+window.playOtherBgmForce3351=function(){
+ pauseHomeBgm3351();
+ const a=ensureOtherAudio3351();
+ a.volume=bgmVol3351();
+ a.play().catch(()=>{});
+};
+
+function isHomeScreen3351(){
+ const t=(p3351().innerText||"").slice(0,3000);
+ if(t.includes("学習モード")||t.includes("その他")||t.includes("英語")||t.includes("国語")||t.includes("古文")||t.includes("社会")||t.includes("問題")||t.includes("結果"))return false;
+ return t.includes("学習")&&t.includes("ランキング")&&t.includes("対戦")&&t.includes("ガチャ")&&t.includes("プロフィール")&&t.includes("成績");
+}
+function isOtherScreen3351(){
+ const t=(p3351().innerText||"").slice(0,3000);
+ return t.includes("その他")||t.includes("英語")||t.includes("国語")||t.includes("古文")||t.includes("社会");
+}
+function updateBgm3351(){
+ if(isOtherScreen3351())playOtherBgmForce3351();
+ else if(isHomeScreen3351())playHomeBgmForce3351();
+}
+
+function style3351(){
+ if(document.getElementById("style3351"))return;
+ const st=document.createElement("style");
+ st.id="style3351";
+ st.textContent=`
+/* その他ボタンをランダムと完全同サイズに固定 */
+#otherLearningBtn3348,#otherLearningBtn3351{
+  width:100%!important;
+  height:96px!important;
+  min-height:96px!important;
+  max-height:96px!important;
+  padding:0!important;
+  margin:12px 0!important;
+  border-radius:16px!important;
+  border:none!important;
+  box-sizing:border-box!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  font-size:32px!important;
+  font-weight:900!important;
+  color:#fff!important;
+  line-height:1!important;
+  background:linear-gradient(135deg,#64748b,#334155)!important;
+  box-shadow:0 8px 20px rgba(0,0,0,.25)!important;
+  overflow:hidden!important;
+}
+.card3351{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.16);border-radius:18px;padding:16px;margin:14px 0;text-align:center}
+.grid3351{display:grid;grid-template-columns:1fr;gap:14px;margin:18px 0}
+.grid3351 button,.choice3351{border:none;border-radius:16px;padding:17px 14px;font-size:21px;font-weight:900;color:#fff;background:linear-gradient(135deg,#06b6d4,#2563eb);box-shadow:0 8px 20px rgba(0,0,0,.25)}
+.jpn3351 button{background:linear-gradient(135deg,#f59e0b,#ef4444)!important}
+.social3351 button{background:linear-gradient(135deg,#22c55e,#15803d)!important}
+.q3351{font-size:30px;font-weight:1000;margin:18px 0;color:#fff;text-shadow:0 0 12px rgba(255,255,255,.45);line-height:1.4}
+.ok3351{background:linear-gradient(135deg,#22c55e,#16a34a)!important}
+.ng3351{background:linear-gradient(135deg,#ef4444,#991b1b)!important}
+`;
+ document.head.appendChild(st);
+}
+
+function findRandomButton3351(){
+ const buttons=[...p3351().querySelectorAll("button")];
+ return buttons.find(b=>(b.innerText||"").includes("ランダム"));
+}
+function ensureOtherButton3351(){
+ style3351();
+ const panel=p3351();
+ const t=(panel.innerText||"").slice(0,2500);
+ if(!(t.includes("学習モード")&&t.includes("ランダム")))return;
+ document.querySelectorAll("#otherLearningBtn3341,#otherLearningBtn3347,#otherLearningBtn3348,#otherLearningBtn3351,.otherLearnBtn3341").forEach(e=>e.remove());
+ const btn=document.createElement("button");
+ btn.id="otherLearningBtn3351";
+ btn.type="button";
+ btn.innerHTML="⚙️ その他";
+ btn.onclick=function(e){e.preventDefault();e.stopPropagation();showLearningOther3351();};
+ const r=findRandomButton3351();
+ if(r)r.insertAdjacentElement("afterend",btn);
+ else panel.appendChild(btn);
+}
+
+function shuffle3351(a){return a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);}
+function getData3351(kind){
+ try{
+   if(typeof DATA3349!=="undefined" && DATA3349[kind])return DATA3349[kind];
+ }catch(e){}
+ // fallback small data
+ if(kind==="eng")return [{ja:"勉強する",en:"study",level:"初級"},{ja:"努力",en:"effort",level:"初級"},{ja:"重要な",en:"important",level:"中級"},{ja:"環境",en:"environment",level:"上級"}];
+ if(kind==="kanji")return [{kanji:"努力",yomi:"どりょく",meaning:"目標に向かってがんばること"},{kanji:"成功",yomi:"せいこう",meaning:"うまくいくこと"},{kanji:"原因",yomi:"げんいん",meaning:"物事が起こるもと"},{kanji:"結果",yomi:"けっか",meaning:"物事のあとに生じたこと"}];
+ if(kind==="kobun")return [{word:"あはれ",meaning:"しみじみとした趣がある"},{word:"をかし",meaning:"趣がある"},{word:"いみじ",meaning:"非常に"},{word:"ゆかし",meaning:"見たい・知りたい"}];
+ if(kind==="social")return [{cat:"地理",q:"日本で最も高い山は？",a:"富士山",choices:["富士山","北岳","阿蘇山","槍ヶ岳"]},{cat:"歴史",q:"鎌倉幕府を開いた人物は？",a:"源頼朝",choices:["源頼朝","徳川家康","足利尊氏","織田信長"]},{cat:"公民",q:"日本の最高法規は？",a:"日本国憲法",choices:["日本国憲法","民法","刑法","商法"]}];
+ return [];
+}
+
+let game3351={kind:"",mode:"",level:"ランダム",pool:[],i:0,ok:0,q:null};
+
+function startOtherGame3351(kind,mode,level){
+ style3351(); playOtherBgmForce3351();
+ game3351={kind,mode,level:level||"ランダム",pool:[],i:0,ok:0,q:null};
+ let arr=getData3351(kind);
+ if(kind==="eng"&&level&&level!=="ランダム")arr=arr.filter(x=>x.level===level);
+ if(kind==="social"&&level&&level!=="ランダム")arr=arr.filter(x=>x.cat===level);
+ game3351.pool=shuffle3351(arr).slice(0,10);
+ if(game3351.pool.length<10){
+   const base=shuffle3351(arr);
+   while(game3351.pool.length<10 && base.length)game3351.pool.push(base[game3351.pool.length%base.length]);
+ }
+ nextOtherQ3351();
+}
+window.startOtherGame3351=startOtherGame3351;
+
+function makeQ3351(item){
+ let ask="", ans="", wrongs=[], all=[];
+ if(game3351.mode==="ja2en"){all=getData3351("eng");ask=item.ja;ans=item.en;wrongs=shuffle3351(all.filter(x=>x.en!==ans)).slice(0,3).map(x=>x.en);}
+ if(game3351.mode==="en2ja"){all=getData3351("eng");ask=item.en;ans=item.ja;wrongs=shuffle3351(all.filter(x=>x.ja!==ans)).slice(0,3).map(x=>x.ja);}
+ if(game3351.mode==="kanjiRead"){all=getData3351("kanji");ask=item.kanji;ans=item.yomi;wrongs=shuffle3351(all.filter(x=>x.yomi!==ans)).slice(0,3).map(x=>x.yomi);}
+ if(game3351.mode==="kanjiMeaning"){all=getData3351("kanji");ask=item.kanji;ans=item.meaning;wrongs=shuffle3351(all.filter(x=>x.meaning!==ans)).slice(0,3).map(x=>x.meaning);}
+ if(game3351.mode==="kobun2meaning"){all=getData3351("kobun");ask=item.word;ans=item.meaning;wrongs=shuffle3351(all.filter(x=>x.meaning!==ans)).slice(0,3).map(x=>x.meaning);}
+ if(game3351.mode==="meaning2kobun"){all=getData3351("kobun");ask=item.meaning;ans=item.word;wrongs=shuffle3351(all.filter(x=>x.word!==ans)).slice(0,3).map(x=>x.word);}
+ if(game3351.mode==="social"){ask=item.q;ans=item.a;wrongs=(item.choices||[]).filter(x=>x!==ans).slice(0,3);}
+ return {ask,ans,choices:shuffle3351([ans,...wrongs])};
+}
+function nextOtherQ3351(){
+ if(game3351.i>=10)return resultOther3351();
+ const item=game3351.pool[game3351.i];
+ game3351.q=makeQ3351(item);
+ p3351().innerHTML=`<h2>⚙️ その他 4択</h2><div class="card3351"><p>${game3351.i+1}/10　正解：${game3351.ok}</p><div class="q3351">${game3351.q.ask}</div><div class="grid3351">${game3351.q.choices.map((c,i)=>`<button class="choice3351" onclick="answerOther3351(${i})">${c}</button>`).join("")}</div></div>`;
+ if(typeof addNav3347==="function")addNav3347();
+}
+window.answerOther3351=function(i){
+ const btns=[...document.querySelectorAll(".choice3351")];
+ const ok=game3351.q.choices[i]===game3351.q.ans;
+ if(ok)game3351.ok++;
+ btns.forEach((b,idx)=>{if(game3351.q.choices[idx]===game3351.q.ans)b.classList.add("ok3351");else if(idx===i)b.classList.add("ng3351");b.disabled=true;});
+ game3351.i++;
+ setTimeout(nextOtherQ3351,800);
+};
+function resultOther3351(){
+ const xpMap={"初級":5,"中級":8,"上級":12,"ランダム":10,"地理":10,"歴史":10,"公民":10};
+ const xp=(xpMap[game3351.level]||10)*game3351.ok;
+ const coins=Math.floor(game3351.ok*0.5);
+ try{
+   if(window.playerData){
+     playerData.xp=(playerData.xp||0)+xp;
+     playerData.coins=(playerData.coins||0)+coins;
+     playerData.totalCorrect=(playerData.totalCorrect||0)+game3351.ok;
+     playerData.totalQuestions=(playerData.totalQuestions||0)+10;
+     if(typeof saveAllData==="function")saveAllData();
+   }
+ }catch(e){}
+ p3351().innerHTML=`<h2>結果</h2><div class="card3351"><h3>${game3351.ok}/10 正解</h3><p>獲得XP：${xp}</p><p>獲得コイン：${coins}</p><button onclick="showLearningOther3351()">その他へ戻る</button><button onclick="showHome&&showHome()">ホームへ</button></div>`;
+ if(typeof addNav3347==="function")addNav3347();
+}
+
+window.showLearningOther3351=function(){
+ style3351(); playOtherBgmForce3351();
+ p3351().innerHTML=`
+ <h2>⚙️ その他</h2>
+ <div class="card3351"><h3>🌍 英語1500</h3><div class="grid3351">
+  <button onclick="showEnglishMenu3351()">🌍 英語</button>
+ </div></div>
+ <div class="card3351"><h3>🇯🇵 国語3000</h3><div class="grid3351 jpn3351">
+  <button onclick="showJapaneseMenu3351()">🇯🇵 国語</button>
+ </div></div>
+ <div class="card3351"><h3>📜 古文1000</h3><div class="grid3351 jpn3351">
+  <button onclick="startOtherGame3351('kobun','kobun2meaning','ランダム')">📜 古文 → 意味</button>
+  <button onclick="startOtherGame3351('kobun','meaning2kobun','ランダム')">🔄 意味 → 古文</button>
+ </div></div>
+ <div class="card3351"><h3>🌏 社会1500</h3><div class="grid3351 social3351">
+  <button onclick="showSocialMenu3351()">🌏 社会</button>
+ </div></div>`;
+ if(typeof addNav3347==="function")addNav3347();
+};
+window.showEnglishMenu3351=function(){
+ p3351().innerHTML=`<h2>🌍 英語</h2><div class="card3351"><h3>レベル</h3><div class="grid3351">
+ <button onclick="showEnglishMode3351('初級')">📗 初級</button>
+ <button onclick="showEnglishMode3351('中級')">📘 中級</button>
+ <button onclick="showEnglishMode3351('上級')">📕 上級</button>
+ <button onclick="showEnglishMode3351('ランダム')">🎲 ランダム</button>
+ </div></div>`;
+ if(typeof addNav3347==="function")addNav3347();
+};
+window.showEnglishMode3351=function(lv){
+ p3351().innerHTML=`<h2>🌍 英語 ${lv}</h2><div class="card3351"><div class="grid3351">
+ <button onclick="startOtherGame3351('eng','en2ja','${lv}')">📝 英語 → 日本語</button>
+ <button onclick="startOtherGame3351('eng','ja2en','${lv}')">🔄 日本語 → 英語</button>
+ </div></div>`;
+ if(typeof addNav3347==="function")addNav3347();
+};
+window.showJapaneseMenu3351=function(){
+ p3351().innerHTML=`<h2>🇯🇵 国語</h2><div class="card3351"><div class="grid3351 jpn3351">
+ <button onclick="startOtherGame3351('kanji','kanjiRead','ランダム')">📖 漢字 → 読み</button>
+ <button onclick="startOtherGame3351('kanji','kanjiMeaning','ランダム')">💭 漢字 → 意味</button>
+ </div></div>`;
+ if(typeof addNav3347==="function")addNav3347();
+};
+window.showSocialMenu3351=function(){
+ p3351().innerHTML=`<h2>🌏 社会</h2><div class="card3351"><div class="grid3351 social3351">
+ <button onclick="startOtherGame3351('social','social','地理')">🗾 地理</button>
+ <button onclick="startOtherGame3351('social','social','歴史')">🏯 歴史</button>
+ <button onclick="startOtherGame3351('social','social','公民')">🏛 公民</button>
+ <button onclick="startOtherGame3351('social','social','ランダム')">🎲 ランダム</button>
+ </div></div>`;
+ if(typeof addNav3347==="function")addNav3347();
+};
+
+/* Home BGMはiPhoneの自動再生制限対策で最初のタップ後にも開始 */
+["touchstart","click"].forEach(ev=>{
+ document.addEventListener(ev,()=>{setTimeout(updateBgm3351,50);}, {passive:true});
+});
+const oldHome3351=typeof showHome==="function"?showHome:null;
+if(oldHome3351&&!oldHome3351.__fix3351){
+ window.showHome=function(){
+   oldHome3351.apply(this,arguments);
+   setTimeout(()=>{playHomeBgmForce3351();ensureOtherButton3351();},120);
+ };
+ window.showHome.__fix3351=true;
+}
+
+setInterval(()=>{ensureOtherButton3351();updateBgm3351();},1500);
+setTimeout(()=>{ensureOtherButton3351();updateBgm3351();},500);
+
+window.showNewsPage=function(){
+ p3351().innerHTML=`<h2>📢 お知らせ</h2><div class="card3351"><h3>Ver3.3.51</h3><p>その他ボタンをランダムと同じ高さに修正しました。</p><p>その他で選択しても開始しない問題を修正しました。</p><p>ホームBGMがタップ後に鳴るように修正しました。</p><p>英語は古文と同じ形式にしました。</p></div>`;
  if(typeof addNav3347==="function")addNav3347();
 };
 })();
