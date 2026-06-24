@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.3.53";
+const VERSION = "3.3.56";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -12205,431 +12205,232 @@ window.showNewsPage=function(){let html="<h2>📢 お知らせ</h2><div class='n
 
 
 
-/* Ver3.3.47 Complete nav + other rebuild */
+
+
+
+
+
+
+
+/* Ver3.3.54 clean single other + BGM */
 (function(){
-if(window.__completeRebuild3347)return;
-window.__completeRebuild3347=true;
+if(window.__cleanOtherBgm3354)return;
+window.__cleanOtherBgm3354=true;
 
-const ENG3347=[{"ja":"勉強する","en":"study","level":"初級"},{"ja":"問題","en":"problem","level":"初級"},{"ja":"答え","en":"answer","level":"初級"},{"ja":"正しい","en":"correct","level":"初級"},{"ja":"間違い","en":"mistake","level":"初級"},{"ja":"難しい","en":"difficult","level":"初級"},{"ja":"簡単な","en":"easy","level":"初級"},{"ja":"続ける","en":"continue","level":"初級"},{"ja":"挑戦","en":"challenge","level":"初級"},{"ja":"成長","en":"growth","level":"初級"},{"ja":"努力","en":"effort","level":"初級"},{"ja":"復習","en":"review","level":"初級"},{"ja":"覚える","en":"remember","level":"初級"},{"ja":"忘れる","en":"forget","level":"初級"},{"ja":"練習","en":"practice","level":"初級"},{"ja":"成功","en":"success","level":"初級"},{"ja":"失敗","en":"failure","level":"初級"},{"ja":"重要な","en":"important","level":"初級"},{"ja":"必要な","en":"necessary","level":"初級"},{"ja":"理由","en":"reason","level":"初級"},{"ja":"方法","en":"method","level":"初級"},{"ja":"結果","en":"result","level":"初級"},{"ja":"選ぶ","en":"choose","level":"初級"},{"ja":"作る","en":"make","level":"初級"},{"ja":"使う","en":"use","level":"初級"},{"ja":"始める","en":"begin","level":"初級"},{"ja":"終わる","en":"finish","level":"初級"},{"ja":"理解する","en":"understand","level":"初級"},{"ja":"説明する","en":"explain","level":"初級"},{"ja":"質問","en":"question","level":"初級"},{"ja":"時間","en":"time","level":"初級"},{"ja":"目標","en":"goal","level":"初級"},{"ja":"毎日","en":"every day","level":"初級"},{"ja":"昨日","en":"yesterday","level":"初級"},{"ja":"明日","en":"tomorrow","level":"初級"},{"ja":"学校","en":"school","level":"初級"},{"ja":"先生","en":"teacher","level":"初級"},{"ja":"生徒","en":"student","level":"初級"},{"ja":"能力","en":"ability","level":"初級"},{"ja":"受け入れる","en":"accept","level":"初級"},{"ja":"達成する","en":"achieve","level":"初級"},{"ja":"行動","en":"action","level":"初級"},{"ja":"活動","en":"activity","level":"初級"},{"ja":"実際の","en":"actual","level":"初級"},{"ja":"加える","en":"add","level":"初級"},{"ja":"利点","en":"advantage","level":"初級"},{"ja":"助言","en":"advice","level":"初級"},{"ja":"影響する","en":"affect","level":"初級"},{"ja":"同意する","en":"agree","level":"初級"},{"ja":"許す","en":"allow","level":"初級"},{"ja":"ほとんど","en":"almost","level":"初級"},{"ja":"すでに","en":"already","level":"初級"},{"ja":"いつも","en":"always","level":"初級"},{"ja":"量","en":"amount","level":"初級"},{"ja":"発表する","en":"announce","level":"初級"},{"ja":"現れる","en":"appear","level":"初級"},{"ja":"適用する","en":"apply","level":"初級"},{"ja":"近づく","en":"approach","level":"初級"},{"ja":"地域","en":"area","level":"初級"},{"ja":"議論する","en":"argue","level":"初級"},{"ja":"到着する","en":"arrive","level":"初級"},{"ja":"記事","en":"article","level":"初級"},{"ja":"尋ねる","en":"ask","level":"初級"},{"ja":"注意","en":"attention","level":"初級"},{"ja":"利用できる","en":"available","level":"初級"},{"ja":"避ける","en":"avoid","level":"初級"},{"ja":"信じる","en":"believe","level":"初級"},{"ja":"利益","en":"benefit","level":"初級"},{"ja":"借りる","en":"borrow","level":"初級"},{"ja":"建てる","en":"build","level":"初級"},{"ja":"場合","en":"case","level":"初級"},{"ja":"原因","en":"cause","level":"初級"},{"ja":"中心","en":"center","level":"初級"},{"ja":"世紀","en":"century","level":"初級"},{"ja":"機会","en":"chance","level":"初級"},{"ja":"性格","en":"character","level":"初級"},{"ja":"選択","en":"choice","level":"初級"},{"ja":"明確な","en":"clear","level":"初級"},{"ja":"快適な","en":"comfortable","level":"初級"},{"ja":"共通の","en":"common","level":"初級"},{"ja":"会社","en":"company","level":"初級"},{"ja":"比べる","en":"compare","level":"初級"},{"ja":"完成する","en":"complete","level":"初級"},{"ja":"状態","en":"condition","level":"初級"},{"ja":"含む","en":"contain","level":"初級"},{"ja":"支配する","en":"control","level":"初級"},{"ja":"会話","en":"conversation","level":"初級"},{"ja":"費用","en":"cost","level":"初級"},{"ja":"文化","en":"culture","level":"初級"},{"ja":"危険","en":"danger","level":"初級"},{"ja":"深い","en":"deep","level":"初級"},{"ja":"程度","en":"degree","level":"初級"},{"ja":"要求する","en":"demand","level":"初級"},{"ja":"説明","en":"description","level":"初級"},{"ja":"設計する","en":"design","level":"初級"},{"ja":"発展する","en":"develop","level":"初級"},{"ja":"違い","en":"difference","level":"初級"},{"ja":"方向","en":"direction","level":"初級"},{"ja":"発見する","en":"discover","level":"初級"},{"ja":"議論","en":"discussion","level":"初級"},{"ja":"距離","en":"distance","level":"初級"},{"ja":"教育","en":"education","level":"初級"},{"ja":"効果","en":"effect","level":"初級"},{"ja":"エネルギー","en":"energy","level":"初級"},{"ja":"楽しむ","en":"enjoy","level":"初級"},{"ja":"十分な","en":"enough","level":"初級"},{"ja":"環境","en":"environment","level":"初級"},{"ja":"特に","en":"especially","level":"初級"},{"ja":"出来事","en":"event","level":"初級"},{"ja":"証拠","en":"evidence","level":"初級"},{"ja":"存在する","en":"exist","level":"初級"},{"ja":"経験","en":"experience","level":"初級"},{"ja":"表現する","en":"express","level":"初級"},{"ja":"事実","en":"fact","level":"初級"},{"ja":"有名な","en":"famous","level":"初級"},{"ja":"恐れ","en":"fear","level":"初級"},{"ja":"分野","en":"field","level":"初級"},{"ja":"見つける","en":"find","level":"初級"},{"ja":"外国の","en":"foreign","level":"初級"},{"ja":"自由","en":"freedom","level":"初級"},{"ja":"将来","en":"future","level":"初級"},{"ja":"一般的な","en":"general","level":"初級"},{"ja":"政府","en":"government","level":"初級"},{"ja":"習慣","en":"habit","level":"初級"},{"ja":"健康","en":"health","level":"初級"},{"ja":"歴史","en":"history","level":"初級"},{"ja":"希望","en":"hope","level":"初級"},{"ja":"人間","en":"human","level":"初級"},{"ja":"考え","en":"idea","level":"初級"},{"ja":"想像する","en":"imagine","level":"初級"},{"ja":"改善する","en":"improve","level":"初級"},{"ja":"増える","en":"increase","level":"初級"},{"ja":"産業","en":"industry","level":"初級"},{"ja":"情報","en":"information","level":"初級"},{"ja":"興味","en":"interest","level":"初級"},{"ja":"招待する","en":"invite","level":"初級"},{"ja":"知識","en":"knowledge","level":"初級"},{"ja":"言語","en":"language","level":"初級"},{"ja":"法律","en":"law","level":"初級"},{"ja":"残す","en":"leave","level":"初級"},{"ja":"図書館","en":"library","level":"初級"},{"ja":"聞く","en":"listen","level":"初級"},{"ja":"地元の","en":"local","level":"初級"},{"ja":"機械","en":"machine","level":"初級"},{"ja":"材料","en":"material","level":"初級"},{"ja":"意味","en":"meaning","level":"初級"},{"ja":"記憶","en":"memory","level":"初級"},{"ja":"必要な","en":"necessary","level":"初級"},{"ja":"普通の","en":"normal","level":"初級"},{"ja":"意見","en":"opinion","level":"初級"},{"ja":"機会","en":"opportunity","level":"初級"},{"ja":"組織","en":"organization","level":"初級"},{"ja":"参加する","en":"participate","level":"初級"},{"ja":"特定の","en":"particular","level":"初級"},{"ja":"平和","en":"peace","level":"初級"},{"ja":"完璧な","en":"perfect","level":"初級"},{"ja":"期間","en":"period","level":"初級"},{"ja":"可能な","en":"possible","level":"初級"},{"ja":"力","en":"power","level":"初級"},{"ja":"準備する","en":"prepare","level":"初級"},{"ja":"現在の","en":"present","level":"初級"},{"ja":"価格","en":"price","level":"初級"},{"ja":"過程","en":"process","level":"初級"},{"ja":"生産する","en":"produce","level":"初級"},{"ja":"約束する","en":"promise","level":"初級"},{"ja":"守る","en":"protect","level":"初級"},{"ja":"提供する","en":"provide","level":"初級"},{"ja":"目的","en":"purpose","level":"初級"},{"ja":"質","en":"quality","level":"初級"},{"ja":"受け取る","en":"receive","level":"初級"},{"ja":"記録","en":"record","level":"中級"},{"ja":"減らす","en":"reduce","level":"中級"},{"ja":"関係","en":"relationship","level":"中級"},{"ja":"残る","en":"remain","level":"中級"},{"ja":"取り除く","en":"remove","level":"中級"},{"ja":"返事する","en":"reply","level":"中級"},{"ja":"報告","en":"report","level":"中級"},{"ja":"研究","en":"research","level":"中級"},{"ja":"尊敬する","en":"respect","level":"中級"},{"ja":"責任","en":"responsibility","level":"中級"},{"ja":"戻る","en":"return","level":"中級"},{"ja":"危険","en":"risk","level":"中級"},{"ja":"規則","en":"rule","level":"中級"},{"ja":"安全な","en":"safe","level":"中級"},{"ja":"科学","en":"science","level":"中級"},{"ja":"季節","en":"season","level":"中級"},{"ja":"秘密","en":"secret","level":"中級"},{"ja":"選ぶ","en":"select","level":"中級"},{"ja":"真剣な","en":"serious","level":"中級"},{"ja":"共有する","en":"share","level":"中級"},{"ja":"社会","en":"society","level":"中級"},{"ja":"解決する","en":"solve","level":"中級"},{"ja":"特別な","en":"special","level":"中級"},{"ja":"速度","en":"speed","level":"中級"},{"ja":"費やす","en":"spend","level":"中級"},{"ja":"状態","en":"state","level":"中級"},{"ja":"物語","en":"story","level":"中級"},{"ja":"構造","en":"structure","level":"中級"},{"ja":"主題","en":"subject","level":"中級"},{"ja":"提案する","en":"suggest","level":"中級"},{"ja":"支える","en":"support","level":"中級"},{"ja":"驚く","en":"surprise","level":"中級"},{"ja":"技術","en":"technology","level":"中級"},{"ja":"試験","en":"test","level":"中級"},{"ja":"一緒に","en":"together","level":"中級"},{"ja":"交通","en":"traffic","level":"中級"},{"ja":"旅行","en":"travel","level":"中級"},{"ja":"真実","en":"truth","level":"中級"},{"ja":"大学","en":"university","level":"中級"},{"ja":"価値","en":"value","level":"中級"},{"ja":"訪れる","en":"visit","level":"中級"},{"ja":"心配する","en":"worry","level":"中級"},{"ja":"絶対の","en":"absolute","level":"中級"},{"ja":"吸収する","en":"absorb","level":"中級"},{"ja":"抽象的な","en":"abstract","level":"中級"},{"ja":"豊富な","en":"abundant","level":"中級"},{"ja":"加速する","en":"accelerate","level":"中級"},{"ja":"獲得する","en":"acquire","level":"中級"},{"ja":"適応する","en":"adapt","level":"中級"},{"ja":"十分な","en":"adequate","level":"中級"},{"ja":"調整する","en":"adjust","level":"中級"},{"ja":"管理","en":"administration","level":"中級"},{"ja":"採用する","en":"adopt","level":"中級"},{"ja":"進歩","en":"advance","level":"中級"},{"ja":"代替案","en":"alternative","level":"中級"},{"ja":"分析","en":"analysis","level":"中級"},{"ja":"古代の","en":"ancient","level":"中級"},{"ja":"予期する","en":"anticipate","level":"中級"},{"ja":"不安","en":"anxiety","level":"中級"},{"ja":"明らかな","en":"apparent","level":"中級"},{"ja":"感謝する","en":"appreciate","level":"中級"},{"ja":"適切な","en":"appropriate","level":"中級"},{"ja":"建築","en":"architecture","level":"中級"},{"ja":"配置する","en":"arrange","level":"中級"},{"ja":"人工の","en":"artificial","level":"中級"},{"ja":"側面","en":"aspect","level":"中級"},{"ja":"評価する","en":"assess","level":"中級"},{"ja":"仮定する","en":"assume","level":"中級"},{"ja":"雰囲気","en":"atmosphere","level":"中級"},{"ja":"権威","en":"authority","level":"中級"},{"ja":"自動の","en":"automatic","level":"中級"},{"ja":"平均","en":"average","level":"中級"},{"ja":"気づいている","en":"aware","level":"中級"},{"ja":"障壁","en":"barrier","level":"中級"},{"ja":"基礎","en":"basis","level":"中級"},{"ja":"振る舞う","en":"behave","level":"中級"},{"ja":"信念","en":"belief","level":"中級"},{"ja":"境界","en":"boundary","level":"中級"},{"ja":"予算","en":"budget","level":"中級"},{"ja":"負担","en":"burden","level":"中級"},{"ja":"計算する","en":"calculate","level":"中級"},{"ja":"能力","en":"capability","level":"中級"},{"ja":"容量","en":"capacity","level":"中級"},{"ja":"捕らえる","en":"capture","level":"中級"},{"ja":"カテゴリー","en":"category","level":"中級"},{"ja":"確実な","en":"certain","level":"中級"},{"ja":"特徴","en":"characteristic","level":"中級"},{"ja":"状況","en":"circumstance","level":"中級"},{"ja":"市民","en":"citizen","level":"中級"},{"ja":"文明","en":"civilization","level":"中級"},{"ja":"主張する","en":"claim","level":"中級"},{"ja":"分類する","en":"classify","level":"中級"},{"ja":"気候","en":"climate","level":"中級"},{"ja":"協力する","en":"collaborate","level":"中級"},{"ja":"崩壊する","en":"collapse","level":"中級"},{"ja":"組み合わせ","en":"combination","level":"中級"},{"ja":"商業","en":"commerce","level":"中級"},{"ja":"伝える","en":"communicate","level":"中級"},{"ja":"地域社会","en":"community","level":"中級"},{"ja":"比較","en":"comparison","level":"中級"},{"ja":"競争","en":"competition","level":"中級"},{"ja":"不満を言う","en":"complain","level":"中級"},{"ja":"複雑な","en":"complex","level":"中級"},{"ja":"構成する","en":"compose","level":"中級"},{"ja":"包括的な","en":"comprehensive","level":"中級"},{"ja":"概念","en":"concept","level":"中級"},{"ja":"結論","en":"conclusion","level":"中級"},{"ja":"自信","en":"confidence","level":"中級"},{"ja":"対立","en":"conflict","level":"中級"},{"ja":"混乱させる","en":"confuse","level":"中級"},{"ja":"結果","en":"consequence","level":"中級"},{"ja":"一貫した","en":"consistent","level":"中級"},{"ja":"建設する","en":"construct","level":"中級"},{"ja":"相談する","en":"consult","level":"中級"},{"ja":"消費する","en":"consume","level":"中級"},{"ja":"現代の","en":"contemporary","level":"中級"},{"ja":"文脈","en":"context","level":"中級"},{"ja":"契約","en":"contract","level":"中級"},{"ja":"対照","en":"contrast","level":"中級"},{"ja":"貢献する","en":"contribute","level":"中級"},{"ja":"便利な","en":"convenient","level":"中級"},{"ja":"説得する","en":"convince","level":"中級"},{"ja":"対応する","en":"correspond","level":"中級"},{"ja":"創造する","en":"create","level":"中級"},{"ja":"基準","en":"criterion","level":"中級"},{"ja":"重要な","en":"critical","level":"中級"},{"ja":"批判する","en":"criticize","level":"中級"},{"ja":"現在の","en":"current","level":"中級"},{"ja":"損害","en":"damage","level":"中級"},{"ja":"議論","en":"debate","level":"中級"},{"ja":"衰退","en":"decline","level":"中級"},{"ja":"定義する","en":"define","level":"中級"},{"ja":"明確な","en":"definite","level":"中級"},{"ja":"民主主義","en":"democracy","level":"中級"},{"ja":"示す","en":"demonstrate","level":"中級"},{"ja":"依存する","en":"depend","level":"中級"},{"ja":"導き出す","en":"derive","level":"中級"},{"ja":"破壊する","en":"destroy","level":"中級"},{"ja":"詳細","en":"detail","level":"中級"},{"ja":"決定する","en":"determine","level":"中級"},{"ja":"診断する","en":"diagnose","level":"中級"},{"ja":"災害","en":"disaster","level":"中級"},{"ja":"規律","en":"discipline","level":"中級"},{"ja":"差別","en":"discrimination","level":"中級"},{"ja":"病気","en":"disease","level":"中級"},{"ja":"分配する","en":"distribute","level":"中級"},{"ja":"多様な","en":"diverse","level":"中級"},{"ja":"支配的な","en":"dominant","level":"中級"},{"ja":"劇的な","en":"dramatic","level":"中級"},{"ja":"経済","en":"economy","level":"中級"},{"ja":"効率的な","en":"efficient","level":"中級"},{"ja":"要素","en":"element","level":"中級"},{"ja":"強調する","en":"emphasize","level":"中級"},{"ja":"可能にする","en":"enable","level":"中級"},{"ja":"出会う","en":"encounter","level":"中級"},{"ja":"励ます","en":"encourage","level":"中級"},{"ja":"従事する","en":"engage","level":"中級"},{"ja":"高める","en":"enhance","level":"中級"},{"ja":"莫大な","en":"enormous","level":"中級"},{"ja":"保証する","en":"ensure","level":"中級"},{"ja":"本質的な","en":"essential","level":"中級"},{"ja":"設立する","en":"establish","level":"中級"},{"ja":"評価する","en":"evaluate","level":"中級"},{"ja":"進化","en":"evolution","level":"中級"},{"ja":"調べる","en":"examine","level":"中級"},{"ja":"優れた","en":"excellent","level":"中級"},{"ja":"例外","en":"exception","level":"中級"},{"ja":"交換","en":"exchange","level":"中級"},{"ja":"除外する","en":"exclude","level":"中級"},{"ja":"拡大する","en":"expand","level":"中級"},{"ja":"期待","en":"expectation","level":"上級"},{"ja":"実験","en":"experiment","level":"上級"},{"ja":"専門家","en":"expert","level":"上級"},{"ja":"さらす","en":"expose","level":"上級"},{"ja":"広範囲の","en":"extensive","level":"上級"},{"ja":"外部の","en":"external","level":"上級"},{"ja":"要因","en":"factor","level":"上級"},{"ja":"特徴","en":"feature","level":"上級"},{"ja":"財政の","en":"financial","level":"上級"},{"ja":"柔軟な","en":"flexible","level":"上級"},{"ja":"焦点","en":"focus","level":"上級"},{"ja":"形式","en":"format","level":"上級"},{"ja":"公式","en":"formula","level":"上級"},{"ja":"基礎","en":"foundation","level":"上級"},{"ja":"枠組み","en":"framework","level":"上級"},{"ja":"頻繁な","en":"frequent","level":"上級"},{"ja":"機能","en":"function","level":"上級"},{"ja":"基本的な","en":"fundamental","level":"上級"},{"ja":"世代","en":"generation","level":"上級"},{"ja":"保証する","en":"guarantee","level":"上級"},{"ja":"仮説","en":"hypothesis","level":"上級"},{"ja":"同一の","en":"identical","level":"上級"},{"ja":"識別する","en":"identify","level":"上級"},{"ja":"無視する","en":"ignore","level":"上級"},{"ja":"違法の","en":"illegal","level":"上級"},{"ja":"説明する","en":"illustrate","level":"上級"},{"ja":"直ちに","en":"immediate","level":"上級"},{"ja":"移民","en":"immigrant","level":"上級"},{"ja":"影響","en":"impact","level":"上級"},{"ja":"実施する","en":"implement","level":"上級"},{"ja":"含意","en":"implication","level":"上級"},{"ja":"暗示する","en":"imply","level":"上級"},{"ja":"印象","en":"impression","level":"上級"},{"ja":"事件","en":"incident","level":"上級"},{"ja":"収入","en":"income","level":"上級"},{"ja":"独立した","en":"independent","level":"上級"},{"ja":"示す","en":"indicate","level":"上級"},{"ja":"個人","en":"individual","level":"上級"},{"ja":"避けられない","en":"inevitable","level":"上級"},{"ja":"推論する","en":"infer","level":"上級"},{"ja":"影響","en":"influence","level":"上級"},{"ja":"初期の","en":"initial","level":"上級"},{"ja":"革新","en":"innovation","level":"上級"},{"ja":"洞察","en":"insight","level":"上級"},{"ja":"制度","en":"institution","level":"上級"},{"ja":"統合する","en":"integrate","level":"上級"},{"ja":"知的な","en":"intellectual","level":"上級"},{"ja":"相互作用","en":"interaction","level":"上級"},{"ja":"内的な","en":"internal","level":"上級"},{"ja":"解釈する","en":"interpret","level":"上級"},{"ja":"投資","en":"investment","level":"上級"},{"ja":"調査","en":"investigation","level":"上級"},{"ja":"孤立させる","en":"isolate","level":"上級"},{"ja":"正当化する","en":"justify","level":"上級"},{"ja":"労働","en":"labor","level":"上級"},{"ja":"合法の","en":"legal","level":"上級"},{"ja":"論理","en":"logic","level":"上級"},{"ja":"維持する","en":"maintain","level":"上級"},{"ja":"大多数","en":"majority","level":"上級"},{"ja":"管理する","en":"manage","level":"上級"}];
-const KANJI3347=[{"kanji":"努力","yomi":"どりょく","meaning":"目標に向かってがんばること"},{"kanji":"成功","yomi":"せいこう","meaning":"うまくいくこと"},{"kanji":"失敗","yomi":"しっぱい","meaning":"うまくいかないこと"},{"kanji":"挑戦","yomi":"ちょうせん","meaning":"難しいことに立ち向かうこと"},{"kanji":"成長","yomi":"せいちょう","meaning":"大きくなる・能力が伸びること"},{"kanji":"復習","yomi":"ふくしゅう","meaning":"一度学んだことをもう一度学ぶこと"},{"kanji":"理解","yomi":"りかい","meaning":"意味や内容がわかること"},{"kanji":"説明","yomi":"せつめい","meaning":"わかるように話すこと"},{"kanji":"問題","yomi":"もんだい","meaning":"解くべき問い"},{"kanji":"解答","yomi":"かいとう","meaning":"答えること・答え"},{"kanji":"正解","yomi":"せいかい","meaning":"正しい答え"},{"kanji":"不正解","yomi":"ふせいかい","meaning":"間違った答え"},{"kanji":"原因","yomi":"げんいん","meaning":"物事が起こるもと"},{"kanji":"結果","yomi":"けっか","meaning":"物事のあとに生じたこと"},{"kanji":"理由","yomi":"りゆう","meaning":"そうなるわけ"},{"kanji":"方法","yomi":"ほうほう","meaning":"やり方"},{"kanji":"目標","yomi":"もくひょう","meaning":"目指すもの"},{"kanji":"計画","yomi":"けいかく","meaning":"前もって考えた手順"},{"kanji":"実行","yomi":"じっこう","meaning":"実際に行うこと"},{"kanji":"継続","yomi":"けいぞく","meaning":"続けること"},{"kanji":"習慣","yomi":"しゅうかん","meaning":"いつも行うこと"},{"kanji":"集中","yomi":"しゅうちゅう","meaning":"一つのことに意識を向けること"},{"kanji":"確認","yomi":"かくにん","meaning":"たしかめること"},{"kanji":"練習","yomi":"れんしゅう","meaning":"上達するためにくり返すこと"},{"kanji":"必要","yomi":"ひつよう","meaning":"なくてはならないこと"},{"kanji":"重要","yomi":"じゅうよう","meaning":"大切なこと"},{"kanji":"基本","yomi":"きほん","meaning":"土台になること"},{"kanji":"応用","yomi":"おうよう","meaning":"学んだことを別の場合に使うこと"},{"kanji":"公式","yomi":"こうしき","meaning":"決まった計算の形"},{"kanji":"計算","yomi":"けいさん","meaning":"数を求めること"},{"kanji":"数式","yomi":"すうしき","meaning":"数字や記号で表した式"},{"kanji":"積分","yomi":"せきぶん","meaning":"微分の逆操作などを扱う数学分野"},{"kanji":"微分","yomi":"びぶん","meaning":"変化の割合を扱う数学分野"},{"kanji":"関数","yomi":"かんすう","meaning":"数の対応関係"},{"kanji":"図形","yomi":"ずけい","meaning":"形を表すもの"},{"kanji":"証明","yomi":"しょうめい","meaning":"正しいことを筋道立てて示すこと"},{"kanji":"仮定","yomi":"かてい","meaning":"前提として考えること"},{"kanji":"結論","yomi":"けつろん","meaning":"考えた結果として出る答え"},{"kanji":"条件","yomi":"じょうけん","meaning":"成り立つために必要な事柄"},{"kanji":"変化","yomi":"へんか","meaning":"状態が変わること"},{"kanji":"増加","yomi":"ぞうか","meaning":"増えること"},{"kanji":"減少","yomi":"げんしょう","meaning":"減ること"},{"kanji":"平均","yomi":"へいきん","meaning":"合計を個数で割った値"},{"kanji":"最大","yomi":"さいだい","meaning":"最も大きいこと"},{"kanji":"最小","yomi":"さいしょう","meaning":"最も小さいこと"},{"kanji":"共通","yomi":"きょうつう","meaning":"同じであること"},{"kanji":"比較","yomi":"ひかく","meaning":"比べること"},{"kanji":"判断","yomi":"はんだん","meaning":"考えて決めること"},{"kanji":"選択","yomi":"せんたく","meaning":"選ぶこと"},{"kanji":"利用","yomi":"りよう","meaning":"使うこと"},{"kanji":"改善","yomi":"かいぜん","meaning":"より良くすること"},{"kanji":"修正","yomi":"しゅうせい","meaning":"間違いを直すこと"},{"kanji":"追加","yomi":"ついか","meaning":"あとから加えること"},{"kanji":"削除","yomi":"さくじょ","meaning":"取り除くこと"},{"kanji":"表示","yomi":"ひょうじ","meaning":"画面などに出すこと"},{"kanji":"設定","yomi":"せってい","meaning":"決めて使えるようにすること"},{"kanji":"記録","yomi":"きろく","meaning":"残しておくこと"},{"kanji":"保存","yomi":"ほぞん","meaning":"消えないように残すこと"},{"kanji":"更新","yomi":"こうしん","meaning":"新しくすること"},{"kanji":"公開","yomi":"こうかい","meaning":"人に見られるようにすること"}];
-const KOBUN3347=[{"word":"あはれ","meaning":"しみじみとした趣がある"},{"word":"をかし","meaning":"趣がある・おもしろい"},{"word":"いみじ","meaning":"非常に・すばらしい"},{"word":"ゆかし","meaning":"見たい・知りたい"},{"word":"おどろく","meaning":"はっと気づく・目を覚ます"},{"word":"ののしる","meaning":"大声で騒ぐ・評判になる"},{"word":"めでたし","meaning":"すばらしい・立派だ"},{"word":"つれづれ","meaning":"手持ち無沙汰だ"},{"word":"うつくし","meaning":"かわいらしい"},{"word":"かなし","meaning":"かわいい・いとしい"},{"word":"ありがたし","meaning":"めったにない・すばらしい"},{"word":"やむごとなし","meaning":"高貴だ・特別だ"},{"word":"あさまし","meaning":"驚きあきれる"},{"word":"くちをし","meaning":"残念だ"},{"word":"こころにくし","meaning":"奥ゆかしい"},{"word":"ねんごろなり","meaning":"熱心だ・親しい"},{"word":"すさまじ","meaning":"興ざめだ"},{"word":"わびし","meaning":"つらい・寂しい"},{"word":"おぼつかなし","meaning":"はっきりしない・不安だ"},{"word":"むつかし","meaning":"不快だ・気味が悪い"},{"word":"いたづらなり","meaning":"むだだ"},{"word":"あてなり","meaning":"上品だ"},{"word":"なまめかし","meaning":"優美だ"},{"word":"はづかし","meaning":"立派で気後れする"},{"word":"つきづきし","meaning":"似つかわしい"},{"word":"らうたし","meaning":"かわいらしい"},{"word":"いらふ","meaning":"返事をする"},{"word":"ありく","meaning":"歩き回る"},{"word":"ぐす","meaning":"連れて行く"},{"word":"とぶらふ","meaning":"訪れる・弔う"},{"word":"まもる","meaning":"じっと見つめる"},{"word":"ながむ","meaning":"物思いに沈む"},{"word":"わづらふ","meaning":"悩む・病気になる"},{"word":"おこたる","meaning":"病気がよくなる"},{"word":"おきつ","meaning":"命令する"},{"word":"かしづく","meaning":"大切に育てる"}];
+const DATA3354={"eng":[{"ja":"勉強する","en":"study","level":"初級"},{"ja":"練習","en":"practice","level":"初級"},{"ja":"復習","en":"review","level":"初級"},{"ja":"問題","en":"problem","level":"初級"},{"ja":"答え","en":"answer","level":"初級"},{"ja":"質問","en":"question","level":"初級"},{"ja":"正しい","en":"correct","level":"初級"},{"ja":"間違い","en":"mistake","level":"初級"},{"ja":"簡単な","en":"easy","level":"初級"},{"ja":"難しい","en":"difficult","level":"初級"},{"ja":"努力","en":"effort","level":"初級"},{"ja":"成功","en":"success","level":"初級"},{"ja":"失敗","en":"failure","level":"初級"},{"ja":"時間","en":"time","level":"初級"},{"ja":"学校","en":"school","level":"初級"},{"ja":"先生","en":"teacher","level":"初級"},{"ja":"生徒","en":"student","level":"初級"},{"ja":"友達","en":"friend","level":"初級"},{"ja":"家族","en":"family","level":"初級"},{"ja":"読む","en":"read","level":"初級"},{"ja":"書く","en":"write","level":"初級"},{"ja":"聞く","en":"listen","level":"初級"},{"ja":"話す","en":"speak","level":"初級"},{"ja":"見る","en":"see","level":"初級"},{"ja":"作る","en":"make","level":"初級"},{"ja":"使う","en":"use","level":"初級"},{"ja":"行く","en":"go","level":"初級"},{"ja":"来る","en":"come","level":"初級"},{"ja":"食べる","en":"eat","level":"初級"},{"ja":"飲む","en":"drink","level":"初級"},{"ja":"重要な","en":"important","level":"中級"},{"ja":"必要な","en":"necessary","level":"中級"},{"ja":"理由","en":"reason","level":"中級"},{"ja":"方法","en":"method","level":"中級"},{"ja":"結果","en":"result","level":"中級"},{"ja":"目標","en":"goal","level":"中級"},{"ja":"経験","en":"experience","level":"中級"},{"ja":"情報","en":"information","level":"中級"},{"ja":"知識","en":"knowledge","level":"中級"},{"ja":"環境","en":"environment","level":"中級"},{"ja":"社会","en":"society","level":"中級"},{"ja":"文化","en":"culture","level":"中級"},{"ja":"歴史","en":"history","level":"中級"},{"ja":"科学","en":"science","level":"中級"},{"ja":"経済","en":"economy","level":"中級"},{"ja":"技術","en":"technology","level":"中級"},{"ja":"教育","en":"education","level":"中級"},{"ja":"健康","en":"health","level":"中級"},{"ja":"自然","en":"nature","level":"中級"},{"ja":"政府","en":"government","level":"中級"},{"ja":"法律","en":"law","level":"中級"},{"ja":"権利","en":"right","level":"中級"},{"ja":"自由","en":"freedom","level":"中級"},{"ja":"責任","en":"responsibility","level":"中級"},{"ja":"機会","en":"opportunity","level":"中級"},{"ja":"能力","en":"ability","level":"中級"},{"ja":"比較する","en":"compare","level":"中級"},{"ja":"改善する","en":"improve","level":"中級"},{"ja":"提供する","en":"provide","level":"中級"},{"ja":"含む","en":"include","level":"中級"},{"ja":"影響","en":"influence","level":"上級"},{"ja":"発展する","en":"develop","level":"上級"},{"ja":"決定する","en":"determine","level":"上級"},{"ja":"分析する","en":"analyze","level":"上級"},{"ja":"増加する","en":"increase","level":"上級"},{"ja":"減少する","en":"decrease","level":"上級"},{"ja":"証拠","en":"evidence","level":"上級"},{"ja":"仮説","en":"hypothesis","level":"上級"},{"ja":"効率的な","en":"efficient","level":"上級"},{"ja":"適切な","en":"appropriate","level":"上級"},{"ja":"可能にする","en":"enable","level":"上級"},{"ja":"強調する","en":"emphasize","level":"上級"},{"ja":"設立する","en":"establish","level":"上級"},{"ja":"評価する","en":"evaluate","level":"上級"},{"ja":"示す","en":"indicate","level":"上級"},{"ja":"解釈する","en":"interpret","level":"上級"},{"ja":"維持する","en":"maintain","level":"上級"},{"ja":"得る","en":"obtain","level":"上級"},{"ja":"予測する","en":"predict","level":"上級"},{"ja":"促進する","en":"promote","level":"上級"},{"ja":"認識する","en":"recognize","level":"上級"},{"ja":"要求する","en":"require","level":"上級"},{"ja":"解決策","en":"solution","level":"上級"},{"ja":"重要な","en":"significant","level":"上級"}],"kanji":[{"kanji":"努力","yomi":"どりょく","meaning":"目標に向かってがんばること"},{"kanji":"成功","yomi":"せいこう","meaning":"うまくいくこと"},{"kanji":"失敗","yomi":"しっぱい","meaning":"うまくいかないこと"},{"kanji":"挑戦","yomi":"ちょうせん","meaning":"難しいことに立ち向かうこと"},{"kanji":"成長","yomi":"せいちょう","meaning":"能力や状態が伸びること"},{"kanji":"復習","yomi":"ふくしゅう","meaning":"一度学んだことをもう一度学ぶこと"},{"kanji":"理解","yomi":"りかい","meaning":"意味や内容がわかること"},{"kanji":"説明","yomi":"せつめい","meaning":"わかるように話すこと"},{"kanji":"原因","yomi":"げんいん","meaning":"物事が起こるもと"},{"kanji":"結果","yomi":"けっか","meaning":"物事のあとに生じたこと"},{"kanji":"理由","yomi":"りゆう","meaning":"そうなるわけ"},{"kanji":"方法","yomi":"ほうほう","meaning":"やり方"},{"kanji":"目標","yomi":"もくひょう","meaning":"目指すもの"},{"kanji":"計画","yomi":"けいかく","meaning":"前もって考えた手順"},{"kanji":"実行","yomi":"じっこう","meaning":"実際に行うこと"},{"kanji":"継続","yomi":"けいぞく","meaning":"続けること"},{"kanji":"習慣","yomi":"しゅうかん","meaning":"いつも行うこと"},{"kanji":"集中","yomi":"しゅうちゅう","meaning":"一つのことに意識を向けること"},{"kanji":"確認","yomi":"かくにん","meaning":"たしかめること"},{"kanji":"練習","yomi":"れんしゅう","meaning":"上達のためにくり返すこと"},{"kanji":"重要","yomi":"じゅうよう","meaning":"大切なこと"},{"kanji":"基本","yomi":"きほん","meaning":"土台になること"},{"kanji":"応用","yomi":"おうよう","meaning":"学んだことを別の場合に使うこと"},{"kanji":"証明","yomi":"しょうめい","meaning":"正しいことを筋道立てて示すこと"},{"kanji":"仮定","yomi":"かてい","meaning":"前提として考えること"},{"kanji":"結論","yomi":"けつろん","meaning":"考えた結果として出る答え"},{"kanji":"条件","yomi":"じょうけん","meaning":"成り立つために必要な事柄"},{"kanji":"比較","yomi":"ひかく","meaning":"比べること"},{"kanji":"判断","yomi":"はんだん","meaning":"考えて決めること"},{"kanji":"改善","yomi":"かいぜん","meaning":"より良くすること"},{"kanji":"修正","yomi":"しゅうせい","meaning":"間違いを直すこと"},{"kanji":"情報","yomi":"じょうほう","meaning":"知るための内容"},{"kanji":"知識","yomi":"ちしき","meaning":"知っている内容"},{"kanji":"技術","yomi":"ぎじゅつ","meaning":"物事を行うためのわざ"},{"kanji":"経験","yomi":"けいけん","meaning":"実際に行って得たこと"},{"kanji":"責任","yomi":"せきにん","meaning":"果たすべき役割"},{"kanji":"協力","yomi":"きょうりょく","meaning":"力を合わせること"},{"kanji":"競争","yomi":"きょうそう","meaning":"勝ち負けを争うこと"},{"kanji":"社会","yomi":"しゃかい","meaning":"人々が集まって生活する場"},{"kanji":"文化","yomi":"ぶんか","meaning":"人々の生活から生まれたもの"},{"kanji":"歴史","yomi":"れきし","meaning":"過去からの出来事の流れ"},{"kanji":"自然","yomi":"しぜん","meaning":"人の手が加わらないもの"},{"kanji":"環境","yomi":"かんきょう","meaning":"周りの状況"},{"kanji":"健康","yomi":"けんこう","meaning":"体や心の調子がよいこと"},{"kanji":"安全","yomi":"あんぜん","meaning":"危険が少ないこと"},{"kanji":"危険","yomi":"きけん","meaning":"悪いことが起きる可能性"},{"kanji":"平和","yomi":"へいわ","meaning":"争いがない状態"},{"kanji":"自由","yomi":"じゆう","meaning":"自分で選べること"},{"kanji":"権利","yomi":"けんり","meaning":"行うことが認められるもの"},{"kanji":"義務","yomi":"ぎむ","meaning":"しなければならないこと"},{"kanji":"経済","yomi":"けいざい","meaning":"お金や物の動き"},{"kanji":"政治","yomi":"せいじ","meaning":"社会を動かす仕組み"},{"kanji":"法律","yomi":"ほうりつ","meaning":"国や社会の決まり"},{"kanji":"制度","yomi":"せいど","meaning":"社会の仕組み"},{"kanji":"選挙","yomi":"せんきょ","meaning":"代表を選ぶこと"},{"kanji":"地域","yomi":"ちいき","meaning":"一定の場所のまとまり"},{"kanji":"人口","yomi":"じんこう","meaning":"人の数"},{"kanji":"都市","yomi":"とし","meaning":"人が多く集まる地域"},{"kanji":"科学","yomi":"かがく","meaning":"自然や物事の法則を調べる学問"},{"kanji":"実験","yomi":"じっけん","meaning":"確かめるために行う試み"}],"kobun":[{"word":"あはれ","meaning":"しみじみとした趣がある"},{"word":"をかし","meaning":"趣がある・おもしろい"},{"word":"いみじ","meaning":"非常に・すばらしい"},{"word":"ゆかし","meaning":"見たい・知りたい"},{"word":"おどろく","meaning":"はっと気づく・目を覚ます"},{"word":"ののしる","meaning":"大声で騒ぐ・評判になる"},{"word":"めでたし","meaning":"すばらしい・立派だ"},{"word":"つれづれ","meaning":"手持ち無沙汰だ"},{"word":"うつくし","meaning":"かわいらしい"},{"word":"かなし","meaning":"かわいい・いとしい"},{"word":"ありがたし","meaning":"めったにない・すばらしい"},{"word":"やむごとなし","meaning":"高貴だ・特別だ"},{"word":"あさまし","meaning":"驚きあきれる"},{"word":"くちをし","meaning":"残念だ"},{"word":"こころにくし","meaning":"奥ゆかしい"},{"word":"ねんごろなり","meaning":"熱心だ・親しい"},{"word":"すさまじ","meaning":"興ざめだ"},{"word":"わびし","meaning":"つらい・寂しい"},{"word":"おぼつかなし","meaning":"はっきりしない・不安だ"},{"word":"むつかし","meaning":"不快だ・気味が悪い"},{"word":"いたづらなり","meaning":"むだだ"},{"word":"あてなり","meaning":"上品だ"},{"word":"なまめかし","meaning":"優美だ"},{"word":"はづかし","meaning":"立派で気後れする"},{"word":"つきづきし","meaning":"似つかわしい"},{"word":"らうたし","meaning":"かわいらしい"},{"word":"いらふ","meaning":"返事をする"},{"word":"ありく","meaning":"歩き回る"},{"word":"ぐす","meaning":"連れて行く"},{"word":"とぶらふ","meaning":"訪れる・弔う"},{"word":"まもる","meaning":"じっと見つめる"},{"word":"ながむ","meaning":"物思いに沈む"},{"word":"わづらふ","meaning":"悩む・病気になる"},{"word":"おこたる","meaning":"病気がよくなる"},{"word":"おきつ","meaning":"命令する"},{"word":"かしづく","meaning":"大切に育てる"},{"word":"たまふ","meaning":"お与えになる・〜なさる"},{"word":"おはす","meaning":"いらっしゃる"},{"word":"めす","meaning":"お呼びになる・召し上がる"},{"word":"きこゆ","meaning":"申し上げる"},{"word":"まゐる","meaning":"参上する・差し上げる"}],"social":[{"cat":"地理","q":"日本で最も高い山は？","a":"富士山","choices":["富士山","北岳","阿蘇山","槍ヶ岳"]},{"cat":"地理","q":"日本で最も長い川は？","a":"信濃川","choices":["信濃川","利根川","石狩川","木曽川"]},{"cat":"地理","q":"北海道の道庁所在地は？","a":"札幌市","choices":["札幌市","函館市","旭川市","釧路市"]},{"cat":"地理","q":"日本の標準時子午線が通る市は？","a":"明石市","choices":["明石市","神戸市","大阪市","奈良市"]},{"cat":"地理","q":"日本最大の湖は？","a":"琵琶湖","choices":["琵琶湖","霞ヶ浦","サロマ湖","猪苗代湖"]},{"cat":"地理","q":"日本の三大工業地帯に入るのは？","a":"中京工業地帯","choices":["中京工業地帯","石狩工業地帯","十勝工業地帯","南九州工業地帯"]},{"cat":"地理","q":"梅雨の影響を強く受ける気候は？","a":"太平洋側の気候","choices":["太平洋側の気候","瀬戸内の気候","中央高地の気候","北海道の気候"]},{"cat":"歴史","q":"鎌倉幕府を開いた人物は？","a":"源頼朝","choices":["源頼朝","徳川家康","足利尊氏","織田信長"]},{"cat":"歴史","q":"江戸幕府を開いた人物は？","a":"徳川家康","choices":["徳川家康","豊臣秀吉","源頼朝","足利尊氏"]},{"cat":"歴史","q":"大化の改新が始まった年は？","a":"645年","choices":["645年","710年","794年","1192年"]},{"cat":"歴史","q":"平安京に都が移された年は？","a":"794年","choices":["794年","710年","645年","1185年"]},{"cat":"歴史","q":"応仁の乱が始まった年は？","a":"1467年","choices":["1467年","1333年","1600年","1868年"]},{"cat":"歴史","q":"関ヶ原の戦いが起きた年は？","a":"1600年","choices":["1600年","1582年","1615年","1868年"]},{"cat":"歴史","q":"明治維新の中心となった時代は？","a":"幕末から明治","choices":["幕末から明治","奈良時代","平安時代","室町時代"]},{"cat":"公民","q":"日本の最高法規は？","a":"日本国憲法","choices":["日本国憲法","民法","刑法","商法"]},{"cat":"公民","q":"国会が担当する権力は？","a":"立法権","choices":["立法権","行政権","司法権","選挙権"]},{"cat":"公民","q":"内閣が担当する権力は？","a":"行政権","choices":["行政権","立法権","司法権","請求権"]},{"cat":"公民","q":"裁判所が担当する権力は？","a":"司法権","choices":["司法権","行政権","立法権","参政権"]},{"cat":"公民","q":"三権分立の目的は？","a":"権力の集中を防ぐこと","choices":["権力の集中を防ぐこと","税金をなくすこと","国会を廃止すること","選挙をなくすこと"]},{"cat":"公民","q":"衆議院議員の任期は？","a":"4年","choices":["4年","3年","5年","6年"]},{"cat":"公民","q":"参議院議員の任期は？","a":"6年","choices":["6年","3年","4年","5年"]}]};
+let game3354={kind:"",mode:"",level:"ランダム",pool:[],i:0,ok:0,q:null};
 
-let q3347=null, mode3347="", score3347=0, count3347=0, level3347="ランダム";
-
-function style3347(){
- if(document.getElementById("style3347"))return;
+function panel3354(){return document.getElementById("panelArea")||document.body;}
+function bgmVolume3354(){const v=localStorage.getItem("mathMaster_bgmVolume");return v===null?0.45:Math.max(0,Math.min(1,Number(v)));}
+function style3354(){
+ if(document.getElementById("style3354"))return;
  const st=document.createElement("style");
- st.id="style3347";
+ st.id="style3354";
  st.textContent=`
-/* 戻る/ホームを完全リセット */
-#instantNav3333,#mainNav3335,#fixedNav3336,#nav3337,#navOnlyClean3339,#nav3347,
-.navDuplicateHide3334{display:none!important;visibility:hidden!important;pointer-events:none!important}
-.nav3347{display:flex!important;justify-content:center;gap:18px;flex-wrap:wrap;margin:14px auto;width:100%;z-index:50}
-.nav3347 button{border:2px solid #22f5d1;border-radius:12px;background:#222;color:#fff;padding:12px 22px;font-size:20px;font-weight:900;box-shadow:0 0 12px rgba(34,245,209,.35)}
-body.home3347 #back3347{display:none!important}
-/* 残骸削除 */
-[id^="enemyStage"],.enemyStage,.enemyField3330,.enemyField3331,.enemyField3332{display:none!important;visibility:hidden!important;pointer-events:none!important}
-/* 学習その他ボタン */
-#otherLearningBtn3347,#otherLearningBtn3341,.otherLearnBtn3341{width:100%!important;min-height:92px!important;border-radius:16px!important;padding:18px 14px!important;margin:12px 0!important;font-size:32px!important;font-weight:900!important;color:#2563eb!important;background:linear-gradient(135deg,#14f1d0,#08e6c5)!important;display:flex!important;align-items:center!important;justify-content:center!important;box-shadow:0 8px 20px rgba(0,0,0,.25)!important}
-.card3347{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.16);border-radius:18px;padding:16px;margin:14px 0;text-align:center}
-.grid3347{display:grid;grid-template-columns:1fr;gap:14px;margin:18px 0}
-.grid3347 button,.choice3347{border:none;border-radius:16px;padding:17px 14px;font-size:21px;font-weight:900;color:#fff;background:linear-gradient(135deg,#06b6d4,#2563eb);box-shadow:0 8px 20px rgba(0,0,0,.25)}
-.jpn3347 button{background:linear-gradient(135deg,#f59e0b,#ef4444)!important}
-.q3347{font-size:36px;font-weight:1000;margin:18px 0;color:#fff;text-shadow:0 0 12px rgba(255,255,255,.45)}
-.ok3347{background:linear-gradient(135deg,#22c55e,#16a34a)!important}
-.ng3347{background:linear-gradient(135deg,#ef4444,#991b1b)!important}
+#otherLearningBtn3341,#otherLearningBtn3347,#otherLearningBtn3348,#otherLearningBtn3351,#otherLearningBtn3352,#otherLearningBtn3353,.otherLearnBtn3341{display:none!important;visibility:hidden!important;pointer-events:none!important}
+#otherLearningBtn3354{width:100%!important;height:96px!important;min-height:96px!important;max-height:96px!important;padding:0!important;margin:12px 0!important;border-radius:16px!important;border:none!important;box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:center!important;font-size:32px!important;font-weight:900!important;color:#fff!important;line-height:1!important;background:linear-gradient(135deg,#64748b,#334155)!important;box-shadow:0 8px 20px rgba(0,0,0,.25)!important;overflow:hidden!important}
+.card3354{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.16);border-radius:18px;padding:16px;margin:14px 0;text-align:center}
+.grid3354{display:grid;grid-template-columns:1fr;gap:14px;margin:18px 0}
+.grid3354 button,.choice3354{border:none;border-radius:16px;padding:17px 14px;font-size:21px;font-weight:900;color:#fff;background:linear-gradient(135deg,#06b6d4,#2563eb);box-shadow:0 8px 20px rgba(0,0,0,.25)}
+.jpn3354 button{background:linear-gradient(135deg,#f59e0b,#ef4444)!important}
+.social3354 button{background:linear-gradient(135deg,#22c55e,#15803d)!important}
+.q3354{font-size:30px;font-weight:1000;margin:18px 0;color:#fff;text-shadow:0 0 12px rgba(255,255,255,.45);line-height:1.4}
+.ok3354{background:linear-gradient(135deg,#22c55e,#16a34a)!important}
+.ng3354{background:linear-gradient(135deg,#ef4444,#991b1b)!important}
 `;
  document.head.appendChild(st);
 }
-
-function panel3347(){return document.getElementById("panelArea")||document.body}
-function txt3347(){return (panel3347().innerText||"").slice(0,3000)}
-function isHome3347(){
- const t=txt3347();
- if(t.includes("学習モード")||t.includes("数学掲示板")||t.includes("その他")||t.includes("英語")||t.includes("国語")||t.includes("難易度を選んでください")||t.includes("問題"))return false;
- return t.includes("学習")&&t.includes("ランキング")&&t.includes("対戦")&&t.includes("ガチャ")&&t.includes("プロフィール")&&t.includes("成績")&&t.includes("掲示板");
+function removeOtherDuplicates3354(){
+ document.querySelectorAll("#otherLearningBtn3341,#otherLearningBtn3347,#otherLearningBtn3348,#otherLearningBtn3351,#otherLearningBtn3352,#otherLearningBtn3353,.otherLearnBtn3341").forEach(e=>e.remove());
+ const arr=[...document.querySelectorAll("#otherLearningBtn3354")];
+ arr.slice(1).forEach(e=>e.remove());
 }
-
-function removeAllNav3347(){
- document.querySelectorAll("#instantNav3333,#mainNav3335,#fixedNav3336,#nav3337,#navOnlyClean3339,#nav3347,.nav3347").forEach(e=>e.remove());
- document.querySelectorAll('[id^="enemyStage"],.enemyStage,.enemyField3330,.enemyField3331,.enemyField3332').forEach(e=>e.remove());
-}
-
-function addNav3347(){
- style3347();
- removeAllNav3347();
- const p=document.getElementById("panelArea");
- if(!p)return;
- const nav=document.createElement("div");
- nav.id="nav3347";
- nav.className="nav3347";
- nav.innerHTML='<button id="back3347" type="button">← 戻る</button><button id="home3347" type="button">🏠 ホームへ</button>';
- const first=p.firstElementChild;
- if(first)p.insertBefore(nav,first); else p.appendChild(nav);
- document.getElementById("back3347").onclick=function(){ if(history.length>1) history.back(); else showHome&&showHome(); };
- document.getElementById("home3347").onclick=function(){ showHome&&showHome(); };
- document.body.classList.toggle("home3347",isHome3347());
-}
-
-function cleanAfter3347(){setTimeout(addNav3347,30)}
-document.addEventListener("click",cleanAfter3347,true);
-setTimeout(addNav3347,50);
-setInterval(addNav3347,2500);
-
-function shuffle3347(a){return a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(v=>v[1])}
-function pick3347(arr, correctKey){
- const c=arr[Math.floor(Math.random()*arr.length)];
- const w=shuffle3347(arr.filter(x=>x!==c)).slice(0,3);
- return {correct:c,choices:shuffle3347([c,...w])};
-}
-
-window.showLearningOther3341=function(){
- style3347();
- const p=panel3347();
- p.innerHTML=`
- <h2>⚙️ その他</h2>
- <div class="card3347">
-  <h3>🌍 英語</h3>
-  <p>日本語→英語 / 英語→日本語</p>
-  <div class="grid3347">
-   <button onclick="showEnglishMenu3347()">🌍 英語</button>
-  </div>
- </div>
- <div class="card3347">
-  <h3>🇯🇵 国語</h3>
-  <p>漢字・古文単語</p>
-  <div class="grid3347 jpn3347">
-   <button onclick="showJapaneseMenu3347()">🇯🇵 国語</button>
-  </div>
- </div>`;
- addNav3347();
-};
-
-window.showEnglishMenu3347=function(){
- panel3347().innerHTML=`
- <h2>🌍 英語</h2>
- <div class="card3347"><h3>レベル</h3><div class="grid3347">
- <button onclick="selectEngLevel3347('初級')">📗 初級</button>
- <button onclick="selectEngLevel3347('中級')">📘 中級</button>
- <button onclick="selectEngLevel3347('上級')">📕 上級</button>
- <button onclick="selectEngLevel3347('ランダム')">🎲 ランダム</button>
- </div></div>`;
- addNav3347();
-};
-window.selectEngLevel3347=function(lv){
- level3347=lv;
- panel3347().innerHTML=`<h2>🌍 英語</h2><div class="card3347"><h3>${lv}</h3><div class="grid3347">
- <button onclick="startEng3347('ja2en')">🇯🇵 日本語 → 🇺🇸 英語</button>
- <button onclick="startEng3347('en2ja')">🇺🇸 英語 → 🇯🇵 日本語</button>
- </div></div>`;
- addNav3347();
-};
-function engPool3347(){return level3347==="ランダム"?ENG3347:ENG3347.filter(x=>x.level===level3347)}
-window.startEng3347=function(m){mode3347=m;score3347=0;count3347=0;showEngQ3347()};
-window.showEngQ3347=function(){
- const pool=engPool3347(); q3347=pick3347(pool);
- const ask=mode3347==="ja2en"?q3347.correct.ja:q3347.correct.en;
- panel3347().innerHTML=`<h2>🌍 英語4択</h2><div class="card3347"><p>${score3347}/${count3347}</p><div class="q3347">${ask}</div><div class="grid3347">${q3347.choices.map((c,i)=>`<button class="choice3347" onclick="ansEng3347(${i})">${mode3347==="ja2en"?c.en:c.ja}</button>`).join("")}</div></div>`;
- addNav3347();
-};
-window.ansEng3347=function(i){ansGeneric3347(i,"en",showEngQ3347)};
-
-window.showJapaneseMenu3347=function(){
- panel3347().innerHTML=`
- <h2>🇯🇵 国語</h2>
- <div class="card3347"><h3>漢字</h3><div class="grid3347 jpn3347">
- <button onclick="startKanji3347('read')">📖 漢字 → 読み</button>
- <button onclick="startKanji3347('meaning')">💭 漢字 → 意味</button>
- </div></div>
- <div class="card3347"><h3>古文単語</h3><div class="grid3347 jpn3347">
- <button onclick="startKobun3347('word2meaning')">📜 古文 → 意味</button>
- <button onclick="startKobun3347('meaning2word')">🔄 意味 → 古文</button>
- </div></div>`;
- addNav3347();
-};
-window.startKanji3347=function(m){mode3347=m;score3347=0;count3347=0;showKanjiQ3347()};
-window.showKanjiQ3347=function(){
- q3347=pick3347(KANJI3347);
- const ask=q3347.correct.kanji;
- panel3347().innerHTML=`<h2>🇯🇵 漢字4択</h2><div class="card3347"><p>${score3347}/${count3347}</p><div class="q3347">${ask}</div><div class="grid3347 jpn3347">${q3347.choices.map((c,i)=>`<button class="choice3347" onclick="ansKanji3347(${i})">${mode3347==="read"?c.yomi:c.meaning}</button>`).join("")}</div></div>`;
- addNav3347();
-};
-window.ansKanji3347=function(i){ansGeneric3347(i,"kanji",showKanjiQ3347)};
-
-window.startKobun3347=function(m){mode3347=m;score3347=0;count3347=0;showKobunQ3347()};
-window.showKobunQ3347=function(){
- q3347=pick3347(KOBUN3347);
- const ask=mode3347==="word2meaning"?q3347.correct.word:q3347.correct.meaning;
- panel3347().innerHTML=`<h2>📜 古文単語4択</h2><div class="card3347"><p>${score3347}/${count3347}</p><div class="q3347">${ask}</div><div class="grid3347 jpn3347">${q3347.choices.map((c,i)=>`<button class="choice3347" onclick="ansKobun3347(${i})">${mode3347==="word2meaning"?c.meaning:c.word}</button>`).join("")}</div></div>`;
- addNav3347();
-};
-window.ansKobun3347=function(i){ansGeneric3347(i,"word",showKobunQ3347)};
-
-window.ansGeneric3347=function(i,key,next){
- const btns=[...document.querySelectorAll(".choice3347")];
- const ok=q3347.choices[i]===q3347.correct;
- count3347++; if(ok)score3347++;
- btns.forEach((b,idx)=>{if(q3347.choices[idx]===q3347.correct)b.classList.add("ok3347"); else if(idx===i)b.classList.add("ng3347"); b.disabled=true;});
- setTimeout(next,850);
-};
-
-function ensureOtherBtn3347(){
- const p=document.getElementById("panelArea"); if(!p)return;
- const t=p.innerText||""; if(!t.includes("学習モード"))return;
- let btn=document.getElementById("otherLearningBtn3347")||document.getElementById("otherLearningBtn3341");
- if(btn){btn.id="otherLearningBtn3347";btn.innerHTML="⚙️ その他";btn.onclick=showLearningOther3341;}
-}
-setInterval(ensureOtherBtn3347,1000);
-
-window.showNewsPage=function(){
- panel3347().innerHTML=`<h2>📢 お知らせ</h2><div class="card3347"><h3>Ver3.3.47</h3><p>戻る/ホームを完全削除して1から作り直しました。</p><p>その他の大きさを統一しました。</p><p>その他に英語/国語の枠を作りました。</p><p>国語に漢字・古文単語を追加しました。</p></div>`;
- addNav3347();
-};
-})();
-
-
-
-/* Ver3.3.48 Other button gray under random */
-(function(){
-if(window.__otherButtonGray3348)return;
-window.__otherButtonGray3348=true;
-
-function style3348(){
- if(document.getElementById("style3348"))return;
- const st=document.createElement("style");
- st.id="style3348";
- st.textContent=`
-#otherLearningBtn3348{
-  width:100%!important;
-  min-height:92px!important;
-  border-radius:16px!important;
-  padding:18px 14px!important;
-  margin:12px 0!important;
-  font-size:32px!important;
-  font-weight:900!important;
-  color:#fff!important;
-  background:linear-gradient(135deg,#64748b,#334155)!important;
-  display:flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  box-shadow:0 8px 20px rgba(0,0,0,.25)!important;
-  border:none!important;
-}
-`;
- document.head.appendChild(st);
-}
-
-function isLearningMode3348(){
- const p=document.getElementById("panelArea");
- if(!p)return false;
+function ensureOtherButton3354(){
+ style3354();
+ const p=panel3354();
  const t=(p.innerText||"").slice(0,2500);
- return t.includes("学習モード") && t.includes("積分") && t.includes("微分") && t.includes("ランダム");
-}
-
-function addOtherButton3348(){
- style3348();
- const p=document.getElementById("panelArea");
- if(!p || !isLearningMode3348())return;
-
- document.querySelectorAll("#otherLearningBtn3341,#otherLearningBtn3347,.otherLearnBtn3341,#otherLearningBtn3348").forEach(e=>e.remove());
-
+ if(!(t.includes("学習モード")&&t.includes("ランダム")))return;
+ removeOtherDuplicates3354();
+ if(document.getElementById("otherLearningBtn3354"))return;
  const btn=document.createElement("button");
- btn.id="otherLearningBtn3348";
+ btn.id="otherLearningBtn3354";
  btn.type="button";
  btn.innerHTML="⚙️ その他";
- btn.onclick=function(){
-   if(typeof showLearningOther3341==="function")showLearningOther3341();
-   else showOtherFallback3348();
- };
-
- const buttons=[...p.querySelectorAll("button")];
- const randomBtn=buttons.find(b=>(b.innerText||"").includes("ランダム"));
- if(randomBtn){
-   randomBtn.insertAdjacentElement("afterend", btn);
- }else{
-   p.appendChild(btn);
- }
+ btn.onclick=function(e){e.preventDefault();e.stopPropagation();showOtherMenu3354();};
+ const randomBtn=[...p.querySelectorAll("button")].find(b=>(b.innerText||"").includes("ランダム"));
+ if(randomBtn)randomBtn.insertAdjacentElement("afterend",btn); else p.appendChild(btn);
+}
+function homeAudio3354(){
+ let a=document.getElementById("homeBgm3354");
+ if(!a){a=document.createElement("audio");a.id="homeBgm3354";a.src="assets/audio/home_bgm.mp3";a.loop=true;a.preload="auto";document.body.appendChild(a);}
+ a.volume=bgmVolume3354();return a;
+}
+function otherAudio3354(){
+ let a=document.getElementById("otherBgm3354");
+ if(!a){a=document.createElement("audio");a.id="otherBgm3354";a.src="assets/audio/other_bgm.mp3";a.loop=true;a.preload="auto";document.body.appendChild(a);}
+ a.volume=bgmVolume3354();return a;
+}
+function stopIds3354(ids){ids.forEach(id=>{try{document.getElementById(id)?.pause();}catch(e){}});}
+function playHome3354(){stopIds3354(["otherBgm3349","otherBgm3350","otherBgm3351","otherBgm3352","otherBgm3353","otherBgm3354"]);homeAudio3354().play().catch(()=>{});}
+function playOther3354(){stopIds3354(["homeBgm3350","homeBgm3351","homeBgm3352","homeBgm3353","homeBgm3354"]);otherAudio3354().play().catch(()=>{});}
+function isHome3354(){
+ const t=(panel3354().innerText||"").slice(0,3000);
+ if(t.includes("学習モード")||t.includes("その他")||t.includes("英語")||t.includes("国語")||t.includes("古文")||t.includes("社会")||t.includes("問題")||t.includes("結果"))return false;
+ return t.includes("学習")&&t.includes("ランキング")&&t.includes("対戦")&&t.includes("ガチャ")&&t.includes("プロフィール")&&t.includes("成績");
 }
 
-window.showOtherFallback3348=function(){
- const p=document.getElementById("panelArea");
- if(!p)return;
- p.innerHTML=`
-  <h2>⚙️ その他</h2>
-  <div class="card3347">
-    <h3>🌍 英語</h3>
-    <p>日本語→英語 / 英語→日本語</p>
-    <div class="grid3347">
-      <button onclick="showEnglishMenu3347&&showEnglishMenu3347()">🌍 英語</button>
-    </div>
-  </div>
-  <div class="card3347">
-    <h3>🇯🇵 国語</h3>
-    <p>漢字・古文単語</p>
-    <div class="grid3347 jpn3347">
-      <button onclick="showJapaneseMenu3347&&showJapaneseMenu3347()">🇯🇵 国語</button>
-    </div>
-  </div>
- `;
- if(typeof addNav3347==="function")addNav3347();
-};
-
-const oldShowLearningMode3348 = typeof showLearningMode==="function" ? showLearningMode : null;
-if(oldShowLearningMode3348 && !oldShowLearningMode3348.__otherGray3348){
- window.showLearningMode=function(){
-   oldShowLearningMode3348.apply(this,arguments);
-   setTimeout(addOtherButton3348,80);
-   setTimeout(addOtherButton3348,300);
- };
- window.showLearningMode.__otherGray3348=true;
+function shuffle3354(a){return a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);}
+function render3354(html){style3354();panel3354().innerHTML=html;}
+function start3354(kind,mode,level){
+ playOther3354();
+ game3354={kind,mode,level:level||"ランダム",pool:[],i:0,ok:0,q:null};
+ let arr=DATA3354[kind]||[];
+ if(kind==="eng"&&level&&level!=="ランダム")arr=arr.filter(x=>x.level===level);
+ if(kind==="social"&&level&&level!=="ランダム")arr=arr.filter(x=>x.cat===level);
+ game3354.pool=shuffle3354(arr).slice(0,10);
+ next3354();
 }
+window.start3354=start3354;
+function makeQ3354(item){
+ let ask="",ans="",wrongs=[];
+ if(game3354.mode==="ja2en"){ask=item.ja;ans=item.en;wrongs=shuffle3354(DATA3354.eng.filter(x=>x.en!==ans)).slice(0,3).map(x=>x.en);}
+ if(game3354.mode==="en2ja"){ask=item.en;ans=item.ja;wrongs=shuffle3354(DATA3354.eng.filter(x=>x.ja!==ans)).slice(0,3).map(x=>x.ja);}
+ if(game3354.mode==="kanjiRead"){ask=item.kanji;ans=item.yomi;wrongs=shuffle3354(DATA3354.kanji.filter(x=>x.yomi!==ans)).slice(0,3).map(x=>x.yomi);}
+ if(game3354.mode==="kanjiMeaning"){ask=item.kanji;ans=item.meaning;wrongs=shuffle3354(DATA3354.kanji.filter(x=>x.meaning!==ans)).slice(0,3).map(x=>x.meaning);}
+ if(game3354.mode==="kobun2meaning"){ask=item.word;ans=item.meaning;wrongs=shuffle3354(DATA3354.kobun.filter(x=>x.meaning!==ans)).slice(0,3).map(x=>x.meaning);}
+ if(game3354.mode==="meaning2kobun"){ask=item.meaning;ans=item.word;wrongs=shuffle3354(DATA3354.kobun.filter(x=>x.word!==ans)).slice(0,3).map(x=>x.word);}
+ if(game3354.mode==="social"){ask=item.q;ans=item.a;wrongs=(item.choices||[]).filter(x=>x!==ans).slice(0,3);}
+ return {ask,ans,choices:shuffle3354([ans,...wrongs])};
+}
+function next3354(){
+ if(game3354.i>=10)return result3354();
+ game3354.q=makeQ3354(game3354.pool[game3354.i]);
+ render3354(`<h2>⚙️ その他 4択</h2><div class="card3354"><p>${game3354.i+1}/10　正解：${game3354.ok}</p><div class="q3354">${game3354.q.ask}</div><div class="grid3354">${game3354.q.choices.map((c,i)=>`<button class="choice3354" onclick="answer3354(${i})">${c}</button>`).join("")}</div></div>`);
+}
+window.answer3354=function(i){
+ const btns=[...document.querySelectorAll(".choice3354")];
+ const ok=game3354.q.choices[i]===game3354.q.ans;
+ if(ok)game3354.ok++;
+ btns.forEach((b,idx)=>{if(game3354.q.choices[idx]===game3354.q.ans)b.classList.add("ok3354");else if(idx===i)b.classList.add("ng3354");b.disabled=true;});
+ game3354.i++;
+ setTimeout(next3354,800);
+}
+function result3354(){
+ const xp=(XP3354[game3354.level]||10)*game3354.ok;
+ const coins=Math.floor(game3354.ok*0.5);
+ try{if(window.playerData){playerData.xp=(playerData.xp||0)+xp;playerData.coins=(playerData.coins||0)+coins;playerData.totalCorrect=(playerData.totalCorrect||0)+game3354.ok;playerData.totalQuestions=(playerData.totalQuestions||0)+10;if(typeof saveAllData==="function")saveAllData();}}catch(e){}
+ render3354(`<h2>結果</h2><div class="card3354"><h3>${game3354.ok}/10 正解</h3><p>獲得XP：${xp}</p><p>獲得コイン：${coins}</p><button onclick="showOtherMenu3354()">その他へ戻る</button><button onclick="showHome&&showHome()">ホームへ</button></div>`);
+}
+window.showOtherMenu3354=function(){
+ playOther3354();
+ render3354(`<h2>⚙️ その他</h2>
+ <div class="card3354"><h3>🌍 英語${DATA3354.eng.length}</h3><div class="grid3354"><button onclick="showEnglishLevel3354()">🌍 英語</button></div></div>
+ <div class="card3354"><h3>🇯🇵 国語${DATA3354.kanji.length}</h3><div class="grid3354 jpn3354"><button onclick="showJapaneseMenu3354()">🇯🇵 国語</button></div></div>
+ <div class="card3354"><h3>📜 古文${DATA3354.kobun.length}</h3><div class="grid3354 jpn3354"><button onclick="start3354('kobun','kobun2meaning','ランダム')">📜 古文 → 意味</button><button onclick="start3354('kobun','meaning2kobun','ランダム')">🔄 意味 → 古文</button></div></div>
+ <div class="card3354"><h3>🌏 社会${DATA3354.social.length}</h3><div class="grid3354 social3354"><button onclick="showSocialMenu3354()">🌏 社会</button></div></div>`);
+}
+window.showLearningOther3341=showOtherMenu3354;
+window.showEnglishLevel3354=function(){render3354(`<h2>🌍 英語</h2><div class="card3354"><div class="grid3354"><button onclick="showEnglishMode3354('初級')">📗 初級</button><button onclick="showEnglishMode3354('中級')">📘 中級</button><button onclick="showEnglishMode3354('上級')">📕 上級</button><button onclick="showEnglishMode3354('ランダム')">🎲 ランダム</button></div></div>`);}
+window.showEnglishMode3354=function(lv){render3354(`<h2>🌍 英語 ${lv}</h2><div class="card3354"><div class="grid3354"><button onclick="start3354('eng','en2ja','${lv}')">📝 英語 → 日本語</button><button onclick="start3354('eng','ja2en','${lv}')">🔄 日本語 → 英語</button></div></div>`);}
+window.showJapaneseMenu3354=function(){render3354(`<h2>🇯🇵 国語</h2><div class="card3354"><div class="grid3354 jpn3354"><button onclick="start3354('kanji','kanjiRead','ランダム')">📖 漢字 → 読み</button><button onclick="start3354('kanji','kanjiMeaning','ランダム')">💭 漢字 → 意味</button></div></div>`);}
+window.showSocialMenu3354=function(){render3354(`<h2>🌏 社会</h2><div class="card3354"><div class="grid3354 social3354"><button onclick="start3354('social','social','地理')">🗾 地理</button><button onclick="start3354('social','social','歴史')">🏯 歴史</button><button onclick="start3354('social','social','公民')">🏛 公民</button><button onclick="start3354('social','social','ランダム')">🎲 ランダム</button></div></div>`);}
 
-setInterval(addOtherButton3348,1000);
-setTimeout(addOtherButton3348,500);
+const oldHome3354=typeof showHome==="function"?showHome:null;
+if(oldHome3354&&!oldHome3354.__clean3354){window.showHome=function(){oldHome3354.apply(this,arguments);setTimeout(()=>{ensureOtherButton3354();playHome3354();},80);};window.showHome.__clean3354=true;}
+document.addEventListener("touchstart",()=>{setTimeout(()=>{if(isHome3354())playHome3354();ensureOtherButton3354();},80);},{passive:true});
+document.addEventListener("click",()=>{setTimeout(()=>{if(isHome3354())playHome3354();ensureOtherButton3354();},80);},true);
+setInterval(()=>{ensureOtherButton3354();removeOtherDuplicates3354();},700);
+setTimeout(()=>{ensureOtherButton3354();if(isHome3354())playHome3354();},500);
 
+window.showNewsPage=function(){
+ render3354(`<h2>📢 お知らせ</h2><div class="card3354"><h3>Ver3.3.54</h3><p>その他関連を作り直しました。</p><p>その他ボタンは1個だけ、ランダムの下に同じ大きさで出ます。</p><p>ホームBGMとその他BGMを入れました。</p></div>`);
+}
+})();
+
+/* Ver3.3.55 real question data add */
+(function(){
+if(window.__realQuestionAdd3355)return;
+window.__realQuestionAdd3355=true;
+const oldNews3355=window.showNewsPage;
 window.showNewsPage=function(){
  const p=document.getElementById("panelArea");
  if(!p)return;
- p.innerHTML=`
-  <h2>📢 お知らせ</h2>
-  <div style="background:rgba(255,255,255,.1);border-radius:16px;padding:16px;margin:14px 0;line-height:1.7;">
-    <h3 style="color:#ffe97a;">Ver3.3.48</h3>
-    <p>・ランダムの下に灰色の「その他」ボタンを追加しました。</p>
-    <p>・ランダムと同じ大きさで表示します。</p>
-    <p>・ランキング・ログイン・Firebase処理は変更していません。</p>
-  </div>
- `;
- if(typeof addNav3347==="function")addNav3347();
+ p.innerHTML=`<h2>📢 お知らせ</h2><div class="card3354"><h3>Ver3.3.55</h3><p>ダミーなしで実問題データを追加しました。</p><p>英語・国語・古文・社会の表示件数は実データ数に合わせています。</p></div>`;
 };
 })();
 
 
 
-
-
-
-/* Ver3.3.53 clean real data + instant nav */
+/* Ver3.3.56 external JSON data loader */
 (function(){
-if(window.__cleanRealDataNav3353)return;
-window.__cleanRealDataNav3353=true;
-const DATA3353={"eng":[{"ja":"勉強する","en":"study","level":"初級"},{"ja":"練習","en":"practice","level":"初級"},{"ja":"復習","en":"review","level":"初級"},{"ja":"問題","en":"problem","level":"初級"},{"ja":"答え","en":"answer","level":"初級"},{"ja":"正しい","en":"correct","level":"初級"},{"ja":"間違い","en":"mistake","level":"初級"},{"ja":"簡単な","en":"easy","level":"初級"},{"ja":"難しい","en":"difficult","level":"初級"},{"ja":"努力","en":"effort","level":"初級"},{"ja":"成功","en":"success","level":"初級"},{"ja":"失敗","en":"failure","level":"初級"},{"ja":"時間","en":"time","level":"初級"},{"ja":"学校","en":"school","level":"初級"},{"ja":"先生","en":"teacher","level":"初級"},{"ja":"生徒","en":"student","level":"初級"},{"ja":"友達","en":"friend","level":"初級"},{"ja":"家族","en":"family","level":"初級"},{"ja":"重要な","en":"important","level":"中級"},{"ja":"必要な","en":"necessary","level":"中級"},{"ja":"理由","en":"reason","level":"中級"},{"ja":"方法","en":"method","level":"中級"},{"ja":"結果","en":"result","level":"中級"},{"ja":"目標","en":"goal","level":"中級"},{"ja":"経験","en":"experience","level":"中級"},{"ja":"情報","en":"information","level":"中級"},{"ja":"知識","en":"knowledge","level":"中級"},{"ja":"環境","en":"environment","level":"中級"},{"ja":"社会","en":"society","level":"中級"},{"ja":"文化","en":"culture","level":"中級"},{"ja":"歴史","en":"history","level":"中級"},{"ja":"科学","en":"science","level":"中級"},{"ja":"経済","en":"economy","level":"中級"},{"ja":"技術","en":"technology","level":"中級"},{"ja":"影響","en":"influence","level":"上級"},{"ja":"発展する","en":"develop","level":"上級"},{"ja":"決定する","en":"determine","level":"上級"},{"ja":"改善する","en":"improve","level":"上級"},{"ja":"比較する","en":"compare","level":"上級"},{"ja":"分析する","en":"analyze","level":"上級"},{"ja":"提供する","en":"provide","level":"上級"},{"ja":"含む","en":"include","level":"上級"},{"ja":"増加する","en":"increase","level":"上級"},{"ja":"減少する","en":"decrease","level":"上級"},{"ja":"証拠","en":"evidence","level":"上級"},{"ja":"仮説","en":"hypothesis","level":"上級"},{"ja":"権利","en":"right","level":"上級"},{"ja":"責任","en":"responsibility","level":"上級"},{"ja":"機会","en":"opportunity","level":"上級"},{"ja":"能力","en":"ability","level":"上級"}],"kanji":[{"kanji":"努力","yomi":"どりょく","meaning":"目標に向かってがんばること"},{"kanji":"成功","yomi":"せいこう","meaning":"うまくいくこと"},{"kanji":"失敗","yomi":"しっぱい","meaning":"うまくいかないこと"},{"kanji":"挑戦","yomi":"ちょうせん","meaning":"難しいことに立ち向かうこと"},{"kanji":"成長","yomi":"せいちょう","meaning":"能力や状態が伸びること"},{"kanji":"復習","yomi":"ふくしゅう","meaning":"一度学んだことをもう一度学ぶこと"},{"kanji":"理解","yomi":"りかい","meaning":"意味や内容がわかること"},{"kanji":"説明","yomi":"せつめい","meaning":"わかるように話すこと"},{"kanji":"原因","yomi":"げんいん","meaning":"物事が起こるもと"},{"kanji":"結果","yomi":"けっか","meaning":"物事のあとに生じたこと"},{"kanji":"理由","yomi":"りゆう","meaning":"そうなるわけ"},{"kanji":"方法","yomi":"ほうほう","meaning":"やり方"},{"kanji":"目標","yomi":"もくひょう","meaning":"目指すもの"},{"kanji":"計画","yomi":"けいかく","meaning":"前もって考えた手順"},{"kanji":"実行","yomi":"じっこう","meaning":"実際に行うこと"},{"kanji":"継続","yomi":"けいぞく","meaning":"続けること"},{"kanji":"習慣","yomi":"しゅうかん","meaning":"いつも行うこと"},{"kanji":"集中","yomi":"しゅうちゅう","meaning":"一つのことに意識を向けること"},{"kanji":"確認","yomi":"かくにん","meaning":"たしかめること"},{"kanji":"練習","yomi":"れんしゅう","meaning":"上達のためにくり返すこと"},{"kanji":"必要","yomi":"ひつよう","meaning":"なくてはならないこと"},{"kanji":"重要","yomi":"じゅうよう","meaning":"大切なこと"},{"kanji":"基本","yomi":"きほん","meaning":"土台になること"},{"kanji":"応用","yomi":"おうよう","meaning":"学んだことを別の場合に使うこと"},{"kanji":"公式","yomi":"こうしき","meaning":"決まった計算の形"},{"kanji":"計算","yomi":"けいさん","meaning":"数を求めること"},{"kanji":"数式","yomi":"すうしき","meaning":"数字や記号で表した式"},{"kanji":"積分","yomi":"せきぶん","meaning":"微分の逆操作などを扱う数学分野"},{"kanji":"微分","yomi":"びぶん","meaning":"変化の割合を扱う数学分野"},{"kanji":"関数","yomi":"かんすう","meaning":"数の対応関係"},{"kanji":"図形","yomi":"ずけい","meaning":"形を表すもの"},{"kanji":"証明","yomi":"しょうめい","meaning":"正しいことを筋道立てて示すこと"},{"kanji":"仮定","yomi":"かてい","meaning":"前提として考えること"},{"kanji":"結論","yomi":"けつろん","meaning":"考えた結果として出る答え"},{"kanji":"条件","yomi":"じょうけん","meaning":"成り立つために必要な事柄"},{"kanji":"比較","yomi":"ひかく","meaning":"比べること"},{"kanji":"判断","yomi":"はんだん","meaning":"考えて決めること"},{"kanji":"改善","yomi":"かいぜん","meaning":"より良くすること"},{"kanji":"修正","yomi":"しゅうせい","meaning":"間違いを直すこと"},{"kanji":"情報","yomi":"じょうほう","meaning":"知るための内容"}],"kobun":[{"word":"あはれ","meaning":"しみじみとした趣がある"},{"word":"をかし","meaning":"趣がある・おもしろい"},{"word":"いみじ","meaning":"非常に・すばらしい"},{"word":"ゆかし","meaning":"見たい・知りたい"},{"word":"おどろく","meaning":"はっと気づく・目を覚ます"},{"word":"ののしる","meaning":"大声で騒ぐ・評判になる"},{"word":"めでたし","meaning":"すばらしい・立派だ"},{"word":"つれづれ","meaning":"手持ち無沙汰だ"},{"word":"うつくし","meaning":"かわいらしい"},{"word":"かなし","meaning":"かわいい・いとしい"},{"word":"ありがたし","meaning":"めったにない・すばらしい"},{"word":"やむごとなし","meaning":"高貴だ・特別だ"},{"word":"あさまし","meaning":"驚きあきれる"},{"word":"くちをし","meaning":"残念だ"},{"word":"こころにくし","meaning":"奥ゆかしい"},{"word":"ねんごろなり","meaning":"熱心だ・親しい"},{"word":"すさまじ","meaning":"興ざめだ"},{"word":"わびし","meaning":"つらい・寂しい"},{"word":"おぼつかなし","meaning":"はっきりしない・不安だ"},{"word":"むつかし","meaning":"不快だ・気味が悪い"},{"word":"いたづらなり","meaning":"むだだ"},{"word":"あてなり","meaning":"上品だ"},{"word":"なまめかし","meaning":"優美だ"},{"word":"はづかし","meaning":"立派で気後れする"},{"word":"つきづきし","meaning":"似つかわしい"},{"word":"らうたし","meaning":"かわいらしい"},{"word":"いらふ","meaning":"返事をする"},{"word":"ありく","meaning":"歩き回る"},{"word":"ぐす","meaning":"連れて行く"},{"word":"とぶらふ","meaning":"訪れる・弔う"},{"word":"まもる","meaning":"じっと見つめる"},{"word":"ながむ","meaning":"物思いに沈む"},{"word":"わづらふ","meaning":"悩む・病気になる"},{"word":"おこたる","meaning":"病気がよくなる"},{"word":"おきつ","meaning":"命令する"},{"word":"かしづく","meaning":"大切に育てる"}],"social":[{"cat":"地理","q":"日本で最も高い山は？","a":"富士山","choices":["富士山","北岳","阿蘇山","槍ヶ岳"]},{"cat":"地理","q":"日本で最も長い川は？","a":"信濃川","choices":["信濃川","利根川","石狩川","木曽川"]},{"cat":"地理","q":"北海道の道庁所在地は？","a":"札幌市","choices":["札幌市","函館市","旭川市","釧路市"]},{"cat":"地理","q":"日本の標準時子午線が通る市は？","a":"明石市","choices":["明石市","神戸市","大阪市","奈良市"]},{"cat":"歴史","q":"鎌倉幕府を開いた人物は？","a":"源頼朝","choices":["源頼朝","徳川家康","足利尊氏","織田信長"]},{"cat":"歴史","q":"江戸幕府を開いた人物は？","a":"徳川家康","choices":["徳川家康","豊臣秀吉","源頼朝","足利尊氏"]},{"cat":"歴史","q":"大化の改新が始まった年は？","a":"645年","choices":["645年","710年","794年","1192年"]},{"cat":"歴史","q":"平安京に都が移された年は？","a":"794年","choices":["794年","710年","645年","1185年"]},{"cat":"公民","q":"日本の最高法規は？","a":"日本国憲法","choices":["日本国憲法","民法","刑法","商法"]},{"cat":"公民","q":"国会が担当する権力は？","a":"立法権","choices":["立法権","行政権","司法権","選挙権"]},{"cat":"公民","q":"内閣が担当する権力は？","a":"行政権","choices":["行政権","立法権","司法権","請求権"]},{"cat":"公民","q":"裁判所が担当する権力は？","a":"司法権","choices":["司法権","行政権","立法権","参政権"]}]};
-let game3353={kind:"",mode:"",level:"ランダム",pool:[],i:0,ok:0,q:null};
-const XP3353={"初級":5,"中級":8,"上級":12,"ランダム":10,"地理":10,"歴史":10,"公民":10};
+if(window.__jsonDataLoader3356)return;
+window.__jsonDataLoader3356=true;
 
-function p3353(){return document.getElementById("panelArea")||document.body;}
-function style3353(){
- if(document.getElementById("style3353"))return;
- const st=document.createElement("style");
- st.id="style3353";
- st.textContent=`
-#otherLearningBtn3341,#otherLearningBtn3347,#otherLearningBtn3348,#otherLearningBtn3351,#otherLearningBtn3352,.otherLearnBtn3341{display:none!important}
-#otherLearningBtn3353{width:100%!important;height:96px!important;min-height:96px!important;max-height:96px!important;padding:0!important;margin:12px 0!important;border-radius:16px!important;border:none!important;box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:center!important;font-size:32px!important;font-weight:900!important;color:#fff!important;line-height:1!important;background:linear-gradient(135deg,#64748b,#334155)!important;box-shadow:0 8px 20px rgba(0,0,0,.25)!important;overflow:hidden!important}
-.nav3353{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin:14px auto;width:100%}
-.nav3353 button{border:2px solid #22f5d1;border-radius:12px;background:#222;color:#fff;padding:12px 22px;font-size:20px;font-weight:900;box-shadow:0 0 12px rgba(34,245,209,.35)}
-.card3353{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.16);border-radius:18px;padding:16px;margin:14px 0;text-align:center}
-.grid3353{display:grid;grid-template-columns:1fr;gap:14px;margin:18px 0}
-.grid3353 button,.choice3353{border:none;border-radius:16px;padding:17px 14px;font-size:21px;font-weight:900;color:#fff;background:linear-gradient(135deg,#06b6d4,#2563eb);box-shadow:0 8px 20px rgba(0,0,0,.25)}
-.jpn3353 button{background:linear-gradient(135deg,#f59e0b,#ef4444)!important}
-.social3353 button{background:linear-gradient(135deg,#22c55e,#15803d)!important}
-.q3353{font-size:30px;font-weight:1000;margin:18px 0;color:#fff;text-shadow:0 0 12px rgba(255,255,255,.45);line-height:1.4}
-.ok3353{background:linear-gradient(135deg,#22c55e,#16a34a)!important}
-.ng3353{background:linear-gradient(135deg,#ef4444,#991b1b)!important}
-`;
- document.head.appendChild(st);
-}
-function nav3353(){
- return `<div class="nav3353"><button onclick="history.length>1?history.back():showHome&&showHome()">← 戻る</button><button onclick="showHome&&showHome()">🏠 ホームへ</button></div>`;
-}
-function render3353(html, withNav=true){
- style3353();
- p3353().innerHTML=(withNav?nav3353():"")+html;
-}
-function ensureOtherBtn3353(){
- style3353();
- const panel=p3353();
- const t=(panel.innerText||"").slice(0,2500);
- if(!(t.includes("学習モード")&&t.includes("ランダム")))return;
- document.querySelectorAll("#otherLearningBtn3341,#otherLearningBtn3347,#otherLearningBtn3348,#otherLearningBtn3351,#otherLearningBtn3352,#otherLearningBtn3353,.otherLearnBtn3341").forEach(e=>e.remove());
- const btn=document.createElement("button");
- btn.id="otherLearningBtn3353";btn.type="button";btn.innerHTML="⚙️ その他";
- btn.onclick=function(e){e.preventDefault();e.stopPropagation();showOtherMenu3353();};
- const randomBtn=[...panel.querySelectorAll("button")].find(b=>(b.innerText||"").includes("ランダム"));
- if(randomBtn)randomBtn.insertAdjacentElement("afterend",btn); else panel.appendChild(btn);
+window.DATA3356={eng:[],kanji:[],kobun:[],social:[]};
+window.DATA_READY3356=false;
+
+async function loadJson3356(path,fallback){
+  try{
+    const res=await fetch(path,{cache:"no-store"});
+    if(!res.ok)throw new Error(path+" "+res.status);
+    const json=await res.json();
+    return Array.isArray(json)?json:fallback;
+  }catch(e){
+    console.warn("JSON load failed:",path,e);
+    return fallback;
+  }
 }
 
-function shuffle3353(a){return a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);}
-function homeBgm3353(){
- let a=document.getElementById("homeBgm3353");
- if(!a){a=document.createElement("audio");a.id="homeBgm3353";a.src="assets/audio/home_bgm.mp3";a.loop=true;a.preload="auto";document.body.appendChild(a);}
- const v=localStorage.getItem("mathMaster_bgmVolume");a.volume=v===null?0.45:Number(v);return a;
-}
-function otherBgm3353(){
- let a=document.getElementById("otherBgm3353");
- if(!a){a=document.createElement("audio");a.id="otherBgm3353";a.src="assets/audio/other_bgm.mp3";a.loop=true;a.preload="auto";document.body.appendChild(a);}
- const v=localStorage.getItem("mathMaster_bgmVolume");a.volume=v===null?0.45:Number(v);return a;
-}
-function playHome3353(){try{document.getElementById("otherBgm3353")?.pause();homeBgm3353().play().catch(()=>{});}catch(e){}}
-function playOther3353(){try{document.getElementById("homeBgm3353")?.pause();otherBgm3353().play().catch(()=>{});}catch(e){}}
+window.loadOtherData3356=async function(){
+  if(window.DATA_READY3356)return window.DATA3356;
+  const fallback=(typeof DATA3354!=="undefined")?DATA3354:{eng:[],kanji:[],kobun:[],social:[]};
+  const [eng,kanji,kobun,social]=await Promise.all([
+    loadJson3356("data/english.json",fallback.eng||[]),
+    loadJson3356("data/kanji.json",fallback.kanji||[]),
+    loadJson3356("data/kobun.json",fallback.kobun||[]),
+    loadJson3356("data/social.json",fallback.social||[])
+  ]);
+  window.DATA3356={eng,kanji,kobun,social};
+  window.DATA_READY3356=true;
+  return window.DATA3356;
+};
 
-function start3353(kind,mode,level){
- playOther3353();
- game3353={kind,mode,level:level||"ランダム",pool:[],i:0,ok:0,q:null};
- let arr=DATA3353[kind];
- if(kind==="eng"&&level&&level!=="ランダム")arr=arr.filter(x=>x.level===level);
- if(kind==="social"&&level&&level!=="ランダム")arr=arr.filter(x=>x.cat===level);
- game3353.pool=shuffle3353(arr).slice(0,10);
- next3353();
+function getData3356(kind){
+  if(window.DATA_READY3356 && window.DATA3356[kind])return window.DATA3356[kind];
+  if(typeof DATA3354!=="undefined" && DATA3354[kind])return DATA3354[kind];
+  return [];
 }
-window.start3353=start3353;
-function makeQ3353(item){
- let ask="",ans="",wrongs=[];
- if(game3353.mode==="ja2en"){ask=item.ja;ans=item.en;wrongs=shuffle3353(DATA3353.eng.filter(x=>x.en!==ans)).slice(0,3).map(x=>x.en);}
- if(game3353.mode==="en2ja"){ask=item.en;ans=item.ja;wrongs=shuffle3353(DATA3353.eng.filter(x=>x.ja!==ans)).slice(0,3).map(x=>x.ja);}
- if(game3353.mode==="kanjiRead"){ask=item.kanji;ans=item.yomi;wrongs=shuffle3353(DATA3353.kanji.filter(x=>x.yomi!==ans)).slice(0,3).map(x=>x.yomi);}
- if(game3353.mode==="kanjiMeaning"){ask=item.kanji;ans=item.meaning;wrongs=shuffle3353(DATA3353.kanji.filter(x=>x.meaning!==ans)).slice(0,3).map(x=>x.meaning);}
- if(game3353.mode==="kobun2meaning"){ask=item.word;ans=item.meaning;wrongs=shuffle3353(DATA3353.kobun.filter(x=>x.meaning!==ans)).slice(0,3).map(x=>x.meaning);}
- if(game3353.mode==="meaning2kobun"){ask=item.meaning;ans=item.word;wrongs=shuffle3353(DATA3353.kobun.filter(x=>x.word!==ans)).slice(0,3).map(x=>x.word);}
- if(game3353.mode==="social"){ask=item.q;ans=item.a;wrongs=(item.choices||[]).filter(x=>x!==ans).slice(0,3);}
- return {ask,ans,choices:shuffle3353([ans,...wrongs])};
-}
-function next3353(){
- if(game3353.i>=10)return result3353();
- game3353.q=makeQ3353(game3353.pool[game3353.i]);
- render3353(`<h2>⚙️ その他 4択</h2><div class="card3353"><p>${game3353.i+1}/10　正解：${game3353.ok}</p><div class="q3353">${game3353.q.ask}</div><div class="grid3353">${game3353.q.choices.map((c,i)=>`<button class="choice3353" onclick="answer3353(${i})">${c}</button>`).join("")}</div></div>`, true);
-}
-window.answer3353=function(i){
- const btns=[...document.querySelectorAll(".choice3353")];
- const ok=game3353.q.choices[i]===game3353.q.ans;
- if(ok)game3353.ok++;
- btns.forEach((b,idx)=>{if(game3353.q.choices[idx]===game3353.q.ans)b.classList.add("ok3353");else if(idx===i)b.classList.add("ng3353");b.disabled=true;});
- game3353.i++;setTimeout(next3353,800);
-}
-function result3353(){
- const xp=(XP3353[game3353.level]||10)*game3353.ok;
- const coins=Math.floor(game3353.ok*0.5);
- try{if(window.playerData){playerData.xp=(playerData.xp||0)+xp;playerData.coins=(playerData.coins||0)+coins;playerData.totalCorrect=(playerData.totalCorrect||0)+game3353.ok;playerData.totalQuestions=(playerData.totalQuestions||0)+10;if(typeof saveAllData==="function")saveAllData();}}catch(e){}
- render3353(`<h2>結果</h2><div class="card3353"><h3>${game3353.ok}/10 正解</h3><p>獲得XP：${xp}</p><p>獲得コイン：${coins}</p><button onclick="showOtherMenu3353()">その他へ戻る</button><button onclick="showHome&&showHome()">ホームへ</button></div>`, true);
-}
-window.showOtherMenu3353=function(){
- playOther3353();
- render3353(`<h2>⚙️ その他</h2>
- <div class="card3353"><h3>🌍 英語${DATA3353.eng.length}</h3><div class="grid3353"><button onclick="showEnglishLv3353()">🌍 英語</button></div></div>
- <div class="card3353"><h3>🇯🇵 国語${DATA3353.kanji.length}</h3><div class="grid3353 jpn3353"><button onclick="showJapaneseMenu3353()">🇯🇵 国語</button></div></div>
- <div class="card3353"><h3>📜 古文${DATA3353.kobun.length}</h3><div class="grid3353 jpn3353"><button onclick="start3353('kobun','kobun2meaning','ランダム')">📜 古文 → 意味</button><button onclick="start3353('kobun','meaning2kobun','ランダム')">🔄 意味 → 古文</button></div></div>
- <div class="card3353"><h3>🌏 社会${DATA3353.social.length}</h3><div class="grid3353 social3353"><button onclick="showSocialMenu3353()">🌏 社会</button></div></div>`, true);
-}
-window.showLearningOther3341=showOtherMenu3353;
-window.showEnglishLv3353=function(){render3353(`<h2>🌍 英語</h2><div class="card3353"><div class="grid3353"><button onclick="showEnglishMode3353('初級')">📗 初級</button><button onclick="showEnglishMode3353('中級')">📘 中級</button><button onclick="showEnglishMode3353('上級')">📕 上級</button><button onclick="showEnglishMode3353('ランダム')">🎲 ランダム</button></div></div>`,true);}
-window.showEnglishMode3353=function(lv){render3353(`<h2>🌍 英語 ${lv}</h2><div class="card3353"><div class="grid3353"><button onclick="start3353('eng','en2ja','${lv}')">📝 英語 → 日本語</button><button onclick="start3353('eng','ja2en','${lv}')">🔄 日本語 → 英語</button></div></div>`,true);}
-window.showJapaneseMenu3353=function(){render3353(`<h2>🇯🇵 国語</h2><div class="card3353"><div class="grid3353 jpn3353"><button onclick="start3353('kanji','kanjiRead','ランダム')">📖 漢字 → 読み</button><button onclick="start3353('kanji','kanjiMeaning','ランダム')">💭 漢字 → 意味</button></div></div>`,true);}
-window.showSocialMenu3353=function(){render3353(`<h2>🌏 社会</h2><div class="card3353"><div class="grid3353 social3353"><button onclick="start3353('social','social','地理')">🗾 地理</button><button onclick="start3353('social','social','歴史')">🏯 歴史</button><button onclick="start3353('social','social','公民')">🏛 公民</button><button onclick="start3353('social','social','ランダム')">🎲 ランダム</button></div></div>`,true);}
 
-const oldHome3353=typeof showHome==="function"?showHome:null;
-if(oldHome3353&&!oldHome3353.__clean3353){window.showHome=function(){oldHome3353.apply(this,arguments);setTimeout(()=>{ensureOtherBtn3353();playHome3353();},80);};window.showHome.__clean3353=true;}
-document.addEventListener("touchstart",()=>{setTimeout(()=>{playHome3353();ensureOtherBtn3353();},80);},{passive:true});
-document.addEventListener("click",()=>{setTimeout(ensureOtherBtn3353,80);},true);
-setInterval(ensureOtherBtn3353,1000);
-setTimeout(ensureOtherBtn3353,500);
+/* 既存のDATA3354参照を外部JSON優先に差し替え */
+const oldShowOther3356=window.showOtherMenu3354;
+window.showOtherMenu3354=async function(){
+  await loadOtherData3356();
+  if(oldShowOther3356)return oldShowOther3356();
+};
 
-window.showNewsPage=function(){render3353(`<h2>📢 お知らせ</h2><div class="card3353"><h3>Ver3.3.53</h3><p>ダミーデータを削除しました。</p><p>戻る/ホームを画面生成と同時に表示する方式に変更しました。</p><p>その他ボタンを1つだけ表示します。</p></div>`,true);}
+const oldStart3356=window.start3354;
+window.start3354=function(kind,mode,level){
+  const run=async()=>{
+    await loadOtherData3356();
+    // ここでDATA3354自体をJSONロード済みに置き換え、既存処理をそのまま使う
+    try{
+      if(typeof DATA3354!=="undefined"){
+        DATA3354.eng=DATA3356.eng;
+        DATA3354.kanji=DATA3356.kanji;
+        DATA3354.kobun=DATA3356.kobun;
+        DATA3354.social=DATA3356.social;
+      }
+    }catch(e){}
+    return oldStart3356?oldStart3356(kind,mode,level):null;
+  };
+  run();
+};
+
+const oldNews3356=window.showNewsPage;
+window.showNewsPage=function(){
+ const p=document.getElementById("panelArea");
+ if(!p)return;
+ p.innerHTML=`<h2>📢 お知らせ</h2><div class="card3354"><h3>Ver3.3.56</h3><p>その他の問題データを外部JSON読み込み方式に変更しました。</p><p>data/english.json, kanji.json, kobun.json, social.json に分割しました。</p><p>今後はJSONを増やすだけで問題数を増やせます。</p></div>`;
+};
+loadOtherData3356();
 })();
