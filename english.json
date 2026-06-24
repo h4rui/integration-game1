@@ -1,0 +1,422 @@
+[
+  {
+    "ja": "勉強する",
+    "en": "study",
+    "level": "初級"
+  },
+  {
+    "ja": "練習",
+    "en": "practice",
+    "level": "初級"
+  },
+  {
+    "ja": "復習",
+    "en": "review",
+    "level": "初級"
+  },
+  {
+    "ja": "問題",
+    "en": "problem",
+    "level": "初級"
+  },
+  {
+    "ja": "答え",
+    "en": "answer",
+    "level": "初級"
+  },
+  {
+    "ja": "質問",
+    "en": "question",
+    "level": "初級"
+  },
+  {
+    "ja": "正しい",
+    "en": "correct",
+    "level": "初級"
+  },
+  {
+    "ja": "間違い",
+    "en": "mistake",
+    "level": "初級"
+  },
+  {
+    "ja": "簡単な",
+    "en": "easy",
+    "level": "初級"
+  },
+  {
+    "ja": "難しい",
+    "en": "difficult",
+    "level": "初級"
+  },
+  {
+    "ja": "努力",
+    "en": "effort",
+    "level": "初級"
+  },
+  {
+    "ja": "成功",
+    "en": "success",
+    "level": "初級"
+  },
+  {
+    "ja": "失敗",
+    "en": "failure",
+    "level": "初級"
+  },
+  {
+    "ja": "時間",
+    "en": "time",
+    "level": "初級"
+  },
+  {
+    "ja": "学校",
+    "en": "school",
+    "level": "初級"
+  },
+  {
+    "ja": "先生",
+    "en": "teacher",
+    "level": "初級"
+  },
+  {
+    "ja": "生徒",
+    "en": "student",
+    "level": "初級"
+  },
+  {
+    "ja": "友達",
+    "en": "friend",
+    "level": "初級"
+  },
+  {
+    "ja": "家族",
+    "en": "family",
+    "level": "初級"
+  },
+  {
+    "ja": "読む",
+    "en": "read",
+    "level": "初級"
+  },
+  {
+    "ja": "書く",
+    "en": "write",
+    "level": "初級"
+  },
+  {
+    "ja": "聞く",
+    "en": "listen",
+    "level": "初級"
+  },
+  {
+    "ja": "話す",
+    "en": "speak",
+    "level": "初級"
+  },
+  {
+    "ja": "見る",
+    "en": "see",
+    "level": "初級"
+  },
+  {
+    "ja": "作る",
+    "en": "make",
+    "level": "初級"
+  },
+  {
+    "ja": "使う",
+    "en": "use",
+    "level": "初級"
+  },
+  {
+    "ja": "行く",
+    "en": "go",
+    "level": "初級"
+  },
+  {
+    "ja": "来る",
+    "en": "come",
+    "level": "初級"
+  },
+  {
+    "ja": "食べる",
+    "en": "eat",
+    "level": "初級"
+  },
+  {
+    "ja": "飲む",
+    "en": "drink",
+    "level": "初級"
+  },
+  {
+    "ja": "重要な",
+    "en": "important",
+    "level": "中級"
+  },
+  {
+    "ja": "必要な",
+    "en": "necessary",
+    "level": "中級"
+  },
+  {
+    "ja": "理由",
+    "en": "reason",
+    "level": "中級"
+  },
+  {
+    "ja": "方法",
+    "en": "method",
+    "level": "中級"
+  },
+  {
+    "ja": "結果",
+    "en": "result",
+    "level": "中級"
+  },
+  {
+    "ja": "目標",
+    "en": "goal",
+    "level": "中級"
+  },
+  {
+    "ja": "経験",
+    "en": "experience",
+    "level": "中級"
+  },
+  {
+    "ja": "情報",
+    "en": "information",
+    "level": "中級"
+  },
+  {
+    "ja": "知識",
+    "en": "knowledge",
+    "level": "中級"
+  },
+  {
+    "ja": "環境",
+    "en": "environment",
+    "level": "中級"
+  },
+  {
+    "ja": "社会",
+    "en": "society",
+    "level": "中級"
+  },
+  {
+    "ja": "文化",
+    "en": "culture",
+    "level": "中級"
+  },
+  {
+    "ja": "歴史",
+    "en": "history",
+    "level": "中級"
+  },
+  {
+    "ja": "科学",
+    "en": "science",
+    "level": "中級"
+  },
+  {
+    "ja": "経済",
+    "en": "economy",
+    "level": "中級"
+  },
+  {
+    "ja": "技術",
+    "en": "technology",
+    "level": "中級"
+  },
+  {
+    "ja": "教育",
+    "en": "education",
+    "level": "中級"
+  },
+  {
+    "ja": "健康",
+    "en": "health",
+    "level": "中級"
+  },
+  {
+    "ja": "自然",
+    "en": "nature",
+    "level": "中級"
+  },
+  {
+    "ja": "政府",
+    "en": "government",
+    "level": "中級"
+  },
+  {
+    "ja": "法律",
+    "en": "law",
+    "level": "中級"
+  },
+  {
+    "ja": "権利",
+    "en": "right",
+    "level": "中級"
+  },
+  {
+    "ja": "自由",
+    "en": "freedom",
+    "level": "中級"
+  },
+  {
+    "ja": "責任",
+    "en": "responsibility",
+    "level": "中級"
+  },
+  {
+    "ja": "機会",
+    "en": "opportunity",
+    "level": "中級"
+  },
+  {
+    "ja": "能力",
+    "en": "ability",
+    "level": "中級"
+  },
+  {
+    "ja": "比較する",
+    "en": "compare",
+    "level": "中級"
+  },
+  {
+    "ja": "改善する",
+    "en": "improve",
+    "level": "中級"
+  },
+  {
+    "ja": "提供する",
+    "en": "provide",
+    "level": "中級"
+  },
+  {
+    "ja": "含む",
+    "en": "include",
+    "level": "中級"
+  },
+  {
+    "ja": "影響",
+    "en": "influence",
+    "level": "上級"
+  },
+  {
+    "ja": "発展する",
+    "en": "develop",
+    "level": "上級"
+  },
+  {
+    "ja": "決定する",
+    "en": "determine",
+    "level": "上級"
+  },
+  {
+    "ja": "分析する",
+    "en": "analyze",
+    "level": "上級"
+  },
+  {
+    "ja": "増加する",
+    "en": "increase",
+    "level": "上級"
+  },
+  {
+    "ja": "減少する",
+    "en": "decrease",
+    "level": "上級"
+  },
+  {
+    "ja": "証拠",
+    "en": "evidence",
+    "level": "上級"
+  },
+  {
+    "ja": "仮説",
+    "en": "hypothesis",
+    "level": "上級"
+  },
+  {
+    "ja": "効率的な",
+    "en": "efficient",
+    "level": "上級"
+  },
+  {
+    "ja": "適切な",
+    "en": "appropriate",
+    "level": "上級"
+  },
+  {
+    "ja": "可能にする",
+    "en": "enable",
+    "level": "上級"
+  },
+  {
+    "ja": "強調する",
+    "en": "emphasize",
+    "level": "上級"
+  },
+  {
+    "ja": "設立する",
+    "en": "establish",
+    "level": "上級"
+  },
+  {
+    "ja": "評価する",
+    "en": "evaluate",
+    "level": "上級"
+  },
+  {
+    "ja": "示す",
+    "en": "indicate",
+    "level": "上級"
+  },
+  {
+    "ja": "解釈する",
+    "en": "interpret",
+    "level": "上級"
+  },
+  {
+    "ja": "維持する",
+    "en": "maintain",
+    "level": "上級"
+  },
+  {
+    "ja": "得る",
+    "en": "obtain",
+    "level": "上級"
+  },
+  {
+    "ja": "予測する",
+    "en": "predict",
+    "level": "上級"
+  },
+  {
+    "ja": "促進する",
+    "en": "promote",
+    "level": "上級"
+  },
+  {
+    "ja": "認識する",
+    "en": "recognize",
+    "level": "上級"
+  },
+  {
+    "ja": "要求する",
+    "en": "require",
+    "level": "上級"
+  },
+  {
+    "ja": "解決策",
+    "en": "solution",
+    "level": "上級"
+  },
+  {
+    "ja": "重要な",
+    "en": "significant",
+    "level": "上級"
+  }
+]
