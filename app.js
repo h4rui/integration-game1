@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.3.43";
+const VERSION = "3.3.46";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -12753,4 +12753,248 @@ window.showNewsPage=function(){
  `;
  if(typeof ensureHomeButton==="function")ensureHomeButton();
 };
+})();
+
+
+
+/* Ver3.3.44 UI bug fix */
+(function(){
+if(window.__uiBugFix3344)return;
+window.__uiBugFix3344=true;
+
+function uiStyle3344(){
+ if(document.getElementById("uiStyle3344"))return;
+ const st=document.createElement("style");
+ st.id="uiStyle3344";
+ st.textContent=`
+#enemyStage3330,#enemyStage3331,#enemyStage3332,#enemyStage3333,[id^="enemyStage"],.enemyStage,.enemyField3330,.enemyField3331,.enemyField3332{
+  display:none!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+}
+#otherLearningBtn3341,.otherLearnBtn3341{
+  width:100%!important;
+  min-height:92px!important;
+  border-radius:16px!important;
+  padding:18px 14px!important;
+  margin:12px 0!important;
+  font-size:32px!important;
+  font-weight:900!important;
+  color:#2563eb!important;
+  background:linear-gradient(135deg,#14f1d0,#08e6c5)!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  box-shadow:0 8px 20px rgba(0,0,0,.25)!important;
+}
+#backBtn3339{
+  display:inline-flex!important;
+  visibility:visible!important;
+  pointer-events:auto!important;
+}
+body.realHome3344 #backBtn3339{
+  display:none!important;
+}
+#navOnlyClean3339{
+  display:flex!important;
+  visibility:visible!important;
+  pointer-events:auto!important;
+}
+`;
+ document.head.appendChild(st);
+}
+
+function panel3344(){
+ return document.getElementById("panelArea") || document.body;
+}
+
+function isRealHome3344(){
+ const txt=(panel3344().innerText||"").slice(0,2500);
+ if(txt.includes("学習モード"))return false;
+ if(txt.includes("数学掲示板"))return false;
+ if(txt.includes("その他"))return false;
+ if(txt.includes("英語4択"))return false;
+ if(txt.includes("難易度を選んでください"))return false;
+ if(txt.includes("問題"))return false;
+ if(txt.includes("レベルランキング"))return false;
+ return txt.includes("学習") && txt.includes("ランキング") && txt.includes("対戦") && txt.includes("ガチャ") && txt.includes("プロフィール") && txt.includes("成績") && txt.includes("掲示板");
+}
+
+function cleanup3344(){
+ uiStyle3344();
+ document.querySelectorAll('[id^="enemyStage"], .enemyStage, .enemyField3330, .enemyField3331, .enemyField3332').forEach(e=>e.remove());
+ document.body.classList.remove("enemyProblemActive3332");
+ document.body.classList.toggle("realHome3344", isRealHome3344());
+ document.body.classList.remove("isHome3339");
+ const other=document.getElementById("otherLearningBtn3341");
+ if(other){
+   other.classList.add("otherLearnBtn3341");
+   other.innerHTML="⚙️ その他";
+ }
+}
+
+setInterval(cleanup3344,500);
+setTimeout(cleanup3344,50);
+
+window.showNewsPage=function(){
+ const p=document.getElementById("panelArea");
+ if(!p)return;
+ p.innerHTML=`
+  <h2>📢 お知らせ</h2>
+  <div style="background:rgba(255,255,255,.1);border-radius:16px;padding:16px;margin:14px 0;line-height:1.7;">
+    <h3 style="color:#ffe97a;">Ver3.3.44</h3>
+    <p>・学習モードの「その他」を周りと同じ大きさにしました。</p>
+    <p>・敵βの残骸で表示されていた「？」画像を削除しました。</p>
+    <p>・戻るボタンがホーム以外でも消える問題を修正しました。</p>
+    <p>・ホーム画面だけ戻るボタンを非表示にしました。</p>
+    <p>・ランキング・ログイン・Firebase処理は変更していません。</p>
+  </div>
+ `;
+ if(typeof ensureHomeButton==="function")ensureHomeButton();
+ cleanup3344();
+};
+})();
+
+
+
+/* Ver3.3.45 その他：漢字4択 */
+(function(){
+if(window.__kanjiQuiz3345)return;
+window.__kanjiQuiz3345=true;
+
+const KANJI_WORDS_3345=[{"kanji":"努力","yomi":"どりょく","meaning":"目標に向かってがんばること"},{"kanji":"成功","yomi":"せいこう","meaning":"うまくいくこと"},{"kanji":"失敗","yomi":"しっぱい","meaning":"うまくいかないこと"},{"kanji":"挑戦","yomi":"ちょうせん","meaning":"難しいことに立ち向かうこと"},{"kanji":"成長","yomi":"せいちょう","meaning":"大きくなる・能力が伸びること"},{"kanji":"復習","yomi":"ふくしゅう","meaning":"一度学んだことをもう一度学ぶこと"},{"kanji":"理解","yomi":"りかい","meaning":"意味や内容がわかること"},{"kanji":"説明","yomi":"せつめい","meaning":"わかるように話すこと"},{"kanji":"問題","yomi":"もんだい","meaning":"解くべき問い"},{"kanji":"解答","yomi":"かいとう","meaning":"答えること・答え"},{"kanji":"正解","yomi":"せいかい","meaning":"正しい答え"},{"kanji":"不正解","yomi":"ふせいかい","meaning":"間違った答え"},{"kanji":"原因","yomi":"げんいん","meaning":"物事が起こるもと"},{"kanji":"結果","yomi":"けっか","meaning":"物事のあとに生じたこと"},{"kanji":"理由","yomi":"りゆう","meaning":"そうなるわけ"},{"kanji":"方法","yomi":"ほうほう","meaning":"やり方"},{"kanji":"目標","yomi":"もくひょう","meaning":"目指すもの"},{"kanji":"計画","yomi":"けいかく","meaning":"前もって考えた手順"},{"kanji":"実行","yomi":"じっこう","meaning":"実際に行うこと"},{"kanji":"継続","yomi":"けいぞく","meaning":"続けること"},{"kanji":"習慣","yomi":"しゅうかん","meaning":"いつも行うこと"},{"kanji":"集中","yomi":"しゅうちゅう","meaning":"一つのことに意識を向けること"},{"kanji":"確認","yomi":"かくにん","meaning":"たしかめること"},{"kanji":"練習","yomi":"れんしゅう","meaning":"上達するためにくり返すこと"},{"kanji":"必要","yomi":"ひつよう","meaning":"なくてはならないこと"},{"kanji":"重要","yomi":"じゅうよう","meaning":"大切なこと"},{"kanji":"基本","yomi":"きほん","meaning":"土台になること"},{"kanji":"応用","yomi":"おうよう","meaning":"学んだことを別の場合に使うこと"},{"kanji":"公式","yomi":"こうしき","meaning":"決まった計算の形"},{"kanji":"計算","yomi":"けいさん","meaning":"数を求めること"},{"kanji":"数式","yomi":"すうしき","meaning":"数字や記号で表した式"},{"kanji":"積分","yomi":"せきぶん","meaning":"微分の逆操作などを扱う数学分野"},{"kanji":"微分","yomi":"びぶん","meaning":"変化の割合を扱う数学分野"},{"kanji":"関数","yomi":"かんすう","meaning":"数の対応関係"},{"kanji":"図形","yomi":"ずけい","meaning":"形を表すもの"},{"kanji":"証明","yomi":"しょうめい","meaning":"正しいことを筋道立てて示すこと"},{"kanji":"仮定","yomi":"かてい","meaning":"前提として考えること"},{"kanji":"結論","yomi":"けつろん","meaning":"考えた結果として出る答え"},{"kanji":"条件","yomi":"じょうけん","meaning":"成り立つために必要な事柄"},{"kanji":"変化","yomi":"へんか","meaning":"状態が変わること"},{"kanji":"増加","yomi":"ぞうか","meaning":"増えること"},{"kanji":"減少","yomi":"げんしょう","meaning":"減ること"},{"kanji":"平均","yomi":"へいきん","meaning":"合計を個数で割った値"},{"kanji":"最大","yomi":"さいだい","meaning":"最も大きいこと"},{"kanji":"最小","yomi":"さいしょう","meaning":"最も小さいこと"},{"kanji":"共通","yomi":"きょうつう","meaning":"同じであること"},{"kanji":"比較","yomi":"ひかく","meaning":"比べること"},{"kanji":"判断","yomi":"はんだん","meaning":"考えて決めること"},{"kanji":"選択","yomi":"せんたく","meaning":"選ぶこと"},{"kanji":"利用","yomi":"りよう","meaning":"使うこと"},{"kanji":"改善","yomi":"かいぜん","meaning":"より良くすること"},{"kanji":"修正","yomi":"しゅうせい","meaning":"間違いを直すこと"},{"kanji":"追加","yomi":"ついか","meaning":"あとから加えること"},{"kanji":"削除","yomi":"さくじょ","meaning":"取り除くこと"},{"kanji":"表示","yomi":"ひょうじ","meaning":"画面などに出すこと"},{"kanji":"設定","yomi":"せってい","meaning":"決めて使えるようにすること"},{"kanji":"記録","yomi":"きろく","meaning":"残しておくこと"},{"kanji":"保存","yomi":"ほぞん","meaning":"消えないように残すこと"},{"kanji":"更新","yomi":"こうしん","meaning":"新しくすること"},{"kanji":"公開","yomi":"こうかい","meaning":"人に見られるようにすること"},{"kanji":"情報","yomi":"じょうほう","meaning":"知るための内容"},{"kanji":"知識","yomi":"ちしき","meaning":"知っている内容"},{"kanji":"技術","yomi":"ぎじゅつ","meaning":"物事を行うためのわざ"},{"kanji":"経験","yomi":"けいけん","meaning":"実際に行って得たこと"},{"kanji":"能力","yomi":"のうりょく","meaning":"物事を行う力"},{"kanji":"才能","yomi":"さいのう","meaning":"生まれ持った力"},{"kanji":"態度","yomi":"たいど","meaning":"物事に向かう姿勢"},{"kanji":"責任","yomi":"せきにん","meaning":"果たすべき役割"},{"kanji":"協力","yomi":"きょうりょく","meaning":"力を合わせること"},{"kanji":"競争","yomi":"きょうそう","meaning":"勝ち負けを争うこと"},{"kanji":"社会","yomi":"しゃかい","meaning":"人々が集まって生活する場"},{"kanji":"文化","yomi":"ぶんか","meaning":"人々の生活から生まれたもの"},{"kanji":"歴史","yomi":"れきし","meaning":"過去からの出来事の流れ"},{"kanji":"自然","yomi":"しぜん","meaning":"人の手が加わらないもの"},{"kanji":"環境","yomi":"かんきょう","meaning":"周りの状況"},{"kanji":"健康","yomi":"けんこう","meaning":"体や心の調子がよいこと"},{"kanji":"安全","yomi":"あんぜん","meaning":"危険が少ないこと"},{"kanji":"危険","yomi":"きけん","meaning":"悪いことが起きる可能性"},{"kanji":"平和","yomi":"へいわ","meaning":"争いがない状態"},{"kanji":"自由","yomi":"じゆう","meaning":"自分で選べること"},{"kanji":"権利","yomi":"けんり","meaning":"行うことが認められるもの"},{"kanji":"義務","yomi":"ぎむ","meaning":"しなければならないこと"},{"kanji":"経済","yomi":"けいざい","meaning":"お金や物の動き"},{"kanji":"産業","yomi":"さんぎょう","meaning":"ものやサービスを作る活動"},{"kanji":"資源","yomi":"しげん","meaning":"使うことのできる材料や力"},{"kanji":"貿易","yomi":"ぼうえき","meaning":"国同士の売買"},{"kanji":"政治","yomi":"せいじ","meaning":"社会を動かす仕組み"},{"kanji":"法律","yomi":"ほうりつ","meaning":"国や社会の決まり"},{"kanji":"制度","yomi":"せいど","meaning":"社会の仕組み"},{"kanji":"選挙","yomi":"せんきょ","meaning":"代表を選ぶこと"},{"kanji":"地域","yomi":"ちいき","meaning":"一定の場所のまとまり"},{"kanji":"人口","yomi":"じんこう","meaning":"人の数"},{"kanji":"都市","yomi":"とし","meaning":"人が多く集まる地域"},{"kanji":"農業","yomi":"のうぎょう","meaning":"作物を育てる仕事"},{"kanji":"工業","yomi":"こうぎょう","meaning":"ものを作る産業"},{"kanji":"科学","yomi":"かがく","meaning":"自然や物事の法則を調べる学問"},{"kanji":"実験","yomi":"じっけん","meaning":"確かめるために行う試み"},{"kanji":"観察","yomi":"かんさつ","meaning":"よく見て調べること"},{"kanji":"発見","yomi":"はっけん","meaning":"新しく見つけること"},{"kanji":"発明","yomi":"はつめい","meaning":"新しいものを作り出すこと"},{"kanji":"研究","yomi":"けんきゅう","meaning":"詳しく調べること"},{"kanji":"資料","yomi":"しりょう","meaning":"調べるための材料"},{"kanji":"課題","yomi":"かだい","meaning":"取り組むべき問題"},{"kanji":"授業","yomi":"じゅぎょう","meaning":"先生が教える時間"},{"kanji":"試験","yomi":"しけん","meaning":"力を確かめるテスト"},{"kanji":"合格","yomi":"ごうかく","meaning":"試験などに受かること"},{"kanji":"受験","yomi":"じゅけん","meaning":"試験を受けること"},{"kanji":"進学","yomi":"しんがく","meaning":"上の学校へ進むこと"}];
+let kanjiMode3345="read";
+let currentKanji3345=null;
+let kanjiScore3345=0;
+let kanjiCount3345=0;
+
+function kjStyle3345(){
+ if(document.getElementById("kjStyle3345"))return;
+ const st=document.createElement("style");
+ st.id="kjStyle3345";
+ st.textContent=`
+.kjCard3345{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.16);border-radius:18px;padding:16px;margin:14px 0;text-align:center}
+.kjGrid3345{display:grid;grid-template-columns:1fr;gap:14px;margin:18px 0}
+.kjGrid3345 button,.kjChoice3345{border:none;border-radius:16px;padding:17px 14px;font-size:21px;font-weight:900;color:#fff;background:linear-gradient(135deg,#f59e0b,#ef4444);box-shadow:0 8px 20px rgba(0,0,0,.25)}
+.kjQuestion3345{font-size:40px;font-weight:1000;margin:18px 0;color:#fff;text-shadow:0 0 12px rgba(255,255,255,.45)}
+.kjInfo3345{opacity:.9;font-size:16px;margin:8px 0}
+.kjCorrect3345{background:linear-gradient(135deg,#22c55e,#16a34a)!important}
+.kjWrong3345{background:linear-gradient(135deg,#ef4444,#991b1b)!important}
+`;
+ document.head.appendChild(st);
+}
+
+function shuffleKj3345(arr){return arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);}
+function pickKj3345(){
+ const correct=KANJI_WORDS_3345[Math.floor(Math.random()*KANJI_WORDS_3345.length)];
+ const wrongs=shuffleKj3345(KANJI_WORDS_3345.filter(x=>x.kanji!==correct.kanji)).slice(0,3);
+ const choices=shuffleKj3345([correct,...wrongs]);
+ currentKanji3345={correct,choices};
+ return currentKanji3345;
+}
+
+const oldOther3345=window.showLearningOther3341;
+window.showLearningOther3341=function(){
+ kjStyle3345();
+ const panel=document.getElementById("panelArea");
+ if(!panel)return;
+ panel.innerHTML=`
+   <h2>⚙️ その他</h2>
+   <p>数学以外の補助メニューです。</p>
+
+   <div class="kjCard3345">
+     <h3>🌍 英語4択</h3>
+     <p>英語は1500語から出題されます。</p>
+     <div class="kjGrid3345">
+       <button onclick="selectEnglishLevel3343&&selectEnglishLevel3343('初級')">📗 英語 初級</button>
+       <button onclick="selectEnglishLevel3343&&selectEnglishLevel3343('中級')">📘 英語 中級</button>
+       <button onclick="selectEnglishLevel3343&&selectEnglishLevel3343('上級')">📕 英語 上級</button>
+       <button onclick="selectEnglishLevel3343&&selectEnglishLevel3343('ランダム')">🎲 英語 ランダム</button>
+     </div>
+   </div>
+
+   <div class="kjCard3345">
+     <h3>🈴 漢字4択</h3>
+     <p>読み・意味を4択で練習できます。</p>
+     <div class="kjGrid3345">
+       <button onclick="startKanjiQuiz3345('read')">📖 漢字 → 読み</button>
+       <button onclick="startKanjiQuiz3345('meaning')">💭 漢字 → 意味</button>
+     </div>
+   </div>
+
+   <button onclick="showLearningMode&&showLearningMode()">← 学習モードへ戻る</button>
+   <button onclick="showHome&&showHome()">🏠 ホームへ</button>
+ `;
+};
+
+window.startKanjiQuiz3345=function(mode){
+ kanjiMode3345=mode;
+ kanjiScore3345=0;
+ kanjiCount3345=0;
+ showKanjiQuestion3345();
+};
+
+window.showKanjiQuestion3345=function(){
+ kjStyle3345();
+ const panel=document.getElementById("panelArea");
+ if(!panel)return;
+ const q=pickKj3345();
+ const modeText=kanjiMode3345==="read" ? "漢字 → 読み" : "漢字 → 意味";
+ panel.innerHTML=`
+  <h2>🈴 漢字4択</h2>
+  <div class="kjCard3345">
+    <div class="kjInfo3345">${modeText}</div>
+    <div class="kjInfo3345">正解数：${kanjiScore3345}/${kanjiCount3345}</div>
+    <div class="kjQuestion3345">${q.correct.kanji}</div>
+    <div class="kjGrid3345">
+      ${q.choices.map((c,i)=>`<button class="kjChoice3345" onclick="answerKanjiQuiz3345(${i})">${kanjiMode3345==="read" ? c.yomi : c.meaning}</button>`).join("")}
+    </div>
+  </div>
+  <button onclick="showLearningOther3341()">← その他へ戻る</button>
+  <button onclick="showHome&&showHome()">🏠 ホームへ</button>
+ `;
+};
+
+window.answerKanjiQuiz3345=function(i){
+ const btns=[...document.querySelectorAll(".kjChoice3345")];
+ const picked=currentKanji3345.choices[i];
+ const ok=picked.kanji===currentKanji3345.correct.kanji;
+ kanjiCount3345++;
+ if(ok)kanjiScore3345++;
+ btns.forEach((b,idx)=>{
+   if(currentKanji3345.choices[idx].kanji===currentKanji3345.correct.kanji)b.classList.add("kjCorrect3345");
+   else if(idx===i)b.classList.add("kjWrong3345");
+   b.disabled=true;
+ });
+ setTimeout(showKanjiQuestion3345,900);
+};
+
+window.showNewsPage=function(){
+ const p=document.getElementById("panelArea");
+ if(!p)return;
+ p.innerHTML=`
+  <h2>📢 お知らせ</h2>
+  <div style="background:rgba(255,255,255,.1);border-radius:16px;padding:16px;margin:14px 0;line-height:1.7;">
+    <h3 style="color:#ffe97a;">Ver3.3.45</h3>
+    <p>・その他に漢字4択を追加しました。</p>
+    <p>・漢字→読み、漢字→意味に対応しました。</p>
+    <p>・ランキング・ログイン・Firebase処理は変更していません。</p>
+  </div>
+ `;
+ if(typeof ensureHomeButton==="function")ensureHomeButton();
+};
+})();
+
+/* Ver3.3.46 Japanese menu label */
+(function(){
+ const old = window.showLearningOther3341;
+ if(!old) return;
+ window.showLearningOther3341 = function(){
+   old();
+   const p=document.getElementById("panelArea");
+   if(!p) return;
+   p.innerHTML=p.innerHTML
+      .replace("🈴 国語","🇯🇵 国語")
+      .replace("<h3>🈴 漢字4択</h3>","<h3>🇯🇵 国語</h3>");
+ };
 })();
