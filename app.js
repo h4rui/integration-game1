@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.3.69";
+const VERSION = "3.3.70";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -12218,4 +12218,193 @@ window.speakEnglish3369=function(text,force){
 window.showNewsPage=function(){render3369(`<h2>📢 お知らせ</h2><div class="panel3369"><h3>Ver3.3.69</h3><p>・積み重なった不要パッチを整理しました。</p><p>・敵モンスター表示をプログラム側から無効化しました。</p><p>・学習カード、その他ページ、音声設定を作り直しました。</p><p>・ランキング/掲示板の白画面化原因の強制削除処理を外しました。</p></div>`,showOtherMenu);};
 function showContact3369(){render3369(`<h2>📩 お問い合わせ</h2><div class="panel3369"><p>不具合報告・要望を書くページです。</p></div>`,showOtherMenu);}
 setInterval(()=>{applyAudioSettings3369();document.querySelectorAll('#enemyStage,#enemyStage3330,#enemyStage3331,#enemyStage3332,.enemyStage,.enemyField3330,.enemyField3331,.enemyField3332,img[src*="slime"],img[src*="monster"],img[src*="enemy"]').forEach(e=>e.remove());},1500);
+})();
+
+
+
+/* Ver3.3.70 UI nav/card fix */
+(function(){
+if(window.__uiNavCardFix3370)return;
+window.__uiNavCardFix3370=true;
+
+function panel3370(){return document.getElementById("panelArea")||document.body;}
+
+function style3370(){
+ if(document.getElementById("style3370"))return;
+ const st=document.createElement("style");
+ st.id="style3370";
+ st.textContent=`
+/* 下側に後から出るナビ、左下固定ボタンを消す */
+.favBtn,.favoriteBtn,#favoriteBtn,#favBtn,
+.aiExplainPlus,#aiExplainPlus,#aiExplainBtn,.aiExplainBtn,
+.floatFav,.floatingFav,.floatingAi,.floatingAI,
+button[data-action="favorite"],button[data-action="ai-explain"]{
+  display:none!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+}
+.grid3370{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0;}
+.card3370{min-height:138px;border:none;border-radius:22px;padding:18px;color:#fff;text-align:left;font-weight:900;box-shadow:0 10px 25px rgba(0,0,0,.25);}
+.card3370 .title{font-size:26px;margin-bottom:10px;}
+.card3370 .sub{font-size:14px;line-height:1.45;opacity:.95;}
+.blue3370{background:linear-gradient(135deg,#06b6d4,#2563eb);}
+.green3370{background:linear-gradient(135deg,#22c55e,#16a34a);}
+.orange3370{background:linear-gradient(135deg,#f59e0b,#ef4444);}
+.purple3370{background:linear-gradient(135deg,#8b5cf6,#ec4899);}
+.gray3370{background:linear-gradient(135deg,#64748b,#334155);}
+.red3370{background:linear-gradient(135deg,#ef4444,#991b1b);}
+.panel3370{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.16);border-radius:18px;padding:16px;margin:14px 0;line-height:1.7;color:#fff;}
+`;
+ document.head.appendChild(st);
+}
+
+function removeBadButtons3370(){
+ style3370();
+
+ // 下側に追加された新しい戻る/ホームだけ削除：画面上部の最初の1セットは残す
+ const navBtns=[...document.querySelectorAll("button")].filter(b=>{
+   const t=(b.innerText||"").trim();
+   return t.includes("戻る") || t.includes("ホームへ");
+ });
+ if(navBtns.length>2){
+   navBtns.slice(2).forEach(b=>b.remove());
+ }
+
+ // お気に入り / AI解説+ 削除
+ [...document.querySelectorAll("button,div,a")].forEach(el=>{
+   const t=(el.innerText||"").trim();
+   if(t.includes("お気に入り") || t.includes("AI解説+")){
+     el.remove();
+   }
+ });
+}
+
+function render3370(html){
+ style3370();
+ panel3370().innerHTML=html;
+ removeBadButtons3370();
+}
+function card3370(cls,title,sub,id){
+ return `<button class="card3370 ${cls}" id="${id}"><div class="title">${title}</div><div class="sub">${sub}</div></button>`;
+}
+
+/* その他に利用規約/プライバシーポリシー追加 */
+window.showOtherMenu3370=function(){
+ render3370(`
+  <h2>⚙️ その他</h2>
+  <div class="grid3370">
+   ${card3370("blue3370","🔊 音声","読み上げ・BGM・効果音","otherVoice3370")}
+   ${card3370("green3370","📢 お知らせ","更新内容を見る","otherNews3370")}
+   ${card3370("purple3370","📖 遊び方","ゲーム説明","otherGuide3370")}
+   ${card3370("orange3370","🎯 ミッション","デイリー確認","otherMission3370")}
+   ${card3370("gray3370","🎁 シリアル","コード入力","otherSerial3370")}
+   ${card3370("red3370","📩 お問い合わせ","不具合報告","otherContact3370")}
+   ${card3370("purple3370","📜 利用規約","利用ルール","otherTerms3370")}
+   ${card3370("gray3370","🔒 プライバシー","個人情報について","otherPrivacy3370")}
+  </div>
+ `);
+ const bind=(id,fn)=>{const e=document.getElementById(id); if(e)e.onclick=fn;};
+ bind("otherVoice3370",()=>{ if(typeof showVoiceSettings3368==="function")showVoiceSettings3368(); else showSimpleVoice3370(); });
+ bind("otherNews3370",()=>{ if(typeof showNewsPage3368==="function")showNewsPage3368(); else if(typeof showNewsPage==="function")showNewsPage(); });
+ bind("otherGuide3370",()=>{ if(typeof showGuide==="function")showGuide(); else showPage3370("📖 遊び方","問題を解いてレベルアップする学習ゲームです。"); });
+ bind("otherMission3370",()=>{ if(typeof showDailyMission==="function")showDailyMission(); else showPage3370("🎯 ミッション","デイリーミッションを確認するページです。"); });
+ bind("otherSerial3370",()=>{ if(typeof showSerialCode==="function")showSerialCode(); else if(typeof showCodeInput==="function")showCodeInput(); else showPage3370("🎁 シリアル","コード入力ページです。"); });
+ bind("otherContact3370",()=>{ if(typeof showContact3368==="function")showContact3368(); else showPage3370("📩 お問い合わせ","不具合報告・要望のページです。"); });
+ bind("otherTerms3370",()=>showPage3370("📜 利用規約","数学マスターは学習目的で利用してください。不正利用、荒らし、データ改ざんは禁止です。"));
+ bind("otherPrivacy3370",()=>showPage3370("🔒 プライバシーポリシー","ログインやランキングに必要な情報のみ扱います。個人情報を不必要に収集しません。"));
+};
+window.showLearningOther3341=showOtherMenu3370;
+
+function showPage3370(title,body){
+ render3370(`<h2>${title}</h2><div class="panel3370"><p>${body}</p></div>`);
+}
+function showSimpleVoice3370(){
+ render3370(`<h2>🔊 音声</h2><div class="panel3370"><p>英語読み上げ・BGM・効果音の設定ページです。</p></div>`);
+}
+
+/* 学習カード：数学以外も、選択後に必ず start3354/start3353 へ飛ばす */
+window.showEnglishCards3370=function(){
+ render3370(`
+  <h2>🌍 英語</h2>
+  <div class="grid3370">
+   ${card3370("green3370","📗 初級","基礎単語","engBeginner3370")}
+   ${card3370("blue3370","📘 中級","標準単語","engMiddle3370")}
+   ${card3370("orange3370","📕 上級","受験単語","engAdvanced3370")}
+   ${card3370("gray3370","🎲 ランダム","全レベル","engRandom3370")}
+  </div>
+ `);
+ const go=lv=>showEnglishDirection3370(lv);
+ document.getElementById("engBeginner3370").onclick=()=>go("初級");
+ document.getElementById("engMiddle3370").onclick=()=>go("中級");
+ document.getElementById("engAdvanced3370").onclick=()=>go("上級");
+ document.getElementById("engRandom3370").onclick=()=>go("ランダム");
+};
+
+function showEnglishDirection3370(level){
+ render3370(`
+  <h2>🌍 英語 ${level}</h2>
+  <div class="grid3370">
+   ${card3370("blue3370","📝 英語→日本語","意味を選ぶ","en2ja3370")}
+   ${card3370("green3370","🔄 日本語→英語","英単語を選ぶ","ja2en3370")}
+  </div>
+ `);
+ document.getElementById("en2ja3370").onclick=()=>startOther3370("eng","en2ja",level);
+ document.getElementById("ja2en3370").onclick=()=>startOther3370("eng","ja2en",level);
+}
+
+window.showJapaneseCards3370=function(){
+ render3370(`
+  <h2>🇯🇵 国語</h2>
+  <div class="grid3370">
+   ${card3370("orange3370","📖 漢字→読み","読み方を選ぶ","kanjiRead3370")}
+   ${card3370("red3370","💭 漢字→意味","意味を選ぶ","kanjiMeaning3370")}
+   ${card3370("purple3370","📜 古文→意味","古語の意味","kobunMeaning3370")}
+   ${card3370("blue3370","🔄 意味→古文","意味から古語","meaningKobun3370")}
+  </div>
+ `);
+ document.getElementById("kanjiRead3370").onclick=()=>startOther3370("kanji","kanjiRead","ランダム");
+ document.getElementById("kanjiMeaning3370").onclick=()=>startOther3370("kanji","kanjiMeaning","ランダム");
+ document.getElementById("kobunMeaning3370").onclick=()=>startOther3370("kobun","kobun2meaning","ランダム");
+ document.getElementById("meaningKobun3370").onclick=()=>startOther3370("kobun","meaning2kobun","ランダム");
+};
+
+window.showSocialCards3370=function(){
+ render3370(`
+  <h2>🏛️ 社会</h2>
+  <div class="grid3370">
+   ${card3370("green3370","🗾 地理","地理問題","geo3370")}
+   ${card3370("orange3370","🏯 歴史","歴史問題","history3370")}
+   ${card3370("purple3370","🏛️ 公民","公民問題","civics3370")}
+   ${card3370("gray3370","🎲 ランダム","全分野","socialRandom3370")}
+  </div>
+ `);
+ document.getElementById("geo3370").onclick=()=>startOther3370("social","social","地理");
+ document.getElementById("history3370").onclick=()=>startOther3370("social","social","歴史");
+ document.getElementById("civics3370").onclick=()=>startOther3370("social","social","公民");
+ document.getElementById("socialRandom3370").onclick=()=>startOther3370("social","social","ランダム");
+};
+
+function startOther3370(kind,mode,level){
+ if(typeof start3354==="function")return start3354(kind,mode,level);
+ if(typeof start3353==="function")return start3353(kind,mode,level);
+ if(typeof startOtherGame3351==="function")return startOtherGame3351(kind,mode,level);
+ alert("問題開始関数が見つかりません");
+}
+
+/* 既存の学習トップが3366/3365系を呼んでも、英語国語社会はこの修正版に差し替え */
+window.showEnglishCards3366=showEnglishCards3370;
+window.showJapaneseCards3366=showJapaneseCards3370;
+window.showSocialCards3366=showSocialCards3370;
+window.showEnglishCards3365=showEnglishCards3370;
+window.showJapaneseCards3365=showJapaneseCards3370;
+window.showSocialCards3365=showSocialCards3370;
+
+/* クリック後に毎回掃除 */
+document.addEventListener("click",()=>setTimeout(removeBadButtons3370,80),true);
+document.addEventListener("touchstart",()=>setTimeout(removeBadButtons3370,80),{passive:true});
+setInterval(removeBadButtons3370,1000);
+
+window.showNewsPage=function(){
+ showPage3370("📢 お知らせ","Ver3.3.70：その他に利用規約・プライバシーポリシーを追加。二重ナビ、左下ボタン、英語/国語/社会カード遷移を修正しました。");
+};
 })();
