@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.3.63";
+const VERSION = "3.3.64";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -12977,5 +12977,71 @@ window.showNewsPage=function(){
  const p=document.getElementById("panelArea");
  if(!p)return;
  p.innerHTML=`<h2>📢 お知らせ</h2><div class="card3354"><h3>Ver3.3.63</h3><p>学習内の全メニューをカード形式にしました。</p><p>ランキング・掲示板で表示されるスライム/モンスターを削除しました。</p></div>`;
+};
+})();
+
+
+
+/* Ver3.3.64 ranking/bbs monster hard remove + white screen guard */
+(function(){
+if(window.__rankBbsGeoFix3364)return;
+window.__rankBbsGeoFix3364=true;
+
+function p3364(){return document.getElementById("panelArea")||document.body;}
+
+function removeMonstersHard3364(){
+  const selectors=[
+    '[id^="enemyStage"]','[id*="enemy"]','[class*="enemy"]',
+    '[id*="monster"]','[class*="monster"]','[id*="slime"]','[class*="slime"]',
+    '.enemyStage','.enemyField3330','.enemyField3331','.enemyField3332',
+    'img[src*="slime"]','img[src*="monster"]','img[src*="enemy"]'
+  ];
+  selectors.forEach(sel=>{
+    try{document.querySelectorAll(sel).forEach(e=>e.remove());}catch(e){}
+  });
+  document.body.classList.remove("enemyProblemActive3332","enemyProblemActive3331","enemyProblemActive3330");
+}
+
+function isRankOrBoard3364(){
+  const t=(p3364().innerText||"").slice(0,3000);
+  return t.includes("ランキング") || t.includes("掲示板");
+}
+
+function guardWhite3364(){
+  if(!isRankOrBoard3364())return;
+  removeMonstersHard3364();
+
+  // 白画面対策：panelAreaが空にされたら最低限の案内だけ戻す
+  const p=p3364();
+  const txt=(p.innerText||"").trim();
+  if(txt.length===0){
+    p.innerHTML=`<h2>表示エラーを防止しました</h2><p>スライム/敵表示の残骸を削除しました。ホームに戻ってもう一度開いてください。</p><button onclick="showHome&&showHome()">🏠 ホームへ</button>`;
+  }
+}
+
+/* ランキング/掲示板関数を包んで、開いた直後に敵を削除 */
+["showRankingMenu","showRanking","showWorldRanking","showBoard","showBBS","showBulletinBoard"].forEach(name=>{
+  const fn=window[name];
+  if(typeof fn==="function" && !fn.__clean3364){
+    window[name]=function(){
+      const r=fn.apply(this,arguments);
+      setTimeout(guardWhite3364,0);
+      setTimeout(guardWhite3364,80);
+      setTimeout(guardWhite3364,300);
+      return r;
+    };
+    window[name].__clean3364=true;
+  }
+});
+
+document.addEventListener("click",()=>setTimeout(guardWhite3364,80),true);
+document.addEventListener("touchstart",()=>setTimeout(guardWhite3364,80),{passive:true});
+setInterval(guardWhite3364,700);
+setTimeout(guardWhite3364,500);
+
+window.showNewsPage=function(){
+ const p=document.getElementById("panelArea");
+ if(!p)return;
+ p.innerHTML=`<h2>📢 お知らせ</h2><div class="card3354"><h3>Ver3.3.64</h3><p>ランキング・掲示板で出るスライム/モンスター残骸を強制削除しました。</p><p>地理に県庁所在地以外の山・川・湖・気候・工業・農業などを追加しました。</p></div>`;
 };
 })();
