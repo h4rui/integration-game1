@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.3.71";
+const VERSION = "3.3.72";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -12226,79 +12226,65 @@ setInterval(()=>{applyAudioSettings3369();document.querySelectorAll('#enemyStage
 
 
 
-/* Ver3.3.71 source remove floating buttons + terms/privacy */
+
+
+
+
+/* Ver3.3.72 terms/privacy + non-math card start fix */
 (function(){
-if(window.__sourceRemoveTermsPrivacy3371)return;
-window.__sourceRemoveTermsPrivacy3371=true;
+if(window.__termsPrivacyCardStartFix3372)return;
+window.__termsPrivacyCardStartFix3372=true;
 
-function panel3371(){return document.getElementById("panelArea")||document.body;}
+function p3372(){return document.getElementById("panelArea")||document.body;}
 
-function style3371(){
- if(document.getElementById("style3371"))return;
+function style3372(){
+ if(document.getElementById("style3372"))return;
  const st=document.createElement("style");
- st.id="style3371";
+ st.id="style3372";
  st.textContent=`
-.grid3371{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0;}
-.card3371{min-height:138px;border:none;border-radius:22px;padding:18px;color:#fff;text-align:left;font-weight:900;box-shadow:0 10px 25px rgba(0,0,0,.25);}
-.card3371 .title{font-size:26px;margin-bottom:10px;}
-.card3371 .sub{font-size:14px;line-height:1.45;opacity:.95;}
-.blue3371{background:linear-gradient(135deg,#06b6d4,#2563eb);}
-.green3371{background:linear-gradient(135deg,#22c55e,#16a34a);}
-.orange3371{background:linear-gradient(135deg,#f59e0b,#ef4444);}
-.purple3371{background:linear-gradient(135deg,#8b5cf6,#ec4899);}
-.gray3371{background:linear-gradient(135deg,#64748b,#334155);}
-.red3371{background:linear-gradient(135deg,#ef4444,#991b1b);}
-.panel3371{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.16);border-radius:18px;padding:16px;margin:14px 0;line-height:1.7;color:#fff;}
-.nav3371{height:76px;display:flex;justify-content:center;gap:18px;align-items:center;}
-.nav3371 button{border:2px solid #22f5d1;border-radius:12px;background:#222;color:#fff;padding:12px 22px;font-size:20px;font-weight:900;}
+.grid3372{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0;}
+.card3372{min-height:138px;border:none;border-radius:22px;padding:18px;color:#fff;text-align:left;font-weight:900;box-shadow:0 10px 25px rgba(0,0,0,.25);}
+.card3372 .title{font-size:26px;margin-bottom:10px;}
+.card3372 .sub{font-size:14px;line-height:1.45;opacity:.95;}
+.blue3372{background:linear-gradient(135deg,#06b6d4,#2563eb);}
+.green3372{background:linear-gradient(135deg,#22c55e,#16a34a);}
+.orange3372{background:linear-gradient(135deg,#f59e0b,#ef4444);}
+.purple3372{background:linear-gradient(135deg,#8b5cf6,#ec4899);}
+.gray3372{background:linear-gradient(135deg,#64748b,#334155);}
+.red3372{background:linear-gradient(135deg,#ef4444,#991b1b);}
+.panel3372{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.16);border-radius:18px;padding:16px;margin:14px 0;line-height:1.7;color:#fff;}
+.nav3372{height:76px;display:flex;justify-content:center;gap:18px;align-items:center;}
+.nav3372 button{border:2px solid #22f5d1;border-radius:12px;background:#222;color:#fff;padding:12px 22px;font-size:20px;font-weight:900;}
 `;
  document.head.appendChild(st);
 }
 
-/* 生成元を無効化：お気に入り、AI解説、後付け戻る/ホーム */
+function nav3372(backFn="showOtherMenu3372"){
+ return `<div class="nav3372"><button id="back3372">← 戻る</button><button id="home3372">🏠 ホームへ</button></div>`;
+}
+function render3372(html, backFn){
+ style3372();
+ p3372().innerHTML=nav3372()+html;
+ const back=document.getElementById("back3372");
+ const home=document.getElementById("home3372");
+ if(back)back.onclick=()=>{ if(backFn) backFn(); else showOtherMenu3372(); };
+ if(home)home.onclick=()=>{ if(typeof showHome==="function")showHome(); };
+}
+function card3372(cls,title,sub,id){
+ return `<button class="card3372 ${cls}" id="${id}"><div class="title">${title}</div><div class="sub">${sub}</div></button>`;
+}
+function page3372(title,body){
+ render3372(`<h2>${title}</h2><div class="panel3372">${body}</div>`, showOtherMenu3372);
+}
+
+/* 生成元の無効化：お気に入り/AI/後付けナビ */
 [
  "addNav3347","addNav3366","addNav3368","addNavigationButtons","createNavigationButtons","createBottomButtons","showBottomButtons","renderBottomNav",
  "createFavoriteButton","showFavoriteButton","addFavoriteButton","renderFavoriteButton",
  "createAIExplainButton","showAIExplainButton","addAIExplainButton","renderAIExplainButton","showAIExplainPlus"
-].forEach(name=>{
-  try{
-    if(typeof window[name]==="function"){
-      window[name]=function(){return null;};
-    }
-  }catch(e){}
-});
+].forEach(name=>{try{if(typeof window[name]==="function")window[name]=function(){return null;};}catch(e){}});
 
-/* append/insert段階でも該当ボタンだけ作らせない */
-if(!window.__sourceButtonBlock3371){
- window.__sourceButtonBlock3371=true;
- const oldAppend=Element.prototype.appendChild;
- Element.prototype.appendChild=function(child){
-   try{
-     const txt=(child.innerText||child.textContent||"").trim();
-     const id=(child.id||"").toLowerCase();
-     const cls=String(child.className||"").toLowerCase();
-     if(txt.includes("お気に入り") || txt.includes("AI解説+") || id.includes("favorite") || id.includes("aiexplain") || cls.includes("favorite") || cls.includes("aiexplain")){
-       return child;
-     }
-     // 下側ナビっぽい後付けだけ止める。既存ページ内の上ナビはrender側が直接innerHTMLなので対象外。
-     if((txt==="← 戻る" || txt==="🏠 ホームへ") && (cls.includes("bottom") || id.includes("bottom") || cls.includes("float") || id.includes("float"))){
-       return child;
-     }
-   }catch(e){}
-   return oldAppend.call(this,child);
- };
- const oldInsert=Element.prototype.insertAdjacentHTML;
- Element.prototype.insertAdjacentHTML=function(pos,html){
-   const s=String(html);
-   if(s.includes("お気に入り") || s.includes("AI解説+")){
-     return;
-   }
-   return oldInsert.call(this,pos,html);
- };
-}
-
-/* DOM直書きされた場合だけ最低限の掃除。生成元停止がメイン */
-function removeForbidden3371(){
+function removeForbidden3372(){
  [...document.querySelectorAll("button,div,a")].forEach(el=>{
    const t=(el.innerText||"").trim();
    const id=(el.id||"").toLowerCase();
@@ -12314,82 +12300,140 @@ function removeForbidden3371(){
  if(navs.length>2) navs.slice(2).forEach(b=>b.remove());
 }
 
-function nav3371(){
- return `<div class="nav3371"><button id="back3371">← 戻る</button><button id="home3371">🏠 ホームへ</button></div>`;
-}
-function render3371(html){
- style3371();
- panel3371().innerHTML=nav3371()+html;
- const b=document.getElementById("back3371");
- const h=document.getElementById("home3371");
- if(b)b.onclick=()=>showOtherMenu3371();
- if(h)h.onclick=()=>{ if(typeof showHome==="function")showHome(); };
- removeForbidden3371();
-}
-function card3371(cls,title,sub,id){
- return `<button class="card3371 ${cls}" id="${id}"><div class="title">${title}</div><div class="sub">${sub}</div></button>`;
-}
-
-/* その他メニュー：利用規約・プライバシーポリシーを確実に追加 */
-window.showOtherMenu3371=function(){
- render3371(`
+/* その他：利用規約・プライバシーポリシーを確実に追加 */
+window.showOtherMenu3372=function(){
+ render3372(`
   <h2>⚙️ その他</h2>
-  <div class="grid3371">
-   ${card3371("blue3371","🔊 音声","読み上げ・BGM・効果音","voice3371")}
-   ${card3371("green3371","📢 お知らせ","更新内容を見る","news3371")}
-   ${card3371("purple3371","📖 遊び方","ゲーム説明","guide3371")}
-   ${card3371("orange3371","🎯 ミッション","デイリー確認","mission3371")}
-   ${card3371("gray3371","🎁 シリアル","コード入力","serial3371")}
-   ${card3371("red3371","📩 お問い合わせ","不具合報告","contact3371")}
-   ${card3371("purple3371","📜 利用規約","利用ルールを確認","terms3371")}
-   ${card3371("gray3371","🔒 プライバシーポリシー","個人情報の扱い","privacy3371")}
+  <div class="grid3372">
+   ${card3372("blue3372","🔊 音声","読み上げ・BGM・効果音","voice3372")}
+   ${card3372("green3372","📢 お知らせ","更新内容を見る","news3372")}
+   ${card3372("purple3372","📖 遊び方","ゲーム説明","guide3372")}
+   ${card3372("orange3372","🎯 ミッション","デイリー確認","mission3372")}
+   ${card3372("gray3372","🎁 シリアル","コード入力","serial3372")}
+   ${card3372("red3372","📩 お問い合わせ","不具合報告","contact3372")}
+   ${card3372("purple3372","📜 利用規約","利用ルールを確認","terms3372")}
+   ${card3372("gray3372","🔒 プライバシーポリシー","個人情報の扱い","privacy3372")}
   </div>
- `);
+ `, showOtherMenu3372);
+
  const bind=(id,fn)=>{const e=document.getElementById(id); if(e)e.onclick=fn;};
- bind("voice3371",()=>showVoice3371());
- bind("news3371",()=>showNews3371());
- bind("guide3371",()=>{ if(typeof showGuide==="function")showGuide(); else showPage3371("📖 遊び方","問題を解いて経験値とコインを集める学習ゲームです。"); });
- bind("mission3371",()=>{ if(typeof showDailyMission==="function")showDailyMission(); else showPage3371("🎯 ミッション","デイリーミッション確認ページです。"); });
- bind("serial3371",()=>{ if(typeof showSerialCode==="function")showSerialCode(); else if(typeof showCodeInput==="function")showCodeInput(); else showPage3371("🎁 シリアル","シリアルコード入力ページです。"); });
- bind("contact3371",()=>showPage3371("📩 お問い合わせ","不具合報告・要望を送るページです。"));
- bind("terms3371",()=>showTerms3371());
- bind("privacy3371",()=>showPrivacy3371());
+ bind("voice3372",()=>page3372("🔊 音声","<p>英語読み上げ・BGM・効果音の設定ページです。</p>"));
+ bind("news3372",()=>page3372("📢 お知らせ","<h3>Ver3.3.72</h3><p>利用規約/プライバシーポリシー追加、英語/国語/社会カード遷移を修正しました。</p>"));
+ bind("guide3372",()=>{ if(typeof showGuide==="function")showGuide(); else page3372("📖 遊び方","<p>問題を解いて経験値とコインを集める学習ゲームです。</p>"); });
+ bind("mission3372",()=>{ if(typeof showDailyMission==="function")showDailyMission(); else page3372("🎯 ミッション","<p>デイリーミッション確認ページです。</p>"); });
+ bind("serial3372",()=>{ if(typeof showSerialCode==="function")showSerialCode(); else if(typeof showCodeInput==="function")showCodeInput(); else page3372("🎁 シリアル","<p>シリアルコード入力ページです。</p>"); });
+ bind("contact3372",()=>page3372("📩 お問い合わせ","<p>不具合報告・要望を送るページです。</p>"));
+ bind("terms3372",()=>showTerms3372());
+ bind("privacy3372",()=>showPrivacy3372());
 };
-window.showLearningOther3341=showOtherMenu3371;
+window.showLearningOther3341=showOtherMenu3372;
+window.showOtherMenu3371=showOtherMenu3372;
+window.showOtherMenu3368=showOtherMenu3372;
+window.showOtherMenu3354=showOtherMenu3372;
 
-function showPage3371(title,body){
- render3371(`<h2>${title}</h2><div class="panel3371"><p>${body}</p></div>`);
-}
-function showVoice3371(){
- render3371(`<h2>🔊 音声</h2><div class="panel3371"><p>英語読み上げ・BGM・効果音の設定ページです。</p><p>既存の音量設定は維持されます。</p></div>`);
-}
-function showNews3371(){
- render3371(`<h2>📢 お知らせ</h2><div class="panel3371"><h3>Ver3.3.71</h3><p>・お気に入り/AI解説+/後付けナビの生成元を無効化しました。</p><p>・その他に利用規約とプライバシーポリシーを追加しました。</p><p>・スライム削除状態は維持しています。</p></div>`);
-}
-function showTerms3371(){
- render3371(`<h2>📜 利用規約</h2><div class="panel3371">
-  <p>数学マスターは学習を目的としたサービスです。</p>
-  <p>不正なスコア改ざん、荒らし、他人への迷惑行為は禁止です。</p>
-  <p>ゲーム内容や仕様は予告なく変更される場合があります。</p>
- </div>`);
-}
-function showPrivacy3371(){
- render3371(`<h2>🔒 プライバシーポリシー</h2><div class="panel3371">
-  <p>数学マスターでは、ログイン、ランキング、成績保存に必要な情報のみ利用します。</p>
+window.showTerms3372=function(){
+ page3372("📜 利用規約",`
+  <p>数学マスターは学習目的で利用するサービスです。</p>
+  <p>ランキングの不正改ざん、荒らし、他人への迷惑行為は禁止です。</p>
+  <p>サービス内容・ゲーム仕様・問題内容は予告なく変更される場合があります。</p>
+  <p>利用者は自己責任で本サービスを利用するものとします。</p>
+ `);
+};
+window.showPrivacy3372=function(){
+ page3372("🔒 プライバシーポリシー",`
+  <p>数学マスターでは、ログイン、成績保存、ランキング表示に必要な情報のみ利用します。</p>
   <p>不要な個人情報は収集しません。</p>
-  <p>お問い合わせ内容は不具合対応や改善のために利用します。</p>
- </div>`);
+  <p>お問い合わせ内容は不具合対応やサービス改善のために利用します。</p>
+  <p>保存された学習データは、ユーザー体験向上のために使用されます。</p>
+ `);
+};
+
+/* 学習の数学以外：難易度/項目を押した後に必ず問題開始 */
+function startOther3372(kind,mode,level){
+ if(typeof start3354==="function")return start3354(kind,mode,level);
+ if(typeof start3353==="function")return start3353(kind,mode,level);
+ if(typeof startOtherGame3351==="function")return startOtherGame3351(kind,mode,level);
+ alert("問題開始処理が見つかりません");
 }
-window.showTerms3371=showTerms3371;
-window.showPrivacy3371=showPrivacy3371;
-window.showNewsPage=showNews3371;
 
-/* 既存その他呼び出しを上書き */
-window.showOtherMenu3368=showOtherMenu3371;
-window.showOtherMenu3367=showOtherMenu3371;
-window.showOtherMenu3354=showOtherMenu3371;
+window.showEnglishCards3372=function(){
+ render3372(`
+  <h2>🌍 英語</h2>
+  <div class="grid3372">
+   ${card3372("green3372","📗 初級","基礎単語","engB3372")}
+   ${card3372("blue3372","📘 中級","標準単語","engM3372")}
+   ${card3372("orange3372","📕 上級","受験単語","engA3372")}
+   ${card3372("gray3372","🎲 ランダム","全レベル","engR3372")}
+  </div>
+ `, showLearningMode);
+ document.getElementById("engB3372").onclick=()=>showEnglishDirection3372("初級");
+ document.getElementById("engM3372").onclick=()=>showEnglishDirection3372("中級");
+ document.getElementById("engA3372").onclick=()=>showEnglishDirection3372("上級");
+ document.getElementById("engR3372").onclick=()=>showEnglishDirection3372("ランダム");
+};
+function showEnglishDirection3372(level){
+ render3372(`
+  <h2>🌍 英語 ${level}</h2>
+  <div class="grid3372">
+   ${card3372("blue3372","📝 英語→日本語","意味を選ぶ","en2ja3372")}
+   ${card3372("green3372","🔄 日本語→英語","英単語を選ぶ","ja2en3372")}
+  </div>
+ `, showEnglishCards3372);
+ document.getElementById("en2ja3372").onclick=()=>startOther3372("eng","en2ja",level);
+ document.getElementById("ja2en3372").onclick=()=>startOther3372("eng","ja2en",level);
+}
 
-document.addEventListener("click",()=>setTimeout(removeForbidden3371,80),true);
-document.addEventListener("touchstart",()=>setTimeout(removeForbidden3371,80),{passive:true});
-setInterval(removeForbidden3371,1000);
+window.showJapaneseCards3372=function(){
+ render3372(`
+  <h2>🇯🇵 国語</h2>
+  <div class="grid3372">
+   ${card3372("orange3372","📖 漢字→読み","読み方を選ぶ","kanjiRead3372")}
+   ${card3372("red3372","💭 漢字→意味","意味を選ぶ","kanjiMeaning3372")}
+   ${card3372("purple3372","📜 古文→意味","古語の意味","kobunMeaning3372")}
+   ${card3372("blue3372","🔄 意味→古文","意味から古語","meaningKobun3372")}
+  </div>
+ `, showLearningMode);
+ document.getElementById("kanjiRead3372").onclick=()=>startOther3372("kanji","kanjiRead","ランダム");
+ document.getElementById("kanjiMeaning3372").onclick=()=>startOther3372("kanji","kanjiMeaning","ランダム");
+ document.getElementById("kobunMeaning3372").onclick=()=>startOther3372("kobun","kobun2meaning","ランダム");
+ document.getElementById("meaningKobun3372").onclick=()=>startOther3372("kobun","meaning2kobun","ランダム");
+};
+
+window.showSocialCards3372=function(){
+ render3372(`
+  <h2>🏛️ 社会</h2>
+  <div class="grid3372">
+   ${card3372("green3372","🗾 地理","地理問題","geo3372")}
+   ${card3372("orange3372","🏯 歴史","歴史問題","hist3372")}
+   ${card3372("purple3372","🏛️ 公民","公民問題","civ3372")}
+   ${card3372("gray3372","🎲 ランダム","全分野","socR3372")}
+  </div>
+ `, showLearningMode);
+ document.getElementById("geo3372").onclick=()=>startOther3372("social","social","地理");
+ document.getElementById("hist3372").onclick=()=>startOther3372("social","social","歴史");
+ document.getElementById("civ3372").onclick=()=>startOther3372("social","social","公民");
+ document.getElementById("socR3372").onclick=()=>startOther3372("social","social","ランダム");
+};
+
+/* 既存学習トップがどの名前を呼んでも修正版へ */
+window.showEnglishCards3371=showEnglishCards3372;
+window.showEnglishCards3370=showEnglishCards3372;
+window.showEnglishCards3366=showEnglishCards3372;
+window.showEnglishCards3365=showEnglishCards3372;
+window.showJapaneseCards3371=showJapaneseCards3372;
+window.showJapaneseCards3370=showJapaneseCards3372;
+window.showJapaneseCards3366=showJapaneseCards3372;
+window.showJapaneseCards3365=showJapaneseCards3372;
+window.showSocialCards3371=showSocialCards3372;
+window.showSocialCards3370=showSocialCards3372;
+window.showSocialCards3366=showSocialCards3372;
+window.showSocialCards3365=showSocialCards3372;
+
+document.addEventListener("click",()=>setTimeout(removeForbidden3372,80),true);
+document.addEventListener("touchstart",()=>setTimeout(removeForbidden3372,80),{passive:true});
+setInterval(removeForbidden3372,1000);
+
+window.showNewsPage=function(){
+ page3372("📢 お知らせ","<h3>Ver3.3.72</h3><p>利用規約/プライバシーポリシー追加、英語/国語/社会カード遷移を修正しました。</p>");
+};
 })();
