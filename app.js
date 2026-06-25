@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.3.64";
+const VERSION = "3.3.65";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -12791,25 +12791,32 @@ window.showNewsPage=function(){
 
 
 
-/* Ver3.3.63 Learning all cards + remove monsters from ranking/bbs */
+
+
+
+
+
+/* Ver3.3.65 safe learning cards + rank/bbs restore */
 (function(){
-if(window.__learningCardsNoMonsters3363)return;
-window.__learningCardsNoMonsters3363=true;
+if(window.__learningRankBbsFix3365)return;
+window.__learningRankBbsFix3365=true;
 
-function p3363(){return document.getElementById("panelArea")||document.body;}
+const originalShowLearning3365 = typeof showLearningMode==="function" ? showLearningMode : null;
 
-function style3363(){
- if(document.getElementById("style3363"))return;
+function panel3365(){return document.getElementById("panelArea")||document.body;}
+
+function style3365(){
+ if(document.getElementById("style3365"))return;
  const st=document.createElement("style");
- st.id="style3363";
+ st.id="style3365";
  st.textContent=`
-.learningGrid3363{
+.learningGrid3365{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:16px;
   margin:18px 0;
 }
-.learnCard3363{
+.learnCard3365{
   min-height:150px;
   border:none;
   border-radius:22px;
@@ -12819,229 +12826,151 @@ function style3363(){
   font-weight:900;
   box-shadow:0 10px 25px rgba(0,0,0,.25);
 }
-.learnCard3363 .title{
-  font-size:28px;
-  margin-bottom:10px;
+.learnCard3365 .title{font-size:28px;margin-bottom:10px;}
+.learnCard3365 .sub{font-size:15px;line-height:1.45;opacity:.95;}
+.cardBlue3365{background:linear-gradient(135deg,#06b6d4,#2563eb);}
+.cardGreen3365{background:linear-gradient(135deg,#22c55e,#16a34a);}
+.cardOrange3365{background:linear-gradient(135deg,#f59e0b,#ef4444);}
+.cardPurple3365{background:linear-gradient(135deg,#8b5cf6,#ec4899);}
+.cardGray3365{background:linear-gradient(135deg,#64748b,#334155);}
+.cardRed3365{background:linear-gradient(135deg,#ef4444,#991b1b);}
+.cardYellow3365{background:linear-gradient(135deg,#facc15,#f97316);}
+.safeNav3365{
+  height:76px;
+  display:flex;
+  justify-content:center;
+  gap:18px;
+  align-items:center;
 }
-.learnCard3363 .sub{
-  font-size:15px;
-  line-height:1.45;
-  opacity:.95;
-}
-.cardBlue3363{background:linear-gradient(135deg,#06b6d4,#2563eb);}
-.cardGreen3363{background:linear-gradient(135deg,#22c55e,#16a34a);}
-.cardOrange3363{background:linear-gradient(135deg,#f59e0b,#ef4444);}
-.cardPurple3363{background:linear-gradient(135deg,#8b5cf6,#ec4899);}
-.cardGray3363{background:linear-gradient(135deg,#64748b,#334155);}
-.cardRed3363{background:linear-gradient(135deg,#ef4444,#991b1b);}
-.cardYellow3363{background:linear-gradient(135deg,#facc15,#f97316);}
-
-/* ランキング・掲示板に残る敵/スライム表示を消す */
-[id^="enemyStage"],
-[id*="enemy"],
-[class*="enemy"],
-[id*="monster"],
-[class*="monster"],
-[id*="slime"],
-[class*="slime"],
-.enemyStage,
-.enemyField3330,
-.enemyField3331,
-.enemyField3332{
-  display:none!important;
-  visibility:hidden!important;
-  pointer-events:none!important;
-}
-body.rankingClean3363 [id^="enemyStage"],
-body.boardClean3363 [id^="enemyStage"]{
-  display:none!important;
+.safeNav3365 button{
+  border:2px solid #22f5d1;
+  border-radius:12px;
+  background:#222;
+  color:#fff;
+  padding:12px 22px;
+  font-size:20px;
+  font-weight:900;
 }
 `;
  document.head.appendChild(st);
 }
 
-function nav3363(){
- return `<div style="height:76px;display:flex;justify-content:center;gap:18px;align-items:center;">
-  <button onclick="history.length>1?history.back():showHome&&showHome()" style="border:2px solid #22f5d1;border-radius:12px;background:#222;color:#fff;padding:12px 22px;font-size:20px;font-weight:900;">← 戻る</button>
-  <button onclick="showHome&&showHome()" style="border:2px solid #22f5d1;border-radius:12px;background:#222;color:#fff;padding:12px 22px;font-size:20px;font-weight:900;">🏠 ホームへ</button>
+function nav3365(){
+ return `<div class="safeNav3365">
+  <button onclick="showHome&&showHome()">← 戻る</button>
+  <button onclick="showHome&&showHome()">🏠 ホームへ</button>
  </div>`;
 }
-
-function render3363(html){
- style3363();
- p3363().innerHTML=nav3363()+html;
+function render3365(html, withNav=true){
+ style3365();
+ panel3365().innerHTML=(withNav?nav3365():"")+html;
 }
-
-function card3363(cls,title,sub,onclick){
- return `<button class="learnCard3363 ${cls}" onclick="${onclick}">
+function card3365(cls,title,sub,action){
+ return `<button class="learnCard3365 ${cls}" onclick="${action}">
   <div class="title">${title}</div>
   <div class="sub">${sub}</div>
  </button>`;
 }
 
-window.showLearningCategories3363=function(){
- render3363(`
+/* ホームの学習から最初に出る4カード */
+window.showLearningMode=function(){
+ render3365(`
   <h2>📚 学習</h2>
   <p style="text-align:center;font-weight:900;opacity:.9;">分野を選んでください</p>
-  <div class="learningGrid3363">
-   ${card3363("cardBlue3363","📚 数学","積分・微分・因数分解など","showMathCards3363()")}
-   ${card3363("cardGreen3363","🌍 英語","英語→日本語 / 日本語→英語","showEnglishCards3363()")}
-   ${card3363("cardOrange3363","🇯🇵 国語","漢字・読み・意味","showJapaneseCards3363()")}
-   ${card3363("cardPurple3363","🏛️ 社会","地理・歴史・公民","showSocialCards3363()")}
+  <div class="learningGrid3365">
+   ${card3365("cardBlue3365","📚 数学","積分・微分・因数分解など","showMathCards3365()")}
+   ${card3365("cardGreen3365","🌍 英語","英語→日本語 / 日本語→英語","showEnglishCards3365()")}
+   ${card3365("cardOrange3365","🇯🇵 国語","漢字・読み・意味","showJapaneseCards3365()")}
+   ${card3365("cardPurple3365","🏛️ 社会","地理・歴史・公民","showSocialCards3365()")}
   </div>
  `);
 };
 
-const originalLearning3363 = typeof showLearningMode==="function" ? showLearningMode : null;
-window.showLearningMode=function(){
- showLearningCategories3363();
-};
-
-window.showMathCards3363=function(){
- render3363(`
+/* 数学カード。押したあと反応しない問題を、元の学習画面を一度作って該当ボタンを押す方式で修正 */
+window.showMathCards3365=function(){
+ render3365(`
   <h2>📚 数学</h2>
-  <div class="learningGrid3363">
-   ${card3363("cardBlue3363","∫ 積分","積分問題","showMathOriginal3363('積分')")}
-   ${card3363("cardGreen3363","𝑑 微分","微分問題","showMathOriginal3363('微分')")}
-   ${card3363("cardOrange3363","✖️ 因数分解","式を因数分解","showMathOriginal3363('因数分解')")}
-   ${card3363("cardPurple3363","📐 展開","式の展開","showMathOriginal3363('展開')")}
-   ${card3363("cardYellow3363","🔢 素因数分解","整数の分解","showMathOriginal3363('素因数分解')")}
-   ${card3363("cardRed3363","➕ 四則演算","計算練習","showMathOriginal3363('四則演算')")}
-   ${card3363("cardGray3363","🎲 ランダム","ランダム問題","showMathOriginal3363('ランダム')")}
+  <div class="learningGrid3365">
+   ${card3365("cardBlue3365","∫ 積分","積分問題","openMathOriginal3365('積分')")}
+   ${card3365("cardGreen3365","𝑑 微分","微分問題","openMathOriginal3365('微分')")}
+   ${card3365("cardOrange3365","✖️ 因数分解","式を因数分解","openMathOriginal3365('因数分解')")}
+   ${card3365("cardPurple3365","📐 展開","式の展開","openMathOriginal3365('展開')")}
+   ${card3365("cardYellow3365","🔢 素因数分解","整数の分解","openMathOriginal3365('素因数分解')")}
+   ${card3365("cardRed3365","➕ 四則演算","openMathOriginal3365('四則演算')")}
+   ${card3365("cardGray3365","🎲 ランダム","ランダム問題","openMathOriginal3365('ランダム')")}
   </div>
  `);
 };
 
-window.showMathOriginal3363=function(label){
- if(!originalLearning3363)return;
- originalLearning3363();
+window.openMathOriginal3365=function(label){
+ if(!originalShowLearning3365)return;
+ originalShowLearning3365();
  setTimeout(()=>{
    const buttons=[...document.querySelectorAll("button")];
-   const btn=buttons.find(b=>(b.innerText||"").includes(label));
+   const btn=buttons.find(b=>{
+     const t=(b.innerText||"").trim();
+     return t.includes(label);
+   });
    if(btn)btn.click();
- },80);
+ },120);
 };
 
-window.showEnglishCards3363=function(){
- render3363(`
+window.showEnglishCards3365=function(){
+ render3365(`
   <h2>🌍 英語</h2>
-  <div class="learningGrid3363">
-   ${card3363("cardGreen3363","📗 初級","基礎単語","showEnglishMode3354 ? showEnglishMode3354('初級') : showEnglishMode3353 && showEnglishMode3353('初級')")}
-   ${card3363("cardBlue3363","📘 中級","標準単語","showEnglishMode3354 ? showEnglishMode3354('中級') : showEnglishMode3353 && showEnglishMode3353('中級')")}
-   ${card3363("cardOrange3363","📕 上級","受験単語","showEnglishMode3354 ? showEnglishMode3354('上級') : showEnglishMode3353 && showEnglishMode3353('上級')")}
-   ${card3363("cardGray3363","🎲 ランダム","全レベルから出題","showEnglishMode3354 ? showEnglishMode3354('ランダム') : showEnglishMode3353 && showEnglishMode3353('ランダム')")}
+  <div class="learningGrid3365">
+   ${card3365("cardGreen3365","📗 初級","基礎単語","showEnglishMode3354 ? showEnglishMode3354('初級') : showEnglishMode3353 && showEnglishMode3353('初級')")}
+   ${card3365("cardBlue3365","📘 中級","標準単語","showEnglishMode3354 ? showEnglishMode3354('中級') : showEnglishMode3353 && showEnglishMode3353('中級')")}
+   ${card3365("cardOrange3365","📕 上級","受験単語","showEnglishMode3354 ? showEnglishMode3354('上級') : showEnglishMode3353 && showEnglishMode3353('上級')")}
+   ${card3365("cardGray3365","🎲 ランダム","全レベルから出題","showEnglishMode3354 ? showEnglishMode3354('ランダム') : showEnglishMode3353 && showEnglishMode3353('ランダム')")}
   </div>
  `);
 };
 
-window.showJapaneseCards3363=function(){
- render3363(`
+window.showJapaneseCards3365=function(){
+ render3365(`
   <h2>🇯🇵 国語</h2>
-  <div class="learningGrid3363">
-   ${card3363("cardOrange3363","📖 漢字→読み","読み方を選ぶ","start3354 ? start3354('kanji','kanjiRead','ランダム') : start3353 && start3353('kanji','kanjiRead','ランダム')")}
-   ${card3363("cardRed3363","💭 漢字→意味","意味を選ぶ","start3354 ? start3354('kanji','kanjiMeaning','ランダム') : start3353 && start3353('kanji','kanjiMeaning','ランダム')")}
-   ${card3363("cardPurple3363","📜 古文→意味","古語の意味","start3354 ? start3354('kobun','kobun2meaning','ランダム') : start3353 && start3353('kobun','kobun2meaning','ランダム')")}
-   ${card3363("cardBlue3363","🔄 意味→古文","意味から古語","start3354 ? start3354('kobun','meaning2kobun','ランダム') : start3353 && start3353('kobun','meaning2kobun','ランダム')")}
+  <div class="learningGrid3365">
+   ${card3365("cardOrange3365","📖 漢字→読み","読み方を選ぶ","start3354 ? start3354('kanji','kanjiRead','ランダム') : start3353 && start3353('kanji','kanjiRead','ランダム')")}
+   ${card3365("cardRed3365","💭 漢字→意味","意味を選ぶ","start3354 ? start3354('kanji','kanjiMeaning','ランダム') : start3353 && start3353('kanji','kanjiMeaning','ランダム')")}
+   ${card3365("cardPurple3365","📜 古文→意味","古語の意味","start3354 ? start3354('kobun','kobun2meaning','ランダム') : start3353 && start3353('kobun','kobun2meaning','ランダム')")}
+   ${card3365("cardBlue3365","🔄 意味→古文","意味から古語","start3354 ? start3354('kobun','meaning2kobun','ランダム') : start3353 && start3353('kobun','meaning2kobun','ランダム')")}
   </div>
  `);
 };
 
-window.showSocialCards3363=function(){
- render3363(`
+window.showSocialCards3365=function(){
+ render3365(`
   <h2>🏛️ 社会</h2>
-  <div class="learningGrid3363">
-   ${card3363("cardGreen3363","🗾 地理","地理問題","start3354 ? start3354('social','social','地理') : start3353 && start3353('social','social','地理')")}
-   ${card3363("cardOrange3363","🏯 歴史","歴史問題","start3354 ? start3354('social','social','歴史') : start3353 && start3353('social','social','歴史')")}
-   ${card3363("cardPurple3363","🏛️ 公民","公民問題","start3354 ? start3354('social','social','公民') : start3353 && start3353('social','social','公民')")}
-   ${card3363("cardGray3363","🎲 ランダム","全分野から出題","start3354 ? start3354('social','social','ランダム') : start3353 && start3353('social','social','ランダム')")}
+  <div class="learningGrid3365">
+   ${card3365("cardGreen3365","🗾 地理","地理問題","start3354 ? start3354('social','social','地理') : start3353 && start3353('social','social','地理')")}
+   ${card3365("cardOrange3365","🏯 歴史","歴史問題","start3354 ? start3354('social','social','歴史') : start3353 && start3353('social','social','歴史')")}
+   ${card3365("cardPurple3365","🏛️ 公民","公民問題","start3354 ? start3354('social','social','公民') : start3353 && start3353('social','social','公民')")}
+   ${card3365("cardGray3365","🎲 ランダム","全分野から出題","start3354 ? start3354('social','social','ランダム') : start3353 && start3353('social','social','ランダム')")}
   </div>
  `);
 };
 
-function removeMonsters3363(){
- const t=(p3363().innerText||"").slice(0,3000);
- const isRank=t.includes("ランキング");
- const isBoard=t.includes("掲示板");
- document.body.classList.toggle("rankingClean3363",isRank);
- document.body.classList.toggle("boardClean3363",isBoard);
- if(!isRank && !isBoard)return;
- document.querySelectorAll('[id^="enemyStage"],[id*="enemy"],[class*="enemy"],[id*="monster"],[class*="monster"],[id*="slime"],[class*="slime"],.enemyStage,.enemyField3330,.enemyField3331,.enemyField3332').forEach(e=>e.remove());
+/* ランキング/掲示板は消さない。白画面になる強制削除は使わない。
+   スライムが出る場合だけ、画像/敵パネルに限定して非表示。panelArea自体は触らない。 */
+function safeHideEnemyOnly3365(){
+ const t=(panel3365().innerText||"").slice(0,3000);
+ if(!(t.includes("ランキング")||t.includes("掲示板")))return;
+ const selectors=[
+  'img[src*="slime"]','img[src*="monster"]','img[src*="enemy"]',
+  '[id^="enemyStage"]','.enemyStage','.enemyField3330','.enemyField3331','.enemyField3332'
+ ];
+ selectors.forEach(sel=>{
+   try{document.querySelectorAll(sel).forEach(e=>{e.style.display="none";});}catch(e){}
+ });
 }
-
-document.addEventListener("click",()=>setTimeout(removeMonsters3363,80),true);
-document.addEventListener("touchstart",()=>setTimeout(removeMonsters3363,80),{passive:true});
-setInterval(removeMonsters3363,800);
-setTimeout(removeMonsters3363,500);
+document.addEventListener("click",()=>setTimeout(safeHideEnemyOnly3365,100),true);
+document.addEventListener("touchstart",()=>setTimeout(safeHideEnemyOnly3365,100),{passive:true});
+setInterval(safeHideEnemyOnly3365,1000);
 
 window.showNewsPage=function(){
  const p=document.getElementById("panelArea");
  if(!p)return;
- p.innerHTML=`<h2>📢 お知らせ</h2><div class="card3354"><h3>Ver3.3.63</h3><p>学習内の全メニューをカード形式にしました。</p><p>ランキング・掲示板で表示されるスライム/モンスターを削除しました。</p></div>`;
-};
-})();
-
-
-
-/* Ver3.3.64 ranking/bbs monster hard remove + white screen guard */
-(function(){
-if(window.__rankBbsGeoFix3364)return;
-window.__rankBbsGeoFix3364=true;
-
-function p3364(){return document.getElementById("panelArea")||document.body;}
-
-function removeMonstersHard3364(){
-  const selectors=[
-    '[id^="enemyStage"]','[id*="enemy"]','[class*="enemy"]',
-    '[id*="monster"]','[class*="monster"]','[id*="slime"]','[class*="slime"]',
-    '.enemyStage','.enemyField3330','.enemyField3331','.enemyField3332',
-    'img[src*="slime"]','img[src*="monster"]','img[src*="enemy"]'
-  ];
-  selectors.forEach(sel=>{
-    try{document.querySelectorAll(sel).forEach(e=>e.remove());}catch(e){}
-  });
-  document.body.classList.remove("enemyProblemActive3332","enemyProblemActive3331","enemyProblemActive3330");
-}
-
-function isRankOrBoard3364(){
-  const t=(p3364().innerText||"").slice(0,3000);
-  return t.includes("ランキング") || t.includes("掲示板");
-}
-
-function guardWhite3364(){
-  if(!isRankOrBoard3364())return;
-  removeMonstersHard3364();
-
-  // 白画面対策：panelAreaが空にされたら最低限の案内だけ戻す
-  const p=p3364();
-  const txt=(p.innerText||"").trim();
-  if(txt.length===0){
-    p.innerHTML=`<h2>表示エラーを防止しました</h2><p>スライム/敵表示の残骸を削除しました。ホームに戻ってもう一度開いてください。</p><button onclick="showHome&&showHome()">🏠 ホームへ</button>`;
-  }
-}
-
-/* ランキング/掲示板関数を包んで、開いた直後に敵を削除 */
-["showRankingMenu","showRanking","showWorldRanking","showBoard","showBBS","showBulletinBoard"].forEach(name=>{
-  const fn=window[name];
-  if(typeof fn==="function" && !fn.__clean3364){
-    window[name]=function(){
-      const r=fn.apply(this,arguments);
-      setTimeout(guardWhite3364,0);
-      setTimeout(guardWhite3364,80);
-      setTimeout(guardWhite3364,300);
-      return r;
-    };
-    window[name].__clean3364=true;
-  }
-});
-
-document.addEventListener("click",()=>setTimeout(guardWhite3364,80),true);
-document.addEventListener("touchstart",()=>setTimeout(guardWhite3364,80),{passive:true});
-setInterval(guardWhite3364,700);
-setTimeout(guardWhite3364,500);
-
-window.showNewsPage=function(){
- const p=document.getElementById("panelArea");
- if(!p)return;
- p.innerHTML=`<h2>📢 お知らせ</h2><div class="card3354"><h3>Ver3.3.64</h3><p>ランキング・掲示板で出るスライム/モンスター残骸を強制削除しました。</p><p>地理に県庁所在地以外の山・川・湖・気候・工業・農業などを追加しました。</p></div>`;
+ p.innerHTML=`<h2>📢 お知らせ</h2><div class="card3354"><h3>Ver3.3.65</h3><p>ランキング/掲示板の白画面化を修正しました。</p><p>学習カードの数学を押しても反応しない問題を修正しました。</p><p>ホームに戻る後に学習が下へ追加される問題を修正しました。</p></div>`;
 };
 })();
