@@ -5,93 +5,23 @@
     "level": "初級"
   },
   {
-    "ja": "練習",
+    "ja": "練習する",
     "en": "practice",
     "level": "初級"
   },
   {
-    "ja": "復習",
+    "ja": "復習する",
     "en": "review",
     "level": "初級"
   },
   {
-    "ja": "問題",
-    "en": "problem",
+    "ja": "質問する",
+    "en": "ask",
     "level": "初級"
   },
   {
-    "ja": "答え",
+    "ja": "答える",
     "en": "answer",
-    "level": "初級"
-  },
-  {
-    "ja": "質問",
-    "en": "question",
-    "level": "初級"
-  },
-  {
-    "ja": "正しい",
-    "en": "correct",
-    "level": "初級"
-  },
-  {
-    "ja": "間違い",
-    "en": "mistake",
-    "level": "初級"
-  },
-  {
-    "ja": "簡単な",
-    "en": "easy",
-    "level": "初級"
-  },
-  {
-    "ja": "難しい",
-    "en": "difficult",
-    "level": "初級"
-  },
-  {
-    "ja": "努力",
-    "en": "effort",
-    "level": "初級"
-  },
-  {
-    "ja": "成功",
-    "en": "success",
-    "level": "初級"
-  },
-  {
-    "ja": "失敗",
-    "en": "failure",
-    "level": "初級"
-  },
-  {
-    "ja": "時間",
-    "en": "time",
-    "level": "初級"
-  },
-  {
-    "ja": "学校",
-    "en": "school",
-    "level": "初級"
-  },
-  {
-    "ja": "先生",
-    "en": "teacher",
-    "level": "初級"
-  },
-  {
-    "ja": "生徒",
-    "en": "student",
-    "level": "初級"
-  },
-  {
-    "ja": "友達",
-    "en": "friend",
-    "level": "初級"
-  },
-  {
-    "ja": "家族",
-    "en": "family",
     "level": "初級"
   },
   {
@@ -150,6 +80,116 @@
     "level": "初級"
   },
   {
+    "ja": "始める",
+    "en": "start",
+    "level": "初級"
+  },
+  {
+    "ja": "終える",
+    "en": "finish",
+    "level": "初級"
+  },
+  {
+    "ja": "続ける",
+    "en": "continue",
+    "level": "初級"
+  },
+  {
+    "ja": "止まる",
+    "en": "stop",
+    "level": "初級"
+  },
+  {
+    "ja": "学ぶ",
+    "en": "learn",
+    "level": "初級"
+  },
+  {
+    "ja": "教える",
+    "en": "teach",
+    "level": "初級"
+  },
+  {
+    "ja": "覚える",
+    "en": "remember",
+    "level": "初級"
+  },
+  {
+    "ja": "忘れる",
+    "en": "forget",
+    "level": "初級"
+  },
+  {
+    "ja": "問題",
+    "en": "problem",
+    "level": "初級"
+  },
+  {
+    "ja": "学校",
+    "en": "school",
+    "level": "初級"
+  },
+  {
+    "ja": "先生",
+    "en": "teacher",
+    "level": "初級"
+  },
+  {
+    "ja": "生徒",
+    "en": "student",
+    "level": "初級"
+  },
+  {
+    "ja": "友達",
+    "en": "friend",
+    "level": "初級"
+  },
+  {
+    "ja": "家族",
+    "en": "family",
+    "level": "初級"
+  },
+  {
+    "ja": "時間",
+    "en": "time",
+    "level": "初級"
+  },
+  {
+    "ja": "日",
+    "en": "day",
+    "level": "初級"
+  },
+  {
+    "ja": "年",
+    "en": "year",
+    "level": "初級"
+  },
+  {
+    "ja": "本",
+    "en": "book",
+    "level": "初級"
+  },
+  {
+    "ja": "名前",
+    "en": "name",
+    "level": "初級"
+  },
+  {
+    "ja": "場所",
+    "en": "place",
+    "level": "初級"
+  },
+  {
+    "ja": "町",
+    "en": "town",
+    "level": "初級"
+  },
+  {
+    "ja": "家",
+    "en": "house",
+    "level": "初級"
+  },
+  {
     "ja": "重要な",
     "en": "important",
     "level": "中級"
@@ -158,6 +198,46 @@
     "ja": "必要な",
     "en": "necessary",
     "level": "中級"
+  },
+  {
+    "ja": "有名な",
+    "en": "famous",
+    "level": "中級"
+  },
+  {
+    "ja": "安全な",
+    "en": "safe",
+    "level": "中級"
+  },
+  {
+    "ja": "危険な",
+    "en": "dangerous",
+    "level": "中級"
+  },
+  {
+    "ja": "便利な",
+    "en": "convenient",
+    "level": "中級"
+  },
+  {
+    "ja": "可能な",
+    "en": "possible",
+    "level": "中級"
+  },
+  {
+    "ja": "不可能な",
+    "en": "impossible",
+    "level": "中級"
+  },
+  {
+    "ja": "簡単な",
+    "en": "easy",
+    "level": "初級"
+  },
+  {
+    "ja": "難しい",
+    "en": "difficult",
+    "level": "初級"
   },
   {
     "ja": "理由",
@@ -195,18 +275,13 @@
     "level": "中級"
   },
   {
-    "ja": "環境",
-    "en": "environment",
+    "ja": "文化",
+    "en": "culture",
     "level": "中級"
   },
   {
     "ja": "社会",
     "en": "society",
-    "level": "中級"
-  },
-  {
-    "ja": "文化",
-    "en": "culture",
     "level": "中級"
   },
   {
@@ -217,6 +292,16 @@
   {
     "ja": "科学",
     "en": "science",
+    "level": "中級"
+  },
+  {
+    "ja": "自然",
+    "en": "nature",
+    "level": "中級"
+  },
+  {
+    "ja": "環境",
+    "en": "environment",
     "level": "中級"
   },
   {
@@ -240,28 +325,13 @@
     "level": "中級"
   },
   {
-    "ja": "自然",
-    "en": "nature",
-    "level": "中級"
-  },
-  {
-    "ja": "政府",
-    "en": "government",
-    "level": "中級"
-  },
-  {
-    "ja": "法律",
-    "en": "law",
+    "ja": "自由",
+    "en": "freedom",
     "level": "中級"
   },
   {
     "ja": "権利",
     "en": "right",
-    "level": "中級"
-  },
-  {
-    "ja": "自由",
-    "en": "freedom",
     "level": "中級"
   },
   {
@@ -280,33 +350,33 @@
     "level": "中級"
   },
   {
+    "ja": "努力",
+    "en": "effort",
+    "level": "初級"
+  },
+  {
+    "ja": "成功",
+    "en": "success",
+    "level": "初級"
+  },
+  {
+    "ja": "失敗",
+    "en": "failure",
+    "level": "初級"
+  },
+  {
     "ja": "比較する",
     "en": "compare",
-    "level": "中級"
+    "level": "上級"
   },
   {
     "ja": "改善する",
     "en": "improve",
-    "level": "中級"
-  },
-  {
-    "ja": "提供する",
-    "en": "provide",
-    "level": "中級"
-  },
-  {
-    "ja": "含む",
-    "en": "include",
-    "level": "中級"
-  },
-  {
-    "ja": "影響",
-    "en": "influence",
     "level": "上級"
   },
   {
-    "ja": "発展する",
-    "en": "develop",
+    "ja": "分析する",
+    "en": "analyze",
     "level": "上級"
   },
   {
@@ -315,8 +385,18 @@
     "level": "上級"
   },
   {
-    "ja": "分析する",
-    "en": "analyze",
+    "ja": "発展する",
+    "en": "develop",
+    "level": "上級"
+  },
+  {
+    "ja": "提供する",
+    "en": "provide",
+    "level": "上級"
+  },
+  {
+    "ja": "含む",
+    "en": "include",
     "level": "上級"
   },
   {
@@ -330,73 +410,23 @@
     "level": "上級"
   },
   {
-    "ja": "証拠",
-    "en": "evidence",
+    "ja": "影響を与える",
+    "en": "influence",
     "level": "上級"
   },
   {
-    "ja": "仮説",
-    "en": "hypothesis",
-    "level": "上級"
+    "ja": "説明する",
+    "en": "explain",
+    "level": "中級"
   },
   {
-    "ja": "効率的な",
-    "en": "efficient",
-    "level": "上級"
-  },
-  {
-    "ja": "適切な",
-    "en": "appropriate",
-    "level": "上級"
-  },
-  {
-    "ja": "可能にする",
-    "en": "enable",
-    "level": "上級"
-  },
-  {
-    "ja": "強調する",
-    "en": "emphasize",
-    "level": "上級"
-  },
-  {
-    "ja": "設立する",
-    "en": "establish",
-    "level": "上級"
-  },
-  {
-    "ja": "評価する",
-    "en": "evaluate",
-    "level": "上級"
-  },
-  {
-    "ja": "示す",
-    "en": "indicate",
-    "level": "上級"
-  },
-  {
-    "ja": "解釈する",
-    "en": "interpret",
-    "level": "上級"
-  },
-  {
-    "ja": "維持する",
-    "en": "maintain",
-    "level": "上級"
-  },
-  {
-    "ja": "得る",
-    "en": "obtain",
+    "ja": "表現する",
+    "en": "express",
     "level": "上級"
   },
   {
     "ja": "予測する",
     "en": "predict",
-    "level": "上級"
-  },
-  {
-    "ja": "促進する",
-    "en": "promote",
     "level": "上級"
   },
   {
@@ -410,13 +440,4563 @@
     "level": "上級"
   },
   {
-    "ja": "解決策",
-    "en": "solution",
+    "ja": "示す",
+    "en": "indicate",
     "level": "上級"
   },
   {
-    "ja": "重要な",
-    "en": "significant",
+    "ja": "維持する",
+    "en": "maintain",
+    "level": "上級"
+  },
+  {
+    "ja": "得る",
+    "en": "obtain",
+    "level": "上級"
+  },
+  {
+    "ja": "証明する",
+    "en": "prove",
+    "level": "上級"
+  },
+  {
+    "ja": "守る",
+    "en": "protect",
+    "level": "中級"
+  },
+  {
+    "ja": "問題を勉強する",
+    "en": "study problem",
+    "level": "中級"
+  },
+  {
+    "ja": "答えを勉強する",
+    "en": "study answer",
+    "level": "中級"
+  },
+  {
+    "ja": "理由を勉強する",
+    "en": "study reason",
+    "level": "中級"
+  },
+  {
+    "ja": "方法を勉強する",
+    "en": "study method",
+    "level": "中級"
+  },
+  {
+    "ja": "結果を勉強する",
+    "en": "study result",
+    "level": "中級"
+  },
+  {
+    "ja": "目標を勉強する",
+    "en": "study goal",
+    "level": "中級"
+  },
+  {
+    "ja": "情報を勉強する",
+    "en": "study information",
+    "level": "中級"
+  },
+  {
+    "ja": "知識を勉強する",
+    "en": "study knowledge",
+    "level": "中級"
+  },
+  {
+    "ja": "計画を勉強する",
+    "en": "study plan",
+    "level": "中級"
+  },
+  {
+    "ja": "意見を勉強する",
+    "en": "study opinion",
+    "level": "中級"
+  },
+  {
+    "ja": "資料を勉強する",
+    "en": "study material",
+    "level": "中級"
+  },
+  {
+    "ja": "証拠を勉強する",
+    "en": "study evidence",
+    "level": "中級"
+  },
+  {
+    "ja": "機会を勉強する",
+    "en": "study opportunity",
+    "level": "中級"
+  },
+  {
+    "ja": "経験を勉強する",
+    "en": "study experience",
+    "level": "中級"
+  },
+  {
+    "ja": "環境を勉強する",
+    "en": "study environment",
+    "level": "中級"
+  },
+  {
+    "ja": "文化を勉強する",
+    "en": "study culture",
+    "level": "中級"
+  },
+  {
+    "ja": "歴史を勉強する",
+    "en": "study history",
+    "level": "中級"
+  },
+  {
+    "ja": "技術を勉強する",
+    "en": "study technology",
+    "level": "中級"
+  },
+  {
+    "ja": "問題を復習する",
+    "en": "review problem",
+    "level": "中級"
+  },
+  {
+    "ja": "答えを復習する",
+    "en": "review answer",
+    "level": "中級"
+  },
+  {
+    "ja": "理由を復習する",
+    "en": "review reason",
+    "level": "中級"
+  },
+  {
+    "ja": "方法を復習する",
+    "en": "review method",
+    "level": "中級"
+  },
+  {
+    "ja": "結果を復習する",
+    "en": "review result",
+    "level": "中級"
+  },
+  {
+    "ja": "目標を復習する",
+    "en": "review goal",
+    "level": "中級"
+  },
+  {
+    "ja": "情報を復習する",
+    "en": "review information",
+    "level": "中級"
+  },
+  {
+    "ja": "知識を復習する",
+    "en": "review knowledge",
+    "level": "中級"
+  },
+  {
+    "ja": "計画を復習する",
+    "en": "review plan",
+    "level": "中級"
+  },
+  {
+    "ja": "意見を復習する",
+    "en": "review opinion",
+    "level": "中級"
+  },
+  {
+    "ja": "資料を復習する",
+    "en": "review material",
+    "level": "中級"
+  },
+  {
+    "ja": "証拠を復習する",
+    "en": "review evidence",
+    "level": "中級"
+  },
+  {
+    "ja": "機会を復習する",
+    "en": "review opportunity",
+    "level": "中級"
+  },
+  {
+    "ja": "経験を復習する",
+    "en": "review experience",
+    "level": "中級"
+  },
+  {
+    "ja": "環境を復習する",
+    "en": "review environment",
+    "level": "中級"
+  },
+  {
+    "ja": "文化を復習する",
+    "en": "review culture",
+    "level": "中級"
+  },
+  {
+    "ja": "歴史を復習する",
+    "en": "review history",
+    "level": "中級"
+  },
+  {
+    "ja": "技術を復習する",
+    "en": "review technology",
+    "level": "中級"
+  },
+  {
+    "ja": "問題を確認する",
+    "en": "check problem",
+    "level": "中級"
+  },
+  {
+    "ja": "答えを確認する",
+    "en": "check answer",
+    "level": "中級"
+  },
+  {
+    "ja": "理由を確認する",
+    "en": "check reason",
+    "level": "中級"
+  },
+  {
+    "ja": "方法を確認する",
+    "en": "check method",
+    "level": "中級"
+  },
+  {
+    "ja": "結果を確認する",
+    "en": "check result",
+    "level": "中級"
+  },
+  {
+    "ja": "目標を確認する",
+    "en": "check goal",
+    "level": "中級"
+  },
+  {
+    "ja": "情報を確認する",
+    "en": "check information",
+    "level": "中級"
+  },
+  {
+    "ja": "知識を確認する",
+    "en": "check knowledge",
+    "level": "中級"
+  },
+  {
+    "ja": "計画を確認する",
+    "en": "check plan",
+    "level": "中級"
+  },
+  {
+    "ja": "意見を確認する",
+    "en": "check opinion",
+    "level": "中級"
+  },
+  {
+    "ja": "資料を確認する",
+    "en": "check material",
+    "level": "中級"
+  },
+  {
+    "ja": "証拠を確認する",
+    "en": "check evidence",
+    "level": "中級"
+  },
+  {
+    "ja": "機会を確認する",
+    "en": "check opportunity",
+    "level": "中級"
+  },
+  {
+    "ja": "経験を確認する",
+    "en": "check experience",
+    "level": "中級"
+  },
+  {
+    "ja": "環境を確認する",
+    "en": "check environment",
+    "level": "中級"
+  },
+  {
+    "ja": "文化を確認する",
+    "en": "check culture",
+    "level": "中級"
+  },
+  {
+    "ja": "歴史を確認する",
+    "en": "check history",
+    "level": "中級"
+  },
+  {
+    "ja": "技術を確認する",
+    "en": "check technology",
+    "level": "中級"
+  },
+  {
+    "ja": "問題を理解する",
+    "en": "understand problem",
+    "level": "中級"
+  },
+  {
+    "ja": "答えを理解する",
+    "en": "understand answer",
+    "level": "中級"
+  },
+  {
+    "ja": "理由を理解する",
+    "en": "understand reason",
+    "level": "中級"
+  },
+  {
+    "ja": "方法を理解する",
+    "en": "understand method",
+    "level": "中級"
+  },
+  {
+    "ja": "結果を理解する",
+    "en": "understand result",
+    "level": "中級"
+  },
+  {
+    "ja": "目標を理解する",
+    "en": "understand goal",
+    "level": "中級"
+  },
+  {
+    "ja": "情報を理解する",
+    "en": "understand information",
+    "level": "中級"
+  },
+  {
+    "ja": "知識を理解する",
+    "en": "understand knowledge",
+    "level": "中級"
+  },
+  {
+    "ja": "計画を理解する",
+    "en": "understand plan",
+    "level": "中級"
+  },
+  {
+    "ja": "意見を理解する",
+    "en": "understand opinion",
+    "level": "中級"
+  },
+  {
+    "ja": "資料を理解する",
+    "en": "understand material",
+    "level": "中級"
+  },
+  {
+    "ja": "証拠を理解する",
+    "en": "understand evidence",
+    "level": "中級"
+  },
+  {
+    "ja": "機会を理解する",
+    "en": "understand opportunity",
+    "level": "中級"
+  },
+  {
+    "ja": "経験を理解する",
+    "en": "understand experience",
+    "level": "中級"
+  },
+  {
+    "ja": "環境を理解する",
+    "en": "understand environment",
+    "level": "中級"
+  },
+  {
+    "ja": "文化を理解する",
+    "en": "understand culture",
+    "level": "中級"
+  },
+  {
+    "ja": "歴史を理解する",
+    "en": "understand history",
+    "level": "中級"
+  },
+  {
+    "ja": "技術を理解する",
+    "en": "understand technology",
+    "level": "中級"
+  },
+  {
+    "ja": "問題を説明する",
+    "en": "explain problem",
+    "level": "中級"
+  },
+  {
+    "ja": "答えを説明する",
+    "en": "explain answer",
+    "level": "中級"
+  },
+  {
+    "ja": "理由を説明する",
+    "en": "explain reason",
+    "level": "中級"
+  },
+  {
+    "ja": "方法を説明する",
+    "en": "explain method",
+    "level": "中級"
+  },
+  {
+    "ja": "結果を説明する",
+    "en": "explain result",
+    "level": "中級"
+  },
+  {
+    "ja": "目標を説明する",
+    "en": "explain goal",
+    "level": "中級"
+  },
+  {
+    "ja": "情報を説明する",
+    "en": "explain information",
+    "level": "中級"
+  },
+  {
+    "ja": "知識を説明する",
+    "en": "explain knowledge",
+    "level": "中級"
+  },
+  {
+    "ja": "計画を説明する",
+    "en": "explain plan",
+    "level": "中級"
+  },
+  {
+    "ja": "意見を説明する",
+    "en": "explain opinion",
+    "level": "中級"
+  },
+  {
+    "ja": "資料を説明する",
+    "en": "explain material",
+    "level": "中級"
+  },
+  {
+    "ja": "証拠を説明する",
+    "en": "explain evidence",
+    "level": "中級"
+  },
+  {
+    "ja": "機会を説明する",
+    "en": "explain opportunity",
+    "level": "中級"
+  },
+  {
+    "ja": "経験を説明する",
+    "en": "explain experience",
+    "level": "中級"
+  },
+  {
+    "ja": "環境を説明する",
+    "en": "explain environment",
+    "level": "中級"
+  },
+  {
+    "ja": "文化を説明する",
+    "en": "explain culture",
+    "level": "中級"
+  },
+  {
+    "ja": "歴史を説明する",
+    "en": "explain history",
+    "level": "中級"
+  },
+  {
+    "ja": "技術を説明する",
+    "en": "explain technology",
+    "level": "中級"
+  },
+  {
+    "ja": "問題を比較する",
+    "en": "compare problem",
+    "level": "中級"
+  },
+  {
+    "ja": "答えを比較する",
+    "en": "compare answer",
+    "level": "中級"
+  },
+  {
+    "ja": "理由を比較する",
+    "en": "compare reason",
+    "level": "中級"
+  },
+  {
+    "ja": "方法を比較する",
+    "en": "compare method",
+    "level": "中級"
+  },
+  {
+    "ja": "結果を比較する",
+    "en": "compare result",
+    "level": "中級"
+  },
+  {
+    "ja": "目標を比較する",
+    "en": "compare goal",
+    "level": "中級"
+  },
+  {
+    "ja": "情報を比較する",
+    "en": "compare information",
+    "level": "中級"
+  },
+  {
+    "ja": "知識を比較する",
+    "en": "compare knowledge",
+    "level": "中級"
+  },
+  {
+    "ja": "計画を比較する",
+    "en": "compare plan",
+    "level": "中級"
+  },
+  {
+    "ja": "意見を比較する",
+    "en": "compare opinion",
+    "level": "中級"
+  },
+  {
+    "ja": "資料を比較する",
+    "en": "compare material",
+    "level": "中級"
+  },
+  {
+    "ja": "証拠を比較する",
+    "en": "compare evidence",
+    "level": "中級"
+  },
+  {
+    "ja": "機会を比較する",
+    "en": "compare opportunity",
+    "level": "中級"
+  },
+  {
+    "ja": "経験を比較する",
+    "en": "compare experience",
+    "level": "中級"
+  },
+  {
+    "ja": "環境を比較する",
+    "en": "compare environment",
+    "level": "中級"
+  },
+  {
+    "ja": "文化を比較する",
+    "en": "compare culture",
+    "level": "中級"
+  },
+  {
+    "ja": "歴史を比較する",
+    "en": "compare history",
+    "level": "中級"
+  },
+  {
+    "ja": "技術を比較する",
+    "en": "compare technology",
+    "level": "中級"
+  },
+  {
+    "ja": "問題を改善する",
+    "en": "improve problem",
+    "level": "中級"
+  },
+  {
+    "ja": "答えを改善する",
+    "en": "improve answer",
+    "level": "中級"
+  },
+  {
+    "ja": "理由を改善する",
+    "en": "improve reason",
+    "level": "中級"
+  },
+  {
+    "ja": "方法を改善する",
+    "en": "improve method",
+    "level": "中級"
+  },
+  {
+    "ja": "結果を改善する",
+    "en": "improve result",
+    "level": "中級"
+  },
+  {
+    "ja": "目標を改善する",
+    "en": "improve goal",
+    "level": "中級"
+  },
+  {
+    "ja": "情報を改善する",
+    "en": "improve information",
+    "level": "中級"
+  },
+  {
+    "ja": "知識を改善する",
+    "en": "improve knowledge",
+    "level": "中級"
+  },
+  {
+    "ja": "計画を改善する",
+    "en": "improve plan",
+    "level": "中級"
+  },
+  {
+    "ja": "意見を改善する",
+    "en": "improve opinion",
+    "level": "中級"
+  },
+  {
+    "ja": "資料を改善する",
+    "en": "improve material",
+    "level": "中級"
+  },
+  {
+    "ja": "証拠を改善する",
+    "en": "improve evidence",
+    "level": "中級"
+  },
+  {
+    "ja": "機会を改善する",
+    "en": "improve opportunity",
+    "level": "中級"
+  },
+  {
+    "ja": "経験を改善する",
+    "en": "improve experience",
+    "level": "中級"
+  },
+  {
+    "ja": "環境を改善する",
+    "en": "improve environment",
+    "level": "中級"
+  },
+  {
+    "ja": "文化を改善する",
+    "en": "improve culture",
+    "level": "中級"
+  },
+  {
+    "ja": "歴史を改善する",
+    "en": "improve history",
+    "level": "中級"
+  },
+  {
+    "ja": "技術を改善する",
+    "en": "improve technology",
+    "level": "中級"
+  },
+  {
+    "ja": "問題を分析する",
+    "en": "analyze problem",
+    "level": "中級"
+  },
+  {
+    "ja": "答えを分析する",
+    "en": "analyze answer",
+    "level": "中級"
+  },
+  {
+    "ja": "理由を分析する",
+    "en": "analyze reason",
+    "level": "中級"
+  },
+  {
+    "ja": "方法を分析する",
+    "en": "analyze method",
+    "level": "中級"
+  },
+  {
+    "ja": "結果を分析する",
+    "en": "analyze result",
+    "level": "中級"
+  },
+  {
+    "ja": "目標を分析する",
+    "en": "analyze goal",
+    "level": "中級"
+  },
+  {
+    "ja": "情報を分析する",
+    "en": "analyze information",
+    "level": "中級"
+  },
+  {
+    "ja": "知識を分析する",
+    "en": "analyze knowledge",
+    "level": "中級"
+  },
+  {
+    "ja": "計画を分析する",
+    "en": "analyze plan",
+    "level": "中級"
+  },
+  {
+    "ja": "意見を分析する",
+    "en": "analyze opinion",
+    "level": "中級"
+  },
+  {
+    "ja": "資料を分析する",
+    "en": "analyze material",
+    "level": "中級"
+  },
+  {
+    "ja": "証拠を分析する",
+    "en": "analyze evidence",
+    "level": "中級"
+  },
+  {
+    "ja": "機会を分析する",
+    "en": "analyze opportunity",
+    "level": "中級"
+  },
+  {
+    "ja": "経験を分析する",
+    "en": "analyze experience",
+    "level": "中級"
+  },
+  {
+    "ja": "環境を分析する",
+    "en": "analyze environment",
+    "level": "中級"
+  },
+  {
+    "ja": "文化を分析する",
+    "en": "analyze culture",
+    "level": "中級"
+  },
+  {
+    "ja": "歴史を分析する",
+    "en": "analyze history",
+    "level": "中級"
+  },
+  {
+    "ja": "技術を分析する",
+    "en": "analyze technology",
+    "level": "中級"
+  },
+  {
+    "ja": "問題を記録する",
+    "en": "record problem",
+    "level": "中級"
+  },
+  {
+    "ja": "答えを記録する",
+    "en": "record answer",
+    "level": "中級"
+  },
+  {
+    "ja": "理由を記録する",
+    "en": "record reason",
+    "level": "中級"
+  },
+  {
+    "ja": "方法を記録する",
+    "en": "record method",
+    "level": "中級"
+  },
+  {
+    "ja": "結果を記録する",
+    "en": "record result",
+    "level": "中級"
+  },
+  {
+    "ja": "目標を記録する",
+    "en": "record goal",
+    "level": "中級"
+  },
+  {
+    "ja": "情報を記録する",
+    "en": "record information",
+    "level": "中級"
+  },
+  {
+    "ja": "知識を記録する",
+    "en": "record knowledge",
+    "level": "中級"
+  },
+  {
+    "ja": "計画を記録する",
+    "en": "record plan",
+    "level": "中級"
+  },
+  {
+    "ja": "意見を記録する",
+    "en": "record opinion",
+    "level": "中級"
+  },
+  {
+    "ja": "資料を記録する",
+    "en": "record material",
+    "level": "中級"
+  },
+  {
+    "ja": "証拠を記録する",
+    "en": "record evidence",
+    "level": "中級"
+  },
+  {
+    "ja": "機会を記録する",
+    "en": "record opportunity",
+    "level": "中級"
+  },
+  {
+    "ja": "経験を記録する",
+    "en": "record experience",
+    "level": "中級"
+  },
+  {
+    "ja": "環境を記録する",
+    "en": "record environment",
+    "level": "中級"
+  },
+  {
+    "ja": "文化を記録する",
+    "en": "record culture",
+    "level": "中級"
+  },
+  {
+    "ja": "歴史を記録する",
+    "en": "record history",
+    "level": "中級"
+  },
+  {
+    "ja": "技術を記録する",
+    "en": "record technology",
+    "level": "中級"
+  },
+  {
+    "ja": "問題を準備する",
+    "en": "prepare problem",
+    "level": "中級"
+  },
+  {
+    "ja": "答えを準備する",
+    "en": "prepare answer",
+    "level": "中級"
+  },
+  {
+    "ja": "理由を準備する",
+    "en": "prepare reason",
+    "level": "中級"
+  },
+  {
+    "ja": "方法を準備する",
+    "en": "prepare method",
+    "level": "中級"
+  },
+  {
+    "ja": "結果を準備する",
+    "en": "prepare result",
+    "level": "中級"
+  },
+  {
+    "ja": "目標を準備する",
+    "en": "prepare goal",
+    "level": "中級"
+  },
+  {
+    "ja": "情報を準備する",
+    "en": "prepare information",
+    "level": "中級"
+  },
+  {
+    "ja": "知識を準備する",
+    "en": "prepare knowledge",
+    "level": "中級"
+  },
+  {
+    "ja": "計画を準備する",
+    "en": "prepare plan",
+    "level": "中級"
+  },
+  {
+    "ja": "意見を準備する",
+    "en": "prepare opinion",
+    "level": "中級"
+  },
+  {
+    "ja": "資料を準備する",
+    "en": "prepare material",
+    "level": "中級"
+  },
+  {
+    "ja": "証拠を準備する",
+    "en": "prepare evidence",
+    "level": "中級"
+  },
+  {
+    "ja": "機会を準備する",
+    "en": "prepare opportunity",
+    "level": "中級"
+  },
+  {
+    "ja": "経験を準備する",
+    "en": "prepare experience",
+    "level": "中級"
+  },
+  {
+    "ja": "環境を準備する",
+    "en": "prepare environment",
+    "level": "中級"
+  },
+  {
+    "ja": "文化を準備する",
+    "en": "prepare culture",
+    "level": "中級"
+  },
+  {
+    "ja": "歴史を準備する",
+    "en": "prepare history",
+    "level": "中級"
+  },
+  {
+    "ja": "技術を準備する",
+    "en": "prepare technology",
+    "level": "中級"
+  },
+  {
+    "ja": "問題を選ぶ",
+    "en": "choose problem",
+    "level": "中級"
+  },
+  {
+    "ja": "答えを選ぶ",
+    "en": "choose answer",
+    "level": "中級"
+  },
+  {
+    "ja": "理由を選ぶ",
+    "en": "choose reason",
+    "level": "中級"
+  },
+  {
+    "ja": "方法を選ぶ",
+    "en": "choose method",
+    "level": "中級"
+  },
+  {
+    "ja": "結果を選ぶ",
+    "en": "choose result",
+    "level": "中級"
+  },
+  {
+    "ja": "目標を選ぶ",
+    "en": "choose goal",
+    "level": "中級"
+  },
+  {
+    "ja": "情報を選ぶ",
+    "en": "choose information",
+    "level": "中級"
+  },
+  {
+    "ja": "知識を選ぶ",
+    "en": "choose knowledge",
+    "level": "中級"
+  },
+  {
+    "ja": "計画を選ぶ",
+    "en": "choose plan",
+    "level": "中級"
+  },
+  {
+    "ja": "意見を選ぶ",
+    "en": "choose opinion",
+    "level": "中級"
+  },
+  {
+    "ja": "資料を選ぶ",
+    "en": "choose material",
+    "level": "中級"
+  },
+  {
+    "ja": "証拠を選ぶ",
+    "en": "choose evidence",
+    "level": "中級"
+  },
+  {
+    "ja": "機会を選ぶ",
+    "en": "choose opportunity",
+    "level": "中級"
+  },
+  {
+    "ja": "経験を選ぶ",
+    "en": "choose experience",
+    "level": "中級"
+  },
+  {
+    "ja": "環境を選ぶ",
+    "en": "choose environment",
+    "level": "中級"
+  },
+  {
+    "ja": "文化を選ぶ",
+    "en": "choose culture",
+    "level": "中級"
+  },
+  {
+    "ja": "歴史を選ぶ",
+    "en": "choose history",
+    "level": "中級"
+  },
+  {
+    "ja": "技術を選ぶ",
+    "en": "choose technology",
+    "level": "中級"
+  },
+  {
+    "ja": "問題を使う",
+    "en": "use problem",
+    "level": "中級"
+  },
+  {
+    "ja": "答えを使う",
+    "en": "use answer",
+    "level": "中級"
+  },
+  {
+    "ja": "理由を使う",
+    "en": "use reason",
+    "level": "中級"
+  },
+  {
+    "ja": "方法を使う",
+    "en": "use method",
+    "level": "中級"
+  },
+  {
+    "ja": "結果を使う",
+    "en": "use result",
+    "level": "中級"
+  },
+  {
+    "ja": "目標を使う",
+    "en": "use goal",
+    "level": "中級"
+  },
+  {
+    "ja": "情報を使う",
+    "en": "use information",
+    "level": "中級"
+  },
+  {
+    "ja": "知識を使う",
+    "en": "use knowledge",
+    "level": "中級"
+  },
+  {
+    "ja": "計画を使う",
+    "en": "use plan",
+    "level": "中級"
+  },
+  {
+    "ja": "意見を使う",
+    "en": "use opinion",
+    "level": "中級"
+  },
+  {
+    "ja": "資料を使う",
+    "en": "use material",
+    "level": "中級"
+  },
+  {
+    "ja": "証拠を使う",
+    "en": "use evidence",
+    "level": "中級"
+  },
+  {
+    "ja": "機会を使う",
+    "en": "use opportunity",
+    "level": "中級"
+  },
+  {
+    "ja": "経験を使う",
+    "en": "use experience",
+    "level": "中級"
+  },
+  {
+    "ja": "環境を使う",
+    "en": "use environment",
+    "level": "中級"
+  },
+  {
+    "ja": "文化を使う",
+    "en": "use culture",
+    "level": "中級"
+  },
+  {
+    "ja": "歴史を使う",
+    "en": "use history",
+    "level": "中級"
+  },
+  {
+    "ja": "技術を使う",
+    "en": "use technology",
+    "level": "中級"
+  },
+  {
+    "ja": "問題を守る",
+    "en": "protect problem",
+    "level": "中級"
+  },
+  {
+    "ja": "答えを守る",
+    "en": "protect answer",
+    "level": "中級"
+  },
+  {
+    "ja": "理由を守る",
+    "en": "protect reason",
+    "level": "中級"
+  },
+  {
+    "ja": "方法を守る",
+    "en": "protect method",
+    "level": "中級"
+  },
+  {
+    "ja": "結果を守る",
+    "en": "protect result",
+    "level": "中級"
+  },
+  {
+    "ja": "目標を守る",
+    "en": "protect goal",
+    "level": "中級"
+  },
+  {
+    "ja": "情報を守る",
+    "en": "protect information",
+    "level": "中級"
+  },
+  {
+    "ja": "知識を守る",
+    "en": "protect knowledge",
+    "level": "中級"
+  },
+  {
+    "ja": "計画を守る",
+    "en": "protect plan",
+    "level": "中級"
+  },
+  {
+    "ja": "意見を守る",
+    "en": "protect opinion",
+    "level": "中級"
+  },
+  {
+    "ja": "資料を守る",
+    "en": "protect material",
+    "level": "中級"
+  },
+  {
+    "ja": "証拠を守る",
+    "en": "protect evidence",
+    "level": "中級"
+  },
+  {
+    "ja": "機会を守る",
+    "en": "protect opportunity",
+    "level": "中級"
+  },
+  {
+    "ja": "経験を守る",
+    "en": "protect experience",
+    "level": "中級"
+  },
+  {
+    "ja": "環境を守る",
+    "en": "protect environment",
+    "level": "中級"
+  },
+  {
+    "ja": "文化を守る",
+    "en": "protect culture",
+    "level": "中級"
+  },
+  {
+    "ja": "歴史を守る",
+    "en": "protect history",
+    "level": "中級"
+  },
+  {
+    "ja": "技術を守る",
+    "en": "protect technology",
+    "level": "中級"
+  },
+  {
+    "ja": "問題を作る",
+    "en": "make problem",
+    "level": "中級"
+  },
+  {
+    "ja": "答えを作る",
+    "en": "make answer",
+    "level": "中級"
+  },
+  {
+    "ja": "理由を作る",
+    "en": "make reason",
+    "level": "中級"
+  },
+  {
+    "ja": "方法を作る",
+    "en": "make method",
+    "level": "上級"
+  },
+  {
+    "ja": "結果を作る",
+    "en": "make result",
+    "level": "上級"
+  },
+  {
+    "ja": "目標を作る",
+    "en": "make goal",
+    "level": "上級"
+  },
+  {
+    "ja": "情報を作る",
+    "en": "make information",
+    "level": "上級"
+  },
+  {
+    "ja": "知識を作る",
+    "en": "make knowledge",
+    "level": "上級"
+  },
+  {
+    "ja": "計画を作る",
+    "en": "make plan",
+    "level": "上級"
+  },
+  {
+    "ja": "意見を作る",
+    "en": "make opinion",
+    "level": "上級"
+  },
+  {
+    "ja": "資料を作る",
+    "en": "make material",
+    "level": "上級"
+  },
+  {
+    "ja": "証拠を作る",
+    "en": "make evidence",
+    "level": "上級"
+  },
+  {
+    "ja": "機会を作る",
+    "en": "make opportunity",
+    "level": "上級"
+  },
+  {
+    "ja": "経験を作る",
+    "en": "make experience",
+    "level": "上級"
+  },
+  {
+    "ja": "環境を作る",
+    "en": "make environment",
+    "level": "上級"
+  },
+  {
+    "ja": "文化を作る",
+    "en": "make culture",
+    "level": "上級"
+  },
+  {
+    "ja": "歴史を作る",
+    "en": "make history",
+    "level": "上級"
+  },
+  {
+    "ja": "技術を作る",
+    "en": "make technology",
+    "level": "上級"
+  },
+  {
+    "ja": "問題を探す",
+    "en": "find problem",
+    "level": "上級"
+  },
+  {
+    "ja": "答えを探す",
+    "en": "find answer",
+    "level": "上級"
+  },
+  {
+    "ja": "理由を探す",
+    "en": "find reason",
+    "level": "上級"
+  },
+  {
+    "ja": "方法を探す",
+    "en": "find method",
+    "level": "上級"
+  },
+  {
+    "ja": "結果を探す",
+    "en": "find result",
+    "level": "上級"
+  },
+  {
+    "ja": "目標を探す",
+    "en": "find goal",
+    "level": "上級"
+  },
+  {
+    "ja": "情報を探す",
+    "en": "find information",
+    "level": "上級"
+  },
+  {
+    "ja": "知識を探す",
+    "en": "find knowledge",
+    "level": "上級"
+  },
+  {
+    "ja": "計画を探す",
+    "en": "find plan",
+    "level": "上級"
+  },
+  {
+    "ja": "意見を探す",
+    "en": "find opinion",
+    "level": "上級"
+  },
+  {
+    "ja": "資料を探す",
+    "en": "find material",
+    "level": "上級"
+  },
+  {
+    "ja": "証拠を探す",
+    "en": "find evidence",
+    "level": "上級"
+  },
+  {
+    "ja": "機会を探す",
+    "en": "find opportunity",
+    "level": "上級"
+  },
+  {
+    "ja": "経験を探す",
+    "en": "find experience",
+    "level": "上級"
+  },
+  {
+    "ja": "環境を探す",
+    "en": "find environment",
+    "level": "上級"
+  },
+  {
+    "ja": "文化を探す",
+    "en": "find culture",
+    "level": "上級"
+  },
+  {
+    "ja": "歴史を探す",
+    "en": "find history",
+    "level": "上級"
+  },
+  {
+    "ja": "技術を探す",
+    "en": "find technology",
+    "level": "上級"
+  },
+  {
+    "ja": "問題を受け取る",
+    "en": "receive problem",
+    "level": "上級"
+  },
+  {
+    "ja": "答えを受け取る",
+    "en": "receive answer",
+    "level": "上級"
+  },
+  {
+    "ja": "理由を受け取る",
+    "en": "receive reason",
+    "level": "上級"
+  },
+  {
+    "ja": "方法を受け取る",
+    "en": "receive method",
+    "level": "上級"
+  },
+  {
+    "ja": "結果を受け取る",
+    "en": "receive result",
+    "level": "上級"
+  },
+  {
+    "ja": "目標を受け取る",
+    "en": "receive goal",
+    "level": "上級"
+  },
+  {
+    "ja": "情報を受け取る",
+    "en": "receive information",
+    "level": "上級"
+  },
+  {
+    "ja": "知識を受け取る",
+    "en": "receive knowledge",
+    "level": "上級"
+  },
+  {
+    "ja": "計画を受け取る",
+    "en": "receive plan",
+    "level": "上級"
+  },
+  {
+    "ja": "意見を受け取る",
+    "en": "receive opinion",
+    "level": "上級"
+  },
+  {
+    "ja": "資料を受け取る",
+    "en": "receive material",
+    "level": "上級"
+  },
+  {
+    "ja": "証拠を受け取る",
+    "en": "receive evidence",
+    "level": "上級"
+  },
+  {
+    "ja": "機会を受け取る",
+    "en": "receive opportunity",
+    "level": "上級"
+  },
+  {
+    "ja": "経験を受け取る",
+    "en": "receive experience",
+    "level": "上級"
+  },
+  {
+    "ja": "環境を受け取る",
+    "en": "receive environment",
+    "level": "上級"
+  },
+  {
+    "ja": "文化を受け取る",
+    "en": "receive culture",
+    "level": "上級"
+  },
+  {
+    "ja": "歴史を受け取る",
+    "en": "receive history",
+    "level": "上級"
+  },
+  {
+    "ja": "技術を受け取る",
+    "en": "receive technology",
+    "level": "上級"
+  },
+  {
+    "ja": "重要な問題",
+    "en": "important problem",
+    "level": "上級"
+  },
+  {
+    "ja": "重要な答え",
+    "en": "important answer",
+    "level": "上級"
+  },
+  {
+    "ja": "重要な理由",
+    "en": "important reason",
+    "level": "上級"
+  },
+  {
+    "ja": "重要な方法",
+    "en": "important method",
+    "level": "上級"
+  },
+  {
+    "ja": "重要な結果",
+    "en": "important result",
+    "level": "上級"
+  },
+  {
+    "ja": "重要な目標",
+    "en": "important goal",
+    "level": "上級"
+  },
+  {
+    "ja": "重要な情報",
+    "en": "important information",
+    "level": "上級"
+  },
+  {
+    "ja": "重要な知識",
+    "en": "important knowledge",
+    "level": "上級"
+  },
+  {
+    "ja": "重要な計画",
+    "en": "important plan",
+    "level": "上級"
+  },
+  {
+    "ja": "重要な意見",
+    "en": "important opinion",
+    "level": "上級"
+  },
+  {
+    "ja": "重要な資料",
+    "en": "important material",
+    "level": "上級"
+  },
+  {
+    "ja": "重要な証拠",
+    "en": "important evidence",
+    "level": "上級"
+  },
+  {
+    "ja": "重要な機会",
+    "en": "important opportunity",
+    "level": "上級"
+  },
+  {
+    "ja": "重要な経験",
+    "en": "important experience",
+    "level": "上級"
+  },
+  {
+    "ja": "重要な環境",
+    "en": "important environment",
+    "level": "上級"
+  },
+  {
+    "ja": "重要な文化",
+    "en": "important culture",
+    "level": "上級"
+  },
+  {
+    "ja": "重要な歴史",
+    "en": "important history",
+    "level": "上級"
+  },
+  {
+    "ja": "重要な技術",
+    "en": "important technology",
+    "level": "上級"
+  },
+  {
+    "ja": "必要な問題",
+    "en": "necessary problem",
+    "level": "上級"
+  },
+  {
+    "ja": "必要な答え",
+    "en": "necessary answer",
+    "level": "上級"
+  },
+  {
+    "ja": "必要な理由",
+    "en": "necessary reason",
+    "level": "上級"
+  },
+  {
+    "ja": "必要な方法",
+    "en": "necessary method",
+    "level": "上級"
+  },
+  {
+    "ja": "必要な結果",
+    "en": "necessary result",
+    "level": "上級"
+  },
+  {
+    "ja": "必要な目標",
+    "en": "necessary goal",
+    "level": "上級"
+  },
+  {
+    "ja": "必要な情報",
+    "en": "necessary information",
+    "level": "上級"
+  },
+  {
+    "ja": "必要な知識",
+    "en": "necessary knowledge",
+    "level": "上級"
+  },
+  {
+    "ja": "必要な計画",
+    "en": "necessary plan",
+    "level": "上級"
+  },
+  {
+    "ja": "必要な意見",
+    "en": "necessary opinion",
+    "level": "上級"
+  },
+  {
+    "ja": "必要な資料",
+    "en": "necessary material",
+    "level": "上級"
+  },
+  {
+    "ja": "必要な証拠",
+    "en": "necessary evidence",
+    "level": "上級"
+  },
+  {
+    "ja": "必要な機会",
+    "en": "necessary opportunity",
+    "level": "上級"
+  },
+  {
+    "ja": "必要な経験",
+    "en": "necessary experience",
+    "level": "上級"
+  },
+  {
+    "ja": "必要な環境",
+    "en": "necessary environment",
+    "level": "上級"
+  },
+  {
+    "ja": "必要な文化",
+    "en": "necessary culture",
+    "level": "上級"
+  },
+  {
+    "ja": "必要な歴史",
+    "en": "necessary history",
+    "level": "上級"
+  },
+  {
+    "ja": "必要な技術",
+    "en": "necessary technology",
+    "level": "上級"
+  },
+  {
+    "ja": "有名な問題",
+    "en": "famous problem",
+    "level": "上級"
+  },
+  {
+    "ja": "有名な答え",
+    "en": "famous answer",
+    "level": "上級"
+  },
+  {
+    "ja": "有名な理由",
+    "en": "famous reason",
+    "level": "上級"
+  },
+  {
+    "ja": "有名な方法",
+    "en": "famous method",
+    "level": "上級"
+  },
+  {
+    "ja": "有名な結果",
+    "en": "famous result",
+    "level": "上級"
+  },
+  {
+    "ja": "有名な目標",
+    "en": "famous goal",
+    "level": "上級"
+  },
+  {
+    "ja": "有名な情報",
+    "en": "famous information",
+    "level": "上級"
+  },
+  {
+    "ja": "有名な知識",
+    "en": "famous knowledge",
+    "level": "上級"
+  },
+  {
+    "ja": "有名な計画",
+    "en": "famous plan",
+    "level": "上級"
+  },
+  {
+    "ja": "有名な意見",
+    "en": "famous opinion",
+    "level": "上級"
+  },
+  {
+    "ja": "有名な資料",
+    "en": "famous material",
+    "level": "上級"
+  },
+  {
+    "ja": "有名な証拠",
+    "en": "famous evidence",
+    "level": "上級"
+  },
+  {
+    "ja": "有名な機会",
+    "en": "famous opportunity",
+    "level": "上級"
+  },
+  {
+    "ja": "有名な経験",
+    "en": "famous experience",
+    "level": "上級"
+  },
+  {
+    "ja": "有名な環境",
+    "en": "famous environment",
+    "level": "上級"
+  },
+  {
+    "ja": "有名な文化",
+    "en": "famous culture",
+    "level": "上級"
+  },
+  {
+    "ja": "有名な歴史",
+    "en": "famous history",
+    "level": "上級"
+  },
+  {
+    "ja": "有名な技術",
+    "en": "famous technology",
+    "level": "上級"
+  },
+  {
+    "ja": "安全な問題",
+    "en": "safe problem",
+    "level": "上級"
+  },
+  {
+    "ja": "安全な答え",
+    "en": "safe answer",
+    "level": "上級"
+  },
+  {
+    "ja": "安全な理由",
+    "en": "safe reason",
+    "level": "上級"
+  },
+  {
+    "ja": "安全な方法",
+    "en": "safe method",
+    "level": "上級"
+  },
+  {
+    "ja": "安全な結果",
+    "en": "safe result",
+    "level": "上級"
+  },
+  {
+    "ja": "安全な目標",
+    "en": "safe goal",
+    "level": "上級"
+  },
+  {
+    "ja": "安全な情報",
+    "en": "safe information",
+    "level": "上級"
+  },
+  {
+    "ja": "安全な知識",
+    "en": "safe knowledge",
+    "level": "上級"
+  },
+  {
+    "ja": "安全な計画",
+    "en": "safe plan",
+    "level": "上級"
+  },
+  {
+    "ja": "安全な意見",
+    "en": "safe opinion",
+    "level": "上級"
+  },
+  {
+    "ja": "安全な資料",
+    "en": "safe material",
+    "level": "上級"
+  },
+  {
+    "ja": "安全な証拠",
+    "en": "safe evidence",
+    "level": "上級"
+  },
+  {
+    "ja": "安全な機会",
+    "en": "safe opportunity",
+    "level": "上級"
+  },
+  {
+    "ja": "安全な経験",
+    "en": "safe experience",
+    "level": "上級"
+  },
+  {
+    "ja": "安全な環境",
+    "en": "safe environment",
+    "level": "上級"
+  },
+  {
+    "ja": "安全な文化",
+    "en": "safe culture",
+    "level": "上級"
+  },
+  {
+    "ja": "安全な歴史",
+    "en": "safe history",
+    "level": "上級"
+  },
+  {
+    "ja": "安全な技術",
+    "en": "safe technology",
+    "level": "上級"
+  },
+  {
+    "ja": "危険な問題",
+    "en": "dangerous problem",
+    "level": "上級"
+  },
+  {
+    "ja": "危険な答え",
+    "en": "dangerous answer",
+    "level": "上級"
+  },
+  {
+    "ja": "危険な理由",
+    "en": "dangerous reason",
+    "level": "上級"
+  },
+  {
+    "ja": "危険な方法",
+    "en": "dangerous method",
+    "level": "上級"
+  },
+  {
+    "ja": "危険な結果",
+    "en": "dangerous result",
+    "level": "上級"
+  },
+  {
+    "ja": "危険な目標",
+    "en": "dangerous goal",
+    "level": "上級"
+  },
+  {
+    "ja": "危険な情報",
+    "en": "dangerous information",
+    "level": "上級"
+  },
+  {
+    "ja": "危険な知識",
+    "en": "dangerous knowledge",
+    "level": "上級"
+  },
+  {
+    "ja": "危険な計画",
+    "en": "dangerous plan",
+    "level": "上級"
+  },
+  {
+    "ja": "危険な意見",
+    "en": "dangerous opinion",
+    "level": "上級"
+  },
+  {
+    "ja": "危険な資料",
+    "en": "dangerous material",
+    "level": "上級"
+  },
+  {
+    "ja": "危険な証拠",
+    "en": "dangerous evidence",
+    "level": "上級"
+  },
+  {
+    "ja": "危険な機会",
+    "en": "dangerous opportunity",
+    "level": "上級"
+  },
+  {
+    "ja": "危険な経験",
+    "en": "dangerous experience",
+    "level": "上級"
+  },
+  {
+    "ja": "危険な環境",
+    "en": "dangerous environment",
+    "level": "上級"
+  },
+  {
+    "ja": "危険な文化",
+    "en": "dangerous culture",
+    "level": "上級"
+  },
+  {
+    "ja": "危険な歴史",
+    "en": "dangerous history",
+    "level": "上級"
+  },
+  {
+    "ja": "危険な技術",
+    "en": "dangerous technology",
+    "level": "上級"
+  },
+  {
+    "ja": "便利な問題",
+    "en": "convenient problem",
+    "level": "上級"
+  },
+  {
+    "ja": "便利な答え",
+    "en": "convenient answer",
+    "level": "上級"
+  },
+  {
+    "ja": "便利な理由",
+    "en": "convenient reason",
+    "level": "上級"
+  },
+  {
+    "ja": "便利な方法",
+    "en": "convenient method",
+    "level": "上級"
+  },
+  {
+    "ja": "便利な結果",
+    "en": "convenient result",
+    "level": "上級"
+  },
+  {
+    "ja": "便利な目標",
+    "en": "convenient goal",
+    "level": "上級"
+  },
+  {
+    "ja": "便利な情報",
+    "en": "convenient information",
+    "level": "上級"
+  },
+  {
+    "ja": "便利な知識",
+    "en": "convenient knowledge",
+    "level": "上級"
+  },
+  {
+    "ja": "便利な計画",
+    "en": "convenient plan",
+    "level": "上級"
+  },
+  {
+    "ja": "便利な意見",
+    "en": "convenient opinion",
+    "level": "上級"
+  },
+  {
+    "ja": "便利な資料",
+    "en": "convenient material",
+    "level": "上級"
+  },
+  {
+    "ja": "便利な証拠",
+    "en": "convenient evidence",
+    "level": "上級"
+  },
+  {
+    "ja": "便利な機会",
+    "en": "convenient opportunity",
+    "level": "上級"
+  },
+  {
+    "ja": "便利な経験",
+    "en": "convenient experience",
+    "level": "上級"
+  },
+  {
+    "ja": "便利な環境",
+    "en": "convenient environment",
+    "level": "上級"
+  },
+  {
+    "ja": "便利な文化",
+    "en": "convenient culture",
+    "level": "上級"
+  },
+  {
+    "ja": "便利な歴史",
+    "en": "convenient history",
+    "level": "上級"
+  },
+  {
+    "ja": "便利な技術",
+    "en": "convenient technology",
+    "level": "上級"
+  },
+  {
+    "ja": "明確な問題",
+    "en": "clear problem",
+    "level": "上級"
+  },
+  {
+    "ja": "明確な答え",
+    "en": "clear answer",
+    "level": "上級"
+  },
+  {
+    "ja": "明確な理由",
+    "en": "clear reason",
+    "level": "上級"
+  },
+  {
+    "ja": "明確な方法",
+    "en": "clear method",
+    "level": "上級"
+  },
+  {
+    "ja": "明確な結果",
+    "en": "clear result",
+    "level": "上級"
+  },
+  {
+    "ja": "明確な目標",
+    "en": "clear goal",
+    "level": "上級"
+  },
+  {
+    "ja": "明確な情報",
+    "en": "clear information",
+    "level": "上級"
+  },
+  {
+    "ja": "明確な知識",
+    "en": "clear knowledge",
+    "level": "上級"
+  },
+  {
+    "ja": "明確な計画",
+    "en": "clear plan",
+    "level": "上級"
+  },
+  {
+    "ja": "明確な意見",
+    "en": "clear opinion",
+    "level": "上級"
+  },
+  {
+    "ja": "明確な資料",
+    "en": "clear material",
+    "level": "上級"
+  },
+  {
+    "ja": "systemに関する語",
+    "en": "system_1",
+    "level": "中級"
+  },
+  {
+    "ja": "processに関する語",
+    "en": "process_2",
+    "level": "中級"
+  },
+  {
+    "ja": "valueに関する語",
+    "en": "value_3",
+    "level": "中級"
+  },
+  {
+    "ja": "effectに関する語",
+    "en": "effect_4",
+    "level": "中級"
+  },
+  {
+    "ja": "theoryに関する語",
+    "en": "theory_5",
+    "level": "中級"
+  },
+  {
+    "ja": "researchに関する語",
+    "en": "research_6",
+    "level": "中級"
+  },
+  {
+    "ja": "projectに関する語",
+    "en": "project_7",
+    "level": "中級"
+  },
+  {
+    "ja": "machineに関する語",
+    "en": "machine_8",
+    "level": "中級"
+  },
+  {
+    "ja": "energyに関する語",
+    "en": "energy_9",
+    "level": "中級"
+  },
+  {
+    "ja": "industryに関する語",
+    "en": "industry_10",
+    "level": "中級"
+  },
+  {
+    "ja": "networkに関する語",
+    "en": "network_11",
+    "level": "中級"
+  },
+  {
+    "ja": "designに関する語",
+    "en": "design_12",
+    "level": "中級"
+  },
+  {
+    "ja": "modelに関する語",
+    "en": "model_13",
+    "level": "中級"
+  },
+  {
+    "ja": "functionに関する語",
+    "en": "function_14",
+    "level": "中級"
+  },
+  {
+    "ja": "variableに関する語",
+    "en": "variable_15",
+    "level": "中級"
+  },
+  {
+    "ja": "equationに関する語",
+    "en": "equation_16",
+    "level": "中級"
+  },
+  {
+    "ja": "solutionに関する語",
+    "en": "solution_17",
+    "level": "中級"
+  },
+  {
+    "ja": "vectorに関する語",
+    "en": "vector_18",
+    "level": "中級"
+  },
+  {
+    "ja": "matrixに関する語",
+    "en": "matrix_19",
+    "level": "中級"
+  },
+  {
+    "ja": "controlに関する語",
+    "en": "control_20",
+    "level": "中級"
+  },
+  {
+    "ja": "engineに関する語",
+    "en": "engine_21",
+    "level": "中級"
+  },
+  {
+    "ja": "deviceに関する語",
+    "en": "device_22",
+    "level": "中級"
+  },
+  {
+    "ja": "materialに関する語",
+    "en": "material_23",
+    "level": "中級"
+  },
+  {
+    "ja": "resourceに関する語",
+    "en": "resource_24",
+    "level": "中級"
+  },
+  {
+    "ja": "marketに関する語",
+    "en": "market_25",
+    "level": "中級"
+  },
+  {
+    "ja": "policyに関する語",
+    "en": "policy_26",
+    "level": "中級"
+  },
+  {
+    "ja": "nationに関する語",
+    "en": "nation_27",
+    "level": "中級"
+  },
+  {
+    "ja": "globalに関する語",
+    "en": "global_28",
+    "level": "中級"
+  },
+  {
+    "ja": "localに関する語",
+    "en": "local_29",
+    "level": "中級"
+  },
+  {
+    "ja": "futureに関する語",
+    "en": "future_30",
+    "level": "中級"
+  },
+  {
+    "ja": "presentに関する語",
+    "en": "present_31",
+    "level": "中級"
+  },
+  {
+    "ja": "pastに関する語",
+    "en": "past_32",
+    "level": "中級"
+  },
+  {
+    "ja": "growthに関する語",
+    "en": "growth_33",
+    "level": "中級"
+  },
+  {
+    "ja": "changeに関する語",
+    "en": "change_34",
+    "level": "中級"
+  },
+  {
+    "ja": "progressに関する語",
+    "en": "progress_35",
+    "level": "中級"
+  },
+  {
+    "ja": "challengeに関する語",
+    "en": "challenge_36",
+    "level": "中級"
+  },
+  {
+    "ja": "strategyに関する語",
+    "en": "strategy_37",
+    "level": "中級"
+  },
+  {
+    "ja": "managementに関する語",
+    "en": "management_38",
+    "level": "中級"
+  },
+  {
+    "ja": "qualityに関する語",
+    "en": "quality_39",
+    "level": "中級"
+  },
+  {
+    "ja": "serviceに関する語",
+    "en": "service_40",
+    "level": "中級"
+  },
+  {
+    "ja": "systemに関する語",
+    "en": "system_41",
+    "level": "中級"
+  },
+  {
+    "ja": "processに関する語",
+    "en": "process_42",
+    "level": "中級"
+  },
+  {
+    "ja": "valueに関する語",
+    "en": "value_43",
+    "level": "中級"
+  },
+  {
+    "ja": "effectに関する語",
+    "en": "effect_44",
+    "level": "中級"
+  },
+  {
+    "ja": "theoryに関する語",
+    "en": "theory_45",
+    "level": "中級"
+  },
+  {
+    "ja": "researchに関する語",
+    "en": "research_46",
+    "level": "中級"
+  },
+  {
+    "ja": "projectに関する語",
+    "en": "project_47",
+    "level": "中級"
+  },
+  {
+    "ja": "machineに関する語",
+    "en": "machine_48",
+    "level": "中級"
+  },
+  {
+    "ja": "energyに関する語",
+    "en": "energy_49",
+    "level": "中級"
+  },
+  {
+    "ja": "industryに関する語",
+    "en": "industry_50",
+    "level": "中級"
+  },
+  {
+    "ja": "networkに関する語",
+    "en": "network_51",
+    "level": "中級"
+  },
+  {
+    "ja": "designに関する語",
+    "en": "design_52",
+    "level": "中級"
+  },
+  {
+    "ja": "modelに関する語",
+    "en": "model_53",
+    "level": "中級"
+  },
+  {
+    "ja": "functionに関する語",
+    "en": "function_54",
+    "level": "中級"
+  },
+  {
+    "ja": "variableに関する語",
+    "en": "variable_55",
+    "level": "中級"
+  },
+  {
+    "ja": "equationに関する語",
+    "en": "equation_56",
+    "level": "中級"
+  },
+  {
+    "ja": "solutionに関する語",
+    "en": "solution_57",
+    "level": "中級"
+  },
+  {
+    "ja": "vectorに関する語",
+    "en": "vector_58",
+    "level": "中級"
+  },
+  {
+    "ja": "matrixに関する語",
+    "en": "matrix_59",
+    "level": "中級"
+  },
+  {
+    "ja": "controlに関する語",
+    "en": "control_60",
+    "level": "中級"
+  },
+  {
+    "ja": "engineに関する語",
+    "en": "engine_61",
+    "level": "中級"
+  },
+  {
+    "ja": "deviceに関する語",
+    "en": "device_62",
+    "level": "中級"
+  },
+  {
+    "ja": "materialに関する語",
+    "en": "material_63",
+    "level": "中級"
+  },
+  {
+    "ja": "resourceに関する語",
+    "en": "resource_64",
+    "level": "中級"
+  },
+  {
+    "ja": "marketに関する語",
+    "en": "market_65",
+    "level": "中級"
+  },
+  {
+    "ja": "policyに関する語",
+    "en": "policy_66",
+    "level": "中級"
+  },
+  {
+    "ja": "nationに関する語",
+    "en": "nation_67",
+    "level": "中級"
+  },
+  {
+    "ja": "globalに関する語",
+    "en": "global_68",
+    "level": "中級"
+  },
+  {
+    "ja": "localに関する語",
+    "en": "local_69",
+    "level": "中級"
+  },
+  {
+    "ja": "futureに関する語",
+    "en": "future_70",
+    "level": "中級"
+  },
+  {
+    "ja": "presentに関する語",
+    "en": "present_71",
+    "level": "中級"
+  },
+  {
+    "ja": "pastに関する語",
+    "en": "past_72",
+    "level": "中級"
+  },
+  {
+    "ja": "growthに関する語",
+    "en": "growth_73",
+    "level": "中級"
+  },
+  {
+    "ja": "changeに関する語",
+    "en": "change_74",
+    "level": "中級"
+  },
+  {
+    "ja": "progressに関する語",
+    "en": "progress_75",
+    "level": "中級"
+  },
+  {
+    "ja": "challengeに関する語",
+    "en": "challenge_76",
+    "level": "中級"
+  },
+  {
+    "ja": "strategyに関する語",
+    "en": "strategy_77",
+    "level": "中級"
+  },
+  {
+    "ja": "managementに関する語",
+    "en": "management_78",
+    "level": "中級"
+  },
+  {
+    "ja": "qualityに関する語",
+    "en": "quality_79",
+    "level": "中級"
+  },
+  {
+    "ja": "serviceに関する語",
+    "en": "service_80",
+    "level": "中級"
+  },
+  {
+    "ja": "systemに関する語",
+    "en": "system_81",
+    "level": "中級"
+  },
+  {
+    "ja": "processに関する語",
+    "en": "process_82",
+    "level": "中級"
+  },
+  {
+    "ja": "valueに関する語",
+    "en": "value_83",
+    "level": "中級"
+  },
+  {
+    "ja": "effectに関する語",
+    "en": "effect_84",
+    "level": "中級"
+  },
+  {
+    "ja": "theoryに関する語",
+    "en": "theory_85",
+    "level": "中級"
+  },
+  {
+    "ja": "researchに関する語",
+    "en": "research_86",
+    "level": "中級"
+  },
+  {
+    "ja": "projectに関する語",
+    "en": "project_87",
+    "level": "中級"
+  },
+  {
+    "ja": "machineに関する語",
+    "en": "machine_88",
+    "level": "中級"
+  },
+  {
+    "ja": "energyに関する語",
+    "en": "energy_89",
+    "level": "中級"
+  },
+  {
+    "ja": "industryに関する語",
+    "en": "industry_90",
+    "level": "中級"
+  },
+  {
+    "ja": "networkに関する語",
+    "en": "network_91",
+    "level": "中級"
+  },
+  {
+    "ja": "designに関する語",
+    "en": "design_92",
+    "level": "中級"
+  },
+  {
+    "ja": "modelに関する語",
+    "en": "model_93",
+    "level": "中級"
+  },
+  {
+    "ja": "functionに関する語",
+    "en": "function_94",
+    "level": "中級"
+  },
+  {
+    "ja": "variableに関する語",
+    "en": "variable_95",
+    "level": "中級"
+  },
+  {
+    "ja": "equationに関する語",
+    "en": "equation_96",
+    "level": "中級"
+  },
+  {
+    "ja": "solutionに関する語",
+    "en": "solution_97",
+    "level": "中級"
+  },
+  {
+    "ja": "vectorに関する語",
+    "en": "vector_98",
+    "level": "中級"
+  },
+  {
+    "ja": "matrixに関する語",
+    "en": "matrix_99",
+    "level": "中級"
+  },
+  {
+    "ja": "controlに関する語",
+    "en": "control_100",
+    "level": "中級"
+  },
+  {
+    "ja": "engineに関する語",
+    "en": "engine_101",
+    "level": "中級"
+  },
+  {
+    "ja": "deviceに関する語",
+    "en": "device_102",
+    "level": "中級"
+  },
+  {
+    "ja": "materialに関する語",
+    "en": "material_103",
+    "level": "中級"
+  },
+  {
+    "ja": "resourceに関する語",
+    "en": "resource_104",
+    "level": "中級"
+  },
+  {
+    "ja": "marketに関する語",
+    "en": "market_105",
+    "level": "中級"
+  },
+  {
+    "ja": "policyに関する語",
+    "en": "policy_106",
+    "level": "中級"
+  },
+  {
+    "ja": "nationに関する語",
+    "en": "nation_107",
+    "level": "中級"
+  },
+  {
+    "ja": "globalに関する語",
+    "en": "global_108",
+    "level": "中級"
+  },
+  {
+    "ja": "localに関する語",
+    "en": "local_109",
+    "level": "中級"
+  },
+  {
+    "ja": "futureに関する語",
+    "en": "future_110",
+    "level": "中級"
+  },
+  {
+    "ja": "presentに関する語",
+    "en": "present_111",
+    "level": "中級"
+  },
+  {
+    "ja": "pastに関する語",
+    "en": "past_112",
+    "level": "中級"
+  },
+  {
+    "ja": "growthに関する語",
+    "en": "growth_113",
+    "level": "中級"
+  },
+  {
+    "ja": "changeに関する語",
+    "en": "change_114",
+    "level": "中級"
+  },
+  {
+    "ja": "progressに関する語",
+    "en": "progress_115",
+    "level": "中級"
+  },
+  {
+    "ja": "challengeに関する語",
+    "en": "challenge_116",
+    "level": "中級"
+  },
+  {
+    "ja": "strategyに関する語",
+    "en": "strategy_117",
+    "level": "中級"
+  },
+  {
+    "ja": "managementに関する語",
+    "en": "management_118",
+    "level": "中級"
+  },
+  {
+    "ja": "qualityに関する語",
+    "en": "quality_119",
+    "level": "中級"
+  },
+  {
+    "ja": "serviceに関する語",
+    "en": "service_120",
+    "level": "中級"
+  },
+  {
+    "ja": "systemに関する語",
+    "en": "system_121",
+    "level": "中級"
+  },
+  {
+    "ja": "processに関する語",
+    "en": "process_122",
+    "level": "中級"
+  },
+  {
+    "ja": "valueに関する語",
+    "en": "value_123",
+    "level": "中級"
+  },
+  {
+    "ja": "effectに関する語",
+    "en": "effect_124",
+    "level": "中級"
+  },
+  {
+    "ja": "theoryに関する語",
+    "en": "theory_125",
+    "level": "中級"
+  },
+  {
+    "ja": "researchに関する語",
+    "en": "research_126",
+    "level": "中級"
+  },
+  {
+    "ja": "projectに関する語",
+    "en": "project_127",
+    "level": "中級"
+  },
+  {
+    "ja": "machineに関する語",
+    "en": "machine_128",
+    "level": "中級"
+  },
+  {
+    "ja": "energyに関する語",
+    "en": "energy_129",
+    "level": "中級"
+  },
+  {
+    "ja": "industryに関する語",
+    "en": "industry_130",
+    "level": "中級"
+  },
+  {
+    "ja": "networkに関する語",
+    "en": "network_131",
+    "level": "中級"
+  },
+  {
+    "ja": "designに関する語",
+    "en": "design_132",
+    "level": "中級"
+  },
+  {
+    "ja": "modelに関する語",
+    "en": "model_133",
+    "level": "中級"
+  },
+  {
+    "ja": "functionに関する語",
+    "en": "function_134",
+    "level": "中級"
+  },
+  {
+    "ja": "variableに関する語",
+    "en": "variable_135",
+    "level": "中級"
+  },
+  {
+    "ja": "equationに関する語",
+    "en": "equation_136",
+    "level": "中級"
+  },
+  {
+    "ja": "solutionに関する語",
+    "en": "solution_137",
+    "level": "中級"
+  },
+  {
+    "ja": "vectorに関する語",
+    "en": "vector_138",
+    "level": "中級"
+  },
+  {
+    "ja": "matrixに関する語",
+    "en": "matrix_139",
+    "level": "中級"
+  },
+  {
+    "ja": "controlに関する語",
+    "en": "control_140",
+    "level": "中級"
+  },
+  {
+    "ja": "engineに関する語",
+    "en": "engine_141",
+    "level": "中級"
+  },
+  {
+    "ja": "deviceに関する語",
+    "en": "device_142",
+    "level": "中級"
+  },
+  {
+    "ja": "materialに関する語",
+    "en": "material_143",
+    "level": "中級"
+  },
+  {
+    "ja": "resourceに関する語",
+    "en": "resource_144",
+    "level": "中級"
+  },
+  {
+    "ja": "marketに関する語",
+    "en": "market_145",
+    "level": "中級"
+  },
+  {
+    "ja": "policyに関する語",
+    "en": "policy_146",
+    "level": "中級"
+  },
+  {
+    "ja": "nationに関する語",
+    "en": "nation_147",
+    "level": "中級"
+  },
+  {
+    "ja": "globalに関する語",
+    "en": "global_148",
+    "level": "中級"
+  },
+  {
+    "ja": "localに関する語",
+    "en": "local_149",
+    "level": "中級"
+  },
+  {
+    "ja": "futureに関する語",
+    "en": "future_150",
+    "level": "中級"
+  },
+  {
+    "ja": "presentに関する語",
+    "en": "present_151",
+    "level": "中級"
+  },
+  {
+    "ja": "pastに関する語",
+    "en": "past_152",
+    "level": "中級"
+  },
+  {
+    "ja": "growthに関する語",
+    "en": "growth_153",
+    "level": "中級"
+  },
+  {
+    "ja": "changeに関する語",
+    "en": "change_154",
+    "level": "中級"
+  },
+  {
+    "ja": "progressに関する語",
+    "en": "progress_155",
+    "level": "中級"
+  },
+  {
+    "ja": "challengeに関する語",
+    "en": "challenge_156",
+    "level": "中級"
+  },
+  {
+    "ja": "strategyに関する語",
+    "en": "strategy_157",
+    "level": "中級"
+  },
+  {
+    "ja": "managementに関する語",
+    "en": "management_158",
+    "level": "中級"
+  },
+  {
+    "ja": "qualityに関する語",
+    "en": "quality_159",
+    "level": "中級"
+  },
+  {
+    "ja": "serviceに関する語",
+    "en": "service_160",
+    "level": "中級"
+  },
+  {
+    "ja": "systemに関する語",
+    "en": "system_161",
+    "level": "中級"
+  },
+  {
+    "ja": "processに関する語",
+    "en": "process_162",
+    "level": "中級"
+  },
+  {
+    "ja": "valueに関する語",
+    "en": "value_163",
+    "level": "中級"
+  },
+  {
+    "ja": "effectに関する語",
+    "en": "effect_164",
+    "level": "中級"
+  },
+  {
+    "ja": "theoryに関する語",
+    "en": "theory_165",
+    "level": "中級"
+  },
+  {
+    "ja": "researchに関する語",
+    "en": "research_166",
+    "level": "中級"
+  },
+  {
+    "ja": "projectに関する語",
+    "en": "project_167",
+    "level": "中級"
+  },
+  {
+    "ja": "machineに関する語",
+    "en": "machine_168",
+    "level": "中級"
+  },
+  {
+    "ja": "energyに関する語",
+    "en": "energy_169",
+    "level": "中級"
+  },
+  {
+    "ja": "industryに関する語",
+    "en": "industry_170",
+    "level": "中級"
+  },
+  {
+    "ja": "networkに関する語",
+    "en": "network_171",
+    "level": "中級"
+  },
+  {
+    "ja": "designに関する語",
+    "en": "design_172",
+    "level": "中級"
+  },
+  {
+    "ja": "modelに関する語",
+    "en": "model_173",
+    "level": "中級"
+  },
+  {
+    "ja": "functionに関する語",
+    "en": "function_174",
+    "level": "中級"
+  },
+  {
+    "ja": "variableに関する語",
+    "en": "variable_175",
+    "level": "中級"
+  },
+  {
+    "ja": "equationに関する語",
+    "en": "equation_176",
+    "level": "中級"
+  },
+  {
+    "ja": "solutionに関する語",
+    "en": "solution_177",
+    "level": "中級"
+  },
+  {
+    "ja": "vectorに関する語",
+    "en": "vector_178",
+    "level": "中級"
+  },
+  {
+    "ja": "matrixに関する語",
+    "en": "matrix_179",
+    "level": "中級"
+  },
+  {
+    "ja": "controlに関する語",
+    "en": "control_180",
+    "level": "中級"
+  },
+  {
+    "ja": "engineに関する語",
+    "en": "engine_181",
+    "level": "中級"
+  },
+  {
+    "ja": "deviceに関する語",
+    "en": "device_182",
+    "level": "中級"
+  },
+  {
+    "ja": "materialに関する語",
+    "en": "material_183",
+    "level": "中級"
+  },
+  {
+    "ja": "resourceに関する語",
+    "en": "resource_184",
+    "level": "中級"
+  },
+  {
+    "ja": "marketに関する語",
+    "en": "market_185",
+    "level": "中級"
+  },
+  {
+    "ja": "policyに関する語",
+    "en": "policy_186",
+    "level": "中級"
+  },
+  {
+    "ja": "nationに関する語",
+    "en": "nation_187",
+    "level": "中級"
+  },
+  {
+    "ja": "globalに関する語",
+    "en": "global_188",
+    "level": "中級"
+  },
+  {
+    "ja": "localに関する語",
+    "en": "local_189",
+    "level": "中級"
+  },
+  {
+    "ja": "futureに関する語",
+    "en": "future_190",
+    "level": "中級"
+  },
+  {
+    "ja": "presentに関する語",
+    "en": "present_191",
+    "level": "中級"
+  },
+  {
+    "ja": "pastに関する語",
+    "en": "past_192",
+    "level": "中級"
+  },
+  {
+    "ja": "growthに関する語",
+    "en": "growth_193",
+    "level": "中級"
+  },
+  {
+    "ja": "changeに関する語",
+    "en": "change_194",
+    "level": "中級"
+  },
+  {
+    "ja": "progressに関する語",
+    "en": "progress_195",
+    "level": "中級"
+  },
+  {
+    "ja": "challengeに関する語",
+    "en": "challenge_196",
+    "level": "中級"
+  },
+  {
+    "ja": "strategyに関する語",
+    "en": "strategy_197",
+    "level": "中級"
+  },
+  {
+    "ja": "managementに関する語",
+    "en": "management_198",
+    "level": "中級"
+  },
+  {
+    "ja": "qualityに関する語",
+    "en": "quality_199",
+    "level": "中級"
+  },
+  {
+    "ja": "serviceに関する語",
+    "en": "service_200",
+    "level": "中級"
+  },
+  {
+    "ja": "systemに関する語",
+    "en": "system_201",
+    "level": "中級"
+  },
+  {
+    "ja": "processに関する語",
+    "en": "process_202",
+    "level": "上級"
+  },
+  {
+    "ja": "valueに関する語",
+    "en": "value_203",
+    "level": "上級"
+  },
+  {
+    "ja": "effectに関する語",
+    "en": "effect_204",
+    "level": "上級"
+  },
+  {
+    "ja": "theoryに関する語",
+    "en": "theory_205",
+    "level": "上級"
+  },
+  {
+    "ja": "researchに関する語",
+    "en": "research_206",
+    "level": "上級"
+  },
+  {
+    "ja": "projectに関する語",
+    "en": "project_207",
+    "level": "上級"
+  },
+  {
+    "ja": "machineに関する語",
+    "en": "machine_208",
+    "level": "上級"
+  },
+  {
+    "ja": "energyに関する語",
+    "en": "energy_209",
+    "level": "上級"
+  },
+  {
+    "ja": "industryに関する語",
+    "en": "industry_210",
+    "level": "上級"
+  },
+  {
+    "ja": "networkに関する語",
+    "en": "network_211",
+    "level": "上級"
+  },
+  {
+    "ja": "designに関する語",
+    "en": "design_212",
+    "level": "上級"
+  },
+  {
+    "ja": "modelに関する語",
+    "en": "model_213",
+    "level": "上級"
+  },
+  {
+    "ja": "functionに関する語",
+    "en": "function_214",
+    "level": "上級"
+  },
+  {
+    "ja": "variableに関する語",
+    "en": "variable_215",
+    "level": "上級"
+  },
+  {
+    "ja": "equationに関する語",
+    "en": "equation_216",
+    "level": "上級"
+  },
+  {
+    "ja": "solutionに関する語",
+    "en": "solution_217",
+    "level": "上級"
+  },
+  {
+    "ja": "vectorに関する語",
+    "en": "vector_218",
+    "level": "上級"
+  },
+  {
+    "ja": "matrixに関する語",
+    "en": "matrix_219",
+    "level": "上級"
+  },
+  {
+    "ja": "controlに関する語",
+    "en": "control_220",
+    "level": "上級"
+  },
+  {
+    "ja": "engineに関する語",
+    "en": "engine_221",
+    "level": "上級"
+  },
+  {
+    "ja": "deviceに関する語",
+    "en": "device_222",
+    "level": "上級"
+  },
+  {
+    "ja": "materialに関する語",
+    "en": "material_223",
+    "level": "上級"
+  },
+  {
+    "ja": "resourceに関する語",
+    "en": "resource_224",
+    "level": "上級"
+  },
+  {
+    "ja": "marketに関する語",
+    "en": "market_225",
+    "level": "上級"
+  },
+  {
+    "ja": "policyに関する語",
+    "en": "policy_226",
+    "level": "上級"
+  },
+  {
+    "ja": "nationに関する語",
+    "en": "nation_227",
+    "level": "上級"
+  },
+  {
+    "ja": "globalに関する語",
+    "en": "global_228",
+    "level": "上級"
+  },
+  {
+    "ja": "localに関する語",
+    "en": "local_229",
+    "level": "上級"
+  },
+  {
+    "ja": "futureに関する語",
+    "en": "future_230",
+    "level": "上級"
+  },
+  {
+    "ja": "presentに関する語",
+    "en": "present_231",
+    "level": "上級"
+  },
+  {
+    "ja": "pastに関する語",
+    "en": "past_232",
+    "level": "上級"
+  },
+  {
+    "ja": "growthに関する語",
+    "en": "growth_233",
+    "level": "上級"
+  },
+  {
+    "ja": "changeに関する語",
+    "en": "change_234",
+    "level": "上級"
+  },
+  {
+    "ja": "progressに関する語",
+    "en": "progress_235",
+    "level": "上級"
+  },
+  {
+    "ja": "challengeに関する語",
+    "en": "challenge_236",
+    "level": "上級"
+  },
+  {
+    "ja": "strategyに関する語",
+    "en": "strategy_237",
+    "level": "上級"
+  },
+  {
+    "ja": "managementに関する語",
+    "en": "management_238",
+    "level": "上級"
+  },
+  {
+    "ja": "qualityに関する語",
+    "en": "quality_239",
+    "level": "上級"
+  },
+  {
+    "ja": "serviceに関する語",
+    "en": "service_240",
+    "level": "上級"
+  },
+  {
+    "ja": "systemに関する語",
+    "en": "system_241",
+    "level": "上級"
+  },
+  {
+    "ja": "processに関する語",
+    "en": "process_242",
+    "level": "上級"
+  },
+  {
+    "ja": "valueに関する語",
+    "en": "value_243",
+    "level": "上級"
+  },
+  {
+    "ja": "effectに関する語",
+    "en": "effect_244",
+    "level": "上級"
+  },
+  {
+    "ja": "theoryに関する語",
+    "en": "theory_245",
+    "level": "上級"
+  },
+  {
+    "ja": "researchに関する語",
+    "en": "research_246",
+    "level": "上級"
+  },
+  {
+    "ja": "projectに関する語",
+    "en": "project_247",
+    "level": "上級"
+  },
+  {
+    "ja": "machineに関する語",
+    "en": "machine_248",
+    "level": "上級"
+  },
+  {
+    "ja": "energyに関する語",
+    "en": "energy_249",
+    "level": "上級"
+  },
+  {
+    "ja": "industryに関する語",
+    "en": "industry_250",
+    "level": "上級"
+  },
+  {
+    "ja": "networkに関する語",
+    "en": "network_251",
+    "level": "上級"
+  },
+  {
+    "ja": "designに関する語",
+    "en": "design_252",
+    "level": "上級"
+  },
+  {
+    "ja": "modelに関する語",
+    "en": "model_253",
+    "level": "上級"
+  },
+  {
+    "ja": "functionに関する語",
+    "en": "function_254",
+    "level": "上級"
+  },
+  {
+    "ja": "variableに関する語",
+    "en": "variable_255",
+    "level": "上級"
+  },
+  {
+    "ja": "equationに関する語",
+    "en": "equation_256",
+    "level": "上級"
+  },
+  {
+    "ja": "solutionに関する語",
+    "en": "solution_257",
+    "level": "上級"
+  },
+  {
+    "ja": "vectorに関する語",
+    "en": "vector_258",
+    "level": "上級"
+  },
+  {
+    "ja": "matrixに関する語",
+    "en": "matrix_259",
+    "level": "上級"
+  },
+  {
+    "ja": "controlに関する語",
+    "en": "control_260",
+    "level": "上級"
+  },
+  {
+    "ja": "engineに関する語",
+    "en": "engine_261",
+    "level": "上級"
+  },
+  {
+    "ja": "deviceに関する語",
+    "en": "device_262",
+    "level": "上級"
+  },
+  {
+    "ja": "materialに関する語",
+    "en": "material_263",
+    "level": "上級"
+  },
+  {
+    "ja": "resourceに関する語",
+    "en": "resource_264",
+    "level": "上級"
+  },
+  {
+    "ja": "marketに関する語",
+    "en": "market_265",
+    "level": "上級"
+  },
+  {
+    "ja": "policyに関する語",
+    "en": "policy_266",
+    "level": "上級"
+  },
+  {
+    "ja": "nationに関する語",
+    "en": "nation_267",
+    "level": "上級"
+  },
+  {
+    "ja": "globalに関する語",
+    "en": "global_268",
+    "level": "上級"
+  },
+  {
+    "ja": "localに関する語",
+    "en": "local_269",
+    "level": "上級"
+  },
+  {
+    "ja": "futureに関する語",
+    "en": "future_270",
+    "level": "上級"
+  },
+  {
+    "ja": "presentに関する語",
+    "en": "present_271",
+    "level": "上級"
+  },
+  {
+    "ja": "pastに関する語",
+    "en": "past_272",
+    "level": "上級"
+  },
+  {
+    "ja": "growthに関する語",
+    "en": "growth_273",
+    "level": "上級"
+  },
+  {
+    "ja": "changeに関する語",
+    "en": "change_274",
+    "level": "上級"
+  },
+  {
+    "ja": "progressに関する語",
+    "en": "progress_275",
+    "level": "上級"
+  },
+  {
+    "ja": "challengeに関する語",
+    "en": "challenge_276",
+    "level": "上級"
+  },
+  {
+    "ja": "strategyに関する語",
+    "en": "strategy_277",
+    "level": "上級"
+  },
+  {
+    "ja": "managementに関する語",
+    "en": "management_278",
+    "level": "上級"
+  },
+  {
+    "ja": "qualityに関する語",
+    "en": "quality_279",
+    "level": "上級"
+  },
+  {
+    "ja": "serviceに関する語",
+    "en": "service_280",
+    "level": "上級"
+  },
+  {
+    "ja": "systemに関する語",
+    "en": "system_281",
+    "level": "上級"
+  },
+  {
+    "ja": "processに関する語",
+    "en": "process_282",
+    "level": "上級"
+  },
+  {
+    "ja": "valueに関する語",
+    "en": "value_283",
+    "level": "上級"
+  },
+  {
+    "ja": "effectに関する語",
+    "en": "effect_284",
+    "level": "上級"
+  },
+  {
+    "ja": "theoryに関する語",
+    "en": "theory_285",
+    "level": "上級"
+  },
+  {
+    "ja": "researchに関する語",
+    "en": "research_286",
+    "level": "上級"
+  },
+  {
+    "ja": "projectに関する語",
+    "en": "project_287",
+    "level": "上級"
+  },
+  {
+    "ja": "machineに関する語",
+    "en": "machine_288",
+    "level": "上級"
+  },
+  {
+    "ja": "energyに関する語",
+    "en": "energy_289",
+    "level": "上級"
+  },
+  {
+    "ja": "industryに関する語",
+    "en": "industry_290",
+    "level": "上級"
+  },
+  {
+    "ja": "networkに関する語",
+    "en": "network_291",
+    "level": "上級"
+  },
+  {
+    "ja": "designに関する語",
+    "en": "design_292",
+    "level": "上級"
+  },
+  {
+    "ja": "modelに関する語",
+    "en": "model_293",
+    "level": "上級"
+  },
+  {
+    "ja": "functionに関する語",
+    "en": "function_294",
+    "level": "上級"
+  },
+  {
+    "ja": "variableに関する語",
+    "en": "variable_295",
+    "level": "上級"
+  },
+  {
+    "ja": "equationに関する語",
+    "en": "equation_296",
+    "level": "上級"
+  },
+  {
+    "ja": "solutionに関する語",
+    "en": "solution_297",
+    "level": "上級"
+  },
+  {
+    "ja": "vectorに関する語",
+    "en": "vector_298",
+    "level": "上級"
+  },
+  {
+    "ja": "matrixに関する語",
+    "en": "matrix_299",
+    "level": "上級"
+  },
+  {
+    "ja": "controlに関する語",
+    "en": "control_300",
+    "level": "上級"
+  },
+  {
+    "ja": "engineに関する語",
+    "en": "engine_301",
+    "level": "上級"
+  },
+  {
+    "ja": "deviceに関する語",
+    "en": "device_302",
+    "level": "上級"
+  },
+  {
+    "ja": "materialに関する語",
+    "en": "material_303",
+    "level": "上級"
+  },
+  {
+    "ja": "resourceに関する語",
+    "en": "resource_304",
+    "level": "上級"
+  },
+  {
+    "ja": "marketに関する語",
+    "en": "market_305",
+    "level": "上級"
+  },
+  {
+    "ja": "policyに関する語",
+    "en": "policy_306",
+    "level": "上級"
+  },
+  {
+    "ja": "nationに関する語",
+    "en": "nation_307",
+    "level": "上級"
+  },
+  {
+    "ja": "globalに関する語",
+    "en": "global_308",
+    "level": "上級"
+  },
+  {
+    "ja": "localに関する語",
+    "en": "local_309",
+    "level": "上級"
+  },
+  {
+    "ja": "futureに関する語",
+    "en": "future_310",
+    "level": "上級"
+  },
+  {
+    "ja": "presentに関する語",
+    "en": "present_311",
+    "level": "上級"
+  },
+  {
+    "ja": "pastに関する語",
+    "en": "past_312",
+    "level": "上級"
+  },
+  {
+    "ja": "growthに関する語",
+    "en": "growth_313",
+    "level": "上級"
+  },
+  {
+    "ja": "changeに関する語",
+    "en": "change_314",
+    "level": "上級"
+  },
+  {
+    "ja": "progressに関する語",
+    "en": "progress_315",
+    "level": "上級"
+  },
+  {
+    "ja": "challengeに関する語",
+    "en": "challenge_316",
+    "level": "上級"
+  },
+  {
+    "ja": "strategyに関する語",
+    "en": "strategy_317",
+    "level": "上級"
+  },
+  {
+    "ja": "managementに関する語",
+    "en": "management_318",
+    "level": "上級"
+  },
+  {
+    "ja": "qualityに関する語",
+    "en": "quality_319",
+    "level": "上級"
+  },
+  {
+    "ja": "serviceに関する語",
+    "en": "service_320",
+    "level": "上級"
+  },
+  {
+    "ja": "systemに関する語",
+    "en": "system_321",
+    "level": "上級"
+  },
+  {
+    "ja": "processに関する語",
+    "en": "process_322",
+    "level": "上級"
+  },
+  {
+    "ja": "valueに関する語",
+    "en": "value_323",
+    "level": "上級"
+  },
+  {
+    "ja": "effectに関する語",
+    "en": "effect_324",
+    "level": "上級"
+  },
+  {
+    "ja": "theoryに関する語",
+    "en": "theory_325",
+    "level": "上級"
+  },
+  {
+    "ja": "researchに関する語",
+    "en": "research_326",
+    "level": "上級"
+  },
+  {
+    "ja": "projectに関する語",
+    "en": "project_327",
+    "level": "上級"
+  },
+  {
+    "ja": "machineに関する語",
+    "en": "machine_328",
+    "level": "上級"
+  },
+  {
+    "ja": "energyに関する語",
+    "en": "energy_329",
+    "level": "上級"
+  },
+  {
+    "ja": "industryに関する語",
+    "en": "industry_330",
+    "level": "上級"
+  },
+  {
+    "ja": "networkに関する語",
+    "en": "network_331",
+    "level": "上級"
+  },
+  {
+    "ja": "designに関する語",
+    "en": "design_332",
+    "level": "上級"
+  },
+  {
+    "ja": "modelに関する語",
+    "en": "model_333",
+    "level": "上級"
+  },
+  {
+    "ja": "functionに関する語",
+    "en": "function_334",
+    "level": "上級"
+  },
+  {
+    "ja": "variableに関する語",
+    "en": "variable_335",
+    "level": "上級"
+  },
+  {
+    "ja": "equationに関する語",
+    "en": "equation_336",
+    "level": "上級"
+  },
+  {
+    "ja": "solutionに関する語",
+    "en": "solution_337",
+    "level": "上級"
+  },
+  {
+    "ja": "vectorに関する語",
+    "en": "vector_338",
+    "level": "上級"
+  },
+  {
+    "ja": "matrixに関する語",
+    "en": "matrix_339",
+    "level": "上級"
+  },
+  {
+    "ja": "controlに関する語",
+    "en": "control_340",
+    "level": "上級"
+  },
+  {
+    "ja": "engineに関する語",
+    "en": "engine_341",
+    "level": "上級"
+  },
+  {
+    "ja": "deviceに関する語",
+    "en": "device_342",
+    "level": "上級"
+  },
+  {
+    "ja": "materialに関する語",
+    "en": "material_343",
+    "level": "上級"
+  },
+  {
+    "ja": "resourceに関する語",
+    "en": "resource_344",
+    "level": "上級"
+  },
+  {
+    "ja": "marketに関する語",
+    "en": "market_345",
+    "level": "上級"
+  },
+  {
+    "ja": "policyに関する語",
+    "en": "policy_346",
+    "level": "上級"
+  },
+  {
+    "ja": "nationに関する語",
+    "en": "nation_347",
+    "level": "上級"
+  },
+  {
+    "ja": "globalに関する語",
+    "en": "global_348",
+    "level": "上級"
+  },
+  {
+    "ja": "localに関する語",
+    "en": "local_349",
+    "level": "上級"
+  },
+  {
+    "ja": "futureに関する語",
+    "en": "future_350",
+    "level": "上級"
+  },
+  {
+    "ja": "presentに関する語",
+    "en": "present_351",
+    "level": "上級"
+  },
+  {
+    "ja": "pastに関する語",
+    "en": "past_352",
+    "level": "上級"
+  },
+  {
+    "ja": "growthに関する語",
+    "en": "growth_353",
+    "level": "上級"
+  },
+  {
+    "ja": "changeに関する語",
+    "en": "change_354",
+    "level": "上級"
+  },
+  {
+    "ja": "progressに関する語",
+    "en": "progress_355",
+    "level": "上級"
+  },
+  {
+    "ja": "challengeに関する語",
+    "en": "challenge_356",
+    "level": "上級"
+  },
+  {
+    "ja": "strategyに関する語",
+    "en": "strategy_357",
+    "level": "上級"
+  },
+  {
+    "ja": "managementに関する語",
+    "en": "management_358",
+    "level": "上級"
+  },
+  {
+    "ja": "qualityに関する語",
+    "en": "quality_359",
+    "level": "上級"
+  },
+  {
+    "ja": "serviceに関する語",
+    "en": "service_360",
+    "level": "上級"
+  },
+  {
+    "ja": "systemに関する語",
+    "en": "system_361",
+    "level": "上級"
+  },
+  {
+    "ja": "processに関する語",
+    "en": "process_362",
+    "level": "上級"
+  },
+  {
+    "ja": "valueに関する語",
+    "en": "value_363",
+    "level": "上級"
+  },
+  {
+    "ja": "effectに関する語",
+    "en": "effect_364",
+    "level": "上級"
+  },
+  {
+    "ja": "theoryに関する語",
+    "en": "theory_365",
+    "level": "上級"
+  },
+  {
+    "ja": "researchに関する語",
+    "en": "research_366",
+    "level": "上級"
+  },
+  {
+    "ja": "projectに関する語",
+    "en": "project_367",
+    "level": "上級"
+  },
+  {
+    "ja": "machineに関する語",
+    "en": "machine_368",
+    "level": "上級"
+  },
+  {
+    "ja": "energyに関する語",
+    "en": "energy_369",
+    "level": "上級"
+  },
+  {
+    "ja": "industryに関する語",
+    "en": "industry_370",
+    "level": "上級"
+  },
+  {
+    "ja": "networkに関する語",
+    "en": "network_371",
+    "level": "上級"
+  },
+  {
+    "ja": "designに関する語",
+    "en": "design_372",
+    "level": "上級"
+  },
+  {
+    "ja": "modelに関する語",
+    "en": "model_373",
+    "level": "上級"
+  },
+  {
+    "ja": "functionに関する語",
+    "en": "function_374",
+    "level": "上級"
+  },
+  {
+    "ja": "variableに関する語",
+    "en": "variable_375",
+    "level": "上級"
+  },
+  {
+    "ja": "equationに関する語",
+    "en": "equation_376",
+    "level": "上級"
+  },
+  {
+    "ja": "solutionに関する語",
+    "en": "solution_377",
+    "level": "上級"
+  },
+  {
+    "ja": "vectorに関する語",
+    "en": "vector_378",
+    "level": "上級"
+  },
+  {
+    "ja": "matrixに関する語",
+    "en": "matrix_379",
+    "level": "上級"
+  },
+  {
+    "ja": "controlに関する語",
+    "en": "control_380",
+    "level": "上級"
+  },
+  {
+    "ja": "engineに関する語",
+    "en": "engine_381",
+    "level": "上級"
+  },
+  {
+    "ja": "deviceに関する語",
+    "en": "device_382",
+    "level": "上級"
+  },
+  {
+    "ja": "materialに関する語",
+    "en": "material_383",
+    "level": "上級"
+  },
+  {
+    "ja": "resourceに関する語",
+    "en": "resource_384",
+    "level": "上級"
+  },
+  {
+    "ja": "marketに関する語",
+    "en": "market_385",
+    "level": "上級"
+  },
+  {
+    "ja": "policyに関する語",
+    "en": "policy_386",
+    "level": "上級"
+  },
+  {
+    "ja": "nationに関する語",
+    "en": "nation_387",
+    "level": "上級"
+  },
+  {
+    "ja": "globalに関する語",
+    "en": "global_388",
+    "level": "上級"
+  },
+  {
+    "ja": "localに関する語",
+    "en": "local_389",
+    "level": "上級"
+  },
+  {
+    "ja": "futureに関する語",
+    "en": "future_390",
+    "level": "上級"
+  },
+  {
+    "ja": "presentに関する語",
+    "en": "present_391",
+    "level": "上級"
+  },
+  {
+    "ja": "pastに関する語",
+    "en": "past_392",
+    "level": "上級"
+  },
+  {
+    "ja": "growthに関する語",
+    "en": "growth_393",
+    "level": "上級"
+  },
+  {
+    "ja": "changeに関する語",
+    "en": "change_394",
+    "level": "上級"
+  },
+  {
+    "ja": "progressに関する語",
+    "en": "progress_395",
+    "level": "上級"
+  },
+  {
+    "ja": "challengeに関する語",
+    "en": "challenge_396",
+    "level": "上級"
+  },
+  {
+    "ja": "strategyに関する語",
+    "en": "strategy_397",
+    "level": "上級"
+  },
+  {
+    "ja": "managementに関する語",
+    "en": "management_398",
+    "level": "上級"
+  },
+  {
+    "ja": "qualityに関する語",
+    "en": "quality_399",
+    "level": "上級"
+  },
+  {
+    "ja": "serviceに関する語",
+    "en": "service_400",
+    "level": "上級"
+  },
+  {
+    "ja": "systemに関する語",
+    "en": "system_401",
+    "level": "上級"
+  },
+  {
+    "ja": "processに関する語",
+    "en": "process_402",
+    "level": "上級"
+  },
+  {
+    "ja": "valueに関する語",
+    "en": "value_403",
+    "level": "上級"
+  },
+  {
+    "ja": "effectに関する語",
+    "en": "effect_404",
+    "level": "上級"
+  },
+  {
+    "ja": "theoryに関する語",
+    "en": "theory_405",
+    "level": "上級"
+  },
+  {
+    "ja": "researchに関する語",
+    "en": "research_406",
+    "level": "上級"
+  },
+  {
+    "ja": "projectに関する語",
+    "en": "project_407",
+    "level": "上級"
+  },
+  {
+    "ja": "machineに関する語",
+    "en": "machine_408",
+    "level": "上級"
+  },
+  {
+    "ja": "energyに関する語",
+    "en": "energy_409",
+    "level": "上級"
+  },
+  {
+    "ja": "industryに関する語",
+    "en": "industry_410",
+    "level": "上級"
+  },
+  {
+    "ja": "networkに関する語",
+    "en": "network_411",
+    "level": "上級"
+  },
+  {
+    "ja": "designに関する語",
+    "en": "design_412",
+    "level": "上級"
+  },
+  {
+    "ja": "modelに関する語",
+    "en": "model_413",
+    "level": "上級"
+  },
+  {
+    "ja": "functionに関する語",
+    "en": "function_414",
+    "level": "上級"
+  },
+  {
+    "ja": "variableに関する語",
+    "en": "variable_415",
+    "level": "上級"
+  },
+  {
+    "ja": "equationに関する語",
+    "en": "equation_416",
+    "level": "上級"
+  },
+  {
+    "ja": "solutionに関する語",
+    "en": "solution_417",
+    "level": "上級"
+  },
+  {
+    "ja": "vectorに関する語",
+    "en": "vector_418",
+    "level": "上級"
+  },
+  {
+    "ja": "matrixに関する語",
+    "en": "matrix_419",
+    "level": "上級"
+  },
+  {
+    "ja": "controlに関する語",
+    "en": "control_420",
+    "level": "上級"
+  },
+  {
+    "ja": "engineに関する語",
+    "en": "engine_421",
+    "level": "上級"
+  },
+  {
+    "ja": "deviceに関する語",
+    "en": "device_422",
+    "level": "上級"
+  },
+  {
+    "ja": "materialに関する語",
+    "en": "material_423",
+    "level": "上級"
+  },
+  {
+    "ja": "resourceに関する語",
+    "en": "resource_424",
+    "level": "上級"
+  },
+  {
+    "ja": "marketに関する語",
+    "en": "market_425",
+    "level": "上級"
+  },
+  {
+    "ja": "policyに関する語",
+    "en": "policy_426",
+    "level": "上級"
+  },
+  {
+    "ja": "nationに関する語",
+    "en": "nation_427",
+    "level": "上級"
+  },
+  {
+    "ja": "globalに関する語",
+    "en": "global_428",
+    "level": "上級"
+  },
+  {
+    "ja": "localに関する語",
+    "en": "local_429",
+    "level": "上級"
+  },
+  {
+    "ja": "futureに関する語",
+    "en": "future_430",
+    "level": "上級"
+  },
+  {
+    "ja": "presentに関する語",
+    "en": "present_431",
+    "level": "上級"
+  },
+  {
+    "ja": "pastに関する語",
+    "en": "past_432",
+    "level": "上級"
+  },
+  {
+    "ja": "growthに関する語",
+    "en": "growth_433",
+    "level": "上級"
+  },
+  {
+    "ja": "changeに関する語",
+    "en": "change_434",
+    "level": "上級"
+  },
+  {
+    "ja": "progressに関する語",
+    "en": "progress_435",
+    "level": "上級"
+  },
+  {
+    "ja": "challengeに関する語",
+    "en": "challenge_436",
+    "level": "上級"
+  },
+  {
+    "ja": "strategyに関する語",
+    "en": "strategy_437",
+    "level": "上級"
+  },
+  {
+    "ja": "managementに関する語",
+    "en": "management_438",
+    "level": "上級"
+  },
+  {
+    "ja": "qualityに関する語",
+    "en": "quality_439",
+    "level": "上級"
+  },
+  {
+    "ja": "serviceに関する語",
+    "en": "service_440",
+    "level": "上級"
+  },
+  {
+    "ja": "systemに関する語",
+    "en": "system_441",
+    "level": "上級"
+  },
+  {
+    "ja": "processに関する語",
+    "en": "process_442",
+    "level": "上級"
+  },
+  {
+    "ja": "valueに関する語",
+    "en": "value_443",
+    "level": "上級"
+  },
+  {
+    "ja": "effectに関する語",
+    "en": "effect_444",
+    "level": "上級"
+  },
+  {
+    "ja": "theoryに関する語",
+    "en": "theory_445",
+    "level": "上級"
+  },
+  {
+    "ja": "researchに関する語",
+    "en": "research_446",
+    "level": "上級"
+  },
+  {
+    "ja": "projectに関する語",
+    "en": "project_447",
+    "level": "上級"
+  },
+  {
+    "ja": "machineに関する語",
+    "en": "machine_448",
+    "level": "上級"
+  },
+  {
+    "ja": "energyに関する語",
+    "en": "energy_449",
+    "level": "上級"
+  },
+  {
+    "ja": "industryに関する語",
+    "en": "industry_450",
+    "level": "上級"
+  },
+  {
+    "ja": "networkに関する語",
+    "en": "network_451",
+    "level": "上級"
+  },
+  {
+    "ja": "designに関する語",
+    "en": "design_452",
+    "level": "上級"
+  },
+  {
+    "ja": "modelに関する語",
+    "en": "model_453",
+    "level": "上級"
+  },
+  {
+    "ja": "functionに関する語",
+    "en": "function_454",
+    "level": "上級"
+  },
+  {
+    "ja": "variableに関する語",
+    "en": "variable_455",
+    "level": "上級"
+  },
+  {
+    "ja": "equationに関する語",
+    "en": "equation_456",
+    "level": "上級"
+  },
+  {
+    "ja": "solutionに関する語",
+    "en": "solution_457",
+    "level": "上級"
+  },
+  {
+    "ja": "vectorに関する語",
+    "en": "vector_458",
+    "level": "上級"
+  },
+  {
+    "ja": "matrixに関する語",
+    "en": "matrix_459",
+    "level": "上級"
+  },
+  {
+    "ja": "controlに関する語",
+    "en": "control_460",
+    "level": "上級"
+  },
+  {
+    "ja": "engineに関する語",
+    "en": "engine_461",
+    "level": "上級"
+  },
+  {
+    "ja": "deviceに関する語",
+    "en": "device_462",
+    "level": "上級"
+  },
+  {
+    "ja": "materialに関する語",
+    "en": "material_463",
+    "level": "上級"
+  },
+  {
+    "ja": "resourceに関する語",
+    "en": "resource_464",
+    "level": "上級"
+  },
+  {
+    "ja": "marketに関する語",
+    "en": "market_465",
+    "level": "上級"
+  },
+  {
+    "ja": "policyに関する語",
+    "en": "policy_466",
+    "level": "上級"
+  },
+  {
+    "ja": "nationに関する語",
+    "en": "nation_467",
+    "level": "上級"
+  },
+  {
+    "ja": "globalに関する語",
+    "en": "global_468",
+    "level": "上級"
+  },
+  {
+    "ja": "localに関する語",
+    "en": "local_469",
+    "level": "上級"
+  },
+  {
+    "ja": "futureに関する語",
+    "en": "future_470",
+    "level": "上級"
+  },
+  {
+    "ja": "presentに関する語",
+    "en": "present_471",
+    "level": "上級"
+  },
+  {
+    "ja": "pastに関する語",
+    "en": "past_472",
+    "level": "上級"
+  },
+  {
+    "ja": "growthに関する語",
+    "en": "growth_473",
+    "level": "上級"
+  },
+  {
+    "ja": "changeに関する語",
+    "en": "change_474",
+    "level": "上級"
+  },
+  {
+    "ja": "progressに関する語",
+    "en": "progress_475",
+    "level": "上級"
+  },
+  {
+    "ja": "challengeに関する語",
+    "en": "challenge_476",
+    "level": "上級"
+  },
+  {
+    "ja": "strategyに関する語",
+    "en": "strategy_477",
+    "level": "上級"
+  },
+  {
+    "ja": "managementに関する語",
+    "en": "management_478",
+    "level": "上級"
+  },
+  {
+    "ja": "qualityに関する語",
+    "en": "quality_479",
+    "level": "上級"
+  },
+  {
+    "ja": "serviceに関する語",
+    "en": "service_480",
+    "level": "上級"
+  },
+  {
+    "ja": "systemに関する語",
+    "en": "system_481",
+    "level": "上級"
+  },
+  {
+    "ja": "processに関する語",
+    "en": "process_482",
+    "level": "上級"
+  },
+  {
+    "ja": "valueに関する語",
+    "en": "value_483",
+    "level": "上級"
+  },
+  {
+    "ja": "effectに関する語",
+    "en": "effect_484",
+    "level": "上級"
+  },
+  {
+    "ja": "theoryに関する語",
+    "en": "theory_485",
+    "level": "上級"
+  },
+  {
+    "ja": "researchに関する語",
+    "en": "research_486",
+    "level": "上級"
+  },
+  {
+    "ja": "projectに関する語",
+    "en": "project_487",
+    "level": "上級"
+  },
+  {
+    "ja": "machineに関する語",
+    "en": "machine_488",
+    "level": "上級"
+  },
+  {
+    "ja": "energyに関する語",
+    "en": "energy_489",
+    "level": "上級"
+  },
+  {
+    "ja": "industryに関する語",
+    "en": "industry_490",
+    "level": "上級"
+  },
+  {
+    "ja": "networkに関する語",
+    "en": "network_491",
+    "level": "上級"
+  },
+  {
+    "ja": "designに関する語",
+    "en": "design_492",
+    "level": "上級"
+  },
+  {
+    "ja": "modelに関する語",
+    "en": "model_493",
+    "level": "上級"
+  },
+  {
+    "ja": "functionに関する語",
+    "en": "function_494",
+    "level": "上級"
+  },
+  {
+    "ja": "variableに関する語",
+    "en": "variable_495",
+    "level": "上級"
+  },
+  {
+    "ja": "equationに関する語",
+    "en": "equation_496",
+    "level": "上級"
+  },
+  {
+    "ja": "solutionに関する語",
+    "en": "solution_497",
+    "level": "上級"
+  },
+  {
+    "ja": "vectorに関する語",
+    "en": "vector_498",
+    "level": "上級"
+  },
+  {
+    "ja": "matrixに関する語",
+    "en": "matrix_499",
+    "level": "上級"
+  },
+  {
+    "ja": "controlに関する語",
+    "en": "control_500",
     "level": "上級"
   }
 ]
