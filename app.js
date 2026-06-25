@@ -48,7 +48,7 @@ if(q.a)q.a=fixFormulaSigns(q.a);
 if(q.answer)q.answer=fixFormulaSigns(q.answer);
 return q;
 }
-const VERSION = "3.3.56";
+const VERSION = "3.3.63";
 let enemyHP = 10;
 let playerHP = 5;
 let current;
@@ -12217,7 +12217,7 @@ window.showNewsPage=function(){let html="<h2>📢 お知らせ</h2><div class='n
 if(window.__cleanOtherBgm3354)return;
 window.__cleanOtherBgm3354=true;
 
-const DATA3354={"eng":[{"ja":"勉強する","en":"study","level":"初級"},{"ja":"練習","en":"practice","level":"初級"},{"ja":"復習","en":"review","level":"初級"},{"ja":"問題","en":"problem","level":"初級"},{"ja":"答え","en":"answer","level":"初級"},{"ja":"質問","en":"question","level":"初級"},{"ja":"正しい","en":"correct","level":"初級"},{"ja":"間違い","en":"mistake","level":"初級"},{"ja":"簡単な","en":"easy","level":"初級"},{"ja":"難しい","en":"difficult","level":"初級"},{"ja":"努力","en":"effort","level":"初級"},{"ja":"成功","en":"success","level":"初級"},{"ja":"失敗","en":"failure","level":"初級"},{"ja":"時間","en":"time","level":"初級"},{"ja":"学校","en":"school","level":"初級"},{"ja":"先生","en":"teacher","level":"初級"},{"ja":"生徒","en":"student","level":"初級"},{"ja":"友達","en":"friend","level":"初級"},{"ja":"家族","en":"family","level":"初級"},{"ja":"読む","en":"read","level":"初級"},{"ja":"書く","en":"write","level":"初級"},{"ja":"聞く","en":"listen","level":"初級"},{"ja":"話す","en":"speak","level":"初級"},{"ja":"見る","en":"see","level":"初級"},{"ja":"作る","en":"make","level":"初級"},{"ja":"使う","en":"use","level":"初級"},{"ja":"行く","en":"go","level":"初級"},{"ja":"来る","en":"come","level":"初級"},{"ja":"食べる","en":"eat","level":"初級"},{"ja":"飲む","en":"drink","level":"初級"},{"ja":"重要な","en":"important","level":"中級"},{"ja":"必要な","en":"necessary","level":"中級"},{"ja":"理由","en":"reason","level":"中級"},{"ja":"方法","en":"method","level":"中級"},{"ja":"結果","en":"result","level":"中級"},{"ja":"目標","en":"goal","level":"中級"},{"ja":"経験","en":"experience","level":"中級"},{"ja":"情報","en":"information","level":"中級"},{"ja":"知識","en":"knowledge","level":"中級"},{"ja":"環境","en":"environment","level":"中級"},{"ja":"社会","en":"society","level":"中級"},{"ja":"文化","en":"culture","level":"中級"},{"ja":"歴史","en":"history","level":"中級"},{"ja":"科学","en":"science","level":"中級"},{"ja":"経済","en":"economy","level":"中級"},{"ja":"技術","en":"technology","level":"中級"},{"ja":"教育","en":"education","level":"中級"},{"ja":"健康","en":"health","level":"中級"},{"ja":"自然","en":"nature","level":"中級"},{"ja":"政府","en":"government","level":"中級"},{"ja":"法律","en":"law","level":"中級"},{"ja":"権利","en":"right","level":"中級"},{"ja":"自由","en":"freedom","level":"中級"},{"ja":"責任","en":"responsibility","level":"中級"},{"ja":"機会","en":"opportunity","level":"中級"},{"ja":"能力","en":"ability","level":"中級"},{"ja":"比較する","en":"compare","level":"中級"},{"ja":"改善する","en":"improve","level":"中級"},{"ja":"提供する","en":"provide","level":"中級"},{"ja":"含む","en":"include","level":"中級"},{"ja":"影響","en":"influence","level":"上級"},{"ja":"発展する","en":"develop","level":"上級"},{"ja":"決定する","en":"determine","level":"上級"},{"ja":"分析する","en":"analyze","level":"上級"},{"ja":"増加する","en":"increase","level":"上級"},{"ja":"減少する","en":"decrease","level":"上級"},{"ja":"証拠","en":"evidence","level":"上級"},{"ja":"仮説","en":"hypothesis","level":"上級"},{"ja":"効率的な","en":"efficient","level":"上級"},{"ja":"適切な","en":"appropriate","level":"上級"},{"ja":"可能にする","en":"enable","level":"上級"},{"ja":"強調する","en":"emphasize","level":"上級"},{"ja":"設立する","en":"establish","level":"上級"},{"ja":"評価する","en":"evaluate","level":"上級"},{"ja":"示す","en":"indicate","level":"上級"},{"ja":"解釈する","en":"interpret","level":"上級"},{"ja":"維持する","en":"maintain","level":"上級"},{"ja":"得る","en":"obtain","level":"上級"},{"ja":"予測する","en":"predict","level":"上級"},{"ja":"促進する","en":"promote","level":"上級"},{"ja":"認識する","en":"recognize","level":"上級"},{"ja":"要求する","en":"require","level":"上級"},{"ja":"解決策","en":"solution","level":"上級"},{"ja":"重要な","en":"significant","level":"上級"}],"kanji":[{"kanji":"努力","yomi":"どりょく","meaning":"目標に向かってがんばること"},{"kanji":"成功","yomi":"せいこう","meaning":"うまくいくこと"},{"kanji":"失敗","yomi":"しっぱい","meaning":"うまくいかないこと"},{"kanji":"挑戦","yomi":"ちょうせん","meaning":"難しいことに立ち向かうこと"},{"kanji":"成長","yomi":"せいちょう","meaning":"能力や状態が伸びること"},{"kanji":"復習","yomi":"ふくしゅう","meaning":"一度学んだことをもう一度学ぶこと"},{"kanji":"理解","yomi":"りかい","meaning":"意味や内容がわかること"},{"kanji":"説明","yomi":"せつめい","meaning":"わかるように話すこと"},{"kanji":"原因","yomi":"げんいん","meaning":"物事が起こるもと"},{"kanji":"結果","yomi":"けっか","meaning":"物事のあとに生じたこと"},{"kanji":"理由","yomi":"りゆう","meaning":"そうなるわけ"},{"kanji":"方法","yomi":"ほうほう","meaning":"やり方"},{"kanji":"目標","yomi":"もくひょう","meaning":"目指すもの"},{"kanji":"計画","yomi":"けいかく","meaning":"前もって考えた手順"},{"kanji":"実行","yomi":"じっこう","meaning":"実際に行うこと"},{"kanji":"継続","yomi":"けいぞく","meaning":"続けること"},{"kanji":"習慣","yomi":"しゅうかん","meaning":"いつも行うこと"},{"kanji":"集中","yomi":"しゅうちゅう","meaning":"一つのことに意識を向けること"},{"kanji":"確認","yomi":"かくにん","meaning":"たしかめること"},{"kanji":"練習","yomi":"れんしゅう","meaning":"上達のためにくり返すこと"},{"kanji":"重要","yomi":"じゅうよう","meaning":"大切なこと"},{"kanji":"基本","yomi":"きほん","meaning":"土台になること"},{"kanji":"応用","yomi":"おうよう","meaning":"学んだことを別の場合に使うこと"},{"kanji":"証明","yomi":"しょうめい","meaning":"正しいことを筋道立てて示すこと"},{"kanji":"仮定","yomi":"かてい","meaning":"前提として考えること"},{"kanji":"結論","yomi":"けつろん","meaning":"考えた結果として出る答え"},{"kanji":"条件","yomi":"じょうけん","meaning":"成り立つために必要な事柄"},{"kanji":"比較","yomi":"ひかく","meaning":"比べること"},{"kanji":"判断","yomi":"はんだん","meaning":"考えて決めること"},{"kanji":"改善","yomi":"かいぜん","meaning":"より良くすること"},{"kanji":"修正","yomi":"しゅうせい","meaning":"間違いを直すこと"},{"kanji":"情報","yomi":"じょうほう","meaning":"知るための内容"},{"kanji":"知識","yomi":"ちしき","meaning":"知っている内容"},{"kanji":"技術","yomi":"ぎじゅつ","meaning":"物事を行うためのわざ"},{"kanji":"経験","yomi":"けいけん","meaning":"実際に行って得たこと"},{"kanji":"責任","yomi":"せきにん","meaning":"果たすべき役割"},{"kanji":"協力","yomi":"きょうりょく","meaning":"力を合わせること"},{"kanji":"競争","yomi":"きょうそう","meaning":"勝ち負けを争うこと"},{"kanji":"社会","yomi":"しゃかい","meaning":"人々が集まって生活する場"},{"kanji":"文化","yomi":"ぶんか","meaning":"人々の生活から生まれたもの"},{"kanji":"歴史","yomi":"れきし","meaning":"過去からの出来事の流れ"},{"kanji":"自然","yomi":"しぜん","meaning":"人の手が加わらないもの"},{"kanji":"環境","yomi":"かんきょう","meaning":"周りの状況"},{"kanji":"健康","yomi":"けんこう","meaning":"体や心の調子がよいこと"},{"kanji":"安全","yomi":"あんぜん","meaning":"危険が少ないこと"},{"kanji":"危険","yomi":"きけん","meaning":"悪いことが起きる可能性"},{"kanji":"平和","yomi":"へいわ","meaning":"争いがない状態"},{"kanji":"自由","yomi":"じゆう","meaning":"自分で選べること"},{"kanji":"権利","yomi":"けんり","meaning":"行うことが認められるもの"},{"kanji":"義務","yomi":"ぎむ","meaning":"しなければならないこと"},{"kanji":"経済","yomi":"けいざい","meaning":"お金や物の動き"},{"kanji":"政治","yomi":"せいじ","meaning":"社会を動かす仕組み"},{"kanji":"法律","yomi":"ほうりつ","meaning":"国や社会の決まり"},{"kanji":"制度","yomi":"せいど","meaning":"社会の仕組み"},{"kanji":"選挙","yomi":"せんきょ","meaning":"代表を選ぶこと"},{"kanji":"地域","yomi":"ちいき","meaning":"一定の場所のまとまり"},{"kanji":"人口","yomi":"じんこう","meaning":"人の数"},{"kanji":"都市","yomi":"とし","meaning":"人が多く集まる地域"},{"kanji":"科学","yomi":"かがく","meaning":"自然や物事の法則を調べる学問"},{"kanji":"実験","yomi":"じっけん","meaning":"確かめるために行う試み"}],"kobun":[{"word":"あはれ","meaning":"しみじみとした趣がある"},{"word":"をかし","meaning":"趣がある・おもしろい"},{"word":"いみじ","meaning":"非常に・すばらしい"},{"word":"ゆかし","meaning":"見たい・知りたい"},{"word":"おどろく","meaning":"はっと気づく・目を覚ます"},{"word":"ののしる","meaning":"大声で騒ぐ・評判になる"},{"word":"めでたし","meaning":"すばらしい・立派だ"},{"word":"つれづれ","meaning":"手持ち無沙汰だ"},{"word":"うつくし","meaning":"かわいらしい"},{"word":"かなし","meaning":"かわいい・いとしい"},{"word":"ありがたし","meaning":"めったにない・すばらしい"},{"word":"やむごとなし","meaning":"高貴だ・特別だ"},{"word":"あさまし","meaning":"驚きあきれる"},{"word":"くちをし","meaning":"残念だ"},{"word":"こころにくし","meaning":"奥ゆかしい"},{"word":"ねんごろなり","meaning":"熱心だ・親しい"},{"word":"すさまじ","meaning":"興ざめだ"},{"word":"わびし","meaning":"つらい・寂しい"},{"word":"おぼつかなし","meaning":"はっきりしない・不安だ"},{"word":"むつかし","meaning":"不快だ・気味が悪い"},{"word":"いたづらなり","meaning":"むだだ"},{"word":"あてなり","meaning":"上品だ"},{"word":"なまめかし","meaning":"優美だ"},{"word":"はづかし","meaning":"立派で気後れする"},{"word":"つきづきし","meaning":"似つかわしい"},{"word":"らうたし","meaning":"かわいらしい"},{"word":"いらふ","meaning":"返事をする"},{"word":"ありく","meaning":"歩き回る"},{"word":"ぐす","meaning":"連れて行く"},{"word":"とぶらふ","meaning":"訪れる・弔う"},{"word":"まもる","meaning":"じっと見つめる"},{"word":"ながむ","meaning":"物思いに沈む"},{"word":"わづらふ","meaning":"悩む・病気になる"},{"word":"おこたる","meaning":"病気がよくなる"},{"word":"おきつ","meaning":"命令する"},{"word":"かしづく","meaning":"大切に育てる"},{"word":"たまふ","meaning":"お与えになる・〜なさる"},{"word":"おはす","meaning":"いらっしゃる"},{"word":"めす","meaning":"お呼びになる・召し上がる"},{"word":"きこゆ","meaning":"申し上げる"},{"word":"まゐる","meaning":"参上する・差し上げる"}],"social":[{"cat":"地理","q":"日本で最も高い山は？","a":"富士山","choices":["富士山","北岳","阿蘇山","槍ヶ岳"]},{"cat":"地理","q":"日本で最も長い川は？","a":"信濃川","choices":["信濃川","利根川","石狩川","木曽川"]},{"cat":"地理","q":"北海道の道庁所在地は？","a":"札幌市","choices":["札幌市","函館市","旭川市","釧路市"]},{"cat":"地理","q":"日本の標準時子午線が通る市は？","a":"明石市","choices":["明石市","神戸市","大阪市","奈良市"]},{"cat":"地理","q":"日本最大の湖は？","a":"琵琶湖","choices":["琵琶湖","霞ヶ浦","サロマ湖","猪苗代湖"]},{"cat":"地理","q":"日本の三大工業地帯に入るのは？","a":"中京工業地帯","choices":["中京工業地帯","石狩工業地帯","十勝工業地帯","南九州工業地帯"]},{"cat":"地理","q":"梅雨の影響を強く受ける気候は？","a":"太平洋側の気候","choices":["太平洋側の気候","瀬戸内の気候","中央高地の気候","北海道の気候"]},{"cat":"歴史","q":"鎌倉幕府を開いた人物は？","a":"源頼朝","choices":["源頼朝","徳川家康","足利尊氏","織田信長"]},{"cat":"歴史","q":"江戸幕府を開いた人物は？","a":"徳川家康","choices":["徳川家康","豊臣秀吉","源頼朝","足利尊氏"]},{"cat":"歴史","q":"大化の改新が始まった年は？","a":"645年","choices":["645年","710年","794年","1192年"]},{"cat":"歴史","q":"平安京に都が移された年は？","a":"794年","choices":["794年","710年","645年","1185年"]},{"cat":"歴史","q":"応仁の乱が始まった年は？","a":"1467年","choices":["1467年","1333年","1600年","1868年"]},{"cat":"歴史","q":"関ヶ原の戦いが起きた年は？","a":"1600年","choices":["1600年","1582年","1615年","1868年"]},{"cat":"歴史","q":"明治維新の中心となった時代は？","a":"幕末から明治","choices":["幕末から明治","奈良時代","平安時代","室町時代"]},{"cat":"公民","q":"日本の最高法規は？","a":"日本国憲法","choices":["日本国憲法","民法","刑法","商法"]},{"cat":"公民","q":"国会が担当する権力は？","a":"立法権","choices":["立法権","行政権","司法権","選挙権"]},{"cat":"公民","q":"内閣が担当する権力は？","a":"行政権","choices":["行政権","立法権","司法権","請求権"]},{"cat":"公民","q":"裁判所が担当する権力は？","a":"司法権","choices":["司法権","行政権","立法権","参政権"]},{"cat":"公民","q":"三権分立の目的は？","a":"権力の集中を防ぐこと","choices":["権力の集中を防ぐこと","税金をなくすこと","国会を廃止すること","選挙をなくすこと"]},{"cat":"公民","q":"衆議院議員の任期は？","a":"4年","choices":["4年","3年","5年","6年"]},{"cat":"公民","q":"参議院議員の任期は？","a":"6年","choices":["6年","3年","4年","5年"]}]};
+const DATA3354={"eng":[{"ja":"勉強する","en":"study","level":"初級"},{"ja":"練習する","en":"practice","level":"初級"},{"ja":"復習する","en":"review","level":"初級"},{"ja":"質問する","en":"ask","level":"初級"},{"ja":"答える","en":"answer","level":"初級"},{"ja":"読む","en":"read","level":"初級"},{"ja":"書く","en":"write","level":"初級"},{"ja":"聞く","en":"listen","level":"初級"},{"ja":"話す","en":"speak","level":"初級"},{"ja":"見る","en":"see","level":"初級"},{"ja":"作る","en":"make","level":"初級"},{"ja":"使う","en":"use","level":"初級"},{"ja":"行く","en":"go","level":"初級"},{"ja":"来る","en":"come","level":"初級"},{"ja":"食べる","en":"eat","level":"初級"},{"ja":"飲む","en":"drink","level":"初級"},{"ja":"始める","en":"start","level":"初級"},{"ja":"終える","en":"finish","level":"初級"},{"ja":"続ける","en":"continue","level":"初級"},{"ja":"止まる","en":"stop","level":"初級"},{"ja":"学ぶ","en":"learn","level":"初級"},{"ja":"教える","en":"teach","level":"初級"},{"ja":"覚える","en":"remember","level":"初級"},{"ja":"忘れる","en":"forget","level":"初級"},{"ja":"問題","en":"problem","level":"初級"},{"ja":"学校","en":"school","level":"初級"},{"ja":"先生","en":"teacher","level":"初級"},{"ja":"生徒","en":"student","level":"初級"},{"ja":"友達","en":"friend","level":"初級"},{"ja":"家族","en":"family","level":"初級"},{"ja":"時間","en":"time","level":"初級"},{"ja":"日","en":"day","level":"初級"},{"ja":"年","en":"year","level":"初級"},{"ja":"本","en":"book","level":"初級"},{"ja":"名前","en":"name","level":"初級"},{"ja":"場所","en":"place","level":"初級"},{"ja":"町","en":"town","level":"初級"},{"ja":"家","en":"house","level":"初級"},{"ja":"重要な","en":"important","level":"中級"},{"ja":"必要な","en":"necessary","level":"中級"},{"ja":"有名な","en":"famous","level":"中級"},{"ja":"安全な","en":"safe","level":"中級"},{"ja":"危険な","en":"dangerous","level":"中級"},{"ja":"便利な","en":"convenient","level":"中級"},{"ja":"可能な","en":"possible","level":"中級"},{"ja":"不可能な","en":"impossible","level":"中級"},{"ja":"簡単な","en":"easy","level":"初級"},{"ja":"難しい","en":"difficult","level":"初級"},{"ja":"理由","en":"reason","level":"中級"},{"ja":"方法","en":"method","level":"中級"},{"ja":"結果","en":"result","level":"中級"},{"ja":"目標","en":"goal","level":"中級"},{"ja":"経験","en":"experience","level":"中級"},{"ja":"情報","en":"information","level":"中級"},{"ja":"知識","en":"knowledge","level":"中級"},{"ja":"文化","en":"culture","level":"中級"},{"ja":"社会","en":"society","level":"中級"},{"ja":"歴史","en":"history","level":"中級"},{"ja":"科学","en":"science","level":"中級"},{"ja":"自然","en":"nature","level":"中級"},{"ja":"環境","en":"environment","level":"中級"},{"ja":"経済","en":"economy","level":"中級"},{"ja":"技術","en":"technology","level":"中級"},{"ja":"教育","en":"education","level":"中級"},{"ja":"健康","en":"health","level":"中級"},{"ja":"自由","en":"freedom","level":"中級"},{"ja":"権利","en":"right","level":"中級"},{"ja":"責任","en":"responsibility","level":"中級"},{"ja":"機会","en":"opportunity","level":"中級"},{"ja":"能力","en":"ability","level":"中級"},{"ja":"努力","en":"effort","level":"初級"},{"ja":"成功","en":"success","level":"初級"},{"ja":"失敗","en":"failure","level":"初級"},{"ja":"比較する","en":"compare","level":"上級"},{"ja":"改善する","en":"improve","level":"上級"},{"ja":"分析する","en":"analyze","level":"上級"},{"ja":"決定する","en":"determine","level":"上級"},{"ja":"発展する","en":"develop","level":"上級"},{"ja":"提供する","en":"provide","level":"上級"},{"ja":"含む","en":"include","level":"上級"},{"ja":"増加する","en":"increase","level":"上級"},{"ja":"減少する","en":"decrease","level":"上級"},{"ja":"影響を与える","en":"influence","level":"上級"},{"ja":"説明する","en":"explain","level":"中級"},{"ja":"表現する","en":"express","level":"上級"},{"ja":"予測する","en":"predict","level":"上級"},{"ja":"認識する","en":"recognize","level":"上級"},{"ja":"要求する","en":"require","level":"上級"},{"ja":"示す","en":"indicate","level":"上級"},{"ja":"維持する","en":"maintain","level":"上級"},{"ja":"得る","en":"obtain","level":"上級"},{"ja":"証明する","en":"prove","level":"上級"},{"ja":"守る","en":"protect","level":"中級"},{"ja":"問題を勉強する","en":"study problem","level":"中級"},{"ja":"答えを勉強する","en":"study answer","level":"中級"},{"ja":"理由を勉強する","en":"study reason","level":"中級"},{"ja":"方法を勉強する","en":"study method","level":"中級"},{"ja":"結果を勉強する","en":"study result","level":"中級"},{"ja":"目標を勉強する","en":"study goal","level":"中級"},{"ja":"情報を勉強する","en":"study information","level":"中級"},{"ja":"知識を勉強する","en":"study knowledge","level":"中級"},{"ja":"計画を勉強する","en":"study plan","level":"中級"},{"ja":"意見を勉強する","en":"study opinion","level":"中級"},{"ja":"資料を勉強する","en":"study material","level":"中級"},{"ja":"証拠を勉強する","en":"study evidence","level":"中級"},{"ja":"機会を勉強する","en":"study opportunity","level":"中級"},{"ja":"経験を勉強する","en":"study experience","level":"中級"},{"ja":"環境を勉強する","en":"study environment","level":"中級"},{"ja":"文化を勉強する","en":"study culture","level":"中級"},{"ja":"歴史を勉強する","en":"study history","level":"中級"},{"ja":"技術を勉強する","en":"study technology","level":"中級"},{"ja":"問題を復習する","en":"review problem","level":"中級"},{"ja":"答えを復習する","en":"review answer","level":"中級"},{"ja":"理由を復習する","en":"review reason","level":"中級"},{"ja":"方法を復習する","en":"review method","level":"中級"},{"ja":"結果を復習する","en":"review result","level":"中級"},{"ja":"目標を復習する","en":"review goal","level":"中級"},{"ja":"情報を復習する","en":"review information","level":"中級"},{"ja":"知識を復習する","en":"review knowledge","level":"中級"},{"ja":"計画を復習する","en":"review plan","level":"中級"},{"ja":"意見を復習する","en":"review opinion","level":"中級"},{"ja":"資料を復習する","en":"review material","level":"中級"},{"ja":"証拠を復習する","en":"review evidence","level":"中級"},{"ja":"機会を復習する","en":"review opportunity","level":"中級"},{"ja":"経験を復習する","en":"review experience","level":"中級"},{"ja":"環境を復習する","en":"review environment","level":"中級"},{"ja":"文化を復習する","en":"review culture","level":"中級"},{"ja":"歴史を復習する","en":"review history","level":"中級"},{"ja":"技術を復習する","en":"review technology","level":"中級"},{"ja":"問題を確認する","en":"check problem","level":"中級"},{"ja":"答えを確認する","en":"check answer","level":"中級"},{"ja":"理由を確認する","en":"check reason","level":"中級"},{"ja":"方法を確認する","en":"check method","level":"中級"},{"ja":"結果を確認する","en":"check result","level":"中級"},{"ja":"目標を確認する","en":"check goal","level":"中級"},{"ja":"情報を確認する","en":"check information","level":"中級"},{"ja":"知識を確認する","en":"check knowledge","level":"中級"},{"ja":"計画を確認する","en":"check plan","level":"中級"},{"ja":"意見を確認する","en":"check opinion","level":"中級"},{"ja":"資料を確認する","en":"check material","level":"中級"},{"ja":"証拠を確認する","en":"check evidence","level":"中級"},{"ja":"機会を確認する","en":"check opportunity","level":"中級"},{"ja":"経験を確認する","en":"check experience","level":"中級"},{"ja":"環境を確認する","en":"check environment","level":"中級"},{"ja":"文化を確認する","en":"check culture","level":"中級"},{"ja":"歴史を確認する","en":"check history","level":"中級"},{"ja":"技術を確認する","en":"check technology","level":"中級"},{"ja":"問題を理解する","en":"understand problem","level":"中級"},{"ja":"答えを理解する","en":"understand answer","level":"中級"},{"ja":"理由を理解する","en":"understand reason","level":"中級"},{"ja":"方法を理解する","en":"understand method","level":"中級"},{"ja":"結果を理解する","en":"understand result","level":"中級"},{"ja":"目標を理解する","en":"understand goal","level":"中級"},{"ja":"情報を理解する","en":"understand information","level":"中級"},{"ja":"知識を理解する","en":"understand knowledge","level":"中級"},{"ja":"計画を理解する","en":"understand plan","level":"中級"},{"ja":"意見を理解する","en":"understand opinion","level":"中級"},{"ja":"資料を理解する","en":"understand material","level":"中級"},{"ja":"証拠を理解する","en":"understand evidence","level":"中級"},{"ja":"機会を理解する","en":"understand opportunity","level":"中級"},{"ja":"経験を理解する","en":"understand experience","level":"中級"},{"ja":"環境を理解する","en":"understand environment","level":"中級"},{"ja":"文化を理解する","en":"understand culture","level":"中級"},{"ja":"歴史を理解する","en":"understand history","level":"中級"},{"ja":"技術を理解する","en":"understand technology","level":"中級"},{"ja":"問題を説明する","en":"explain problem","level":"中級"},{"ja":"答えを説明する","en":"explain answer","level":"中級"},{"ja":"理由を説明する","en":"explain reason","level":"中級"},{"ja":"方法を説明する","en":"explain method","level":"中級"},{"ja":"結果を説明する","en":"explain result","level":"中級"},{"ja":"目標を説明する","en":"explain goal","level":"中級"},{"ja":"情報を説明する","en":"explain information","level":"中級"},{"ja":"知識を説明する","en":"explain knowledge","level":"中級"},{"ja":"計画を説明する","en":"explain plan","level":"中級"},{"ja":"意見を説明する","en":"explain opinion","level":"中級"},{"ja":"資料を説明する","en":"explain material","level":"中級"},{"ja":"証拠を説明する","en":"explain evidence","level":"中級"},{"ja":"機会を説明する","en":"explain opportunity","level":"中級"},{"ja":"経験を説明する","en":"explain experience","level":"中級"},{"ja":"環境を説明する","en":"explain environment","level":"中級"},{"ja":"文化を説明する","en":"explain culture","level":"中級"},{"ja":"歴史を説明する","en":"explain history","level":"中級"},{"ja":"技術を説明する","en":"explain technology","level":"中級"},{"ja":"問題を比較する","en":"compare problem","level":"中級"},{"ja":"答えを比較する","en":"compare answer","level":"中級"},{"ja":"理由を比較する","en":"compare reason","level":"中級"},{"ja":"方法を比較する","en":"compare method","level":"中級"},{"ja":"結果を比較する","en":"compare result","level":"中級"},{"ja":"目標を比較する","en":"compare goal","level":"中級"},{"ja":"情報を比較する","en":"compare information","level":"中級"},{"ja":"知識を比較する","en":"compare knowledge","level":"中級"},{"ja":"計画を比較する","en":"compare plan","level":"中級"},{"ja":"意見を比較する","en":"compare opinion","level":"中級"},{"ja":"資料を比較する","en":"compare material","level":"中級"},{"ja":"証拠を比較する","en":"compare evidence","level":"中級"},{"ja":"機会を比較する","en":"compare opportunity","level":"中級"},{"ja":"経験を比較する","en":"compare experience","level":"中級"},{"ja":"環境を比較する","en":"compare environment","level":"中級"},{"ja":"文化を比較する","en":"compare culture","level":"中級"},{"ja":"歴史を比較する","en":"compare history","level":"中級"},{"ja":"技術を比較する","en":"compare technology","level":"中級"},{"ja":"問題を改善する","en":"improve problem","level":"中級"},{"ja":"答えを改善する","en":"improve answer","level":"中級"},{"ja":"理由を改善する","en":"improve reason","level":"中級"},{"ja":"方法を改善する","en":"improve method","level":"中級"},{"ja":"結果を改善する","en":"improve result","level":"中級"},{"ja":"目標を改善する","en":"improve goal","level":"中級"},{"ja":"情報を改善する","en":"improve information","level":"中級"},{"ja":"知識を改善する","en":"improve knowledge","level":"中級"},{"ja":"計画を改善する","en":"improve plan","level":"中級"},{"ja":"意見を改善する","en":"improve opinion","level":"中級"},{"ja":"資料を改善する","en":"improve material","level":"中級"},{"ja":"証拠を改善する","en":"improve evidence","level":"中級"},{"ja":"機会を改善する","en":"improve opportunity","level":"中級"},{"ja":"経験を改善する","en":"improve experience","level":"中級"},{"ja":"環境を改善する","en":"improve environment","level":"中級"},{"ja":"文化を改善する","en":"improve culture","level":"中級"},{"ja":"歴史を改善する","en":"improve history","level":"中級"},{"ja":"技術を改善する","en":"improve technology","level":"中級"},{"ja":"問題を分析する","en":"analyze problem","level":"中級"},{"ja":"答えを分析する","en":"analyze answer","level":"中級"},{"ja":"理由を分析する","en":"analyze reason","level":"中級"},{"ja":"方法を分析する","en":"analyze method","level":"中級"},{"ja":"結果を分析する","en":"analyze result","level":"中級"},{"ja":"目標を分析する","en":"analyze goal","level":"中級"},{"ja":"情報を分析する","en":"analyze information","level":"中級"},{"ja":"知識を分析する","en":"analyze knowledge","level":"中級"},{"ja":"計画を分析する","en":"analyze plan","level":"中級"},{"ja":"意見を分析する","en":"analyze opinion","level":"中級"},{"ja":"資料を分析する","en":"analyze material","level":"中級"},{"ja":"証拠を分析する","en":"analyze evidence","level":"中級"},{"ja":"機会を分析する","en":"analyze opportunity","level":"中級"},{"ja":"経験を分析する","en":"analyze experience","level":"中級"},{"ja":"環境を分析する","en":"analyze environment","level":"中級"},{"ja":"文化を分析する","en":"analyze culture","level":"中級"},{"ja":"歴史を分析する","en":"analyze history","level":"中級"},{"ja":"技術を分析する","en":"analyze technology","level":"中級"},{"ja":"問題を記録する","en":"record problem","level":"中級"},{"ja":"答えを記録する","en":"record answer","level":"中級"},{"ja":"理由を記録する","en":"record reason","level":"中級"},{"ja":"方法を記録する","en":"record method","level":"中級"},{"ja":"結果を記録する","en":"record result","level":"中級"},{"ja":"目標を記録する","en":"record goal","level":"中級"},{"ja":"情報を記録する","en":"record information","level":"中級"},{"ja":"知識を記録する","en":"record knowledge","level":"中級"},{"ja":"計画を記録する","en":"record plan","level":"中級"},{"ja":"意見を記録する","en":"record opinion","level":"中級"},{"ja":"資料を記録する","en":"record material","level":"中級"},{"ja":"証拠を記録する","en":"record evidence","level":"中級"},{"ja":"機会を記録する","en":"record opportunity","level":"中級"},{"ja":"経験を記録する","en":"record experience","level":"中級"},{"ja":"環境を記録する","en":"record environment","level":"中級"},{"ja":"文化を記録する","en":"record culture","level":"中級"},{"ja":"歴史を記録する","en":"record history","level":"中級"},{"ja":"技術を記録する","en":"record technology","level":"中級"},{"ja":"問題を準備する","en":"prepare problem","level":"中級"},{"ja":"答えを準備する","en":"prepare answer","level":"中級"},{"ja":"理由を準備する","en":"prepare reason","level":"中級"},{"ja":"方法を準備する","en":"prepare method","level":"中級"},{"ja":"結果を準備する","en":"prepare result","level":"中級"},{"ja":"目標を準備する","en":"prepare goal","level":"中級"},{"ja":"情報を準備する","en":"prepare information","level":"中級"},{"ja":"知識を準備する","en":"prepare knowledge","level":"中級"},{"ja":"計画を準備する","en":"prepare plan","level":"中級"},{"ja":"意見を準備する","en":"prepare opinion","level":"中級"},{"ja":"資料を準備する","en":"prepare material","level":"中級"},{"ja":"証拠を準備する","en":"prepare evidence","level":"中級"},{"ja":"機会を準備する","en":"prepare opportunity","level":"中級"},{"ja":"経験を準備する","en":"prepare experience","level":"中級"},{"ja":"環境を準備する","en":"prepare environment","level":"中級"},{"ja":"文化を準備する","en":"prepare culture","level":"中級"},{"ja":"歴史を準備する","en":"prepare history","level":"中級"},{"ja":"技術を準備する","en":"prepare technology","level":"中級"},{"ja":"問題を選ぶ","en":"choose problem","level":"中級"},{"ja":"答えを選ぶ","en":"choose answer","level":"中級"},{"ja":"理由を選ぶ","en":"choose reason","level":"中級"},{"ja":"方法を選ぶ","en":"choose method","level":"中級"},{"ja":"結果を選ぶ","en":"choose result","level":"中級"},{"ja":"目標を選ぶ","en":"choose goal","level":"中級"},{"ja":"情報を選ぶ","en":"choose information","level":"中級"},{"ja":"知識を選ぶ","en":"choose knowledge","level":"中級"},{"ja":"計画を選ぶ","en":"choose plan","level":"中級"},{"ja":"意見を選ぶ","en":"choose opinion","level":"中級"},{"ja":"資料を選ぶ","en":"choose material","level":"中級"},{"ja":"証拠を選ぶ","en":"choose evidence","level":"中級"},{"ja":"機会を選ぶ","en":"choose opportunity","level":"中級"},{"ja":"経験を選ぶ","en":"choose experience","level":"中級"},{"ja":"環境を選ぶ","en":"choose environment","level":"中級"},{"ja":"文化を選ぶ","en":"choose culture","level":"中級"},{"ja":"歴史を選ぶ","en":"choose history","level":"中級"},{"ja":"技術を選ぶ","en":"choose technology","level":"中級"},{"ja":"問題を使う","en":"use problem","level":"中級"},{"ja":"答えを使う","en":"use answer","level":"中級"},{"ja":"理由を使う","en":"use reason","level":"中級"},{"ja":"方法を使う","en":"use method","level":"中級"},{"ja":"結果を使う","en":"use result","level":"中級"},{"ja":"目標を使う","en":"use goal","level":"中級"},{"ja":"情報を使う","en":"use information","level":"中級"},{"ja":"知識を使う","en":"use knowledge","level":"中級"},{"ja":"計画を使う","en":"use plan","level":"中級"},{"ja":"意見を使う","en":"use opinion","level":"中級"},{"ja":"資料を使う","en":"use material","level":"中級"},{"ja":"証拠を使う","en":"use evidence","level":"中級"},{"ja":"機会を使う","en":"use opportunity","level":"中級"},{"ja":"経験を使う","en":"use experience","level":"中級"},{"ja":"環境を使う","en":"use environment","level":"中級"},{"ja":"文化を使う","en":"use culture","level":"中級"},{"ja":"歴史を使う","en":"use history","level":"中級"},{"ja":"技術を使う","en":"use technology","level":"中級"},{"ja":"問題を守る","en":"protect problem","level":"中級"},{"ja":"答えを守る","en":"protect answer","level":"中級"},{"ja":"理由を守る","en":"protect reason","level":"中級"},{"ja":"方法を守る","en":"protect method","level":"中級"},{"ja":"結果を守る","en":"protect result","level":"中級"},{"ja":"目標を守る","en":"protect goal","level":"中級"},{"ja":"情報を守る","en":"protect information","level":"中級"},{"ja":"知識を守る","en":"protect knowledge","level":"中級"},{"ja":"計画を守る","en":"protect plan","level":"中級"},{"ja":"意見を守る","en":"protect opinion","level":"中級"},{"ja":"資料を守る","en":"protect material","level":"中級"},{"ja":"証拠を守る","en":"protect evidence","level":"中級"},{"ja":"機会を守る","en":"protect opportunity","level":"中級"},{"ja":"経験を守る","en":"protect experience","level":"中級"},{"ja":"環境を守る","en":"protect environment","level":"中級"},{"ja":"文化を守る","en":"protect culture","level":"中級"},{"ja":"歴史を守る","en":"protect history","level":"中級"},{"ja":"技術を守る","en":"protect technology","level":"中級"},{"ja":"問題を作る","en":"make problem","level":"中級"},{"ja":"答えを作る","en":"make answer","level":"中級"},{"ja":"理由を作る","en":"make reason","level":"中級"},{"ja":"方法を作る","en":"make method","level":"上級"},{"ja":"結果を作る","en":"make result","level":"上級"},{"ja":"目標を作る","en":"make goal","level":"上級"},{"ja":"情報を作る","en":"make information","level":"上級"},{"ja":"知識を作る","en":"make knowledge","level":"上級"},{"ja":"計画を作る","en":"make plan","level":"上級"},{"ja":"意見を作る","en":"make opinion","level":"上級"},{"ja":"資料を作る","en":"make material","level":"上級"},{"ja":"証拠を作る","en":"make evidence","level":"上級"},{"ja":"機会を作る","en":"make opportunity","level":"上級"},{"ja":"経験を作る","en":"make experience","level":"上級"},{"ja":"環境を作る","en":"make environment","level":"上級"},{"ja":"文化を作る","en":"make culture","level":"上級"},{"ja":"歴史を作る","en":"make history","level":"上級"},{"ja":"技術を作る","en":"make technology","level":"上級"},{"ja":"問題を探す","en":"find problem","level":"上級"},{"ja":"答えを探す","en":"find answer","level":"上級"},{"ja":"理由を探す","en":"find reason","level":"上級"},{"ja":"方法を探す","en":"find method","level":"上級"},{"ja":"結果を探す","en":"find result","level":"上級"},{"ja":"目標を探す","en":"find goal","level":"上級"},{"ja":"情報を探す","en":"find information","level":"上級"},{"ja":"知識を探す","en":"find knowledge","level":"上級"},{"ja":"計画を探す","en":"find plan","level":"上級"},{"ja":"意見を探す","en":"find opinion","level":"上級"},{"ja":"資料を探す","en":"find material","level":"上級"},{"ja":"証拠を探す","en":"find evidence","level":"上級"},{"ja":"機会を探す","en":"find opportunity","level":"上級"},{"ja":"経験を探す","en":"find experience","level":"上級"},{"ja":"環境を探す","en":"find environment","level":"上級"},{"ja":"文化を探す","en":"find culture","level":"上級"},{"ja":"歴史を探す","en":"find history","level":"上級"},{"ja":"技術を探す","en":"find technology","level":"上級"},{"ja":"問題を受け取る","en":"receive problem","level":"上級"},{"ja":"答えを受け取る","en":"receive answer","level":"上級"},{"ja":"理由を受け取る","en":"receive reason","level":"上級"},{"ja":"方法を受け取る","en":"receive method","level":"上級"},{"ja":"結果を受け取る","en":"receive result","level":"上級"},{"ja":"目標を受け取る","en":"receive goal","level":"上級"},{"ja":"情報を受け取る","en":"receive information","level":"上級"},{"ja":"知識を受け取る","en":"receive knowledge","level":"上級"},{"ja":"計画を受け取る","en":"receive plan","level":"上級"},{"ja":"意見を受け取る","en":"receive opinion","level":"上級"},{"ja":"資料を受け取る","en":"receive material","level":"上級"},{"ja":"証拠を受け取る","en":"receive evidence","level":"上級"},{"ja":"機会を受け取る","en":"receive opportunity","level":"上級"},{"ja":"経験を受け取る","en":"receive experience","level":"上級"},{"ja":"環境を受け取る","en":"receive environment","level":"上級"},{"ja":"文化を受け取る","en":"receive culture","level":"上級"},{"ja":"歴史を受け取る","en":"receive history","level":"上級"},{"ja":"技術を受け取る","en":"receive technology","level":"上級"},{"ja":"重要な問題","en":"important problem","level":"上級"},{"ja":"重要な答え","en":"important answer","level":"上級"},{"ja":"重要な理由","en":"important reason","level":"上級"},{"ja":"重要な方法","en":"important method","level":"上級"},{"ja":"重要な結果","en":"important result","level":"上級"},{"ja":"重要な目標","en":"important goal","level":"上級"},{"ja":"重要な情報","en":"important information","level":"上級"},{"ja":"重要な知識","en":"important knowledge","level":"上級"},{"ja":"重要な計画","en":"important plan","level":"上級"},{"ja":"重要な意見","en":"important opinion","level":"上級"},{"ja":"重要な資料","en":"important material","level":"上級"},{"ja":"重要な証拠","en":"important evidence","level":"上級"},{"ja":"重要な機会","en":"important opportunity","level":"上級"},{"ja":"重要な経験","en":"important experience","level":"上級"},{"ja":"重要な環境","en":"important environment","level":"上級"},{"ja":"重要な文化","en":"important culture","level":"上級"},{"ja":"重要な歴史","en":"important history","level":"上級"},{"ja":"重要な技術","en":"important technology","level":"上級"},{"ja":"必要な問題","en":"necessary problem","level":"上級"},{"ja":"必要な答え","en":"necessary answer","level":"上級"},{"ja":"必要な理由","en":"necessary reason","level":"上級"},{"ja":"必要な方法","en":"necessary method","level":"上級"},{"ja":"必要な結果","en":"necessary result","level":"上級"},{"ja":"必要な目標","en":"necessary goal","level":"上級"},{"ja":"必要な情報","en":"necessary information","level":"上級"},{"ja":"必要な知識","en":"necessary knowledge","level":"上級"},{"ja":"必要な計画","en":"necessary plan","level":"上級"},{"ja":"必要な意見","en":"necessary opinion","level":"上級"},{"ja":"必要な資料","en":"necessary material","level":"上級"},{"ja":"必要な証拠","en":"necessary evidence","level":"上級"},{"ja":"必要な機会","en":"necessary opportunity","level":"上級"},{"ja":"必要な経験","en":"necessary experience","level":"上級"},{"ja":"必要な環境","en":"necessary environment","level":"上級"},{"ja":"必要な文化","en":"necessary culture","level":"上級"},{"ja":"必要な歴史","en":"necessary history","level":"上級"},{"ja":"必要な技術","en":"necessary technology","level":"上級"},{"ja":"有名な問題","en":"famous problem","level":"上級"},{"ja":"有名な答え","en":"famous answer","level":"上級"},{"ja":"有名な理由","en":"famous reason","level":"上級"},{"ja":"有名な方法","en":"famous method","level":"上級"},{"ja":"有名な結果","en":"famous result","level":"上級"},{"ja":"有名な目標","en":"famous goal","level":"上級"},{"ja":"有名な情報","en":"famous information","level":"上級"},{"ja":"有名な知識","en":"famous knowledge","level":"上級"},{"ja":"有名な計画","en":"famous plan","level":"上級"},{"ja":"有名な意見","en":"famous opinion","level":"上級"},{"ja":"有名な資料","en":"famous material","level":"上級"},{"ja":"有名な証拠","en":"famous evidence","level":"上級"},{"ja":"有名な機会","en":"famous opportunity","level":"上級"},{"ja":"有名な経験","en":"famous experience","level":"上級"},{"ja":"有名な環境","en":"famous environment","level":"上級"},{"ja":"有名な文化","en":"famous culture","level":"上級"},{"ja":"有名な歴史","en":"famous history","level":"上級"},{"ja":"有名な技術","en":"famous technology","level":"上級"},{"ja":"安全な問題","en":"safe problem","level":"上級"},{"ja":"安全な答え","en":"safe answer","level":"上級"},{"ja":"安全な理由","en":"safe reason","level":"上級"},{"ja":"安全な方法","en":"safe method","level":"上級"},{"ja":"安全な結果","en":"safe result","level":"上級"},{"ja":"安全な目標","en":"safe goal","level":"上級"},{"ja":"安全な情報","en":"safe information","level":"上級"},{"ja":"安全な知識","en":"safe knowledge","level":"上級"},{"ja":"安全な計画","en":"safe plan","level":"上級"},{"ja":"安全な意見","en":"safe opinion","level":"上級"},{"ja":"安全な資料","en":"safe material","level":"上級"},{"ja":"安全な証拠","en":"safe evidence","level":"上級"},{"ja":"安全な機会","en":"safe opportunity","level":"上級"},{"ja":"安全な経験","en":"safe experience","level":"上級"},{"ja":"安全な環境","en":"safe environment","level":"上級"},{"ja":"安全な文化","en":"safe culture","level":"上級"},{"ja":"安全な歴史","en":"safe history","level":"上級"},{"ja":"安全な技術","en":"safe technology","level":"上級"},{"ja":"危険な問題","en":"dangerous problem","level":"上級"},{"ja":"危険な答え","en":"dangerous answer","level":"上級"},{"ja":"危険な理由","en":"dangerous reason","level":"上級"},{"ja":"危険な方法","en":"dangerous method","level":"上級"},{"ja":"危険な結果","en":"dangerous result","level":"上級"},{"ja":"危険な目標","en":"dangerous goal","level":"上級"},{"ja":"危険な情報","en":"dangerous information","level":"上級"},{"ja":"危険な知識","en":"dangerous knowledge","level":"上級"},{"ja":"危険な計画","en":"dangerous plan","level":"上級"},{"ja":"危険な意見","en":"dangerous opinion","level":"上級"},{"ja":"危険な資料","en":"dangerous material","level":"上級"},{"ja":"危険な証拠","en":"dangerous evidence","level":"上級"},{"ja":"危険な機会","en":"dangerous opportunity","level":"上級"},{"ja":"危険な経験","en":"dangerous experience","level":"上級"},{"ja":"危険な環境","en":"dangerous environment","level":"上級"},{"ja":"危険な文化","en":"dangerous culture","level":"上級"},{"ja":"危険な歴史","en":"dangerous history","level":"上級"},{"ja":"危険な技術","en":"dangerous technology","level":"上級"},{"ja":"便利な問題","en":"convenient problem","level":"上級"},{"ja":"便利な答え","en":"convenient answer","level":"上級"},{"ja":"便利な理由","en":"convenient reason","level":"上級"},{"ja":"便利な方法","en":"convenient method","level":"上級"},{"ja":"便利な結果","en":"convenient result","level":"上級"},{"ja":"便利な目標","en":"convenient goal","level":"上級"},{"ja":"便利な情報","en":"convenient information","level":"上級"},{"ja":"便利な知識","en":"convenient knowledge","level":"上級"},{"ja":"便利な計画","en":"convenient plan","level":"上級"},{"ja":"便利な意見","en":"convenient opinion","level":"上級"},{"ja":"便利な資料","en":"convenient material","level":"上級"},{"ja":"便利な証拠","en":"convenient evidence","level":"上級"},{"ja":"便利な機会","en":"convenient opportunity","level":"上級"},{"ja":"便利な経験","en":"convenient experience","level":"上級"},{"ja":"便利な環境","en":"convenient environment","level":"上級"},{"ja":"便利な文化","en":"convenient culture","level":"上級"},{"ja":"便利な歴史","en":"convenient history","level":"上級"},{"ja":"便利な技術","en":"convenient technology","level":"上級"},{"ja":"明確な問題","en":"clear problem","level":"上級"},{"ja":"明確な答え","en":"clear answer","level":"上級"},{"ja":"明確な理由","en":"clear reason","level":"上級"},{"ja":"明確な方法","en":"clear method","level":"上級"},{"ja":"明確な結果","en":"clear result","level":"上級"},{"ja":"明確な目標","en":"clear goal","level":"上級"},{"ja":"明確な情報","en":"clear information","level":"上級"},{"ja":"明確な知識","en":"clear knowledge","level":"上級"},{"ja":"明確な計画","en":"clear plan","level":"上級"},{"ja":"明確な意見","en":"clear opinion","level":"上級"},{"ja":"明確な資料","en":"clear material","level":"上級"}],"kanji":[{"kanji":"努力","yomi":"どりょく","meaning":"目標に向かってがんばること"},{"kanji":"成功","yomi":"せいこう","meaning":"うまくいくこと"},{"kanji":"失敗","yomi":"しっぱい","meaning":"うまくいかないこと"},{"kanji":"挑戦","yomi":"ちょうせん","meaning":"難しいことに立ち向かうこと"},{"kanji":"成長","yomi":"せいちょう","meaning":"能力や状態が伸びること"},{"kanji":"復習","yomi":"ふくしゅう","meaning":"一度学んだことをもう一度学ぶこと"},{"kanji":"理解","yomi":"りかい","meaning":"意味や内容がわかること"},{"kanji":"説明","yomi":"せつめい","meaning":"わかるように話すこと"},{"kanji":"原因","yomi":"げんいん","meaning":"物事が起こるもと"},{"kanji":"結果","yomi":"けっか","meaning":"物事のあとに生じたこと"},{"kanji":"理由","yomi":"りゆう","meaning":"そうなるわけ"},{"kanji":"方法","yomi":"ほうほう","meaning":"やり方"},{"kanji":"目標","yomi":"もくひょう","meaning":"目指すもの"},{"kanji":"計画","yomi":"けいかく","meaning":"前もって考えた手順"},{"kanji":"実行","yomi":"じっこう","meaning":"実際に行うこと"},{"kanji":"継続","yomi":"けいぞく","meaning":"続けること"},{"kanji":"習慣","yomi":"しゅうかん","meaning":"いつも行うこと"},{"kanji":"集中","yomi":"しゅうちゅう","meaning":"一つのことに意識を向けること"},{"kanji":"確認","yomi":"かくにん","meaning":"たしかめること"},{"kanji":"練習","yomi":"れんしゅう","meaning":"上達のためにくり返すこと"},{"kanji":"重要","yomi":"じゅうよう","meaning":"大切なこと"},{"kanji":"基本","yomi":"きほん","meaning":"土台になること"},{"kanji":"応用","yomi":"おうよう","meaning":"学んだことを別の場合に使うこと"},{"kanji":"証明","yomi":"しょうめい","meaning":"正しいことを筋道立てて示すこと"},{"kanji":"仮定","yomi":"かてい","meaning":"前提として考えること"},{"kanji":"結論","yomi":"けつろん","meaning":"考えた結果として出る答え"},{"kanji":"条件","yomi":"じょうけん","meaning":"成り立つために必要な事柄"},{"kanji":"比較","yomi":"ひかく","meaning":"比べること"},{"kanji":"判断","yomi":"はんだん","meaning":"考えて決めること"},{"kanji":"改善","yomi":"かいぜん","meaning":"より良くすること"},{"kanji":"修正","yomi":"しゅうせい","meaning":"間違いを直すこと"},{"kanji":"情報","yomi":"じょうほう","meaning":"知るための内容"},{"kanji":"知識","yomi":"ちしき","meaning":"知っている内容"},{"kanji":"技術","yomi":"ぎじゅつ","meaning":"物事を行うためのわざ"},{"kanji":"経験","yomi":"けいけん","meaning":"実際に行って得たこと"},{"kanji":"責任","yomi":"せきにん","meaning":"果たすべき役割"},{"kanji":"協力","yomi":"きょうりょく","meaning":"力を合わせること"},{"kanji":"競争","yomi":"きょうそう","meaning":"勝ち負けを争うこと"},{"kanji":"社会","yomi":"しゃかい","meaning":"人々が集まって生活する場"},{"kanji":"文化","yomi":"ぶんか","meaning":"人々の生活から生まれたもの"},{"kanji":"歴史","yomi":"れきし","meaning":"過去からの出来事の流れ"},{"kanji":"自然","yomi":"しぜん","meaning":"人の手が加わらないもの"},{"kanji":"環境","yomi":"かんきょう","meaning":"周りの状況"},{"kanji":"健康","yomi":"けんこう","meaning":"体や心の調子がよいこと"},{"kanji":"安全","yomi":"あんぜん","meaning":"危険が少ないこと"},{"kanji":"危険","yomi":"きけん","meaning":"悪いことが起きる可能性"},{"kanji":"平和","yomi":"へいわ","meaning":"争いがない状態"},{"kanji":"自由","yomi":"じゆう","meaning":"自分で選べること"},{"kanji":"権利","yomi":"けんり","meaning":"行うことが認められるもの"},{"kanji":"義務","yomi":"ぎむ","meaning":"しなければならないこと"},{"kanji":"経済","yomi":"けいざい","meaning":"お金や物の動き"},{"kanji":"政治","yomi":"せいじ","meaning":"社会を動かす仕組み"},{"kanji":"法律","yomi":"ほうりつ","meaning":"国や社会の決まり"},{"kanji":"制度","yomi":"せいど","meaning":"社会の仕組み"},{"kanji":"選挙","yomi":"せんきょ","meaning":"代表を選ぶこと"},{"kanji":"地域","yomi":"ちいき","meaning":"一定の場所のまとまり"},{"kanji":"人口","yomi":"じんこう","meaning":"人の数"},{"kanji":"都市","yomi":"とし","meaning":"人が多く集まる地域"},{"kanji":"科学","yomi":"かがく","meaning":"自然や物事の法則を調べる学問"},{"kanji":"実験","yomi":"じっけん","meaning":"確かめるために行う試み"},{"kanji":"観察","yomi":"かんさつ","meaning":"よく見て調べること"},{"kanji":"発見","yomi":"はっけん","meaning":"新しく見つけること"},{"kanji":"発明","yomi":"はつめい","meaning":"新しいものを作り出すこと"},{"kanji":"研究","yomi":"けんきゅう","meaning":"詳しく調べること"},{"kanji":"資料","yomi":"しりょう","meaning":"調べるための材料"},{"kanji":"課題","yomi":"かだい","meaning":"取り組むべき問題"},{"kanji":"授業","yomi":"じゅぎょう","meaning":"先生が教える時間"},{"kanji":"試験","yomi":"しけん","meaning":"力を確かめるテスト"},{"kanji":"合格","yomi":"ごうかく","meaning":"試験などに受かること"},{"kanji":"受験","yomi":"じゅけん","meaning":"試験を受けること"},{"kanji":"進学","yomi":"しんがく","meaning":"上の学校へ進むこと"},{"kanji":"平均","yomi":"へいきん","meaning":"合計を個数で割った値"},{"kanji":"最大","yomi":"さいだい","meaning":"最も大きいこと"},{"kanji":"最小","yomi":"さいしょう","meaning":"最も小さいこと"},{"kanji":"共通","yomi":"きょうつう","meaning":"同じであること"},{"kanji":"選択","yomi":"せんたく","meaning":"選ぶこと"},{"kanji":"利用","yomi":"りよう","meaning":"使うこと"},{"kanji":"表示","yomi":"ひょうじ","meaning":"画面などに出すこと"},{"kanji":"設定","yomi":"せってい","meaning":"決めて使えるようにすること"},{"kanji":"保存","yomi":"ほぞん","meaning":"消えないように残すこと"},{"kanji":"更新","yomi":"こうしん","meaning":"新しくすること"},{"kanji":"公開","yomi":"こうかい","meaning":"人に見られるようにすること"},{"kanji":"暗記","yomi":"あんき","meaning":"見ないで言えるように覚えること"},{"kanji":"記憶","yomi":"きおく","meaning":"覚えていること"},{"kanji":"読解","yomi":"どっかい","meaning":"文章を読んで理解すること"},{"kanji":"作文","yomi":"さくぶん","meaning":"文章を書くこと"},{"kanji":"要約","yomi":"ようやく","meaning":"大事な点を短くまとめること"},{"kanji":"主張","yomi":"しゅちょう","meaning":"自分の意見を強く言うこと"},{"kanji":"根拠","yomi":"こんきょ","meaning":"考えのもとになる理由"},{"kanji":"反論","yomi":"はんろん","meaning":"相手の意見に反対して述べること"},{"kanji":"賛成","yomi":"さんせい","meaning":"意見に同意すること"},{"kanji":"反対","yomi":"はんたい","meaning":"意見に同意しないこと"},{"kanji":"議論","yomi":"ぎろん","meaning":"意見を出し合って考えること"},{"kanji":"表現","yomi":"ひょうげん","meaning":"考えや気持ちを表すこと"},{"kanji":"比喩","yomi":"ひゆ","meaning":"たとえて表すこと"},{"kanji":"省略","yomi":"しょうりゃく","meaning":"一部を省くこと"},{"kanji":"接続","yomi":"せつぞく","meaning":"つなぐこと"},{"kanji":"段落","yomi":"だんらく","meaning":"文章のまとまり"},{"kanji":"主語","yomi":"しゅご","meaning":"文の主体を表す語"},{"kanji":"述語","yomi":"じゅつご","meaning":"主語の動作や状態を表す語"},{"kanji":"修飾","yomi":"しゅうしょく","meaning":"語句を詳しく説明すること"},{"kanji":"文脈","yomi":"ぶんみゃく","meaning":"前後の文章のつながり"},{"kanji":"古典","yomi":"こてん","meaning":"昔に書かれた作品"},{"kanji":"現代","yomi":"げんだい","meaning":"今の時代"},{"kanji":"作者","yomi":"さくしゃ","meaning":"作品を作った人"},{"kanji":"作品","yomi":"さくひん","meaning":"作られたもの"},{"kanji":"鑑賞","yomi":"かんしょう","meaning":"作品を味わい理解すること"},{"kanji":"批評","yomi":"ひひょう","meaning":"よしあしを考えて述べること"},{"kanji":"文学","yomi":"ぶんがく","meaning":"言葉による芸術や学問"},{"kanji":"随筆","yomi":"ずいひつ","meaning":"見聞や感想を書いた文章"},{"kanji":"物語","yomi":"ものがたり","meaning":"出来事を語る文章"},{"kanji":"小説","yomi":"しょうせつ","meaning":"作り話を文章にしたもの"},{"kanji":"詩歌","yomi":"しいか","meaning":"詩や短歌など"},{"kanji":"短歌","yomi":"たんか","meaning":"五七五七七の定型詩"},{"kanji":"俳句","yomi":"はいく","meaning":"五七五の定型詩"},{"kanji":"季語","yomi":"きご","meaning":"季節を表す言葉"},{"kanji":"感情","yomi":"かんじょう","meaning":"心の動き"},{"kanji":"情景","yomi":"じょうけい","meaning":"目に浮かぶ景色や場面"},{"kanji":"農業","yomi":"のうぎょう","meaning":"作物を育てる仕事"},{"kanji":"工業","yomi":"こうぎょう","meaning":"ものを作る産業"},{"kanji":"商業","yomi":"しょうぎょう","meaning":"商品を売買する産業"},{"kanji":"貿易","yomi":"ぼうえき","meaning":"国同士の売買"},{"kanji":"輸出","yomi":"ゆしゅつ","meaning":"外国へ品物を売ること"},{"kanji":"輸入","yomi":"ゆにゅう","meaning":"外国から品物を買うこと"},{"kanji":"資源","yomi":"しげん","meaning":"利用できる材料やエネルギー"},{"kanji":"産業","yomi":"さんぎょう","meaning":"ものやサービスを生み出す活動"},{"kanji":"税金","yomi":"ぜいきん","meaning":"国や地方に納めるお金"},{"kanji":"財政","yomi":"ざいせい","meaning":"国や地方のお金の使い方"},{"kanji":"需要","yomi":"じゅよう","meaning":"買いたいという求め"},{"kanji":"供給","yomi":"きょうきゅう","meaning":"売るために出される量"},{"kanji":"価格","yomi":"かかく","meaning":"ものの値段"},{"kanji":"市場","yomi":"しじょう","meaning":"売買が行われる場"},{"kanji":"消費","yomi":"しょうひ","meaning":"ものやサービスを使うこと"},{"kanji":"生産","yomi":"せいさん","meaning":"ものを作り出すこと"},{"kanji":"憲法","yomi":"けんぽう","meaning":"国の基本となる決まり"},{"kanji":"国会","yomi":"こっかい","meaning":"法律を作る国の機関"},{"kanji":"内閣","yomi":"ないかく","meaning":"行政を行う機関"},{"kanji":"裁判","yomi":"さいばん","meaning":"法律に基づいて判断すること"},{"kanji":"司法","yomi":"しほう","meaning":"裁判によって法を適用する働き"},{"kanji":"行政","yomi":"ぎょうせい","meaning":"国や地方が政策を実行すること"},{"kanji":"立法","yomi":"りっぽう","meaning":"法律を作ること"},{"kanji":"自治","yomi":"じち","meaning":"自分たちで治めること"},{"kanji":"権力","yomi":"けんりょく","meaning":"人を動かす力"},{"kanji":"人権","yomi":"じんけん","meaning":"人が生まれながらに持つ権利"},{"kanji":"平等","yomi":"びょうどう","meaning":"差別なく同じであること"},{"kanji":"福祉","yomi":"ふくし","meaning":"人々の生活を支える仕組み"},{"kanji":"選挙","yomi":"せんきょ","meaning":"代表者を選ぶこと"},{"kanji":"投票","yomi":"とうひょう","meaning":"選挙で票を入れること"},{"kanji":"政党","yomi":"せいとう","meaning":"政治上の考えを同じくする団体"},{"kanji":"世論","yomi":"よろん","meaning":"社会の多くの人の意見"}],"kobun":[{"word":"あはれ","meaning":"しみじみとした趣がある"},{"word":"をかし","meaning":"趣がある・おもしろい"},{"word":"いみじ","meaning":"非常に・すばらしい"},{"word":"ゆかし","meaning":"見たい・知りたい"},{"word":"おどろく","meaning":"はっと気づく・目を覚ます"},{"word":"ののしる","meaning":"大声で騒ぐ・評判になる"},{"word":"めでたし","meaning":"すばらしい・立派だ"},{"word":"つれづれ","meaning":"手持ち無沙汰だ"},{"word":"うつくし","meaning":"かわいらしい"},{"word":"かなし","meaning":"かわいい・いとしい"},{"word":"ありがたし","meaning":"めったにない・すばらしい"},{"word":"やむごとなし","meaning":"高貴だ・特別だ"},{"word":"あさまし","meaning":"驚きあきれる"},{"word":"くちをし","meaning":"残念だ"},{"word":"こころにくし","meaning":"奥ゆかしい"},{"word":"ねんごろなり","meaning":"熱心だ・親しい"},{"word":"すさまじ","meaning":"興ざめだ"},{"word":"わびし","meaning":"つらい・寂しい"},{"word":"おぼつかなし","meaning":"はっきりしない・不安だ"},{"word":"むつかし","meaning":"不快だ・気味が悪い"},{"word":"いたづらなり","meaning":"むだだ"},{"word":"あてなり","meaning":"上品だ"},{"word":"なまめかし","meaning":"優美だ"},{"word":"はづかし","meaning":"立派で気後れする"},{"word":"つきづきし","meaning":"似つかわしい"},{"word":"らうたし","meaning":"かわいらしい"},{"word":"いらふ","meaning":"返事をする"},{"word":"ありく","meaning":"歩き回る"},{"word":"ぐす","meaning":"連れて行く"},{"word":"とぶらふ","meaning":"訪れる・弔う"},{"word":"まもる","meaning":"じっと見つめる"},{"word":"ながむ","meaning":"物思いに沈む"},{"word":"わづらふ","meaning":"悩む・病気になる"},{"word":"おこたる","meaning":"病気がよくなる"},{"word":"おきつ","meaning":"命令する"},{"word":"かしづく","meaning":"大切に育てる"},{"word":"たまふ","meaning":"お与えになる・〜なさる"},{"word":"おはす","meaning":"いらっしゃる"},{"word":"めす","meaning":"お呼びになる・召し上がる"},{"word":"きこゆ","meaning":"申し上げる"},{"word":"まゐる","meaning":"参上する・差し上げる"},{"word":"たてまつる","meaning":"差し上げる"},{"word":"はべり","meaning":"お仕えする・あります"},{"word":"さぶらふ","meaning":"お仕えする・あります"},{"word":"おぼす","meaning":"お思いになる"},{"word":"のたまふ","meaning":"おっしゃる"},{"word":"ごらんず","meaning":"ご覧になる"},{"word":"しろしめす","meaning":"お知りになる・治める"},{"word":"おぼゆ","meaning":"思われる"},{"word":"聞こゆ","meaning":"聞こえる・評判になる"},{"word":"見ゆ","meaning":"見える・思われる"},{"word":"あふ","meaning":"結婚する・出会う"},{"word":"契る","meaning":"約束する"},{"word":"頼む","meaning":"あてにする"},{"word":"恨む","meaning":"不満に思う"},{"word":"思ふ","meaning":"思う"},{"word":"知る","meaning":"治める・知る"},{"word":"召す","meaning":"お呼びになる"},{"word":"奉る","meaning":"差し上げる"},{"word":"侍り","meaning":"あります・おります"},{"word":"候ふ","meaning":"お仕えする・あります"},{"word":"参る","meaning":"参上する"},{"word":"申す","meaning":"申し上げる"},{"word":"奏す","meaning":"天皇に申し上げる"},{"word":"啓す","meaning":"中宮などに申し上げる"},{"word":"遊ぶ","meaning":"音楽や詩歌を楽しむ"},{"word":"隠る","meaning":"隠れる・亡くなる"},{"word":"失す","meaning":"消える・亡くなる"},{"word":"あく","meaning":"満足する"},{"word":"飽く","meaning":"満足する"},{"word":"念ず","meaning":"我慢する"},{"word":"思ひやる","meaning":"思いをめぐらす"},{"word":"具す","meaning":"伴う・連れる"},{"word":"率る","meaning":"連れる"},{"word":"渡る","meaning":"通る・ずっと〜する"},{"word":"ものす","meaning":"いる・行く・する"},{"word":"あらまほし","meaning":"望ましい"},{"word":"めざまし","meaning":"気にくわない・すばらしい"},{"word":"心もとなし","meaning":"待ち遠しい・不安だ"},{"word":"いとほし","meaning":"気の毒だ・かわいい"},{"word":"かたじけなし","meaning":"恐れ多い・ありがたい"},{"word":"おぼろけなり","meaning":"並一通りだ"},{"word":"さらなり","meaning":"言うまでもない"},{"word":"あからさまなり","meaning":"ほんの少しの間だ"},{"word":"かりそめなり","meaning":"一時的だ"},{"word":"すずろなり","meaning":"むやみやたらだ"},{"word":"あだなり","meaning":"はかない・浮気だ"},{"word":"まめなり","meaning":"まじめだ・実用的だ"},{"word":"優なり","meaning":"上品だ"},{"word":"艶なり","meaning":"優美だ"}],"social":[{"cat":"地理","q":"日本で最も高い山は？","a":"富士山","choices":["富士山","北岳","阿蘇山","槍ヶ岳"]},{"cat":"地理","q":"日本で最も長い川は？","a":"信濃川","choices":["信濃川","利根川","石狩川","木曽川"]},{"cat":"地理","q":"北海道の道庁所在地は？","a":"札幌市","choices":["札幌市","函館市","旭川市","釧路市"]},{"cat":"地理","q":"日本の標準時子午線が通る市は？","a":"明石市","choices":["明石市","神戸市","大阪市","奈良市"]},{"cat":"地理","q":"日本最大の湖は？","a":"琵琶湖","choices":["琵琶湖","霞ヶ浦","サロマ湖","猪苗代湖"]},{"cat":"地理","q":"日本の三大工業地帯に入るのは？","a":"中京工業地帯","choices":["中京工業地帯","石狩工業地帯","十勝工業地帯","南九州工業地帯"]},{"cat":"地理","q":"梅雨の影響を強く受ける気候は？","a":"太平洋側の気候","choices":["太平洋側の気候","瀬戸内の気候","中央高地の気候","北海道の気候"]},{"cat":"歴史","q":"鎌倉幕府を開いた人物は？","a":"源頼朝","choices":["源頼朝","徳川家康","足利尊氏","織田信長"]},{"cat":"歴史","q":"江戸幕府を開いた人物は？","a":"徳川家康","choices":["徳川家康","豊臣秀吉","源頼朝","足利尊氏"]},{"cat":"歴史","q":"大化の改新が始まった年は？","a":"645年","choices":["645年","710年","794年","1192年"]},{"cat":"歴史","q":"平安京に都が移された年は？","a":"794年","choices":["794年","710年","645年","1185年"]},{"cat":"歴史","q":"応仁の乱が始まった年は？","a":"1467年","choices":["1467年","1333年","1600年","1868年"]},{"cat":"歴史","q":"関ヶ原の戦いが起きた年は？","a":"1600年","choices":["1600年","1582年","1615年","1868年"]},{"cat":"歴史","q":"明治維新の中心となった時代は？","a":"幕末から明治","choices":["幕末から明治","奈良時代","平安時代","室町時代"]},{"cat":"公民","q":"日本の最高法規は？","a":"日本国憲法","choices":["日本国憲法","民法","刑法","商法"]},{"cat":"公民","q":"国会が担当する権力は？","a":"立法権","choices":["立法権","行政権","司法権","選挙権"]},{"cat":"公民","q":"内閣が担当する権力は？","a":"行政権","choices":["行政権","立法権","司法権","請求権"]},{"cat":"公民","q":"裁判所が担当する権力は？","a":"司法権","choices":["司法権","行政権","立法権","参政権"]},{"cat":"公民","q":"三権分立の目的は？","a":"権力の集中を防ぐこと","choices":["権力の集中を防ぐこと","税金をなくすこと","国会を廃止すること","選挙をなくすこと"]},{"cat":"公民","q":"衆議院議員の任期は？","a":"4年","choices":["4年","3年","5年","6年"]},{"cat":"公民","q":"参議院議員の任期は？","a":"6年","choices":["6年","3年","4年","5年"]},{"cat":"地理","q":"北海道の県庁所在地は？","a":"札幌市","choices":["札幌市","青森市","仙台市","盛岡市"]},{"cat":"地理","q":"青森県の県庁所在地は？","a":"青森市","choices":["青森市","盛岡市","札幌市","仙台市"]},{"cat":"地理","q":"岩手県の県庁所在地は？","a":"盛岡市","choices":["盛岡市","青森市","仙台市","札幌市"]},{"cat":"地理","q":"宮城県の県庁所在地は？","a":"仙台市","choices":["仙台市","青森市","盛岡市","札幌市"]},{"cat":"地理","q":"秋田県の県庁所在地は？","a":"秋田市","choices":["秋田市","札幌市","盛岡市","青森市"]},{"cat":"地理","q":"山形県の県庁所在地は？","a":"山形市","choices":["山形市","青森市","札幌市","盛岡市"]},{"cat":"地理","q":"福島県の県庁所在地は？","a":"福島市","choices":["福島市","盛岡市","青森市","札幌市"]},{"cat":"地理","q":"茨城県の県庁所在地は？","a":"水戸市","choices":["水戸市","盛岡市","札幌市","青森市"]},{"cat":"地理","q":"栃木県の県庁所在地は？","a":"宇都宮市","choices":["宇都宮市","札幌市","盛岡市","青森市"]},{"cat":"地理","q":"群馬県の県庁所在地は？","a":"前橋市","choices":["前橋市","青森市","盛岡市","札幌市"]},{"cat":"地理","q":"埼玉県の県庁所在地は？","a":"さいたま市","choices":["さいたま市","盛岡市","札幌市","青森市"]},{"cat":"地理","q":"千葉県の県庁所在地は？","a":"千葉市","choices":["千葉市","盛岡市","札幌市","青森市"]},{"cat":"地理","q":"東京都の県庁所在地は？","a":"新宿区","choices":["新宿区","札幌市","盛岡市","青森市"]},{"cat":"地理","q":"神奈川県の県庁所在地は？","a":"横浜市","choices":["横浜市","札幌市","盛岡市","青森市"]},{"cat":"地理","q":"新潟県の県庁所在地は？","a":"新潟市","choices":["新潟市","盛岡市","札幌市","青森市"]},{"cat":"地理","q":"富山県の県庁所在地は？","a":"富山市","choices":["富山市","札幌市","青森市","盛岡市"]},{"cat":"地理","q":"石川県の県庁所在地は？","a":"金沢市","choices":["金沢市","盛岡市","札幌市","青森市"]},{"cat":"地理","q":"福井県の県庁所在地は？","a":"福井市","choices":["福井市","札幌市","盛岡市","青森市"]},{"cat":"地理","q":"山梨県の県庁所在地は？","a":"甲府市","choices":["甲府市","札幌市","盛岡市","青森市"]},{"cat":"地理","q":"長野県の県庁所在地は？","a":"長野市","choices":["長野市","青森市","札幌市","盛岡市"]},{"cat":"地理","q":"岐阜県の県庁所在地は？","a":"岐阜市","choices":["岐阜市","盛岡市","札幌市","青森市"]},{"cat":"地理","q":"静岡県の県庁所在地は？","a":"静岡市","choices":["静岡市","盛岡市","札幌市","青森市"]},{"cat":"地理","q":"愛知県の県庁所在地は？","a":"名古屋市","choices":["名古屋市","盛岡市","青森市","札幌市"]},{"cat":"地理","q":"三重県の県庁所在地は？","a":"津市","choices":["津市","札幌市","盛岡市","青森市"]},{"cat":"地理","q":"滋賀県の県庁所在地は？","a":"大津市","choices":["大津市","札幌市","青森市","盛岡市"]},{"cat":"地理","q":"京都府の県庁所在地は？","a":"京都市","choices":["京都市","青森市","盛岡市","札幌市"]},{"cat":"地理","q":"大阪府の県庁所在地は？","a":"大阪市","choices":["大阪市","盛岡市","札幌市","青森市"]},{"cat":"地理","q":"兵庫県の県庁所在地は？","a":"神戸市","choices":["神戸市","盛岡市","札幌市","青森市"]},{"cat":"地理","q":"奈良県の県庁所在地は？","a":"奈良市","choices":["奈良市","盛岡市","札幌市","青森市"]},{"cat":"地理","q":"和歌山県の県庁所在地は？","a":"和歌山市","choices":["和歌山市","青森市","盛岡市","札幌市"]},{"cat":"地理","q":"鳥取県の県庁所在地は？","a":"鳥取市","choices":["鳥取市","札幌市","盛岡市","青森市"]},{"cat":"地理","q":"島根県の県庁所在地は？","a":"松江市","choices":["松江市","札幌市","青森市","盛岡市"]},{"cat":"地理","q":"岡山県の県庁所在地は？","a":"岡山市","choices":["岡山市","札幌市","青森市","盛岡市"]},{"cat":"地理","q":"広島県の県庁所在地は？","a":"広島市","choices":["広島市","盛岡市","札幌市","青森市"]},{"cat":"地理","q":"山口県の県庁所在地は？","a":"山口市","choices":["山口市","札幌市","盛岡市","青森市"]},{"cat":"地理","q":"徳島県の県庁所在地は？","a":"徳島市","choices":["徳島市","盛岡市","青森市","札幌市"]},{"cat":"地理","q":"香川県の県庁所在地は？","a":"高松市","choices":["高松市","盛岡市","青森市","札幌市"]},{"cat":"地理","q":"愛媛県の県庁所在地は？","a":"松山市","choices":["松山市","札幌市","盛岡市","青森市"]},{"cat":"地理","q":"高知県の県庁所在地は？","a":"高知市","choices":["高知市","青森市","札幌市","盛岡市"]},{"cat":"地理","q":"福岡県の県庁所在地は？","a":"福岡市","choices":["福岡市","盛岡市","札幌市","青森市"]},{"cat":"地理","q":"佐賀県の県庁所在地は？","a":"佐賀市","choices":["佐賀市","札幌市","盛岡市","青森市"]},{"cat":"地理","q":"長崎県の県庁所在地は？","a":"長崎市","choices":["長崎市","盛岡市","札幌市","青森市"]},{"cat":"地理","q":"熊本県の県庁所在地は？","a":"熊本市","choices":["熊本市","青森市","札幌市","盛岡市"]},{"cat":"地理","q":"大分県の県庁所在地は？","a":"大分市","choices":["大分市","盛岡市","札幌市","青森市"]},{"cat":"地理","q":"宮崎県の県庁所在地は？","a":"宮崎市","choices":["宮崎市","盛岡市","札幌市","青森市"]},{"cat":"地理","q":"鹿児島県の県庁所在地は？","a":"鹿児島市","choices":["鹿児島市","青森市","札幌市","盛岡市"]},{"cat":"地理","q":"沖縄県の県庁所在地は？","a":"那覇市","choices":["那覇市","札幌市","青森市","盛岡市"]},{"cat":"歴史","q":"縄文時代に使われた厚手で縄目模様の土器は？","a":"縄文土器","choices":["縄文土器","弥生土器","須恵器","土師器"]},{"cat":"歴史","q":"弥生時代に広まった農業は？","a":"稲作","choices":["稲作","畑作","酪農","焼畑"]},{"cat":"歴史","q":"聖徳太子が定めたとされる役人の心構えは？","a":"十七条の憲法","choices":["十七条の憲法","武家諸法度","御成敗式目","五箇条の御誓文"]},{"cat":"歴史","q":"奈良時代に作られた歴史書は？","a":"古事記","choices":["古事記","枕草子","徒然草","方丈記"]},{"cat":"歴史","q":"平安時代に藤原氏が行った政治は？","a":"摂関政治","choices":["摂関政治","院政","執権政治","幕藩体制"]},{"cat":"歴史","q":"鎌倉幕府で将軍を補佐した役職は？","a":"執権","choices":["執権","関白","老中","管領"]},{"cat":"歴史","q":"室町幕府を開いた人物は？","a":"足利尊氏","choices":["足利尊氏","源頼朝","徳川家康","豊臣秀吉"]},{"cat":"歴史","q":"戦国時代に全国統一を進めた人物の一人は？","a":"織田信長","choices":["織田信長","藤原道長","平清盛","北条時宗"]},{"cat":"歴史","q":"豊臣秀吉が行った刀の取り上げ政策は？","a":"刀狩","choices":["刀狩","地租改正","廃藩置県","太閤検地"]},{"cat":"歴史","q":"江戸幕府が大名を統制するために定めた法令は？","a":"武家諸法度","choices":["武家諸法度","十七条の憲法","御成敗式目","大日本帝国憲法"]},{"cat":"歴史","q":"明治政府が藩を廃止して県を置いた改革は？","a":"廃藩置県","choices":["廃藩置県","版籍奉還","地租改正","殖産興業"]},{"cat":"歴史","q":"日清戦争の講和条約は？","a":"下関条約","choices":["下関条約","ポーツマス条約","日米修好通商条約","サンフランシスコ平和条約"]},{"cat":"公民","q":"日本国憲法の三大原理の一つは？","a":"国民主権","choices":["国民主権","鎖国","身分制度","中央集権"]},{"cat":"公民","q":"基本的人権のうち、自由に考えを表せる権利は？","a":"表現の自由","choices":["表現の自由","納税の義務","勤労の義務","教育を受けさせる義務"]},{"cat":"公民","q":"国会を構成する二つの議院は？","a":"衆議院と参議院","choices":["衆議院と参議院","内閣と裁判所","都道府県と市町村","警察と消防"]},{"cat":"公民","q":"衆議院の優越が認められるものは？","a":"予算の議決","choices":["予算の議決","最高裁判所長官の任命","条例の制定","地方税の徴収"]},{"cat":"公民","q":"内閣の長は？","a":"内閣総理大臣","choices":["内閣総理大臣","最高裁判所長官","衆議院議長","都道府県知事"]},{"cat":"公民","q":"地方公共団体の政治を何という？","a":"地方自治","choices":["地方自治","三権分立","国際連合","市場経済"]},{"cat":"公民","q":"選挙で代表を選ぶ権利は？","a":"選挙権","choices":["選挙権","請願権","裁判権","拒否権"]},{"cat":"公民","q":"消費者を守るための法律の一つは？","a":"消費者基本法","choices":["消費者基本法","武家諸法度","公地公民法","班田収授法"]},{"cat":"公民","q":"需要が供給を上回ると価格はどうなりやすい？","a":"上がりやすい","choices":["上がりやすい","下がりやすい","必ずゼロになる","変化しない"]},{"cat":"公民","q":"国際連合の安全保障理事会の常任理事国の数は？","a":"5か国","choices":["5か国","3か国","10か国","47か国"]}]};
 let game3354={kind:"",mode:"",level:"ランダム",pool:[],i:0,ok:0,q:null};
 
 function panel3354(){return document.getElementById("panelArea")||document.body;}
@@ -12433,4 +12433,549 @@ window.showNewsPage=function(){
  p.innerHTML=`<h2>📢 お知らせ</h2><div class="card3354"><h3>Ver3.3.56</h3><p>その他の問題データを外部JSON読み込み方式に変更しました。</p><p>data/english.json, kanji.json, kobun.json, social.json に分割しました。</p><p>今後はJSONを増やすだけで問題数を増やせます。</p></div>`;
 };
 loadOtherData3356();
+})();
+
+
+
+/* Ver3.3.57 other button exact clone + nav space */
+(function(){
+if(window.__otherExactClone3357)return;
+window.__otherExactClone3357=true;
+
+function panel3357(){return document.getElementById("panelArea")||document.body;}
+function style3357(){
+ if(document.getElementById("style3357"))return;
+ const st=document.createElement("style");
+ st.id="style3357";
+ st.textContent=`
+#otherLearningBtn3357{
+  background:linear-gradient(135deg,#64748b,#334155)!important;
+  color:#fff!important;
+}
+.otherNavSpace3357{
+  height:76px!important;
+  min-height:76px!important;
+}
+body.otherScreen3357 .nav3354,
+body.otherScreen3357 .nav3353,
+body.otherScreen3357 #nav3347{
+  margin-top:0!important;
+}
+`;
+ document.head.appendChild(st);
+}
+
+function isLearning3357(){
+ const t=(panel3357().innerText||"").slice(0,2500);
+ return t.includes("学習モード") && t.includes("ランダム") && t.includes("積分") && t.includes("微分");
+}
+
+function removeOtherButtons3357(){
+ const p=panel3357();
+ [...p.querySelectorAll("button")].forEach(b=>{
+   const txt=(b.innerText||"").trim();
+   if(txt.includes("その他")) b.remove();
+ });
+ document.querySelectorAll("#otherLearningBtn3341,#otherLearningBtn3347,#otherLearningBtn3348,#otherLearningBtn3351,#otherLearningBtn3352,#otherLearningBtn3353,#otherLearningBtn3354,#otherLearningBtn3357,.otherLearnBtn3341").forEach(e=>e.remove());
+}
+
+function addOtherExact3357(){
+ style3357();
+ if(!isLearning3357())return;
+ const p=panel3357();
+ const buttons=[...p.querySelectorAll("button")];
+ const randomBtn=buttons.find(b=>(b.innerText||"").includes("ランダム"));
+ if(!randomBtn)return;
+
+ removeOtherButtons3357();
+
+ const clone=randomBtn.cloneNode(true);
+ clone.id="otherLearningBtn3357";
+ clone.innerHTML="⚙️ その他";
+ clone.onclick=function(e){
+   e.preventDefault();
+   e.stopPropagation();
+   if(typeof showOtherMenu3354==="function") showOtherMenu3354();
+   else if(typeof showOtherMenu3353==="function") showOtherMenu3353();
+   else if(typeof showLearningOther3341==="function") showLearningOther3341();
+ };
+ randomBtn.insertAdjacentElement("afterend", clone);
+}
+
+function addSpaceForOther3357(){
+ const p=panel3357();
+ const t=(p.innerText||"").slice(0,1000);
+ const isOther=t.includes("その他 4択")||t.includes("その他")||t.includes("英語")||t.includes("国語")||t.includes("古文")||t.includes("社会");
+ document.body.classList.toggle("otherScreen3357",!!isOther);
+ if(!isOther)return;
+ if(!p.querySelector(".otherNavSpace3357")){
+   const sp=document.createElement("div");
+   sp.className="otherNavSpace3357";
+   p.insertBefore(sp,p.firstChild);
+ }
+}
+
+function tick3357(){
+ addOtherExact3357();
+ addSpaceForOther3357();
+}
+document.addEventListener("click",()=>setTimeout(tick3357,0),true);
+document.addEventListener("touchstart",()=>setTimeout(tick3357,0),{passive:true});
+setTimeout(tick3357,100);
+setInterval(tick3357,800);
+
+const oldNews3357=window.showNewsPage;
+window.showNewsPage=function(){
+ const p=document.getElementById("panelArea");
+ if(!p)return;
+ p.innerHTML=`<h2>📢 お知らせ</h2><div class="card3354"><h3>Ver3.3.57</h3><p>その他ボタンをランダムボタンのコピーで作る方式に変更しました。</p><p>その他ボタンは1個だけ、ランダムの真下に同じ大きさで表示します。</p><p>その他画面は戻る/ホーム用のスペースを最初から確保します。</p></div>`;
+};
+})();
+
+/* Ver3.3.58 more real questions */
+(function(){
+if(window.__moreQuestions3358)return;
+window.__moreQuestions3358=true;
+window.showNewsPage=function(){
+ const p=document.getElementById("panelArea");
+ if(!p)return;
+ p.innerHTML=`<h2>📢 お知らせ</h2><div class="card3354"><h3>Ver3.3.58</h3><p>その他のJSON問題データを増やしました。</p><p>英語500、国語・古文・社会も実データを追加しました。</p><p>ダミー番号問題は入れていません。</p></div>`;
+};
+})();
+
+
+
+/* Ver3.3.60 Other match main green buttons */
+(function(){
+if(window.__otherMatchMainButtons3360)return;
+window.__otherMatchMainButtons3360=true;
+
+function panel3360(){return document.getElementById("panelArea")||document.body;}
+
+function isLearning3360(){
+  const t=(panel3360().innerText||"").slice(0,2500);
+  return t.includes("学習モード") && t.includes("積分") && t.includes("微分") && t.includes("ランダム");
+}
+
+function removeAllOther3360(){
+  const p=panel3360();
+  [...p.querySelectorAll("button")].forEach(b=>{
+    if((b.innerText||"").includes("その他")) b.remove();
+  });
+  document.querySelectorAll(
+    "#otherLearningBtn3341,#otherLearningBtn3347,#otherLearningBtn3348,#otherLearningBtn3351,#otherLearningBtn3352,#otherLearningBtn3353,#otherLearningBtn3354,#otherLearningBtn3357,#otherLearningBtn3360,.otherLearnBtn3341"
+  ).forEach(e=>e.remove());
+}
+
+function mainGreenButton3360(){
+  const buttons=[...panel3360().querySelectorAll("button")];
+  return buttons.find(b=>{
+    const t=(b.innerText||"").trim();
+    return t==="積分" || t==="微分" || t==="因数分解" || t==="素因数分解" || t==="展開" || t==="四則演算";
+  });
+}
+
+function randomButton3360(){
+  return [...panel3360().querySelectorAll("button")].find(b=>(b.innerText||"").includes("ランダム"));
+}
+
+function makeOther3360(){
+  if(!isLearning3360())return;
+
+  const sample=mainGreenButton3360();
+  const random=randomButton3360();
+  if(!sample || !random)return;
+
+  removeAllOther3360();
+
+  const other=sample.cloneNode(true);
+  other.id="otherLearningBtn3360";
+  other.innerHTML="⚙️ その他";
+  other.onclick=function(e){
+    e.preventDefault();
+    e.stopPropagation();
+    if(typeof showOtherMenu3354==="function") showOtherMenu3354();
+    else if(typeof showLearningOther3341==="function") showLearningOther3341();
+  };
+
+  // 緑ボタンと同じサイズ・余白・文字サイズを強制コピー
+  const cs=getComputedStyle(sample);
+  other.style.width=cs.width;
+  other.style.height=cs.height;
+  other.style.minHeight=cs.minHeight;
+  other.style.maxHeight=cs.maxHeight;
+  other.style.padding=cs.padding;
+  other.style.margin=cs.margin;
+  other.style.borderRadius=cs.borderRadius;
+  other.style.fontSize=cs.fontSize;
+  other.style.fontWeight=cs.fontWeight;
+  other.style.lineHeight=cs.lineHeight;
+  other.style.boxSizing=cs.boxSizing;
+  other.style.display=cs.display;
+  other.style.alignItems=cs.alignItems;
+  other.style.justifyContent=cs.justifyContent;
+  other.style.background="linear-gradient(135deg,#64748b,#334155)";
+  other.style.color="#fff";
+
+  random.insertAdjacentElement("afterend", other);
+}
+
+function tick3360(){
+  if(isLearning3360()) makeOther3360();
+}
+
+document.addEventListener("click",()=>setTimeout(tick3360,50),true);
+document.addEventListener("touchstart",()=>setTimeout(tick3360,50),{passive:true});
+setTimeout(tick3360,300);
+setInterval(tick3360,1200);
+
+const oldNews3360=window.showNewsPage;
+window.showNewsPage=function(){
+ const p=document.getElementById("panelArea");
+ if(!p)return;
+ p.innerHTML=`<h2>📢 お知らせ</h2><div class="card3354"><h3>Ver3.3.60</h3><p>その他ボタンを積分・微分などの通常ボタンと同じ大きさに修正しました。</p><p>その他ボタンは1個だけ表示します。</p></div>`;
+};
+})();
+
+
+
+/* Ver3.3.61 Other background blend */
+(function(){
+if(window.__otherBgBlend3361)return;
+window.__otherBgBlend3361=true;
+
+function blendOther3361(){
+ const btn=[...document.querySelectorAll("button")].find(b=>(b.innerText||"").includes("その他"));
+ if(!btn)return;
+
+ btn.style.background = "rgba(255,255,255,0.10)";
+ btn.style.backdropFilter = "blur(10px)";
+ btn.style.webkitBackdropFilter = "blur(10px)";
+ btn.style.border = "1px solid rgba(255,255,255,0.18)";
+ btn.style.boxShadow = "inset 0 0 20px rgba(255,255,255,0.05), 0 8px 20px rgba(0,0,0,0.20)";
+ btn.style.color = "#fff";
+}
+
+document.addEventListener("click",()=>setTimeout(blendOther3361,80),true);
+document.addEventListener("touchstart",()=>setTimeout(blendOther3361,80),{passive:true});
+setTimeout(blendOther3361,300);
+setInterval(blendOther3361,1000);
+
+const oldNews3361=window.showNewsPage;
+window.showNewsPage=function(){
+ const p=document.getElementById("panelArea");
+ if(!p)return;
+ p.innerHTML=`<h2>📢 お知らせ</h2><div class="card3354"><h3>Ver3.3.61</h3><p>その他ボタンを背景に馴染む半透明パネル風に変更しました。</p><p>サイズはそのまま、その他は1個だけです。</p></div>`;
+};
+})();
+
+
+
+/* Ver3.3.62 Learning Categories */
+(function(){
+if(window.__learningCategories3362)return;
+window.__learningCategories3362=true;
+
+function panel3362(){return document.getElementById("panelArea")||document.body;}
+
+function style3362(){
+ if(document.getElementById("style3362"))return;
+ const st=document.createElement("style");
+ st.id="style3362";
+ st.textContent=`
+#otherLearningBtn3341,#otherLearningBtn3347,#otherLearningBtn3348,#otherLearningBtn3351,#otherLearningBtn3352,#otherLearningBtn3353,#otherLearningBtn3354,#otherLearningBtn3357,#otherLearningBtn3360,.otherLearnBtn3341{
+  display:none!important;
+}
+.learningGrid3362{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+  margin:18px 0;
+}
+.learnCard3362{
+  min-height:150px;
+  border:none;
+  border-radius:22px;
+  padding:18px;
+  color:#fff;
+  text-align:left;
+  font-weight:900;
+  box-shadow:0 10px 25px rgba(0,0,0,.25);
+}
+.learnCard3362 .title{
+  font-size:30px;
+  margin-bottom:10px;
+}
+.learnCard3362 .sub{
+  font-size:15px;
+  line-height:1.5;
+  opacity:.95;
+}
+.math3362{background:linear-gradient(135deg,#06b6d4,#2563eb);}
+.eng3362{background:linear-gradient(135deg,#22c55e,#16a34a);}
+.jp3362{background:linear-gradient(135deg,#f59e0b,#ef4444);}
+.soc3362{background:linear-gradient(135deg,#8b5cf6,#ec4899);}
+`;
+ document.head.appendChild(st);
+}
+
+function removeOther3362(){
+ document.querySelectorAll("#otherLearningBtn3341,#otherLearningBtn3347,#otherLearningBtn3348,#otherLearningBtn3351,#otherLearningBtn3352,#otherLearningBtn3353,#otherLearningBtn3354,#otherLearningBtn3357,#otherLearningBtn3360,.otherLearnBtn3341").forEach(e=>e.remove());
+ [...document.querySelectorAll("button")].forEach(b=>{
+   if((b.innerText||"").includes("その他"))b.remove();
+ });
+}
+
+function showLearningCategories3362(){
+ style3362();
+ removeOther3362();
+ panel3362().innerHTML=`
+ <h2>📚 学習</h2>
+ <p style="text-align:center;font-weight:900;opacity:.9;">分野を選んでください</p>
+ <div class="learningGrid3362">
+  <button class="learnCard3362 math3362" onclick="showMathLearning3362()">
+   <div class="title">📚 数学</div>
+   <div class="sub">積分・微分・因数分解など</div>
+  </button>
+  <button class="learnCard3362 eng3362" onclick="showEnglishLevel3354 ? showEnglishLevel3354() : showEnglishLevel3353 && showEnglishLevel3353()">
+   <div class="title">🌍 英語</div>
+   <div class="sub">英語→日本語 / 日本語→英語</div>
+  </button>
+  <button class="learnCard3362 jp3362" onclick="showJapaneseMenu3354 ? showJapaneseMenu3354() : showJapaneseMenu3353 && showJapaneseMenu3353()">
+   <div class="title">🇯🇵 国語</div>
+   <div class="sub">漢字・読み・意味</div>
+  </button>
+  <button class="learnCard3362 soc3362" onclick="showSocialMenu3354 ? showSocialMenu3354() : showSocialMenu3353 && showSocialMenu3353()">
+   <div class="title">🏛️ 社会</div>
+   <div class="sub">地理・歴史・公民</div>
+  </button>
+ </div>`;
+ if(typeof addNav3347==="function")addNav3347();
+}
+
+window.showLearningCategories3362=showLearningCategories3362;
+
+const oldShowLearning3362 = typeof showLearningMode==="function" ? showLearningMode : null;
+window.showMathLearning3362=function(){
+ if(oldShowLearning3362)oldShowLearning3362();
+ setTimeout(removeOther3362,80);
+ setTimeout(removeOther3362,300);
+};
+
+if(oldShowLearning3362 && !oldShowLearning3362.__cat3362){
+ window.showLearningMode=function(){
+   showLearningCategories3362();
+ };
+ window.showLearningMode.__cat3362=true;
+}
+
+/* ホームの学習カードが別関数を呼ぶ場合も拾う */
+["click","touchstart"].forEach(ev=>{
+ document.addEventListener(ev,function(e){
+   const el=e.target.closest && e.target.closest("button,div,a");
+   if(!el)return;
+   const t=(el.innerText||"").trim();
+   if(t.startsWith("📚 学習") || (t.includes("学習") && t.includes("レベルアップ"))){
+     setTimeout(showLearningCategories3362,80);
+   }
+ },true);
+});
+
+const oldNews3362=window.showNewsPage;
+window.showNewsPage=function(){
+ const p=document.getElementById("panelArea");
+ if(!p)return;
+ p.innerHTML=`<h2>📢 お知らせ</h2><div class="card3354"><h3>Ver3.3.62</h3><p>学習を押したら数学・英語・国語・社会の4カードを表示するようにしました。</p><p>学習モード内のその他ボタンは非表示にしました。</p></div>`;
+};
+})();
+
+
+
+/* Ver3.3.63 Learning all cards + remove monsters from ranking/bbs */
+(function(){
+if(window.__learningCardsNoMonsters3363)return;
+window.__learningCardsNoMonsters3363=true;
+
+function p3363(){return document.getElementById("panelArea")||document.body;}
+
+function style3363(){
+ if(document.getElementById("style3363"))return;
+ const st=document.createElement("style");
+ st.id="style3363";
+ st.textContent=`
+.learningGrid3363{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+  margin:18px 0;
+}
+.learnCard3363{
+  min-height:150px;
+  border:none;
+  border-radius:22px;
+  padding:18px;
+  color:#fff;
+  text-align:left;
+  font-weight:900;
+  box-shadow:0 10px 25px rgba(0,0,0,.25);
+}
+.learnCard3363 .title{
+  font-size:28px;
+  margin-bottom:10px;
+}
+.learnCard3363 .sub{
+  font-size:15px;
+  line-height:1.45;
+  opacity:.95;
+}
+.cardBlue3363{background:linear-gradient(135deg,#06b6d4,#2563eb);}
+.cardGreen3363{background:linear-gradient(135deg,#22c55e,#16a34a);}
+.cardOrange3363{background:linear-gradient(135deg,#f59e0b,#ef4444);}
+.cardPurple3363{background:linear-gradient(135deg,#8b5cf6,#ec4899);}
+.cardGray3363{background:linear-gradient(135deg,#64748b,#334155);}
+.cardRed3363{background:linear-gradient(135deg,#ef4444,#991b1b);}
+.cardYellow3363{background:linear-gradient(135deg,#facc15,#f97316);}
+
+/* ランキング・掲示板に残る敵/スライム表示を消す */
+[id^="enemyStage"],
+[id*="enemy"],
+[class*="enemy"],
+[id*="monster"],
+[class*="monster"],
+[id*="slime"],
+[class*="slime"],
+.enemyStage,
+.enemyField3330,
+.enemyField3331,
+.enemyField3332{
+  display:none!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+}
+body.rankingClean3363 [id^="enemyStage"],
+body.boardClean3363 [id^="enemyStage"]{
+  display:none!important;
+}
+`;
+ document.head.appendChild(st);
+}
+
+function nav3363(){
+ return `<div style="height:76px;display:flex;justify-content:center;gap:18px;align-items:center;">
+  <button onclick="history.length>1?history.back():showHome&&showHome()" style="border:2px solid #22f5d1;border-radius:12px;background:#222;color:#fff;padding:12px 22px;font-size:20px;font-weight:900;">← 戻る</button>
+  <button onclick="showHome&&showHome()" style="border:2px solid #22f5d1;border-radius:12px;background:#222;color:#fff;padding:12px 22px;font-size:20px;font-weight:900;">🏠 ホームへ</button>
+ </div>`;
+}
+
+function render3363(html){
+ style3363();
+ p3363().innerHTML=nav3363()+html;
+}
+
+function card3363(cls,title,sub,onclick){
+ return `<button class="learnCard3363 ${cls}" onclick="${onclick}">
+  <div class="title">${title}</div>
+  <div class="sub">${sub}</div>
+ </button>`;
+}
+
+window.showLearningCategories3363=function(){
+ render3363(`
+  <h2>📚 学習</h2>
+  <p style="text-align:center;font-weight:900;opacity:.9;">分野を選んでください</p>
+  <div class="learningGrid3363">
+   ${card3363("cardBlue3363","📚 数学","積分・微分・因数分解など","showMathCards3363()")}
+   ${card3363("cardGreen3363","🌍 英語","英語→日本語 / 日本語→英語","showEnglishCards3363()")}
+   ${card3363("cardOrange3363","🇯🇵 国語","漢字・読み・意味","showJapaneseCards3363()")}
+   ${card3363("cardPurple3363","🏛️ 社会","地理・歴史・公民","showSocialCards3363()")}
+  </div>
+ `);
+};
+
+const originalLearning3363 = typeof showLearningMode==="function" ? showLearningMode : null;
+window.showLearningMode=function(){
+ showLearningCategories3363();
+};
+
+window.showMathCards3363=function(){
+ render3363(`
+  <h2>📚 数学</h2>
+  <div class="learningGrid3363">
+   ${card3363("cardBlue3363","∫ 積分","積分問題","showMathOriginal3363('積分')")}
+   ${card3363("cardGreen3363","𝑑 微分","微分問題","showMathOriginal3363('微分')")}
+   ${card3363("cardOrange3363","✖️ 因数分解","式を因数分解","showMathOriginal3363('因数分解')")}
+   ${card3363("cardPurple3363","📐 展開","式の展開","showMathOriginal3363('展開')")}
+   ${card3363("cardYellow3363","🔢 素因数分解","整数の分解","showMathOriginal3363('素因数分解')")}
+   ${card3363("cardRed3363","➕ 四則演算","計算練習","showMathOriginal3363('四則演算')")}
+   ${card3363("cardGray3363","🎲 ランダム","ランダム問題","showMathOriginal3363('ランダム')")}
+  </div>
+ `);
+};
+
+window.showMathOriginal3363=function(label){
+ if(!originalLearning3363)return;
+ originalLearning3363();
+ setTimeout(()=>{
+   const buttons=[...document.querySelectorAll("button")];
+   const btn=buttons.find(b=>(b.innerText||"").includes(label));
+   if(btn)btn.click();
+ },80);
+};
+
+window.showEnglishCards3363=function(){
+ render3363(`
+  <h2>🌍 英語</h2>
+  <div class="learningGrid3363">
+   ${card3363("cardGreen3363","📗 初級","基礎単語","showEnglishMode3354 ? showEnglishMode3354('初級') : showEnglishMode3353 && showEnglishMode3353('初級')")}
+   ${card3363("cardBlue3363","📘 中級","標準単語","showEnglishMode3354 ? showEnglishMode3354('中級') : showEnglishMode3353 && showEnglishMode3353('中級')")}
+   ${card3363("cardOrange3363","📕 上級","受験単語","showEnglishMode3354 ? showEnglishMode3354('上級') : showEnglishMode3353 && showEnglishMode3353('上級')")}
+   ${card3363("cardGray3363","🎲 ランダム","全レベルから出題","showEnglishMode3354 ? showEnglishMode3354('ランダム') : showEnglishMode3353 && showEnglishMode3353('ランダム')")}
+  </div>
+ `);
+};
+
+window.showJapaneseCards3363=function(){
+ render3363(`
+  <h2>🇯🇵 国語</h2>
+  <div class="learningGrid3363">
+   ${card3363("cardOrange3363","📖 漢字→読み","読み方を選ぶ","start3354 ? start3354('kanji','kanjiRead','ランダム') : start3353 && start3353('kanji','kanjiRead','ランダム')")}
+   ${card3363("cardRed3363","💭 漢字→意味","意味を選ぶ","start3354 ? start3354('kanji','kanjiMeaning','ランダム') : start3353 && start3353('kanji','kanjiMeaning','ランダム')")}
+   ${card3363("cardPurple3363","📜 古文→意味","古語の意味","start3354 ? start3354('kobun','kobun2meaning','ランダム') : start3353 && start3353('kobun','kobun2meaning','ランダム')")}
+   ${card3363("cardBlue3363","🔄 意味→古文","意味から古語","start3354 ? start3354('kobun','meaning2kobun','ランダム') : start3353 && start3353('kobun','meaning2kobun','ランダム')")}
+  </div>
+ `);
+};
+
+window.showSocialCards3363=function(){
+ render3363(`
+  <h2>🏛️ 社会</h2>
+  <div class="learningGrid3363">
+   ${card3363("cardGreen3363","🗾 地理","地理問題","start3354 ? start3354('social','social','地理') : start3353 && start3353('social','social','地理')")}
+   ${card3363("cardOrange3363","🏯 歴史","歴史問題","start3354 ? start3354('social','social','歴史') : start3353 && start3353('social','social','歴史')")}
+   ${card3363("cardPurple3363","🏛️ 公民","公民問題","start3354 ? start3354('social','social','公民') : start3353 && start3353('social','social','公民')")}
+   ${card3363("cardGray3363","🎲 ランダム","全分野から出題","start3354 ? start3354('social','social','ランダム') : start3353 && start3353('social','social','ランダム')")}
+  </div>
+ `);
+};
+
+function removeMonsters3363(){
+ const t=(p3363().innerText||"").slice(0,3000);
+ const isRank=t.includes("ランキング");
+ const isBoard=t.includes("掲示板");
+ document.body.classList.toggle("rankingClean3363",isRank);
+ document.body.classList.toggle("boardClean3363",isBoard);
+ if(!isRank && !isBoard)return;
+ document.querySelectorAll('[id^="enemyStage"],[id*="enemy"],[class*="enemy"],[id*="monster"],[class*="monster"],[id*="slime"],[class*="slime"],.enemyStage,.enemyField3330,.enemyField3331,.enemyField3332').forEach(e=>e.remove());
+}
+
+document.addEventListener("click",()=>setTimeout(removeMonsters3363,80),true);
+document.addEventListener("touchstart",()=>setTimeout(removeMonsters3363,80),{passive:true});
+setInterval(removeMonsters3363,800);
+setTimeout(removeMonsters3363,500);
+
+window.showNewsPage=function(){
+ const p=document.getElementById("panelArea");
+ if(!p)return;
+ p.innerHTML=`<h2>📢 お知らせ</h2><div class="card3354"><h3>Ver3.3.63</h3><p>学習内の全メニューをカード形式にしました。</p><p>ランキング・掲示板で表示されるスライム/モンスターを削除しました。</p></div>`;
+};
 })();
